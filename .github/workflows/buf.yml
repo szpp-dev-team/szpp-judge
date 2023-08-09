@@ -18,14 +18,10 @@ jobs:
         with:
           version: "1.25.1"
       - uses: bufbuild/buf-lint-action@v1
-        with:
-          input: "proto"
       - uses: bufbuild/buf-breaking-action@v1
         with:
-          input: "proto"
           # The 'main' branch of the GitHub repository that defines the module.
           against: "https://github.com/szpp-dev-team/szpp-judge.git#branch=main,subdir=proto"
       - uses: bufbuild/buf-push-action@v1
         with:
-          input: "proto"
           buf_token: ${{ secrets.BUF_TOKEN }}
