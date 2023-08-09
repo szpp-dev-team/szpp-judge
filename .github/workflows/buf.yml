@@ -23,7 +23,7 @@ jobs:
         with:
           input: "proto"
           # The 'main' branch of the GitHub repository that defines the module.
-          against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
+          against: "https://github.com/szpp-dev-team/szpp-judge.git#branch=main"
       - uses: bufbuild/buf-push-action@v1
         with:
           input: "proto"
