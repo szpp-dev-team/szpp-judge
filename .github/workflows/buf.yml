@@ -25,7 +25,3 @@ jobs:
           # The 'main' branch of the GitHub repository that defines the module.
           against: "https://github.com/szpp-dev-team/szpp-judge.git#branch=main,subdir=proto"
           input: proto
-      - uses: bufbuild/buf-push-action@v1
-        with:
-          buf_token: ${{ secrets.BUF_TOKEN }}
-          input: proto
