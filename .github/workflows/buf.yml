@@ -25,3 +25,12 @@ jobs:
           # The 'main' branch of the GitHub repository that defines the module.
           against: "https://github.com/szpp-dev-team/szpp-judge.git#branch=main,subdir=proto"
           input: proto
+      - name: format
+        run: buf format -w
+      - name: generate
+        run: buf generate
+      - name: commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply Code Formatter Change
+          ref: ${{ steps.upstreambranch.outputs.branch }}
