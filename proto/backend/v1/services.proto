@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package backend.v1;
+
+import "backend/v1/messages.proto";
+
+service HealthcheckService { rpc Ping(PingRequest) returns (PingResponse); }

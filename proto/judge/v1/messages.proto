@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package judge.v1;
+
+message PingRequest { string name = 1; }
+
+message PingResponse { string message = 1; }

@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package judge.v1;
+
+import "judge/v1/messages.proto";
+
+service HealthcheckService { rpc Ping(PingRequest) returns (PingResponse); }
