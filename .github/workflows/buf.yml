@@ -5,6 +5,9 @@ on:
       - main
     paths:
       - proto/**
+defaults:
+  run:
+    working-directory: ./proto
 jobs:
   build:
     runs-on: ubuntu-latest
