@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - proto/**
+      - .github/**
 defaults:
   run:
     working-directory: ./proto
