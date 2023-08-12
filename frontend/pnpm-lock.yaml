@@ -32,6 +32,9 @@ dependencies:
   next:
     specifier: 13.4.13
     version: 13.4.13(react-dom@18.2.0)(react@18.2.0)
+  proto-gen-ts:
+    specifier: link:../proto-gen/ts
+    version: link:../proto-gen/ts
   react:
     specifier: 18.2.0
     version: 18.2.0
