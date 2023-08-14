@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3306:3306
+    env_file:
+      - .env
+    volumes:
+      - ./.data/var/lib/mysql:/var/lib/mysql
+  envoy:
+    image: envoyproxy/envoy:v1.26-latest
+    volumes:
+      - ./envoy/envoy_local.yaml:/etc/envoy/envoy.yaml
