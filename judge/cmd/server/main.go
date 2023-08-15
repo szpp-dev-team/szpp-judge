@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	docker "github.com/docker/docker/client"
 	"github.com/szpp-dev-team/szpp-judge/judge/config"
@@ -16,12 +15,6 @@ import (
 
 func main() {
 	cfg, err := config.New()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Time zone
-	_, err = time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,10 +36,13 @@ func main() {
 		grpc_server.WithDockerClient(dockerClient),
 		grpc_server.WithReflection(cfg.ModeDev),
 	)
+
 	lsnr, err := net.Listen("tcp", ":"+cfg.GrpcPort)
 	if err != nil {
+		dockerClient.Close()
 		log.Fatal(err)
 	}
+	defer dockerClient.Close()
 	defer lsnr.Close()
 	go func() {
 		logger.Info("launched server:", "GrpcPort", cfg.GrpcPort, "ModeDev", cfg.ModeDev)
