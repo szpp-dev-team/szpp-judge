@@ -17,6 +17,9 @@ dependencies:
   '@emotion/styled':
     specifier: 11.11.0
     version: 11.11.0(@emotion/react@11.11.1)(@types/react@18.2.20)(react@18.2.0)
+  '@protobuf-ts/grpcweb-transport':
+    specifier: ^2.9.1
+    version: 2.9.1
   '@types/node':
     specifier: 20.4.10
     version: 20.4.10
@@ -1415,6 +1418,23 @@ packages:
 
   /@popperjs/core@2.11.8:
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
+    dev: false
+
+  /@protobuf-ts/grpcweb-transport@2.9.1:
+    resolution: {integrity: sha512-42bvBX312qhPlosMNTZE9XI+lt58ISM5vEJKv/wOx2Fu70J0TdlLa4Bjz8xcuRlv4Pq1CA+94DC1IgNxNRsQdg==}
+    dependencies:
+      '@protobuf-ts/runtime': 2.9.1
+      '@protobuf-ts/runtime-rpc': 2.9.1
+    dev: false
+
+  /@protobuf-ts/runtime-rpc@2.9.1:
+    resolution: {integrity: sha512-pzO20J6s07LTWcj8hKAXh/dAacU5HIVir6SANKXXH8G0pn0VIIB4FFECq5Hbv25/8PQoOGZ7iApq/DMHaSjGhg==}
+    dependencies:
+      '@protobuf-ts/runtime': 2.9.1
+    dev: false
+
+  /@protobuf-ts/runtime@2.9.1:
+    resolution: {integrity: sha512-ZTc8b+pQ6bwxZa3qg9/IO/M/brRkvr0tic9cSGgAsDByfPrtatT2300wTIRLDk8X9WTW1tT+FhyqmcrbMHTeww==}
     dev: false
 
   /@swc/helpers@0.5.1:
