@@ -1,6 +1,6 @@
 module github.com/szpp-dev-team/szpp-judge/backend
 
-go 1.20
+go 1.21
 
 replace github.com/szpp-dev-team/szpp-judge/proto-gen/go => ../proto-gen/go
 
