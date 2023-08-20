@@ -36,8 +36,8 @@ dependencies:
     specifier: 13.4.13
     version: 13.4.13(react-dom@18.2.0)(react@18.2.0)
   proto-gen-ts:
-    specifier: link:../proto-gen/ts
-    version: link:../proto-gen/ts
+    specifier: file:../proto-gen/ts
+    version: file:../proto-gen/ts
   react:
     specifier: 18.2.0
     version: 18.2.0
@@ -3853,4 +3853,12 @@ packages:
 
   /zod@3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+    dev: false
+
+  file:../proto-gen/ts:
+    resolution: {directory: ../proto-gen/ts, type: directory}
+    name: proto-gen-ts
+    dependencies:
+      '@protobuf-ts/runtime': 2.9.1
+      '@protobuf-ts/runtime-rpc': 2.9.1
     dev: false
