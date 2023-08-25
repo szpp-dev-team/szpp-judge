@@ -25,14 +25,26 @@ func TestNewDockerContaineredRunner(t *testing.T) {
 
 	dc, err := docker.NewClientWithOpts(docker.FromEnv, docker.WithAPIVersionNegotiation())
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	r, err := NewDockerContaineredRunner(ctx, dc, lang.GCC, cfg.WorkingDirAbsRoot)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
-	defer r.Close()
+	t.Logf("Successfully created a container: ID=%s, hostWorkingDir=%s\n", r.ID, r.HostWorkingDir)
 
-	log.Printf("Successfully created a container: ID=%s, hostWorkingDir=%s\n", r.ID, r.HostWorkingDir)
+	execResult, err := r.Exec(ctx, []string{"curl", "http://example.com"})
+	if err != nil {
+		r.Close()
+		t.Fatal(err)
+	}
+
+	t.Log("------------ execution result ------------")
+	t.Logf("::: stdout :::\n'%s'\n", execResult.Stdout)
+	t.Logf("::: stderr :::\n'%s'\n", execResult.Stderr)
+	t.Logf("::: exit code :::\n[%d]\n", execResult.ExitCode)
+	t.Log("------------------------------------------")
+
+	defer r.Close()
 }

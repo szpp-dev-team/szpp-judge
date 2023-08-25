@@ -1,8 +1,10 @@
 package runner
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path"
@@ -12,6 +14,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	docker "github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/google/uuid"
 	"github.com/szpp-dev-team/szpp-judge/judge/runner/lang"
 )
@@ -22,6 +25,12 @@ type DockerContaineredRunner struct {
 	Lang                lang.Lang
 	ContainerWorkingDir string
 	HostWorkingDir      string
+}
+
+type ExecResult struct {
+	Stdout   string
+	Stderr   string
+	ExitCode int
 }
 
 const (
@@ -72,7 +81,7 @@ func NewDockerContaineredRunner(
 	hostCfg := &container.HostConfig{
 		LogConfig:  container.LogConfig{},
 		AutoRemove: true,
-		Resources:  container.Resources{},
+		Resources:  container.Resources{}, // TODO: ulimit などの設定
 		Init:       &runInit,
 		Mounts: []mount.Mount{
 			{
@@ -117,4 +126,79 @@ func (r *DockerContaineredRunner) Close() {
 		slog.Error("Failed to remove temporary dir on the host:", "path", r.HostWorkingDir)
 	}
 	cancel()
+}
+
+func (r *DockerContaineredRunner) Exec(ctx context.Context, cmd []string) (ExecResult, error) {
+	execID, err := r.cli.ContainerExecCreate(ctx, r.ID, types.ExecConfig{
+		User:         "1234:1234",
+		Tty:          false,
+		AttachStdin:  false,
+		AttachStderr: true,
+		AttachStdout: true,
+		Cmd:          cmd,
+	})
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	resp, err := r.cli.ContainerExecAttach(ctx, execID.ID, types.ExecStartCheck{})
+	if err != nil {
+		return ExecResult{}, err
+	}
+	defer resp.Close()
+
+	var stdoutBuf, stderrBuf bytes.Buffer
+	outputDone := make(chan error)
+
+	go func() {
+		_, err := stdcopy.StdCopy(&stdoutBuf, &stderrBuf, resp.Reader)
+		outputDone <- err
+	}()
+
+	select {
+	case err := <-outputDone:
+		if err != nil {
+			return ExecResult{}, err
+		}
+		break
+
+	case <-ctx.Done():
+		return ExecResult{}, ctx.Err()
+	}
+
+	stdout, err := io.ReadAll(&stdoutBuf)
+	if err != nil {
+		return ExecResult{}, err
+	}
+	stderr, err := io.ReadAll(&stderrBuf)
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	res, err := r.cli.ContainerExecInspect(ctx, execID.ID)
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	return ExecResult{
+		Stdout:   string(stdout),
+		Stderr:   string(stderr),
+		ExitCode: res.ExitCode,
+	}, nil
+}
+
+func (r *DockerContaineredRunner) PrintLogs(ctx context.Context) error {
+	out, err := r.cli.ContainerLogs(ctx, r.ID, types.ContainerLogsOptions{
+		ShowStdout: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
