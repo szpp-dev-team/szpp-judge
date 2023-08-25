@@ -19,8 +19,8 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/judge/runner/lang"
 )
 
-type DockerContaineredRunner struct {
-	cli                 *docker.Client
+type Runner struct {
+	docker              *docker.Client
 	ContainerID         string
 	Lang                lang.Lang
 	ContainerWorkingDir string
@@ -46,12 +46,12 @@ func ResolveDockerImageName(l lang.Lang) string {
 	panic(l)
 }
 
-func NewDockerContaineredRunner(
+func New(
 	ctx context.Context,
 	dc *docker.Client,
 	l lang.Lang,
 	hostWorkingDirAbsRoot string,
-) (*DockerContaineredRunner, error) {
+) (*Runner, error) {
 	iname := ResolveDockerImageName(l)
 
 	u, err := uuid.NewUUID()
@@ -102,8 +102,8 @@ func NewDockerContaineredRunner(
 		return nil, err
 	}
 
-	return &DockerContaineredRunner{
-		cli:                 dc,
+	return &Runner{
+		docker:              dc,
 		ContainerID:         resp.ID,
 		Lang:                l,
 		ContainerWorkingDir: containerWorkingDir,
@@ -111,9 +111,9 @@ func NewDockerContaineredRunner(
 	}, nil
 }
 
-func (r *DockerContaineredRunner) Close() {
+func (r *Runner) Close() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	err := r.cli.ContainerRemove(ctx, r.ContainerID, types.ContainerRemoveOptions{
+	err := r.docker.ContainerRemove(ctx, r.ContainerID, types.ContainerRemoveOptions{
 		Force: true,
 	})
 	if err != nil {
@@ -128,8 +128,8 @@ func (r *DockerContaineredRunner) Close() {
 	cancel()
 }
 
-func (r *DockerContaineredRunner) Exec(ctx context.Context, cmd []string) (ExecResult, error) {
-	execID, err := r.cli.ContainerExecCreate(ctx, r.ContainerID, types.ExecConfig{
+func (r *Runner) Exec(ctx context.Context, cmd []string) (ExecResult, error) {
+	execID, err := r.docker.ContainerExecCreate(ctx, r.ContainerID, types.ExecConfig{
 		User:         "1234:1234",
 		Tty:          false,
 		AttachStdin:  false,
@@ -141,7 +141,7 @@ func (r *DockerContaineredRunner) Exec(ctx context.Context, cmd []string) (ExecR
 		return ExecResult{}, err
 	}
 
-	resp, err := r.cli.ContainerExecAttach(ctx, execID.ID, types.ExecStartCheck{})
+	resp, err := r.docker.ContainerExecAttach(ctx, execID.ID, types.ExecStartCheck{})
 	if err != nil {
 		return ExecResult{}, err
 	}
@@ -175,7 +175,7 @@ func (r *DockerContaineredRunner) Exec(ctx context.Context, cmd []string) (ExecR
 		return ExecResult{}, err
 	}
 
-	res, err := r.cli.ContainerExecInspect(ctx, execID.ID)
+	res, err := r.docker.ContainerExecInspect(ctx, execID.ID)
 	if err != nil {
 		return ExecResult{}, err
 	}
@@ -187,8 +187,8 @@ func (r *DockerContaineredRunner) Exec(ctx context.Context, cmd []string) (ExecR
 	}, nil
 }
 
-func (r *DockerContaineredRunner) PrintLogs(ctx context.Context) error {
-	out, err := r.cli.ContainerLogs(ctx, r.ContainerID, types.ContainerLogsOptions{
+func (r *Runner) PrintLogs(ctx context.Context) error {
+	out, err := r.docker.ContainerLogs(ctx, r.ContainerID, types.ContainerLogsOptions{
 		ShowStdout: true,
 	})
 	if err != nil {

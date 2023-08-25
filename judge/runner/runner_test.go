@@ -28,7 +28,7 @@ func TestNewDockerContaineredRunner(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := NewDockerContaineredRunner(ctx, dc, lang.GCC, cfg.WorkingDirAbsRoot)
+	r, err := New(ctx, dc, lang.GCC, cfg.WorkingDirAbsRoot)
 	if err != nil {
 		t.Fatal(err)
 	}
