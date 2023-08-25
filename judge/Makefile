@@ -1,6 +1,6 @@
 .DEFAULT_GOAL      := help
 SHELL              := /usr/bin/env bash -euo pipefail
-DOCKERFILES_DIR    := _docker
+DOCKER_DIR         := _docker
 IMAGE_NAME_PREFIX  := szpp-judge-images
 
 .PHONY:	help
@@ -25,7 +25,9 @@ lint:
 
 .PHONY:	langs/build/images
 langs/build/images:
-	docker build -t $(IMAGE_NAME_PREFIX)-gcc -f $(DOCKERFILES_DIR)/gcc.Dockerfile $(DOCKERFILES_DIR)
+	docker build -t $(IMAGE_NAME_PREFIX)-gcc $(DOCKER_DIR)/gcc
+	docker build -t $(IMAGE_NAME_PREFIX)-python $(DOCKER_DIR)/python
+	docker build -t $(IMAGE_NAME_PREFIX)-java $(DOCKER_DIR)/java
 
 
 .PHONY:	langs/ls/images
