@@ -6,6 +6,7 @@ replace github.com/szpp-dev-team/szpp-judge/proto-gen/go => ../proto-gen/go
 
 require (
 	github.com/docker/docker v24.0.5+incompatible
+	github.com/google/uuid v1.3.1
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/szpp-dev-team/szpp-judge/proto-gen/go v0.0.0-00010101000000-000000000000

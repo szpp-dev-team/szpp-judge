@@ -1,0 +1,4 @@
+env_file = '.env'
+
+[env]
+JUDGE_WORKING_DIR_ABS_ROOT = '{{config_root}}/judge/_workdir'
