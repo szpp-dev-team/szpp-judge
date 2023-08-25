@@ -21,7 +21,7 @@ import (
 
 type DockerContaineredRunner struct {
 	cli                 *docker.Client
-	ID                  string
+	ContainerID         string
 	Lang                lang.Lang
 	ContainerWorkingDir string
 	HostWorkingDir      string
@@ -104,7 +104,7 @@ func NewDockerContaineredRunner(
 
 	return &DockerContaineredRunner{
 		cli:                 dc,
-		ID:                  resp.ID,
+		ContainerID:         resp.ID,
 		Lang:                l,
 		ContainerWorkingDir: containerWorkingDir,
 		HostWorkingDir:      hostWorkingDir,
@@ -113,14 +113,14 @@ func NewDockerContaineredRunner(
 
 func (r *DockerContaineredRunner) Close() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	err := r.cli.ContainerRemove(ctx, r.ID, types.ContainerRemoveOptions{
+	err := r.cli.ContainerRemove(ctx, r.ContainerID, types.ContainerRemoveOptions{
 		Force: true,
 	})
 	if err != nil {
-		slog.Error("Failed to remove container:", "ID", r.ID, "err", err)
+		slog.Error("Failed to remove container:", "ID", r.ContainerID, "err", err)
 	}
 
-	slog.Info("Successfully removed the container:", "ID", r.ID)
+	slog.Info("Successfully removed the container:", "ID", r.ContainerID)
 
 	if err = os.RemoveAll(r.HostWorkingDir); err != nil {
 		slog.Error("Failed to remove temporary dir on the host:", "path", r.HostWorkingDir)
@@ -129,7 +129,7 @@ func (r *DockerContaineredRunner) Close() {
 }
 
 func (r *DockerContaineredRunner) Exec(ctx context.Context, cmd []string) (ExecResult, error) {
-	execID, err := r.cli.ContainerExecCreate(ctx, r.ID, types.ExecConfig{
+	execID, err := r.cli.ContainerExecCreate(ctx, r.ContainerID, types.ExecConfig{
 		User:         "1234:1234",
 		Tty:          false,
 		AttachStdin:  false,
@@ -188,7 +188,7 @@ func (r *DockerContaineredRunner) Exec(ctx context.Context, cmd []string) (ExecR
 }
 
 func (r *DockerContaineredRunner) PrintLogs(ctx context.Context) error {
-	out, err := r.cli.ContainerLogs(ctx, r.ID, types.ContainerLogsOptions{
+	out, err := r.cli.ContainerLogs(ctx, r.ContainerID, types.ContainerLogsOptions{
 		ShowStdout: true,
 	})
 	if err != nil {

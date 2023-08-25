@@ -32,7 +32,7 @@ func TestNewDockerContaineredRunner(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("Successfully created a container: ID=%s, hostWorkingDir=%s\n", r.ID, r.HostWorkingDir)
+	t.Logf("Successfully created a container: ID=%s, hostWorkingDir=%s\n", r.ContainerID, r.HostWorkingDir)
 
 	execResult, err := r.Exec(ctx, []string{"curl", "http://example.com"})
 	if err != nil {
