@@ -107,6 +107,9 @@ func run(
 		return err
 	}
 	slog.Info("Finished compilation:", "res", res)
+	if res.ExitCode != 0 {
+		return fmt.Errorf("compile error: exitCode=%d, msg=%s", res.ExitCode, res.Stderr)
+	}
 
 	slog.Info("Executing exec cmd:", "cmd", lm.ExecCmd)
 	res, err = r.Exec(ctx, runner.ExecOption{
