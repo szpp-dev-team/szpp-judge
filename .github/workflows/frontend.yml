@@ -57,4 +57,4 @@ jobs:
       - name: Commit format changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "[ci] apply code formatter changes"
+          commit_message: "style(frontend): [bot] apply code formatter changes"
