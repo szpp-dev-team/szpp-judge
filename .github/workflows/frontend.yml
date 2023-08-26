@@ -1,0 +1,61 @@
+name: frontend
+on:
+  push:
+    branches: ['main']
+    paths:
+    - frontend/**
+    - .github/workflows/frontend.yml
+  pull_request:
+    branches: ['main']
+    paths:
+    - frontend/**
+    - .github/workflows/frontend.yml
+defaults:
+  run:
+    working-directory: ./frontend
+
+jobs:
+  lint-build-format:
+    name: "Lint & Build & Format"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: .node-version
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # next build を実行すると内部で lint も実行してくれる
+      - name: Build with lint
+        run: pnpm build
+
+      - name: Format
+        run: pnpm fmt
+
+      - name: Commit format changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "[ci] apply code formatter changes"
+          ref: ${{ steps.upstreambranch.outputs.branch }}
