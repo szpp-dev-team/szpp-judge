@@ -7,7 +7,6 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"path"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -15,56 +14,30 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	docker "github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
-	"github.com/google/uuid"
-	"github.com/szpp-dev-team/szpp-judge/judge/runner/lang"
 )
 
 type Runner struct {
 	docker              *docker.Client
 	ContainerID         string
-	Lang                lang.Lang
+	ImageName           string
 	ContainerWorkingDir string
 	HostWorkingDir      string
-}
-
-type ExecResult struct {
-	Stdout   string
-	Stderr   string
-	ExitCode int
 }
 
 const (
 	RUNNER_STOP_TIMEOUT int = 60 * 10 // 10 minutes
 )
 
-func ResolveDockerImageName(l lang.Lang) string {
-	if l == lang.GCC {
-		return "szpp-judge-images-gcc"
-	}
-
-	slog.Error("unknown language", "l", l)
-	panic(l)
-}
-
 func New(
 	ctx context.Context,
 	dc *docker.Client,
-	l lang.Lang,
-	hostWorkingDirAbsRoot string,
+	imageName string,
+	hostWorkingDirAbsPath string,
 ) (*Runner, error) {
-	iname := ResolveDockerImageName(l)
-
-	u, err := uuid.NewUUID()
-	if err != nil {
-		return nil, err
-	}
-	now := time.Now()
-	hostWorkingDir := path.Join(hostWorkingDirAbsRoot, now.Format("0102_150405_")+u.String())
-
 	containerWorkingDir := "/work"
 
-	if err = os.MkdirAll(hostWorkingDir, 0750); err != nil {
-		return nil, fmt.Errorf("failed to create temporary dir '%s' to bind to the container: %w", hostWorkingDir, err)
+	if err := os.MkdirAll(hostWorkingDirAbsPath, 0750); err != nil {
+		return nil, fmt.Errorf("failed to create temporary dir '%s' to bind to the container: %w", hostWorkingDirAbsPath, err)
 	}
 
 	stopTimeout := RUNNER_STOP_TIMEOUT // const はアドレス取得できないので一旦変数へ
@@ -73,7 +46,7 @@ func New(
 		Tty:             true,
 		Env:             []string{"SZPP_JUDGE=1"},
 		Cmd:             []string{"/bin/sh"},
-		Image:           iname,
+		Image:           imageName,
 		WorkingDir:      containerWorkingDir,
 		NetworkDisabled: true,
 		StopTimeout:     &stopTimeout,
@@ -86,7 +59,7 @@ func New(
 		Mounts: []mount.Mount{
 			{
 				Type:        mount.TypeBind,
-				Source:      hostWorkingDir,
+				Source:      hostWorkingDirAbsPath,
 				Target:      containerWorkingDir,
 				Consistency: mount.ConsistencyFull,
 			},
@@ -104,10 +77,10 @@ func New(
 
 	return &Runner{
 		docker:              dc,
+		ImageName:           imageName,
 		ContainerID:         resp.ID,
-		Lang:                l,
 		ContainerWorkingDir: containerWorkingDir,
-		HostWorkingDir:      hostWorkingDir,
+		HostWorkingDir:      hostWorkingDirAbsPath,
 	}, nil
 }
 
@@ -122,20 +95,36 @@ func (r *Runner) Close() {
 
 	slog.Info("Successfully removed the container:", "ID", r.ContainerID)
 
-	if err = os.RemoveAll(r.HostWorkingDir); err != nil {
-		slog.Error("Failed to remove temporary dir on the host:", "path", r.HostWorkingDir)
-	}
+	// if err = os.RemoveAll(r.HostWorkingDir); err != nil {
+	// 	slog.Error("Failed to remove temporary dir on the host:", "path", r.HostWorkingDir)
+	// }
 	cancel()
 }
 
-func (r *Runner) Exec(ctx context.Context, cmd []string) (ExecResult, error) {
+type ExecOption struct {
+	AsRootUser bool
+	Stdin      *bytes.Buffer
+	Cmd        []string
+}
+
+type ExecResult struct {
+	Stdout   string
+	Stderr   string
+	ExitCode int
+}
+
+func (r *Runner) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
+	user := ""
+	if !opt.AsRootUser {
+		user = "1234:1234"
+	}
+
 	execID, err := r.docker.ContainerExecCreate(ctx, r.ContainerID, types.ExecConfig{
-		User:         "1234:1234",
-		Tty:          false,
-		AttachStdin:  false,
+		User:         user,
+		AttachStdin:  opt.Stdin != nil,
 		AttachStderr: true,
 		AttachStdout: true,
-		Cmd:          cmd,
+		Cmd:          opt.Cmd,
 	})
 	if err != nil {
 		return ExecResult{}, err
@@ -146,6 +135,14 @@ func (r *Runner) Exec(ctx context.Context, cmd []string) (ExecResult, error) {
 		return ExecResult{}, err
 	}
 	defer resp.Close()
+
+	if opt.Stdin != nil {
+		_, err = io.Copy(resp.Conn, opt.Stdin)
+		if err != nil {
+			return ExecResult{}, err
+		}
+		resp.CloseWrite()
+	}
 
 	var stdoutBuf, stderrBuf bytes.Buffer
 	outputDone := make(chan error)
@@ -190,6 +187,7 @@ func (r *Runner) Exec(ctx context.Context, cmd []string) (ExecResult, error) {
 func (r *Runner) PrintLogs(ctx context.Context) error {
 	out, err := r.docker.ContainerLogs(ctx, r.ContainerID, types.ContainerLogsOptions{
 		ShowStdout: true,
+		ShowStderr: true,
 	})
 	if err != nil {
 		return err
