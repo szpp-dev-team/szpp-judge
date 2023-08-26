@@ -1,14 +1,14 @@
+import { HealthcheckService } from "@/src/gen/proto/backend/v1/services_connect";
+import { createPromiseClient } from "@bufbuild/connect";
+import { createGrpcWebTransport } from "@bufbuild/connect-web";
+import { Button, Container } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useState } from "react";
-import { Button, Container } from "@chakra-ui/react";
-import { createGrpcWebTransport } from "@bufbuild/connect-web";
-import { createPromiseClient } from "@bufbuild/connect";
-import { HealthcheckService } from "@/src/gen/proto/backend/v1/services_connect";
 
 const Page: NextPage = () => {
   const cli = createPromiseClient(
     HealthcheckService,
-    createGrpcWebTransport({ baseUrl: "http://localhost:8080" })
+    createGrpcWebTransport({ baseUrl: "http://localhost:8080" }),
   );
 
   const [waitingPing, setWaitingPing] = useState(false);
