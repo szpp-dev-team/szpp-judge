@@ -13,5 +13,11 @@ plugins:
     opt:
       - paths=source_relative
       - require_unimplemented_servers=false
-  - plugin: buf.build/community/timostamm-protobuf-ts
-    out: ../proto-gen/ts
+  - plugin: buf.build/bufbuild/connect-es
+    out: ../frontend/src/gen/proto
+    opt:
+      - target=ts
+      - import_extension=none
+  - plugin: buf.build/bufbuild/es
+    out: ../frontend/src/gen/proto
+    opt: target=ts
