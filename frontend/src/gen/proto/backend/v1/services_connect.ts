@@ -3,8 +3,62 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { PingRequest, PingResponse } from "./messages_pb";
+import { CreateUserRequest, CreateUserResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
+
+/**
+ * @generated from service backend.v1.UserService
+ */
+export const UserService = {
+  typeName: "backend.v1.UserService",
+  methods: {
+    /**
+     * @generated from rpc backend.v1.UserService.GetUser
+     */
+    getUser: {
+      name: "GetUser",
+      I: GetUserRequest,
+      O: GetUserResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc backend.v1.UserService.CreateUser
+     */
+    createUser: {
+      name: "CreateUser",
+      I: CreateUserRequest,
+      O: CreateUserResponse,
+      kind: MethodKind.Unary,
+    },
+  }
+} as const;
+
+/**
+ * @generated from service backend.v1.AuthService
+ */
+export const AuthService = {
+  typeName: "backend.v1.AuthService",
+  methods: {
+    /**
+     * @generated from rpc backend.v1.AuthService.Login
+     */
+    login: {
+      name: "Login",
+      I: LoginRequest,
+      O: LoginResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc backend.v1.AuthService.Logout
+     */
+    logout: {
+      name: "Logout",
+      I: LogoutRequest,
+      O: LogoutResponse,
+      kind: MethodKind.Unary,
+    },
+  }
+} as const;
 
 /**
  * @generated from service backend.v1.HealthcheckService
