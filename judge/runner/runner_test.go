@@ -7,7 +7,6 @@ import (
 
 	docker "github.com/docker/docker/client"
 	"github.com/szpp-dev-team/szpp-judge/judge/config"
-	"github.com/szpp-dev-team/szpp-judge/judge/runner/lang"
 )
 
 func loadConfig() *config.Config {
@@ -28,13 +27,17 @@ func TestNewDockerContaineredRunner(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := New(ctx, dc, lang.GCC, cfg.WorkingDirAbsRoot)
+	r, err := New(ctx, dc, "szpp-judge-images-gcc", cfg.WorkingDirAbsRoot)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Logf("Successfully created a container: ID=%s, hostWorkingDir=%s\n", r.ContainerID, r.HostWorkingDir)
 
-	execResult, err := r.Exec(ctx, []string{"curl", "http://example.com"})
+	execResult, err := r.Exec(ctx, ExecOption{
+		AsRootUser: false,
+		Stdin:      nil,
+		Cmd:        []string{"curl", "http://example.com"},
+	})
 	if err != nil {
 		r.Close()
 		t.Fatal(err)
