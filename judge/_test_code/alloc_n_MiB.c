@@ -3,8 +3,16 @@
 #include <stdlib.h>
 #include <time.h>
 
+// stdin から整数 n を読み取って `n` MiB の領域を確保する。
+
 int main() {
-  size_t const len = 1024 * 1024 * 4;
+  size_t n;
+  if (scanf("%zu", &n) != 1) {
+    fprintf(stderr, "Failed to read an integer from stdin");
+    return 1;
+  }
+
+  size_t const len = 1024 * 1024 * n;
 
   char *const a = malloc(len);
   if (a == NULL) {

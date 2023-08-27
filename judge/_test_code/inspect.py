@@ -18,5 +18,6 @@ def main():
     run_cmd(["id"])
     run_cmd(["pwd"])
     run_cmd(["ls",  "-la", "/", "/var"])
+    run_cmd(["bash", "-c", "ulimit -a"])
 
 main()
