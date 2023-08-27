@@ -55,15 +55,15 @@ func parseArg(args []string) (parseArgResult, error) {
 func subMain(args []string) error {
 	a, err := parseArg(args)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "Error:", err)
 		printUsage()
 		os.Exit(1)
 	}
 
 	fmt.Fprintf(os.Stderr, "timeLimit: %d ms\n", a.timeLimit.Milliseconds())
-	fmt.Fprintf(os.Stderr, "meoryLimit: %d kiB\n", a.memLimit/unit.KiB)
+	fmt.Fprintf(os.Stderr, "meoryLimit: %d kiB (=%d MiB)\n", a.memLimit/unit.KiB, a.memLimit/unit.MiB)
 
-	ctx, cancel := context.WithTimeout(context.Background(), a.timeLimit+500*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), a.timeLimit+100*time.Millisecond)
 
 	cmd := exec.CommandContext(ctx, a.cmd[0], a.cmd[1:]...)
 	cmd.Stdin = os.Stdin
@@ -117,8 +117,23 @@ func subMain(args []string) error {
 	os.Stderr.Sync()
 	fmt.Println("--------------------")
 	fmt.Printf("elapsed: %d ms\n", elapsed.Milliseconds())
-	fmt.Printf("max RSS: %d kiB\n", maxRSS/unit.KiB)
+	fmt.Printf("max RSS: %d kiB (=%d MiB)\n", maxRSS/unit.KiB, maxRSS/unit.MiB)
 	fmt.Printf("exit code: %d\n", cmd.ProcessState.ExitCode())
 
+	if err := saveResult(elapsed, maxRSS, cmd.ProcessState.ExitCode()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func saveResult(elapsed time.Duration, maxRSS unit.ByteSize, exitCode int) error {
+	const NAME string = ".exec-result.txt"
+	f, err := os.Create(NAME)
+	if err != nil {
+		return fmt.Errorf("cannot create file named %q: %w", NAME, err)
+	}
+
+	fmt.Fprintf(f, "%d %d %d\n", elapsed.Milliseconds(), maxRSS/unit.KiB, exitCode)
 	return nil
 }
