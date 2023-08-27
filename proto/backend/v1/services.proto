@@ -5,12 +5,16 @@ package backend.v1;
 import "backend/v1/messages.proto";
 
 service UserService {
+  // 指定された User を取得する
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  // User を新たに作成する
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
 }
 
 service AuthService {
+  // ログイン
   rpc Login(LoginRequest) returns (LoginResponse);
+  // ログアウト
   rpc Logout(LogoutRequest) returns (LogoutResponse);
 }
 

@@ -7,7 +7,6 @@ import "google/protobuf/timestamp.proto";
 message User {
   int32 id = 1;
   string username = 2;
-  string password = 3;
   bool is_admin = 4;
   google.protobuf.Timestamp created_at = 5;
   optional google.protobuf.Timestamp updated_at = 6;
