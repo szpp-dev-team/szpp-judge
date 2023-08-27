@@ -4,6 +4,16 @@ package backend.v1;
 
 import "backend/v1/messages.proto";
 
+service UserService {
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+}
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+}
+
 service HealthcheckService {
   rpc Ping(PingRequest) returns (PingResponse);
 }
