@@ -59,7 +59,7 @@ func mainSub(args []string) error {
 		return err
 	}
 
-	var stdin *bytes.Buffer = nil
+	var stdin []byte = nil
 	if len(args) >= 3 {
 		stdin, err = ReadFromStdinOrFile(args[2])
 		if err != nil {
@@ -93,10 +93,8 @@ func run(
 	ctx context.Context,
 	r *runner.Runner,
 	lm *lang.LangMeta,
-	stdin *bytes.Buffer,
+	stdin []byte,
 ) error {
-	slog.Info("run()", "lm", lm, "stdin", stdin)
-
 	slog.Info("Executing compile cmd:", "cmd", lm.CompileCmd)
 	res, err := r.Exec(ctx, runner.ExecOption{
 		AsRootUser: false,
@@ -106,27 +104,50 @@ func run(
 	if err != nil {
 		return err
 	}
-	slog.Info("Finished compilation:", "res", res)
+	slog.Info("Finished compilation")
+	showExecResult(res)
 	if res.ExitCode != 0 {
 		return fmt.Errorf("compile error: exitCode=%d, msg=%s", res.ExitCode, res.Stderr)
 	}
 
-	slog.Info("Executing exec cmd:", "cmd", lm.ExecCmd)
+	slog.Info("Executing exec cmd:", "cmd", lm.ExecCmd, "len(stdin)", len(stdin), "stdin", truncateStr(string(stdin), 30))
 	res, err = r.Exec(ctx, runner.ExecOption{
 		AsRootUser: false,
-		Stdin:      stdin,
+		Stdin:      bytes.NewBuffer(stdin),
 		Cmd:        lm.ExecCmd,
 	})
 	if err != nil {
 		return err
 	}
-	slog.Info("Finished execution:", "res", res)
+	slog.Info("Finished execution")
+	showExecResult(res)
 
 	fmt.Fprintln(os.Stderr, "----------------- logs ------------------")
 	_ = r.PrintLogs(ctx)
 	fmt.Fprintln(os.Stderr, "-----------------------------------------")
 
 	return nil
+}
+
+func truncateStr(s string, limitLen int) string {
+	if len(s) < limitLen {
+		return s
+	} else {
+		return s[:limitLen] + "..."
+	}
+}
+
+func showExecResult(r runner.ExecResult) {
+	fmt.Fprintln(os.Stderr, "- - - ExecResult - - -")
+	fmt.Fprintf(os.Stderr, "len(Stdout): %d\nlen(Stderr): %d\nExitCode: %d\n", len(r.Stdout), len(r.Stderr), r.ExitCode)
+
+	write := func(prefix string, s string, limit int) {
+		fmt.Fprintf(os.Stderr, "%s%q\n", prefix, truncateStr(s, limit))
+	}
+
+	write("Stdout: ", r.Stdout, 60)
+	write("Stderr: ", r.Stderr, 60)
+	fmt.Fprintln(os.Stderr, "- - - - - - - - - - - -")
 }
 
 func DetectLang(filepath string) lang.LangID {
@@ -145,8 +166,7 @@ func DetectLang(filepath string) lang.LangID {
 	panic(filepath)
 }
 
-func ReadFromStdinOrFile(filepathOrHyphen string) (*bytes.Buffer, error) {
-	buf := bytes.NewBuffer(nil)
+func ReadFromStdinOrFile(filepathOrHyphen string) ([]byte, error) {
 	var src io.ReadCloser
 
 	if filepathOrHyphen == "-" {
@@ -160,11 +180,11 @@ func ReadFromStdinOrFile(filepathOrHyphen string) (*bytes.Buffer, error) {
 	}
 	defer src.Close()
 
-	_, err := io.Copy(buf, src)
+	bs, err := io.ReadAll(src)
 	if err != nil {
 		return nil, err
 	}
-	return buf, nil
+	return bs, nil
 }
 
 func CopyFile(srcPath string, dstPath string) error {
