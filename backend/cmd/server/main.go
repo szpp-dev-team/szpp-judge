@@ -31,7 +31,7 @@ func main() {
 		DBName:    config.DBName,
 		User:      config.DBUser,
 		Passwd:    config.DBPass,
-		Addr:      config.DBHost + ":" + config.DBPort,
+		Addr:      config.DBAddr,
 		Net:       "tcp",
 		ParseTime: true,
 		Loc:       jst,

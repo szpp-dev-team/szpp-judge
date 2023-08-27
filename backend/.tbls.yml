@@ -1,2 +1,2 @@
-dsn: mysql://root:szpp@localhost:3306/szpp-judge-db
+dsn: mysql://szpp_judge:szpp_judge@localhost:3306/szpp_judge_db
 docPath: docs/schema
