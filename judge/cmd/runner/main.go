@@ -142,11 +142,15 @@ func showExecResult(r runner.ExecResult) {
 	fmt.Fprintf(os.Stderr, "len(Stdout): %d\nlen(Stderr): %d\nExitCode: %d\n", len(r.Stdout), len(r.Stderr), r.ExitCode)
 
 	write := func(prefix string, s string, limit int) {
-		fmt.Fprintf(os.Stderr, "%s%q\n", prefix, truncateStr(s, limit))
+		if len(s) > limit {
+			fmt.Fprintf(os.Stderr, "%s%q\n", prefix, truncateStr(s, limit))
+		} else {
+			fmt.Fprintf(os.Stderr, "%s\n%s\n", prefix, s)
+		}
 	}
 
-	write("Stdout: ", r.Stdout, 60)
-	write("Stderr: ", r.Stderr, 60)
+	write("Stdout: ", r.Stdout, 4000)
+	write("Stderr: ", r.Stderr, 4000)
 	fmt.Fprintln(os.Stderr, "- - - - - - - - - - - -")
 }
 
