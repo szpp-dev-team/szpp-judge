@@ -21,11 +21,6 @@ export class User extends Message<User> {
   username = "";
 
   /**
-   * @generated from field: string password = 3;
-   */
-  password = "";
-
-  /**
    * @generated from field: bool is_admin = 4;
    */
   isAdmin = false;
@@ -50,7 +45,6 @@ export class User extends Message<User> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "is_admin", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "created_at", kind: "message", T: Timestamp },
     { no: 6, name: "updated_at", kind: "message", T: Timestamp, opt: true },

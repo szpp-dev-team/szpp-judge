@@ -13,6 +13,8 @@ export const UserService = {
   typeName: "backend.v1.UserService",
   methods: {
     /**
+     * 指定された User を取得する
+     *
      * @generated from rpc backend.v1.UserService.GetUser
      */
     getUser: {
@@ -22,6 +24,8 @@ export const UserService = {
       kind: MethodKind.Unary,
     },
     /**
+     * User を新たに作成する
+     *
      * @generated from rpc backend.v1.UserService.CreateUser
      */
     createUser: {
@@ -40,6 +44,8 @@ export const AuthService = {
   typeName: "backend.v1.AuthService",
   methods: {
     /**
+     * ログイン
+     *
      * @generated from rpc backend.v1.AuthService.Login
      */
     login: {
@@ -49,6 +55,8 @@ export const AuthService = {
       kind: MethodKind.Unary,
     },
     /**
+     * ログアウト
+     *
      * @generated from rpc backend.v1.AuthService.Logout
      */
     logout: {
