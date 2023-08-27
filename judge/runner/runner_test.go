@@ -27,11 +27,14 @@ func TestNewDockerContaineredRunner(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := New(ctx, dc, "szpp-judge-images-gcc", cfg.WorkingDirAbsRoot)
+	r, err := New(ctx, dc, "szpp-judge-images-gcc",
+		WithWorkingDir("/work"),
+		WithBindDir(cfg.WorkingDirAbsRoot, "/work"),
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("Successfully created a container: ID=%s, hostWorkingDir=%s\n", r.ContainerID, r.HostWorkingDir)
+	t.Logf("Successfully created a container: ID=%s, hostWorkingDir=%s\n", r.ContainerID, r.HostBindDir)
 
 	execResult, err := r.Exec(ctx, ExecOption{
 		AsRootUser: false,

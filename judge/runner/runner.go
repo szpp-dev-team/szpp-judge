@@ -3,7 +3,6 @@ package runner
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -21,7 +20,7 @@ type Runner struct {
 	ContainerID         string
 	ImageName           string
 	ContainerWorkingDir string
-	HostWorkingDir      string
+	HostBindDir         string
 }
 
 const (
@@ -32,12 +31,21 @@ func New(
 	ctx context.Context,
 	dc *docker.Client,
 	imageName string,
-	hostWorkingDirAbsPath string,
+	opts ...optionFunc,
 ) (*Runner, error) {
-	containerWorkingDir := "/work"
+	opt := defaultOption()
+	for _, f := range opts {
+		f(&opt)
+	}
 
-	if err := os.MkdirAll(hostWorkingDirAbsPath, 0750); err != nil {
-		return nil, fmt.Errorf("failed to create temporary dir '%s' to bind to the container: %w", hostWorkingDirAbsPath, err)
+	mounts := make([]mount.Mount, 0, 1)
+	if len(opt.hostBindDirAbsPath) > 0 {
+		mounts = append(mounts, mount.Mount{
+			Type:        mount.TypeBind,
+			Source:      opt.hostBindDirAbsPath,
+			Target:      opt.containerBindDirAbsPath,
+			Consistency: mount.ConsistencyFull,
+		})
 	}
 
 	stopTimeout := RUNNER_STOP_TIMEOUT // const はアドレス取得できないので一旦変数へ
@@ -47,23 +55,23 @@ func New(
 		Env:             []string{"SZPP_JUDGE=1"},
 		Cmd:             []string{"/bin/sh"},
 		Image:           imageName,
-		WorkingDir:      containerWorkingDir,
-		NetworkDisabled: true,
+		WorkingDir:      opt.workingDir,
+		NetworkDisabled: !opt.allowNetwork,
 		StopTimeout:     &stopTimeout,
 	}
+
 	hostCfg := &container.HostConfig{
 		LogConfig:  container.LogConfig{},
 		AutoRemove: true,
-		Resources:  container.Resources{}, // TODO: ulimit などの設定
+		IpcMode:    container.IPCModeNone,
 		Init:       &runInit,
-		Mounts: []mount.Mount{
-			{
-				Type:        mount.TypeBind,
-				Source:      hostWorkingDirAbsPath,
-				Target:      containerWorkingDir,
-				Consistency: mount.ConsistencyFull,
-			},
+		Resources: container.Resources{
+			Memory:     opt.maxContainerMemoryBytes,
+			MemorySwap: opt.maxContainerMemoryBytes,
+			PidsLimit:  opt.maxProcNum,
+			Ulimits:    opt.createUlimits(),
 		},
+		Mounts: mounts,
 	}
 
 	resp, err := dc.ContainerCreate(ctx, containerCfg, hostCfg, nil, nil, "")
@@ -79,8 +87,8 @@ func New(
 		docker:              dc,
 		ImageName:           imageName,
 		ContainerID:         resp.ID,
-		ContainerWorkingDir: containerWorkingDir,
-		HostWorkingDir:      hostWorkingDirAbsPath,
+		ContainerWorkingDir: opt.workingDir,
+		HostBindDir:         opt.hostBindDirAbsPath,
 	}, nil
 }
 
@@ -192,6 +200,9 @@ func (r *Runner) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
 }
 
 func (r *Runner) PrintLogs(ctx context.Context) error {
+	os.Stdout.Sync()
+	os.Stderr.Sync()
+
 	out, err := r.docker.ContainerLogs(ctx, r.ContainerID, types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,

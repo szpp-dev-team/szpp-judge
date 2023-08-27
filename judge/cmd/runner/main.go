@@ -9,11 +9,13 @@ import (
 	"log/slog"
 	"os"
 	"path"
+	"time"
 
 	"github.com/docker/docker/client"
 	"github.com/szpp-dev-team/szpp-judge/judge/config"
 	"github.com/szpp-dev-team/szpp-judge/judge/lang"
 	"github.com/szpp-dev-team/szpp-judge/judge/runner"
+	"github.com/szpp-dev-team/szpp-judge/judge/util/unit"
 )
 
 func printUsage() {
@@ -74,12 +76,21 @@ func mainSub(args []string) error {
 	defer dc.Close()
 
 	ctx := context.Background()
-	r, err := runner.New(ctx, dc, langMeta.ImageName, hostWorkingDir)
+	r, err := runner.New(ctx, dc, langMeta.ImageName,
+		runner.WithWorkingDir("/work"),
+		runner.WithBindDir(hostWorkingDir, "/work"),
+		runner.WithMaxProcNum(20),
+		runner.WithMaxContainerMemory(10*unit.MiB),
+		runner.WithMaxStack(-1),
+		runner.WithMaxWriteFile(30*unit.MiB),
+		runner.WithMaxOpenFiles(256),
+		runner.WithMaxCPUTime(1*time.Second),
+	)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
-	slog.Info("Created runner:", " ContainerID", r.ContainerID[:6])
+	slog.Info("Created runner:", "ContainerID", r.ContainerID[:6])
 
 	err = run(ctx, r, langMeta, stdin)
 	if err != nil {
