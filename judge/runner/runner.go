@@ -91,9 +91,9 @@ func (r *Runner) Close() {
 	})
 	if err != nil {
 		slog.Error("Failed to remove container:", "ID", r.ContainerID, "err", err)
+	} else {
+		slog.Info("Successfully removed the container:", "ID", r.ContainerID)
 	}
-
-	slog.Info("Successfully removed the container:", "ID", r.ContainerID)
 
 	// if err = os.RemoveAll(r.HostWorkingDir); err != nil {
 	// 	slog.Error("Failed to remove temporary dir on the host:", "path", r.HostWorkingDir)
