@@ -35,7 +35,7 @@ var langMetas map[LangID]*LangMeta = map[LangID]*LangMeta{
 			"-O2",
 			"-march=native",
 			"-mtune=native",
-			"main.cpp",
+			"main.c",
 		},
 		ExecCmd: []string{"./a.out"},
 	},
