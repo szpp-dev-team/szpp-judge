@@ -136,17 +136,22 @@ func (r *Runner) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
 	}
 	defer resp.Close()
 
-	if opt.Stdin != nil {
-		_, err = io.Copy(resp.Conn, opt.Stdin)
-		if err != nil {
-			return ExecResult{}, err
+	inputDone := make(chan struct{})
+	go func() {
+		if opt.Stdin != nil {
+			_, err = io.Copy(resp.Conn, opt.Stdin)
+			if err != nil {
+				slog.Error("Cannot send stdin:", "err", err)
+			}
 		}
-		resp.CloseWrite()
-	}
+		if err := resp.CloseWrite(); err != nil {
+			slog.Error("Cannot close stdin:", "err", err)
+		}
+		close(inputDone)
+	}()
 
 	var stdoutBuf, stderrBuf bytes.Buffer
 	outputDone := make(chan error)
-
 	go func() {
 		_, err := stdcopy.StdCopy(&stdoutBuf, &stderrBuf, resp.Reader)
 		outputDone <- err
@@ -157,8 +162,10 @@ func (r *Runner) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
 		if err != nil {
 			return ExecResult{}, err
 		}
-		break
-
+	case <-inputDone:
+		if err := <-outputDone; err != nil {
+			return ExecResult{}, err
+		}
 	case <-ctx.Done():
 		return ExecResult{}, ctx.Err()
 	}
