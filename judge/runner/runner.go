@@ -13,6 +13,8 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	docker "github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/szpp-dev-team/szpp-judge/judge/util/buffer"
+	"github.com/szpp-dev-team/szpp-judge/judge/util/unit"
 )
 
 type Runner struct {
@@ -110,15 +112,19 @@ func (r *Runner) Close() {
 }
 
 type ExecOption struct {
-	AsRootUser bool
-	Stdin      *bytes.Buffer
-	Cmd        []string
+	AsRootUser      bool
+	Stdin           *bytes.Buffer
+	Cmd             []string
+	StdoutReadLimit unit.ByteSize
+	StderrReadLimit unit.ByteSize
 }
 
 type ExecResult struct {
-	Stdout   string
-	Stderr   string
-	ExitCode int
+	ExitCode          int
+	Stdout            string
+	Stderr            string
+	StdoutIsTruncated bool
+	StderrIsTruncated bool
 }
 
 func (r *Runner) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
@@ -158,10 +164,11 @@ func (r *Runner) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
 		close(inputDone)
 	}()
 
-	var stdoutBuf, stderrBuf bytes.Buffer
+	stdout := buffer.NewLimitedWriter(int(opt.StdoutReadLimit), nil)
+	stderr := buffer.NewLimitedWriter(int(opt.StderrReadLimit), nil)
 	outputDone := make(chan error)
 	go func() {
-		_, err := stdcopy.StdCopy(&stdoutBuf, &stderrBuf, resp.Reader)
+		_, err := stdcopy.StdCopy(&stdout, &stderr, resp.Reader)
 		outputDone <- err
 	}()
 
@@ -178,24 +185,17 @@ func (r *Runner) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
 		return ExecResult{}, ctx.Err()
 	}
 
-	stdout, err := io.ReadAll(&stdoutBuf)
-	if err != nil {
-		return ExecResult{}, err
-	}
-	stderr, err := io.ReadAll(&stderrBuf)
-	if err != nil {
-		return ExecResult{}, err
-	}
-
 	res, err := r.docker.ContainerExecInspect(ctx, execID.ID)
 	if err != nil {
 		return ExecResult{}, err
 	}
 
 	return ExecResult{
-		Stdout:   string(stdout),
-		Stderr:   string(stderr),
-		ExitCode: res.ExitCode,
+		ExitCode:          res.ExitCode,
+		Stdout:            string(stdout.Buf),
+		Stderr:            string(stderr.Buf),
+		StdoutIsTruncated: stdout.HasOverflowed(),
+		StderrIsTruncated: stderr.HasOverflowed(),
 	}, nil
 }
 

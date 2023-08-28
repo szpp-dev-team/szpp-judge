@@ -108,9 +108,11 @@ func run(
 ) error {
 	slog.Info("Executing compile cmd:", "cmd", lm.CompileCmd)
 	res, err := r.Exec(ctx, runner.ExecOption{
-		AsRootUser: false,
-		Stdin:      nil,
-		Cmd:        lm.CompileCmd,
+		AsRootUser:      false,
+		Stdin:           nil,
+		Cmd:             lm.CompileCmd,
+		StdoutReadLimit: 4 * unit.KiB,
+		StderrReadLimit: 16 * unit.KiB,
 	})
 	if err != nil {
 		return err
@@ -123,9 +125,11 @@ func run(
 
 	slog.Info("Executing exec cmd:", "cmd", lm.ExecCmd, "len(stdin)", len(stdin), "stdin", truncateStr(string(stdin), 30))
 	res, err = r.Exec(ctx, runner.ExecOption{
-		AsRootUser: false,
-		Stdin:      bytes.NewBuffer(stdin),
-		Cmd:        lm.ExecCmd,
+		AsRootUser:      false,
+		Stdin:           bytes.NewBuffer(stdin),
+		Cmd:             lm.ExecCmd,
+		StdoutReadLimit: 256 * unit.KiB,
+		StderrReadLimit: 64 * unit.KiB,
 	})
 	if err != nil {
 		return err
