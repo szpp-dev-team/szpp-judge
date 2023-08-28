@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package judge.v1;
+
+enum Lang {
+  UNKNOWN = 0;
+  C_11 = 1;
+  CPP_20 = 2;
+  JAVA_20 = 3;
+  PYTHON_3_11 = 4;
+  SCRATCH = 5;
+}
+
+enum JudgeStatus {
+  WAITING = 0;
+  AC = 1;
+  CE = 2;
+  IE = 3;
+  MLE = 4;
+  OLE = 5;
+  TLE = 6;
+  WA = 7;
+}
+
+message Testcase {
+  string input_path = 1;
+  string expected_path = 2;
+}
+
+message ExecutionResultDetail {
+  optional uint32 exit_code = 1; // TLE 等で kill した場合は exit_code はナシ
+  string stdin = 2;
+  string stdout = 3;
+  string stderr = 4;
+  bool stdout_omitted = 5; // stdout が巨大すぎて省略した場合は true
+  bool stderr_omitted = 6; // stderr が巨大すぎて省略した場合は true
+}

@@ -2,10 +2,53 @@ syntax = "proto3";
 
 package judge.v1;
 
+import "judge/v1/judge_type.proto";
+import "judge/v1/resources.proto";
+
 message PingRequest {
   string name = 1;
 }
 
 message PingResponse {
   string message = 1;
+}
+
+message JudgeRequest {
+  string source_code = 1;
+  Lang lang = 2;
+  JudgeType judge_type = 3;
+  uint32 exec_time_limit_ms = 4; // 実行時間制限 [ms]
+  uint32 exec_memory_limit_kib = 5; // 実行時メモリ制限 [kiB]
+  string gcs_bucket = 6;
+  repeated Testcase testcases = 7;
+  optional bool want_result_detail = 8;
+  optional uint32 stdout_limit_kib = 9;
+  optional uint32 stderr_limit_kib = 10;
+}
+
+message JudgeResponse {
+  uint32 seq = 1; // テストケース番号 (0-indexed)
+  JudgeStatus status = 2;
+  uint32 exec_time_ms = 3;
+  uint32 exec_memory_kib = 4;
+  string compiler_message = 5;
+  optional ExecutionResultDetail detail = 6; // want_result_detail=true のときに値がセットされる
+}
+
+// AtCoder でいうコードテスト向けのリクエスト
+message RunRequest {
+  string source_code = 1;
+  Lang lang = 2;
+  string stdin = 3;
+  uint32 exec_time_limit_ms = 4; // 実行時間制限 [ms]
+  uint32 exec_memory_limit_kib = 5; // 実行時メモリ制限 [kiB]
+  optional uint32 stdout_limit_kib = 6;
+  optional uint32 stderr_limit_kib = 7;
+}
+
+message RunResponse {
+  uint32 exec_time_ms = 1;
+  uint32 exec_memory_kib = 2;
+  string compiler_message = 3;
+  ExecutionResultDetail detail = 4;
 }

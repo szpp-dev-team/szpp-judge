@@ -7,3 +7,8 @@ import "judge/v1/messages.proto";
 service HealthcheckService {
   rpc Ping(PingRequest) returns (PingResponse);
 }
+
+service JudgeService {
+  rpc Judge(JudgeRequest) returns (stream JudgeResponse);
+  rpc Run(RunRequest) returns (RunResponse);
+}

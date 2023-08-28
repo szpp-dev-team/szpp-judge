@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package judge.v1;
+
+// 行ごとの一致比較 (最後の改行忘れは許容, 改行コードの違いも許容)
+message JudgeTypeNormal {
+  optional bool case_insensitive = 1;
+}
+
+// 浮動小数点数向けの許容誤差付き比較
+message JudgeTypeNumericalErrTolerant {
+  // 許容誤差の桁数
+  // 例えば ndigits=5 なら絶対誤差または相対誤差のいずれかが 1e-5 未満なら正解
+  uint32 ndigits = 1;
+}
+
+// インタラクティブジャッジ
+// 提出プログラムとジャッジプログラムとでリアルタイムに入出力をやりとりする
+message JudgeTypeInteractive {
+  string judge_code_path = 1;
+}
+
+// スペシャルジャッジ
+// 正解が複数考えられる場合にはこのジャッジ形式を使う
+message JudgeTypeCustom {
+  string judge_code_path = 1;
+}
+
+message JudgeType {
+  oneof judge_type {
+    JudgeTypeNormal normal = 1;
+    JudgeTypeNumericalErrTolerant numerical_err_torelant = 2;
+    JudgeTypeInteractive interactive = 3;
+    JudgeTypeCustom custom = 4;
+  }
+}
