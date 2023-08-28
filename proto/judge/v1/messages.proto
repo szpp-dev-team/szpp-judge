@@ -15,7 +15,7 @@ message PingResponse {
 
 message JudgeRequest {
   string source_code = 1;
-  Lang lang = 2;
+  int32 lang_id = 2;
   JudgeType judge_type = 3;
   uint32 exec_time_limit_ms = 4; // 実行時間制限 [ms]
   uint32 exec_memory_limit_kib = 5; // 実行時メモリ制限 [kiB]
@@ -38,7 +38,7 @@ message JudgeResponse {
 // AtCoder でいうコードテスト向けのリクエスト
 message RunRequest {
   string source_code = 1;
-  Lang lang = 2;
+  int32 lang_id = 2;
   string stdin = 3;
   uint32 exec_time_limit_ms = 4; // 実行時間制限 [ms]
   uint32 exec_memory_limit_kib = 5; // 実行時メモリ制限 [kiB]
