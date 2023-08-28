@@ -2,7 +2,7 @@ name: buf
 on:
   pull_request:
     branches:
-      - main
+      - develop
     paths:
       - .github/workflows/buf.yml
       - proto/**
