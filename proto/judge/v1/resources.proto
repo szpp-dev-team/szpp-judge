@@ -3,7 +3,7 @@ syntax = "proto3";
 package judge.v1;
 
 enum JudgeStatus {
-  WAITING = 0;
+  JUDGE_STATUS_UNSPECIFIED = 0;
   AC = 1;
   CE = 2;
   IE = 3;
