@@ -12,6 +12,9 @@ async function initMocks() {
     const { worker } = await import("./browser");
     worker.start({
       onUnhandledRequest: (req, print) => {
+        if (req.url.protocol === "chrome-extension:") {
+          return;
+        }
         if (ignoredPathnames.some(pathname => req.url.pathname.startsWith(pathname))) {
           return;
         }
