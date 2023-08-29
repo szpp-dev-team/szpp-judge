@@ -1,8 +1,8 @@
-import { UniversalServerResponse, createAsyncIterable, encodeEnvelope, readAllBytes } from "@bufbuild/connect/protocol";
+import { HealthcheckService } from "@/src/gen/proto/backend/v1/services_connect";
+import { createAsyncIterable, encodeEnvelope, readAllBytes, UniversalServerResponse } from "@bufbuild/connect/protocol";
 import { grpcStatusOk, trailerFlag, trailerSerialize } from "@bufbuild/connect/protocol-grpc-web";
 import { Message as ProtobufMessage } from "@bufbuild/protobuf";
-import { RequestHandler as MSWRequestHandler, ResponseTransformer, rest } from "msw"
-import { HealthcheckService } from "@/src/gen/proto/backend/v1/services_connect";
+import { RequestHandler as MSWRequestHandler, ResponseTransformer, rest } from "msw";
 
 // Thanks to this blog and this issue.
 // Original idea was written for protobuf-ts, and I ported it to `connect` for this file.
@@ -28,13 +28,13 @@ const createGrpcResponse = <Response extends ProtobufMessage>(message: Response)
           new Headers({
             "Grpc-Status": grpcStatusOk,
             "Grpc-Message": "",
-          })
-        )
-      )
+          }),
+        ),
+      ),
     ]),
     trailer: new Headers(),
   };
-}
+};
 
 /**
  * Create a transformer that transforms GrpcResponse to MSW compatible response.
@@ -51,16 +51,16 @@ const grpcResToMSWRes = (grpcResponse: ReturnType<typeof createGrpcResponse>): R
     }
     res.status = grpcResponse.status;
     return res;
-  }
-}
+  };
+};
 
 export const handlers: MSWRequestHandler[] = [
   // eslint-disable-next-line no-unused-vars
   rest.post("http://localhost:8080/backend.v1.HealthcheckService/Ping", (_req, res, _ctx) => {
     const respCls = HealthcheckService.methods.ping.O;
     const message = createGrpcResponse(
-      respCls.fromJson({ message: "Hi Bob! Pong :)" })
+      respCls.fromJson({ message: "Hi Bob! Pong :)" }),
     );
     return res(grpcResToMSWRes(message));
   }),
-]
+];

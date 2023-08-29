@@ -16,7 +16,7 @@ async function initMocks() {
           return;
         }
         print.warning();
-      }
+      },
     });
   }
 }
