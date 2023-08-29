@@ -24,6 +24,6 @@ message ExecutionResultDetail {
   string stdin = 2;
   string stdout = 3;
   string stderr = 4;
-  bool stdout_omitted = 5; // stdout が巨大すぎて省略した場合は true
-  bool stderr_omitted = 6; // stderr が巨大すぎて省略した場合は true
+  bool stdout_truncated = 5; // stdout が巨大すぎて途中から省略した場合は true
+  bool stderr_truncated = 6; // stderr が巨大すぎて途中から省略した場合は true
 }
