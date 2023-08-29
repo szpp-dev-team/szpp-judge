@@ -4,6 +4,7 @@
   "excludes": [
     "**/node_modules",
     "src/gen/**",
+    "public/**",
     "**/*-lock.json"
   ],
   "plugins": [
