@@ -9,8 +9,9 @@ enum JudgeStatus {
   IE = 3;
   MLE = 4;
   OLE = 5;
-  TLE = 6;
-  WA = 7;
+  RE = 6;
+  TLE = 7;
+  WA = 8;
 }
 
 message Testcase {
