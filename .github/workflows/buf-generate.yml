@@ -1,8 +1,8 @@
 name: buf
 on:
   push:
-    branches:
-      - develop
+    branchs-ignore:
+      - main
     paths:
       - .github/workflows/buf-generate.yml
       - proto/**
