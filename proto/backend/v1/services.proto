@@ -18,6 +18,15 @@ service AuthService {
   rpc Logout(LogoutRequest) returns (LogoutResponse);
 }
 
+service TaskService {
+  // Task を作成する
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  // 指定された Task を取得する
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  // Task を更新する
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+}
+
 service HealthcheckService {
   rpc Ping(PingRequest) returns (PingResponse);
 }
