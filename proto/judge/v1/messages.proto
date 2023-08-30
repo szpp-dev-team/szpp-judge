@@ -18,7 +18,7 @@ message JudgeRequest {
   string lang_id = 2;
   JudgeType judge_type = 3;
   uint32 exec_time_limit_ms = 4; // 実行時間制限 [ms]
-  uint32 exec_memory_limit_kib = 5; // 実行時メモリ制限 [kiB]
+  uint32 exec_memory_limit_mib = 5; // 実行時メモリ制限 [MiB]
   repeated Testcase testcases = 7;
   optional bool want_result_detail = 8;
   optional uint32 stdout_limit_kib = 9;
@@ -40,7 +40,7 @@ message RunRequest {
   string lang_id = 2;
   string stdin = 3;
   uint32 exec_time_limit_ms = 4; // 実行時間制限 [ms]
-  uint32 exec_memory_limit_kib = 5; // 実行時メモリ制限 [kiB]
+  uint32 exec_memory_limit_mib = 5; // 実行時メモリ制限 [MiB]
   optional uint32 stdout_limit_kib = 6;
   optional uint32 stderr_limit_kib = 7;
 }
