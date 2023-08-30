@@ -4,7 +4,7 @@ on:
     branches:
       - develop
     paths:
-      - .github/workflows/buf.yml
+      - .github/workflows/buf-generate.yml
       - proto/**
 defaults:
   run:
