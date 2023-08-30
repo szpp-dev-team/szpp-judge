@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting on PR
+name: Deploy to Firebase Hosting on PR to preview
 on:
   pull_request:
     branches:
@@ -46,6 +46,7 @@ jobs:
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
+          entryPoint: frontend
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SZPP_JUDGE_3776 }}'
           expires: 2d
