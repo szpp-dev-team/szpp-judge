@@ -16,7 +16,7 @@ const loginPassword = z.string()
   .max(60)
   .regex(/^[^\x00-\x1F\x80-\xFF]+$/, "不正な文字が含まれています");
 
-const password = loginPassword
+const registrationPassword = loginPassword
   .describe("半角英大文字・英小文字・数字・記号全て必須、8文字以上60文字以内")
   .min(8)
   .regex(/[A-Z]/, "半角英大文字を含めてください")
@@ -32,8 +32,8 @@ export const userLoginSchema = z.object({
   password: loginPassword,
 });
 
-export const userRegisterSchema = z.object({
+export const userRegistrationSchema = z.object({
   email,
   username,
-  password,
+  password: registrationPassword,
 });
