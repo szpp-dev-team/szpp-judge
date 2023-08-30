@@ -30,12 +30,25 @@ service TaskService {
   rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
   // 指定された Clarification を取得する
   rpc GetClarification(GetClarificationRequest) returns (GetClarificationResponse);
-  // ClarificationList を取得する
+  // ClarificationListを取得する
   rpc GetClarificationList(GetClarificationListRequest) returns (GetClarificationListResponse);
   // Clarification を更新する
   rpc UpdateClarification(UpdateClarificationRequest) returns (UpdateClarificationResponse);
   // Clarification を削除する
   rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
+
+  // Answerを追加する
+  rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
+  // Answerを取得する
+  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
+  // AnswerListを取得する
+  rpc GetAnswerList(GetAnswerListRequest) returns (GetAnswerListResponse);
+  // 特定のClarificationのAnswerListを取得する
+  rpc GetAnswerListByClarificationId(GetAnswerListByClarificationIdRequest) returns (GetAnswerListByClarificationIdResponse);
+  // Answerを更新する
+  rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
+  // Answerを削除する
+  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
 }
 
 service HealthcheckService {

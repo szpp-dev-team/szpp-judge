@@ -13,13 +13,27 @@ message User {
 }
 
 message Clarification {
-  int32 id = 1; 
-  int32 user_id = 2; 
-  string content = 3; 
-  google.protobuf.Timestamp created_at = 4; 
-  google.protobuf.Timestamp updated_at = 5; 
-  bool is_public = 7; 
-  repeated Clarification answers = 8; 
+  int32 id = 1;
+  Question question = 2;
+  repeated Answer answers = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+  bool is_public = 6;
+
+  message Question {
+    int32 user_id = 1;
+    string content = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp updated_at = 4;
+  }
+  
+  message Answer {
+    int32 id = 1;
+    int32 user_id = 2;
+    string content = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+  }
 }
 
 message Task {
