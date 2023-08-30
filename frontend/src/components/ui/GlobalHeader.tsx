@@ -22,7 +22,7 @@ const NavItemLink: FC<LinkProps> = ({ children, ...props }) => {
 
 export const GlobalHeader = () => {
   return (
-    <Box as="header" position="sticky" width="100%" top="0" left="0">
+    <Box as="header" position="sticky" width="100%" top="0" left="0" zIndex={50}>
       <Flex as="nav" justifyContent="space-between" bg="teal.500" color="white">
         <Flex>
           <NavItemLink href="/" px="1.25rem">SZPP Judge</NavItemLink>
