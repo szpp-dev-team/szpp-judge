@@ -30,27 +30,5 @@ jobs:
       - name: commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "style(proto): [ci] apply code formatter change"
-          ref: ${{ steps.upstreambranch.outputs.branch }}
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: bufbuild/buf-setup-action@v1
-        with:
-          version: "1.25.1"
-      - uses: bufbuild/buf-lint-action@v1
-        with:
-          input: proto
-      - uses: bufbuild/buf-breaking-action@v1
-        with:
-          # The 'main' branch of the GitHub repository that defines the module.
-          against: "https://github.com/szpp-dev-team/szpp-judge.git#branch=main,subdir=proto"
-          input: proto
-      - name: generate
-        run: buf generate
-      - name: commit
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "chore(proto-gen): (ci) generate code from proto-buf"
+          commit_message: "style(proto): [bot] apply code formatter change"
           ref: ${{ steps.upstreambranch.outputs.branch }}
