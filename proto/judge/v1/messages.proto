@@ -14,7 +14,7 @@ message PingResponse {
 }
 
 message JudgeRequest {
-  string source_code = 1;
+  string source_code_path = 1; // GCS上のパス
   string lang_id = 2;
   JudgeType judge_type = 3;
   uint32 exec_time_limit_ms = 4; // 実行時間制限 [ms]
