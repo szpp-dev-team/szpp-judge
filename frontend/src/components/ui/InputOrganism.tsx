@@ -27,7 +27,7 @@ export const InputOrganism = <T extends ZodType<any, any, any>>({
       {desc && <FormHelperText mt={0} mb={2} fontSize="xs">{desc}</FormHelperText>}
       {children}
       {/*@ts-ignore*/}
-      <FormErrorMessage>{errors?.[name]?.message}</FormErrorMessage>
+      <FormErrorMessage position="absolute" bottom="-1.5lh">{errors?.[name]?.message}</FormErrorMessage>
     </FormControl>
   );
 };
