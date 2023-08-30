@@ -1,9 +1,18 @@
 import { userLoginSchema } from "@/src/zschema/user";
-import { Button, Card, CardBody, CardFooter, CardHeader, Container, Heading } from "@chakra-ui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Container,
+  Heading,
+  Input,
+} from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ControlledInput } from "../../ui/ControlledInput";
+import { InputOrganism } from "../../ui/InputOrganism";
 import { Link } from "../../ui/Link";
 
 type FormFields = z.infer<typeof userLoginSchema>;
@@ -38,14 +47,22 @@ export const Login = () => {
             id={formId}
             onSubmit={onSubmit}
           >
-            <ControlledInput
+            <InputOrganism
+              schema={userLoginSchema}
               label="ユーザ名"
-              error={errors.username}
-              helpText={userLoginSchema.shape.username.description}
-              {...register("username")}
-              formControlProps={{ mb: 8 }}
-            />
-            <ControlledInput label="パスワード" error={errors.password} {...register("password")} />
+              name="username"
+              errors={errors}
+            >
+              <Input {...register("username")} />
+            </InputOrganism>
+            <InputOrganism
+              schema={userLoginSchema}
+              label="パスワード"
+              name="password"
+              errors={errors}
+            >
+              <Input {...register("password")} />
+            </InputOrganism>
           </form>
         </CardBody>
         <CardFooter justifyContent="center">
