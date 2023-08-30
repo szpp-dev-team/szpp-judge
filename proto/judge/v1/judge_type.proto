@@ -8,7 +8,7 @@ message JudgeTypeNormal {
 }
 
 // 浮動小数点数向けの許容誤差付き比較
-message JudgeTypeNumericalErrTolerant {
+message JudgeTypeEPS {
   // 許容誤差の桁数
   // 例えば ndigits=5 なら絶対誤差または相対誤差のいずれかが 1e-5 未満なら正解
   uint32 ndigits = 1;
@@ -29,7 +29,7 @@ message JudgeTypeCustom {
 message JudgeType {
   oneof judge_type {
     JudgeTypeNormal normal = 1;
-    JudgeTypeNumericalErrTolerant numerical_err_torelant = 2;
+    JudgeTypeEPS eps = 2;
     JudgeTypeInteractive interactive = 3;
     JudgeTypeCustom custom = 4;
   }
