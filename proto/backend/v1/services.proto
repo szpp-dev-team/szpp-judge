@@ -26,18 +26,16 @@ service TaskService {
   // Task を更新する
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
 
-  rpc CreateQuestion(CreateQuestionRequest) returns (CreateQuestionResponse);
-  rpc GetQuestion(GetQuestionRequest) returns (GetQuestionResponse);
-  rpc GetQuestionList(GetQuestionListRequest) returns (GetQuestionListResponse);
-  rpc UpdateQuestion(UpdateQuestionRequest) returns (UpdateQuestionResponse);
-  rpc DeleteQuestion(DeleteQuestionRequest) returns (DeleteQuestionResponse);
-
-  rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
-  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
-  rpc GetAnswerList(GetAnswerListRequest) returns (GetAnswerListResponse);
-  rpc GetAnswerListByQuestionId(GetAnswerListByQuestionIdRequest) returns (GetAnswerListByQuestionIdResponse);
-  rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
-  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
+  // Clarification を作成する
+  rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
+  // 指定された Clarification を取得する
+  rpc GetClarification(GetClarificationRequest) returns (GetClarificationResponse);
+  // ClarificationList を取得する
+  rpc GetClarificationList(GetClarificationListRequest) returns (GetClarificationListResponse);
+  // Clarification を更新する
+  rpc UpdateClarification(UpdateClarificationRequest) returns (UpdateClarificationResponse);
+  // Clarification を削除する
+  rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
 }
 
 service HealthcheckService {
