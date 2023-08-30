@@ -78,8 +78,8 @@ message PingResponse {
 }
 
 message SubmitRequest {
-  int contest_id = 1;
-  int task_id = 2;
+  int32 contest_id = 1;
+  int32 task_id = 2;
   string langage = 3;
   string source_code = 4;
 }
@@ -89,7 +89,7 @@ message SubmitResponse {
 }
 
 message GetSubmitRequest {
-  int id = 1;
+  int32 id = 1;
 }
 
 message GetSubmitResponse {

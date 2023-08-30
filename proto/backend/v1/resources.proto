@@ -108,19 +108,19 @@ message Submit {
   optional int32 contest_id = 3;
   int32 task_id = 4;
   string source_code = 5;
-  string langage = 6;
+  string lang_id = 6;
   string status = 7;
-  int32 exectime = 8;
-  int32 memory = 9;
+  optional uint32 exectime = 8;
+  optional uint32 memory = 9;
   time.Time submited_at = 10;
   time.Time created_at = 11;
-  time.Time update_at = 12;
+  optional time.Time update_at = 12;
   repeated TestcaseResult TestcaseResult = 13;
 }
 
 message TestcaseResult {
   string name = 1;
   string result = 2;
-  int32 exec_time = 3;
-  int32 memory = 4;
+  uint32 exec_time_ms = 3;
+  uint32 exec_memory_kib = 4;
 }
