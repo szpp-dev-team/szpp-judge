@@ -13,8 +13,7 @@ const username = z.string()
 // が対応する最大文字数が72文字なので、ソルトの追加も考慮して最大文字数は60文字とする
 const loginPassword = z.string()
   .min(1)
-  .max(60)
-  .regex(/^[^\x00-\x1F\x80-\xFF]+$/, "不正な文字が含まれています");
+  .max(60);
 
 const registrationPassword = loginPassword
   .describe("半角英大文字・英小文字・数字・記号全て必須、8文字以上60文字以内")
