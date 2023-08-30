@@ -27,3 +27,93 @@ message Answer {
   string content = 4;
   google.protobuf.Timestamp created_at = 5;
 }
+
+message Task {
+  int32 id = 1;
+  string title = 2; // 問題名
+  string statement = 3; // 問題文
+  double exec_time_limit = 4; // 実行時間制限[s]
+  int32 exec_memory_limit = 5; // 実行メモリ制限[MB]
+  optional int32 contest_id = 6; // 属するコンテストの ID
+  string checker = 7; // TODO: judge の型を使う(testlib-checkers or custom)
+  oneof task_type {
+    TaskContest contest = 8;
+    TaskNormal normal = 9;
+  }
+  google.protobuf.Timestamp created_at = 10;
+  optional google.protobuf.Timestamp updated_at = 11;
+}
+
+// コンテスト用の問題
+// GitHub Actions or Admin からのリクエストしか受け付けない
+message TaskContest {
+  string contest_slug = 1;
+}
+
+// 単発の問題
+message TaskNormal {
+  enum Visibility {
+    VISIBILITY_UNSPECIFIED = 0;
+    PUBLIC = 1;
+    PRIVATE = 2;
+  }
+  Visibility visibility = 3;
+}
+
+message MutationTask {
+  string title = 1; // 問題名
+  string statement = 2; // 問題文
+  double exec_time_limit = 3; // 実行時間制限[s]
+  int32 exec_memory_limit = 4; // 実行メモリ制限[MB]
+  optional int32 contest_id = 5; // 属するコンテストの ID
+  string checker = 6; // TODO: judge の型を使う(testlib-checkers or custom)
+  oneof task_type {
+    TaskContest contest = 7;
+    TaskNormal normal = 8;
+  }
+}
+
+enum Difficulty {
+  DIFFICULTY_UNSPECIFIED = 0;
+  BEGINNER = 1;
+  EASY = 2;
+  MEDIUM = 3;
+  HARD = 4;
+  IMPOSSIBLE = 5;
+}
+
+// (slug, task_id) は複合 unique
+message TestcaseSet {
+  int32 id = 1;
+  string slug = 2; // means name
+  int32 score = 3;
+  repeated string testcase_slugs = 4;
+  google.protobuf.Timestamp created_at = 5;
+  optional google.protobuf.Timestamp updated_at = 6;
+  int32 task_id = 7;
+}
+
+message MutationTestcaseSet {
+  string slug = 1; // means name
+  int32 score = 2;
+  repeated string testcase_slugs = 3;
+}
+
+// (slug, task_id) は複合 unique
+message Testcase {
+  int32 id = 1;
+  string slug = 2;
+  optional string description = 3;
+  string input = 4;
+  string output = 5;
+  google.protobuf.Timestamp created_at = 6;
+  optional google.protobuf.Timestamp updated_at = 7;
+  int32 task_id = 8;
+}
+
+message MutationTestcase {
+  string slug = 1;
+  optional string description = 2;
+  string input = 3;
+  string output = 4;
+}

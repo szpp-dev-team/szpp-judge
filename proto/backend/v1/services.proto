@@ -18,23 +18,28 @@ service AuthService {
   rpc Logout(LogoutRequest) returns (LogoutResponse);
 }
 
-service HealthcheckService {
-  rpc Ping(PingRequest) returns (PingResponse);
-}
+service TaskService {
+  // Task を作成する
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  // 指定された Task を取得する
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  // Task を更新する
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
 
-service QuestionService {
   rpc CreateQuestion(CreateQuestionRequest) returns (CreateQuestionResponse);
   rpc GetQuestion(GetQuestionRequest) returns (GetQuestionResponse);
   rpc GetQuestionList(GetQuestionListRequest) returns (GetQuestionListResponse);
   rpc UpdateQuestion(UpdateQuestionRequest) returns (UpdateQuestionResponse);
   rpc DeleteQuestion(DeleteQuestionRequest) returns (DeleteQuestionResponse);
-}
 
-service AnswerService {
   rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
   rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
   rpc GetAnswerList(GetAnswerListRequest) returns (GetAnswerListResponse);
   rpc GetAnswerListByQuestionId(GetAnswerListByQuestionIdRequest) returns (GetAnswerListByQuestionIdResponse);
   rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
   rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
+}
+
+service HealthcheckService {
+  rpc Ping(PingRequest) returns (PingResponse);
 }
