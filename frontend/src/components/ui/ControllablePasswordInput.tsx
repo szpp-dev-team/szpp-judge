@@ -1,0 +1,73 @@
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import {
+  Flex,
+  forwardRef,
+  Input,
+  InputGroup,
+  InputGroupProps,
+  InputProps,
+  InputRightElement,
+  Text,
+  TextProps,
+} from "@chakra-ui/react";
+import { MouseEventHandler, ReactNode } from "react";
+
+export type ControllablePasswordInputProps = {
+  showPassword?: boolean;
+  onToggleButtonClick?: MouseEventHandler<HTMLButtonElement>;
+  leftElem?: ReactNode;
+  inputGroupProps?: InputGroupProps;
+} & InputProps;
+
+export const ControllablePasswordInput = forwardRef<ControllablePasswordInputProps, "input">(
+  ({
+    showPassword,
+    onToggleButtonClick,
+    leftElem,
+    inputGroupProps,
+    ...props
+  }, ref) => {
+    const btnTextProps: TextProps = {
+      as: "span",
+      fontSize: "sm",
+    };
+    return (
+      <InputGroup {...inputGroupProps}>
+        {leftElem}
+        <Input
+          type={showPassword ? "text" : "password"}
+          fontFamily="monospace"
+          ref={ref}
+          {...props}
+        />
+        <InputRightElement w="6.5em" p="1px" color="gray.500" justifyContent="end">
+          <Flex
+            as="button"
+            type="button"
+            alignItems="center"
+            gap={1}
+            px={3}
+            h="100%"
+            bg="whitesmoke"
+            // @ts-ignore
+            onClick={onToggleButtonClick}
+          >
+            {showPassword
+              ? (
+                <>
+                  <ViewIcon />
+                  <Text {...btnTextProps}>隠す</Text>
+                </>
+              )
+              : (
+                <>
+                  <ViewOffIcon />
+                  <Text {...btnTextProps}>表示する</Text>
+                </>
+              )}
+          </Flex>
+        </InputRightElement>
+      </InputGroup>
+    );
+  },
+);
