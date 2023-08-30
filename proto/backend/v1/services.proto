@@ -27,6 +27,8 @@ service TaskService {
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
   // 提出する
   rpc Submit(SubmitRequest) returns (SubmitResponse);
+  // ジャッジ状況を取得する
+  rpc GetSubmit(GetSubmitRequest) returns (GetSubmitResponse);
 }
 
 service HealthcheckService {

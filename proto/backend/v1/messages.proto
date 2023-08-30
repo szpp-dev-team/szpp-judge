@@ -87,3 +87,11 @@ message SubmitRequest {
 message SubmitResponse {
   Submit submit = 1;
 }
+
+message GetSubmitRequest {
+  int id = 1;
+}
+
+message GetSubmitResponse {
+  Submit submit = 1;
+}
