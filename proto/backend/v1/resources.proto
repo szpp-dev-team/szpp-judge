@@ -11,3 +11,19 @@ message User {
   google.protobuf.Timestamp created_at = 5;
   optional google.protobuf.Timestamp updated_at = 6;
 }
+
+message Question {
+  int32 id = 1;
+  int32 user_id = 2;
+  string content = 3;
+  google.protobuf.Timestamp created_at = 4;
+  repeated Answer answers = 5;
+  bool is_public = 6;
+}
+
+message Answer {
+  int32 id = 1;
+  int32 user_id = 3;
+  string content = 4;
+  google.protobuf.Timestamp created_at = 5;
+}

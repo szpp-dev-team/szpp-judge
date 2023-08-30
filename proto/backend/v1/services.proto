@@ -21,3 +21,20 @@ service AuthService {
 service HealthcheckService {
   rpc Ping(PingRequest) returns (PingResponse);
 }
+
+service QuestionService {
+  rpc CreateQuestion(CreateQuestionRequest) returns (CreateQuestionResponse);
+  rpc GetQuestion(GetQuestionRequest) returns (GetQuestionResponse);
+  rpc GetQuestionList(GetQuestionListRequest) returns (GetQuestionListResponse);
+  rpc UpdateQuestion(UpdateQuestionRequest) returns (UpdateQuestionResponse);
+  rpc DeleteQuestion(DeleteQuestionRequest) returns (DeleteQuestionResponse);
+}
+
+service AnswerService {
+  rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
+  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
+  rpc GetAnswerList(GetAnswerListRequest) returns (GetAnswerListResponse);
+  rpc GetAnswerListByQuestionId(GetAnswerListByQuestionIdRequest) returns (GetAnswerListByQuestionIdResponse);
+  rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
+  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
+}
