@@ -11,7 +11,6 @@ defaults:
     working-directory: ./backend
 jobs:
   lint:
-    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,7 +29,6 @@ jobs:
           cache-key: ${{ matrix.go }}
           working-directory: backend
   format:
-    name: Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
