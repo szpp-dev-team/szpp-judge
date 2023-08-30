@@ -66,6 +66,7 @@ enum Difficulty {
   IMPOSSIBLE = 5;
 }
 
+// (slug, task_id) は複合 unique
 message TestcaseSet {
   int32 id = 1;
   string slug = 2; // means name
@@ -82,6 +83,7 @@ message MutationTestcaseSet {
   repeated string testcase_slugs = 3;
 }
 
+// (slug, task_id) は複合 unique
 message Testcase {
   int32 id = 1;
   string slug = 2;
