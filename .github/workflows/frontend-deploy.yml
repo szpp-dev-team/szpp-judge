@@ -7,6 +7,10 @@ on:
       - develop
     paths:
       - frontend/**
+  push:
+    branches:
+      - develop
+    paths:
       - .github/workflows/frontend-deploy.yml
 defaults:
   run:
