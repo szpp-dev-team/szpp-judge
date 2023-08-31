@@ -49,6 +49,8 @@ export const ControllablePasswordInput = forwardRef<ControllablePasswordInputPro
             px={3}
             h="100%"
             bg="whitesmoke"
+            borderTopRightRadius="var(--input-border-radius)"
+            borderBottomRightRadius="var(--input-border-radius)"
             // @ts-expect-error MouseEventHandler<Button> を MouseEventHandler<Div> に代入できないため型エラー
             // Flex に as="button" を指定しているけど onClick 属性が許容する型は div のままになってそう
             onClick={onToggleButtonClick}
