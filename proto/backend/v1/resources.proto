@@ -30,6 +30,7 @@ message Task {
 }
 
 // コンテスト用の問題
+// 紐付ける Contest が公式コンテストである場合、
 // GitHub Actions or Admin からのリクエストしか受け付けない
 message TaskContest {
   string contest_slug = 1;
