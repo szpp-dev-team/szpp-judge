@@ -7,7 +7,7 @@ on:
       - develop
     paths:
       - frontend/**
-      - .github/workflows/frontend-deploy-preview.yml
+      - .github/workflows/frontend-deploy.yml
 defaults:
   run:
     working-directory: ./frontend
