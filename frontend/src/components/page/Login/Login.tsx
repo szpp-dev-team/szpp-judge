@@ -1,29 +1,57 @@
+import { LoginRequest } from "@/src/gen/proto/backend/v1/messages_pb";
+import { authRepo } from "@/src/repository/auth";
 import { userLoginSchema } from "@/src/zschema/user";
-import { Button, Card, CardBody, CardFooter, CardHeader, Container, Heading, Input } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Container, Heading, Input, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { InputOrganism } from "../../ui/InputOrganism";
 import { Link } from "../../ui/Link";
 import { PasswordInput } from "../../ui/PasswordInput";
+import { useState } from "react";
+import { Code, ConnectError } from "@bufbuild/connect";
+import { useRouter } from "next/router";
 
 type FormFields = z.infer<typeof userLoginSchema>;
 
 export const Login = () => {
-  const formId = "login-form";
+  const [errMsgFooter, setErrMsgFooter] = useState("");
+  const router = useRouter();
 
   const {
     register,
     handleSubmit,
+    setError: setFormError,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
     mode: "onChange",
     resolver: zodResolver(userLoginSchema),
   });
 
-  const onSubmit = handleSubmit((values) => {
-    console.log("submit:", values);
+  const onSubmit = handleSubmit(async (values) => {
+    console.log("onSubmit(): values=", values);
+    try {
+      const resp = await authRepo.login(new LoginRequest(values));
+      console.log("onSubmit(): resp=", resp);
+      router.replace("/");
+    } catch (e) {
+      setErrMsgFooter("ログインに失敗しました")
+      console.error(typeof (e), e);
+
+      if (e instanceof ConnectError && e.code === Code.Unauthenticated) {
+        console.log("e.code:", e.code);
+        console.log("e.name:", e.name);
+        console.log("e.message:", e.message);
+        console.log("e.details:", e.details);
+        console.log("e.metadata:", e.metadata);
+        const err = { type: "custom", message: "ユーザ名またはパスワードが間違っています" } as const;
+        setFormError("username", err)
+        setFormError("password", err)
+      }
+    }
   });
+
+  const formId = "login-form";
 
   return (
     <Container maxW="48rem" py="7rem" px="2rem">
@@ -57,10 +85,11 @@ export const Login = () => {
             </InputOrganism>
           </form>
         </CardBody>
-        <CardFooter justifyContent="center">
+        <CardFooter flexDirection="column" alignItems="center" gap={2}>
           <Button type="submit" form={formId} size="lg" colorScheme="teal" isLoading={isSubmitting}>
             ログイン
           </Button>
+          <Text color="red.500">{errMsgFooter}</Text>
         </CardFooter>
       </Card>
     </Container>
