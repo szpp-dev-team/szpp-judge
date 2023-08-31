@@ -1,16 +1,16 @@
 import { LoginRequest } from "@/src/gen/proto/backend/v1/messages_pb";
 import { authRepo } from "@/src/repository/auth";
 import { userLoginSchema } from "@/src/zschema/user";
+import { Code, ConnectError } from "@bufbuild/connect";
 import { Button, Card, CardBody, CardFooter, CardHeader, Container, Heading, Input, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { InputOrganism } from "../../ui/InputOrganism";
 import { Link } from "../../ui/Link";
 import { PasswordInput } from "../../ui/PasswordInput";
-import { useState } from "react";
-import { Code, ConnectError } from "@bufbuild/connect";
-import { useRouter } from "next/router";
 
 type FormFields = z.infer<typeof userLoginSchema>;
 
@@ -35,8 +35,8 @@ export const Login = () => {
       console.log("onSubmit(): resp=", resp);
       router.replace("/");
     } catch (e) {
-      setErrMsgFooter("ログインに失敗しました")
-      console.error(typeof (e), e);
+      setErrMsgFooter("ログインに失敗しました");
+      console.error(typeof e, e);
 
       if (e instanceof ConnectError && e.code === Code.Unauthenticated) {
         console.log("e.code:", e.code);
@@ -45,8 +45,8 @@ export const Login = () => {
         console.log("e.details:", e.details);
         console.log("e.metadata:", e.metadata);
         const err = { type: "custom", message: "ユーザ名またはパスワードが間違っています" } as const;
-        setFormError("username", err)
-        setFormError("password", err)
+        setFormError("username", err);
+        setFormError("password", err);
       }
     }
   });
