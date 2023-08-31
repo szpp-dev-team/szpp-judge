@@ -3,6 +3,7 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/resources.proto";
+import "google/protobuf/empty.proto";
 
 message GetUserRequest {
   string username = 1;
