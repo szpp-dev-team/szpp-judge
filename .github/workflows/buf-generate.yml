@@ -1,0 +1,29 @@
+name: buf
+on:
+  push:
+    # 原則として main と develop では generate を行わない
+    # 生成済みのコードを PR を通して merge するという運用にする
+    branchs-ignore:
+      - main
+      - develop
+    paths:
+      - .github/workflows/buf-generate.yml
+      - proto/**
+defaults:
+  run:
+    working-directory: ./proto
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: "1.25.1"
+      - name: generate
+        run: buf generate
+      - name: commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore(proto-gen): [bot] generate code from proto-buf"
+          ref: ${{ steps.upstreambranch.outputs.branch }}
