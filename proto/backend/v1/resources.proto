@@ -22,7 +22,7 @@ message Task {
   string checker = 7; // TODO: judge の型を使う(testlib-checkers or custom)
   oneof task_type {
     TaskContest contest = 8;
-    TaskNormal normal = 9;
+    TaskStandalone standalone = 9;
   }
   google.protobuf.Timestamp created_at = 10;
   optional google.protobuf.Timestamp updated_at = 11;
@@ -35,7 +35,7 @@ message TaskContest {
 }
 
 // 単発の問題
-message TaskNormal {
+message TaskStandalone {
   enum Visibility {
     VISIBILITY_UNSPECIFIED = 0;
     PUBLIC = 1;
@@ -53,7 +53,7 @@ message MutationTask {
   string checker = 6; // TODO: judge の型を使う(testlib-checkers or custom)
   oneof task_type {
     TaskContest contest = 7;
-    TaskNormal normal = 8;
+    TaskStandalone standalone = 8;
   }
 }
 
