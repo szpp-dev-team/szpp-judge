@@ -95,9 +95,9 @@ message GetClarificationResponse{
   Clarification clarification = 1;
 }
 
-message GetClarificationListRequest{}
+message ListClarificationRequest{}
 
-message GetClarificationListResponse{
+message ListClarificationResponse{
   repeated Clarification clarifications = 1;
 }
 
@@ -116,7 +116,7 @@ message DeleteClarificationRequest{
 }
 
 message DeleteClarificationResponse{
-  Clarification clarification = 1;
+  google.protobuf.Empty empty = 1;
 }
 
 message CreateAnswerRequest{
@@ -137,17 +137,17 @@ message GetAnswerResponse{
   Clarification.Answer answer = 1;
 }
 
-message GetAnswerListRequest{}
+message ListAnswerRequest{}
 
-message GetAnswerListResponse{
+message ListAnswerResponse{
   repeated Clarification.Answer answers = 1;
 }
 
-message GetAnswerListByClarificationIdRequest{
+message ListAnswerClarificationIdRequest{
   int32 clarification_id = 1;
 }
 
-message GetAnswerListByClarificationIdResponse{
+message ListAnswerClarificationIdResponse{
   repeated Clarification.Answer answers = 1;
 }
 
@@ -165,5 +165,5 @@ message DeleteAnswerRequest{
 }
 
 message DeleteAnswerResponse{
-  Clarification.Answer answer = 1;
+  google.protobuf.Empty empty = 1;
 }
