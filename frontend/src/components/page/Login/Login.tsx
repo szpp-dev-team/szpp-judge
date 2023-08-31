@@ -2,10 +2,20 @@ import { LoginRequest } from "@/src/gen/proto/backend/v1/messages_pb";
 import { authRepo } from "@/src/repository/auth";
 import { userLoginSchema } from "@/src/zschema/user";
 import { Code, ConnectError } from "@bufbuild/connect";
-import { Button, Card, CardBody, CardFooter, CardHeader, Container, Heading, Input, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Container,
+  Heading,
+  Input,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { InputOrganism } from "../../ui/InputOrganism";
@@ -15,8 +25,10 @@ import { PasswordInput } from "../../ui/PasswordInput";
 type FormFields = z.infer<typeof userLoginSchema>;
 
 export const Login = () => {
-  const [errMsgFooter, setErrMsgFooter] = useState("");
   const router = useRouter();
+  const toast = useToast({
+    position: "bottom",
+  });
 
   const {
     register,
@@ -33,9 +45,16 @@ export const Login = () => {
     try {
       const resp = await authRepo.login(new LoginRequest(values));
       console.log("onSubmit(): resp=", resp);
+      toast({
+        title: `${resp.username} にログインしました`,
+        status: "success",
+      });
       router.replace("/");
     } catch (e) {
-      setErrMsgFooter("ログインに失敗しました");
+      toast({
+        title: "ログインに失敗しました",
+        status: "error",
+      });
       console.error(typeof e, e);
 
       if (e instanceof ConnectError && e.code === Code.Unauthenticated) {
@@ -89,7 +108,6 @@ export const Login = () => {
           <Button type="submit" form={formId} size="lg" colorScheme="teal" isLoading={isSubmitting}>
             ログイン
           </Button>
-          <Text color="red.500">{errMsgFooter}</Text>
         </CardFooter>
       </Card>
     </Container>
