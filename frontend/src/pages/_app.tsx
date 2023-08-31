@@ -9,7 +9,7 @@ z.setErrorMap(defaultErrorMap);
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
-    <ChakraProvider>
+    <ChakraProvider toastOptions={{ defaultOptions: { isClosable: true } }}>
       <Component {...pageProps} />
     </ChakraProvider>
   );
