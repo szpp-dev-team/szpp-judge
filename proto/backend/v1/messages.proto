@@ -42,3 +42,21 @@ message PingRequest {
 message PingResponse {
   string message = 1;
 }
+
+message CreateContestRequest {
+  string slug = 1;
+  string description = 2;
+}
+
+message CreateContestResponse {
+  Contest contest = 1;
+}
+
+message SearchContestRequest {
+  string name = 1;
+  string slug = 2;
+}
+
+message SearchContestResponse {
+  Contest contest = 1;
+}

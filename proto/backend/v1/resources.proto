@@ -11,3 +11,14 @@ message User {
   google.protobuf.Timestamp created_at = 5;
   optional google.protobuf.Timestamp updated_at = 6;
 }
+
+message Contest {
+  int32 id = 1;
+  string name = 2; // ER図から消えていたけどslugをnameとして使うわけではないはず…？
+  string slug = 3;
+  string description = 4;
+  int32 task_id = 5;
+  int32 clarification_id = 6;
+  google.protobuf.Timestamp start_at = 7;
+  google.protobuf.Timestamp end_at = 8;
+}

@@ -21,3 +21,8 @@ service AuthService {
 service HealthcheckService {
   rpc Ping(PingRequest) returns (PingResponse);
 }
+
+service ContestService {
+  rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
+  rpc SearchContest(SearchContestRequest) returns (SearchContestResponse);
+}
