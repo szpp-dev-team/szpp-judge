@@ -2,10 +2,12 @@
   "typescript": {},
   "json": {},
   "excludes": [
+    "**/*-lock.json",
     "**/node_modules",
-    "src/gen/**",
+    ".next/**",
+    "out/**",
     "public/**",
-    "**/*-lock.json"
+    "src/gen/**"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.86.2.wasm",
