@@ -1,5 +1,5 @@
-import { HealthcheckService } from "@/src/gen/proto/backend/v1/services_connect";
 import { backendGrpcTransport } from "@/src/config/grpc";
+import { HealthcheckService } from "@/src/gen/proto/backend/v1/services_connect";
 import { createPromiseClient } from "@bufbuild/connect";
 import { Button, Container } from "@chakra-ui/react";
 import type { NextPage } from "next";
@@ -8,7 +8,7 @@ import { useState } from "react";
 const Page: NextPage = () => {
   const cli = createPromiseClient(
     HealthcheckService,
-    backendGrpcTransport
+    backendGrpcTransport,
   );
 
   const [waitingPing, setWaitingPing] = useState(false);
