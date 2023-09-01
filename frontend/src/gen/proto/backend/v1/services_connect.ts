@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateUserRequest, CreateUserResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse } from "./messages_pb";
+import { CreateContestRequest, CreateContestResponse, CreateUserRequest, CreateUserResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, SearchContestRequest, SearchContestResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -81,6 +81,33 @@ export const HealthcheckService = {
       name: "Ping",
       I: PingRequest,
       O: PingResponse,
+      kind: MethodKind.Unary,
+    },
+  }
+} as const;
+
+/**
+ * @generated from service backend.v1.ContestService
+ */
+export const ContestService = {
+  typeName: "backend.v1.ContestService",
+  methods: {
+    /**
+     * @generated from rpc backend.v1.ContestService.CreateContest
+     */
+    createContest: {
+      name: "CreateContest",
+      I: CreateContestRequest,
+      O: CreateContestResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc backend.v1.ContestService.SearchContest
+     */
+    searchContest: {
+      name: "SearchContest",
+      I: SearchContestRequest,
+      O: SearchContestResponse,
       kind: MethodKind.Unary,
     },
   }

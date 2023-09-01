@@ -496,6 +496,210 @@ func (x *PingResponse) GetMessage() string {
 	return ""
 }
 
+type CreateContestRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Slug        string `protobuf:"bytes,1,opt,name=slug,proto3" json:"slug,omitempty"`
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+}
+
+func (x *CreateContestRequest) Reset() {
+	*x = CreateContestRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateContestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateContestRequest) ProtoMessage() {}
+
+func (x *CreateContestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateContestRequest.ProtoReflect.Descriptor instead.
+func (*CreateContestRequest) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CreateContestRequest) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
+func (x *CreateContestRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type CreateContestResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Contest *Contest `protobuf:"bytes,1,opt,name=contest,proto3" json:"contest,omitempty"`
+}
+
+func (x *CreateContestResponse) Reset() {
+	*x = CreateContestResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateContestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateContestResponse) ProtoMessage() {}
+
+func (x *CreateContestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateContestResponse.ProtoReflect.Descriptor instead.
+func (*CreateContestResponse) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CreateContestResponse) GetContest() *Contest {
+	if x != nil {
+		return x.Contest
+	}
+	return nil
+}
+
+type SearchContestRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Slug string `protobuf:"bytes,2,opt,name=slug,proto3" json:"slug,omitempty"`
+}
+
+func (x *SearchContestRequest) Reset() {
+	*x = SearchContestRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SearchContestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchContestRequest) ProtoMessage() {}
+
+func (x *SearchContestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchContestRequest.ProtoReflect.Descriptor instead.
+func (*SearchContestRequest) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *SearchContestRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SearchContestRequest) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
+type SearchContestResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Contest *Contest `protobuf:"bytes,1,opt,name=contest,proto3" json:"contest,omitempty"`
+}
+
+func (x *SearchContestResponse) Reset() {
+	*x = SearchContestResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SearchContestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchContestResponse) ProtoMessage() {}
+
+func (x *SearchContestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchContestResponse.ProtoReflect.Descriptor instead.
+func (*SearchContestResponse) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *SearchContestResponse) GetContest() *Contest {
+	if x != nil {
+		return x.Contest
+	}
+	return nil
+}
+
 var File_backend_v1_messages_proto protoreflect.FileDescriptor
 
 var file_backend_v1_messages_proto_rawDesc = []byte{
@@ -534,19 +738,36 @@ var file_backend_v1_messages_proto_rawDesc = []byte{
 	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x28,
 	0x0a, 0x0c, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18,
 	0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x42, 0xaf, 0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d,
-	0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x42, 0x0d, 0x4d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x45, 0x67, 0x69,
-	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65,
-	0x76, 0x2d, 0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67,
-	0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62,
-	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e,
-	0x64, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b,
-	0x65, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64,
-	0x5c, 0x56, 0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31,
-	0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0b, 0x42,
-	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x4c, 0x0a, 0x14, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x12, 0x0a, 0x04, 0x73, 0x6c, 0x75, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x73, 0x6c, 0x75, 0x67, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72,
+	0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x46, 0x0a, 0x15, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x2d, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x13, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f,
+	0x6e, 0x74, 0x65, 0x73, 0x74, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x22, 0x3e,
+	0x0a, 0x14, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x6c,
+	0x75, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x73, 0x6c, 0x75, 0x67, 0x22, 0x46,
+	0x0a, 0x15, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65,
+	0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x52, 0x07, 0x63,
+	0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x42, 0xaf, 0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62,
+	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x42, 0x0d, 0x4d, 0x65, 0x73, 0x73, 0x61,
+	0x67, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d,
+	0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63,
+	0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76,
+	0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e,
+	0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56,
+	0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47,
+	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63,
+	0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -561,29 +782,36 @@ func file_backend_v1_messages_proto_rawDescGZIP() []byte {
 	return file_backend_v1_messages_proto_rawDescData
 }
 
-var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_backend_v1_messages_proto_goTypes = []interface{}{
-	(*GetUserRequest)(nil),     // 0: backend.v1.GetUserRequest
-	(*GetUserResponse)(nil),    // 1: backend.v1.GetUserResponse
-	(*CreateUserRequest)(nil),  // 2: backend.v1.CreateUserRequest
-	(*CreateUserResponse)(nil), // 3: backend.v1.CreateUserResponse
-	(*LoginRequest)(nil),       // 4: backend.v1.LoginRequest
-	(*LoginResponse)(nil),      // 5: backend.v1.LoginResponse
-	(*LogoutRequest)(nil),      // 6: backend.v1.LogoutRequest
-	(*LogoutResponse)(nil),     // 7: backend.v1.LogoutResponse
-	(*PingRequest)(nil),        // 8: backend.v1.PingRequest
-	(*PingResponse)(nil),       // 9: backend.v1.PingResponse
-	(*User)(nil),               // 10: backend.v1.User
+	(*GetUserRequest)(nil),        // 0: backend.v1.GetUserRequest
+	(*GetUserResponse)(nil),       // 1: backend.v1.GetUserResponse
+	(*CreateUserRequest)(nil),     // 2: backend.v1.CreateUserRequest
+	(*CreateUserResponse)(nil),    // 3: backend.v1.CreateUserResponse
+	(*LoginRequest)(nil),          // 4: backend.v1.LoginRequest
+	(*LoginResponse)(nil),         // 5: backend.v1.LoginResponse
+	(*LogoutRequest)(nil),         // 6: backend.v1.LogoutRequest
+	(*LogoutResponse)(nil),        // 7: backend.v1.LogoutResponse
+	(*PingRequest)(nil),           // 8: backend.v1.PingRequest
+	(*PingResponse)(nil),          // 9: backend.v1.PingResponse
+	(*CreateContestRequest)(nil),  // 10: backend.v1.CreateContestRequest
+	(*CreateContestResponse)(nil), // 11: backend.v1.CreateContestResponse
+	(*SearchContestRequest)(nil),  // 12: backend.v1.SearchContestRequest
+	(*SearchContestResponse)(nil), // 13: backend.v1.SearchContestResponse
+	(*User)(nil),                  // 14: backend.v1.User
+	(*Contest)(nil),               // 15: backend.v1.Contest
 }
 var file_backend_v1_messages_proto_depIdxs = []int32{
-	10, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
-	10, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
-	10, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
-	3,  // [3:3] is the sub-list for method output_type
-	3,  // [3:3] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	14, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
+	14, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
+	14, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
+	15, // 3: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
+	15, // 4: backend.v1.SearchContestResponse.contest:type_name -> backend.v1.Contest
+	5,  // [5:5] is the sub-list for method output_type
+	5,  // [5:5] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_backend_v1_messages_proto_init() }
@@ -713,6 +941,54 @@ func file_backend_v1_messages_proto_init() {
 				return nil
 			}
 		}
+		file_backend_v1_messages_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateContestRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_v1_messages_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateContestResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_v1_messages_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SearchContestRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_v1_messages_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SearchContestResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -720,7 +996,7 @@ func file_backend_v1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_v1_messages_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
