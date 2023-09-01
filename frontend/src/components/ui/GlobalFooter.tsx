@@ -1,5 +1,6 @@
-import { BoxProps, Flex, Text } from "@chakra-ui/react";
-import { FC } from "react";
+import { Flex, Text } from "@chakra-ui/react";
+import type { BoxProps } from "@chakra-ui/react";
+import type { FC } from "react";
 
 export type GlobalFooterProps = Omit<BoxProps, "children">;
 

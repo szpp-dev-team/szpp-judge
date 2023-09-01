@@ -1,4 +1,4 @@
-import { RequestHandler } from "msw";
+import type { RequestHandler } from "msw";
 import { authHandlers } from "./auth";
 import { healthcheckHandlers } from "./healthcheck";
 

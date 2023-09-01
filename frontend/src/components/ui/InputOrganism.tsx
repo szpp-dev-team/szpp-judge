@@ -1,7 +1,7 @@
 import { FormControl, FormErrorMessage, FormHelperText, FormLabel } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { FieldErrors, FieldValues } from "react-hook-form";
-import { z, ZodTypeAny } from "zod";
+import { z, type ZodTypeAny } from "zod";
 
 export type InputOrganismProps<T extends ZodTypeAny, Fields extends FieldValues = z.infer<T>> = {
   label?: string;

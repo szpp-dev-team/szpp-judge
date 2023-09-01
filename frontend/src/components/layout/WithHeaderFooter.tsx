@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { FC, ReactNode } from "react";
+import { type FC, ReactNode } from "react";
 import { GlobalFooter } from "../ui/GlobalFooter";
 import { GlobalHeader } from "../ui/GlobalHeader";
 

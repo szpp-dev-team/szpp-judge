@@ -1,15 +1,6 @@
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import {
-  Flex,
-  forwardRef,
-  Input,
-  InputGroup,
-  InputGroupProps,
-  InputProps,
-  InputRightElement,
-  Text,
-  TextProps,
-} from "@chakra-ui/react";
+import { Flex, forwardRef, Input, InputGroup, InputRightElement, Text } from "@chakra-ui/react";
+import type { InputGroupProps, InputProps, TextProps } from "@chakra-ui/react";
 import { MouseEventHandler, ReactNode } from "react";
 
 export type ControllablePasswordInputProps = {

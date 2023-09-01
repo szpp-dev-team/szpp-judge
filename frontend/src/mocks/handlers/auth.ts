@@ -1,7 +1,7 @@
 import { LoginRequest, LoginResponse } from "@/src/gen/proto/backend/v1/messages_pb";
 import { AuthService } from "@/src/gen/proto/backend/v1/services_connect";
 import { Timestamp } from "@bufbuild/protobuf";
-import { RequestHandler } from "msw";
+import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
 
 export const authHandlers: RequestHandler[] = [

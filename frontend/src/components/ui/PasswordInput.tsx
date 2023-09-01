@@ -1,5 +1,5 @@
 import { forwardRef, useBoolean } from "@chakra-ui/react";
-import { ControllablePasswordInput, ControllablePasswordInputProps } from "./ControllablePasswordInput";
+import { ControllablePasswordInput, type ControllablePasswordInputProps } from "./ControllablePasswordInput";
 
 export type PasswordInputProps = Omit<
   ControllablePasswordInputProps,
