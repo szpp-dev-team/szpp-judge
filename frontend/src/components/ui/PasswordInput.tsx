@@ -2,8 +2,8 @@ import { forwardRef, useBoolean } from "@chakra-ui/react";
 import { ControllablePasswordInput, ControllablePasswordInputProps } from "./ControllablePasswordInput";
 
 export type PasswordInputProps = Omit<
-  Omit<ControllablePasswordInputProps, "showPassword">,
-  "onToggleButtonClicked"
+  ControllablePasswordInputProps,
+  "showPassword" | "onToggleButtonClicked"
 >;
 
 export const PasswordInput = forwardRef<PasswordInputProps, "input">(
