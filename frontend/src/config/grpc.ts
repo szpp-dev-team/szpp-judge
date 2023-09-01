@@ -1,4 +1,4 @@
 import { createGrpcWebTransport } from "@bufbuild/connect-web";
 
-export const backendGrpcBaseUrl = "http://localhost:8080";
+export const backendGrpcBaseUrl = process.env.NEXT_PUBLIC_ENVOY_BASE_URL!;
 export const backendGrpcTransport = createGrpcWebTransport({ baseUrl: backendGrpcBaseUrl });
