@@ -59,6 +59,8 @@ export type GrpcService<T extends Record<string, MethodInfo>> = Readonly<{
   methods: T;
 }>;
 
+// RequestBodyType_3 等の `_3` がついているものは node_modules/.pnpm/msw@1.2.5_typescript@5.1.6/node_modules/msw/lib/index.d.ts
+// の rest.post() の型パラメータをコピペしたことを表わす
 export type ResponseResolver<
   RequestBodyType_3 extends msw.DefaultBodyType = msw.DefaultBodyType,
   Params_3 extends msw.PathParams<keyof Params_3> = msw.PathParams,
