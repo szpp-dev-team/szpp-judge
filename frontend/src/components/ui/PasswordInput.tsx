@@ -8,12 +8,12 @@ export type PasswordInputProps = Omit<
 
 export const PasswordInput = forwardRef<PasswordInputProps, "input">(
   ({ ...props }, ref) => {
-    const [passwordVisible, setPasswordVisible] = useBoolean(false);
+    const [showPassword, setShowPassword] = useBoolean(false);
     return (
       <ControllablePasswordInput
         ref={ref}
-        showPassword={passwordVisible}
-        onToggleButtonClick={setPasswordVisible.toggle}
+        showPassword={showPassword}
+        onToggleButtonClick={setShowPassword.toggle}
         {...props}
       />
     );
