@@ -11,7 +11,7 @@ export const authHandlers: RequestHandler[] = [
     if (!ok) {
       return res(
         ctx.delay(500),
-        ctx.status(401), // 401 Forbidden
+        ctx.status(401), // 401 Unauthorized
       );
     }
     return res(
