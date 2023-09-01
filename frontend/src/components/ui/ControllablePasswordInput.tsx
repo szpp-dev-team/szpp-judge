@@ -49,13 +49,13 @@ export const ControllablePasswordInput = forwardRef<ControllablePasswordInputPro
             {showPassword
               ? (
                 <>
-                  <ViewIcon />
+                  <ViewOffIcon />
                   <Text {...btnTextProps}>隠す</Text>
                 </>
               )
               : (
                 <>
-                  <ViewOffIcon />
+                  <ViewIcon />
                   <Text {...btnTextProps}>表示する</Text>
                 </>
               )}
