@@ -87,14 +87,16 @@ export class PingResponse extends Message<PingResponse> {
  */
 export class JudgeRequest extends Message<JudgeRequest> {
   /**
-   * @generated from field: string source_code = 1;
+   * GCS上のパス
+   *
+   * @generated from field: string source_code_path = 1;
    */
-  sourceCode = "";
+  sourceCodePath = "";
 
   /**
-   * @generated from field: int32 lang_id = 2;
+   * @generated from field: string lang_id = 2;
    */
-  langId = 0;
+  langId = "";
 
   /**
    * @generated from field: judge.v1.JudgeType judge_type = 3;
@@ -109,16 +111,11 @@ export class JudgeRequest extends Message<JudgeRequest> {
   execTimeLimitMs = 0;
 
   /**
-   * 実行時メモリ制限 [kiB]
+   * 実行時メモリ制限 [MiB]
    *
-   * @generated from field: uint32 exec_memory_limit_kib = 5;
+   * @generated from field: uint32 exec_memory_limit_mib = 5;
    */
-  execMemoryLimitKib = 0;
-
-  /**
-   * @generated from field: string gcs_bucket = 6;
-   */
-  gcsBucket = "";
+  execMemoryLimitMib = 0;
 
   /**
    * @generated from field: repeated judge.v1.Testcase testcases = 7;
@@ -148,12 +145,11 @@ export class JudgeRequest extends Message<JudgeRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "judge.v1.JudgeRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "source_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "lang_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 1, name: "source_code_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "lang_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "judge_type", kind: "message", T: JudgeType },
     { no: 4, name: "exec_time_limit_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 5, name: "exec_memory_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 6, name: "gcs_bucket", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "exec_memory_limit_mib", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 7, name: "testcases", kind: "message", T: Testcase, repeated: true },
     { no: 8, name: "want_result_detail", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
     { no: 9, name: "stdout_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
@@ -260,9 +256,9 @@ export class RunRequest extends Message<RunRequest> {
   sourceCode = "";
 
   /**
-   * @generated from field: int32 lang_id = 2;
+   * @generated from field: string lang_id = 2;
    */
-  langId = 0;
+  langId = "";
 
   /**
    * @generated from field: string stdin = 3;
@@ -277,11 +273,11 @@ export class RunRequest extends Message<RunRequest> {
   execTimeLimitMs = 0;
 
   /**
-   * 実行時メモリ制限 [kiB]
+   * 実行時メモリ制限 [MiB]
    *
-   * @generated from field: uint32 exec_memory_limit_kib = 5;
+   * @generated from field: uint32 exec_memory_limit_mib = 5;
    */
-  execMemoryLimitKib = 0;
+  execMemoryLimitMib = 0;
 
   /**
    * @generated from field: optional uint32 stdout_limit_kib = 6;
@@ -302,10 +298,10 @@ export class RunRequest extends Message<RunRequest> {
   static readonly typeName = "judge.v1.RunRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "lang_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "lang_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "stdin", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "exec_time_limit_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 5, name: "exec_memory_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 5, name: "exec_memory_limit_mib", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 6, name: "stdout_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 7, name: "stderr_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
   ]);
