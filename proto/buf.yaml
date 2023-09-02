@@ -5,5 +5,8 @@ breaking:
 lint:
   use:
     - DEFAULT
+  ignore_only:
+    ENUM_VALUE_PREFIX:
+      - judge/v1/resources.proto
 deps:
   - buf.build/googleapis/googleapis
