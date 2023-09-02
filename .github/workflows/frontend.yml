@@ -53,6 +53,8 @@ jobs:
       # next build を実行すると内部で lint も実行してくれる
       - name: Build with lint
         run: pnpm build
+        env:
+          NEXT_PUBLIC_ENVOY_BASE_URL: ${{ secrets.NEXT_PUBLIC_ENVOY_BASE_URL }}
 
       - name: Format
         run: pnpm fmt
