@@ -162,9 +162,9 @@ export class Task extends Message<Task> {
   statement = "";
 
   /**
-   * 実行時間制限[s]
+   * 実行時間制限[ms]
    *
-   * @generated from field: double exec_time_limit = 4;
+   * @generated from field: int32 exec_time_limit = 4;
    */
   execTimeLimit = 0;
 
@@ -215,7 +215,7 @@ export class Task extends Message<Task> {
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "exec_time_limit", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 4, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 6, name: "contest_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
     { no: 7, name: "judge_type", kind: "message", T: JudgeType },
