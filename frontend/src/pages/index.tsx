@@ -1,11 +1,3 @@
-import type { NextPage } from "next";
+import { TopPage } from "@/src/components/page/Top/Top.page";
 
-const Page: NextPage = () => { // TODO: cool name
-  return (
-    <p>
-      This page will be at /.
-    </p>
-  );
-};
-
-export default Page;
+export default TopPage;

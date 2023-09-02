@@ -1,3 +1,5 @@
+import { backendGrpcBaseUrl } from "../config/grpc";
+
 /** https://github.com/mswjs/msw/discussions/1231 */
 const ignoredPathnames = [
   "/_next/static/development",
@@ -12,7 +14,7 @@ async function initMocks() {
     const { worker } = await import("./browser");
     worker.start({
       onUnhandledRequest: (req, print) => {
-        if (req.url.protocol === "chrome-extension:") {
+        if (!req.url.toString().startsWith(backendGrpcBaseUrl)) {
           return;
         }
         if (ignoredPathnames.some(pathname => req.url.pathname.startsWith(pathname))) {
