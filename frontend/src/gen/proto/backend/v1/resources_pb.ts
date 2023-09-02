@@ -260,9 +260,9 @@ export class MutationTask extends Message<MutationTask> {
   statement = "";
 
   /**
-   * 実行時間制限[s]
+   * 実行時間制限[ms]
    *
-   * @generated from field: double exec_time_limit = 3;
+   * @generated from field: int32 exec_time_limit = 3;
    */
   execTimeLimit = 0;
 
@@ -295,7 +295,7 @@ export class MutationTask extends Message<MutationTask> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "exec_time_limit", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 3, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "judge_type", kind: "message", T: JudgeType },
     { no: 6, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
