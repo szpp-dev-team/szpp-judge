@@ -29,6 +29,8 @@ service TaskService {
   rpc Submit(SubmitRequest) returns (SubmitResponse);
   // 提出の詳細を取得
   rpc GetSubmission(GetSubmissionRequest) returns (GetSubmissionResponse);
+  // 提出一覧を取得
+  rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissoinsResponse);
 }
 
 service HealthcheckService {

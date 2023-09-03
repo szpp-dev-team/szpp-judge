@@ -95,3 +95,33 @@ message GetSubmissionRequest {
 message GetSubmissionResponse {
   Submit submit = 1;
 }
+
+message ListSubmissionsRequest {
+  optional int32 contest_id = 1;
+  optional int32 user_id = 2;
+}
+
+message ListSubmissoinsResponse {
+  repeated SubmissonSummary submissions = 1;
+}
+
+message SubmissonSummary {
+  int32 id = 1;
+
+  int32 user_id = 2;
+  string user_name = 3;
+  
+  optional int32 contest_id = 4;
+
+  int32 task_id = 5;
+  string task_title = 6;
+
+  string lang_id = 7;
+
+  string status = 8;
+  int score = 9;
+  optional uint32 exec_time = 10;
+  optional uint32 memory = 11;
+
+  google.protobuf.Timestamp submited_at = 12; 
+}
