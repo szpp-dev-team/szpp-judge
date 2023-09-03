@@ -78,7 +78,7 @@ message PingResponse {
 }
 
 message SubmitRequest {
-  int32 contest_id = 1;
+  optional int32 contest_id = 1;
   int32 task_id = 2;
   string langage = 3;
   string source_code = 4;
