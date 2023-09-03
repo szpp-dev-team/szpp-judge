@@ -1,5 +1,5 @@
 import { Difficulty } from "@/src/model/task";
-import { captalize } from "@/src/util/string";
+import { capitalize } from "@/src/util/string";
 import { Box, type BoxProps } from "@chakra-ui/react";
 import type { FC } from "react";
 
@@ -24,7 +24,7 @@ const Base = ({ d, ...props }: {
       fontSize="xs"
       {...props}
     >
-      {captalize(d)}
+      {capitalize(d)}
     </Box>
   );
 };
