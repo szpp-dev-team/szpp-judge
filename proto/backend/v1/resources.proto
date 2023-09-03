@@ -112,9 +112,9 @@ message Submit {
   string status = 7;
   optional uint32 exectime = 8;
   optional uint32 memory = 9;
-  time.Time submited_at = 10;
-  time.Time created_at = 11;
-  optional time.Time update_at = 12;
+  google.protobuf.Timestamp submited_at = 10;
+  google.protobuf.Timestamp created_at = 11;
+  optional google.protobuf.Timestamp update_at = 12;
   repeated TestcaseResult TestcaseResult = 13;
 }
 
