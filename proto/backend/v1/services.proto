@@ -27,7 +27,7 @@ service TaskService {
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
   // 提出する
   rpc Submit(SubmitRequest) returns (SubmitResponse);
-  // ジャッジ状況を取得する
+  // 提出の詳細を取得
   rpc GetSubmission(GetSubmissionRequest) returns (GetSubmissionResponse);
 }
 
