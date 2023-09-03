@@ -110,12 +110,13 @@ message Submit {
   string source_code = 5;
   string lang_id = 6;
   string status = 7;
-  optional uint32 exectime = 8;
-  optional uint32 memory = 9;
-  google.protobuf.Timestamp submited_at = 10;
-  google.protobuf.Timestamp created_at = 11;
-  optional google.protobuf.Timestamp update_at = 12;
-  repeated TestcaseResult TestcaseResult = 13;
+  int score = 8;
+  optional uint32 exectime = 9;
+  optional uint32 memory = 10;
+  google.protobuf.Timestamp submited_at = 11;
+  google.protobuf.Timestamp created_at = 12;
+  optional google.protobuf.Timestamp update_at = 13;
+  repeated TestcaseResult TestcaseResult = 14;
 }
 
 message TestcaseResult {
