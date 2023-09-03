@@ -25,7 +25,7 @@ type TaskQuery struct {
 	inters           []Interceptor
 	predicates       []predicate.Task
 	withTestcaseSets *TestcaseSetQuery
-	withUsers        *UserQuery
+	withUser         *UserQuery
 	withFKs          bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -85,8 +85,8 @@ func (tq *TaskQuery) QueryTestcaseSets() *TestcaseSetQuery {
 	return query
 }
 
-// QueryUsers chains the current query on the "users" edge.
-func (tq *TaskQuery) QueryUsers() *UserQuery {
+// QueryUser chains the current query on the "user" edge.
+func (tq *TaskQuery) QueryUser() *UserQuery {
 	query := (&UserClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
@@ -99,7 +99,7 @@ func (tq *TaskQuery) QueryUsers() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(task.Table, task.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, task.UsersTable, task.UsersColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, task.UserTable, task.UserColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -300,7 +300,7 @@ func (tq *TaskQuery) Clone() *TaskQuery {
 		inters:           append([]Interceptor{}, tq.inters...),
 		predicates:       append([]predicate.Task{}, tq.predicates...),
 		withTestcaseSets: tq.withTestcaseSets.Clone(),
-		withUsers:        tq.withUsers.Clone(),
+		withUser:         tq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -318,14 +318,14 @@ func (tq *TaskQuery) WithTestcaseSets(opts ...func(*TestcaseSetQuery)) *TaskQuer
 	return tq
 }
 
-// WithUsers tells the query-builder to eager-load the nodes that are connected to
-// the "users" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TaskQuery) WithUsers(opts ...func(*UserQuery)) *TaskQuery {
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TaskQuery) WithUser(opts ...func(*UserQuery)) *TaskQuery {
 	query := (&UserClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	tq.withUsers = query
+	tq.withUser = query
 	return tq
 }
 
@@ -410,10 +410,10 @@ func (tq *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 		_spec       = tq.querySpec()
 		loadedTypes = [2]bool{
 			tq.withTestcaseSets != nil,
-			tq.withUsers != nil,
+			tq.withUser != nil,
 		}
 	)
-	if tq.withUsers != nil {
+	if tq.withUser != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -444,9 +444,9 @@ func (tq *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 			return nil, err
 		}
 	}
-	if query := tq.withUsers; query != nil {
-		if err := tq.loadUsers(ctx, query, nodes, nil,
-			func(n *Task, e *User) { n.Edges.Users = e }); err != nil {
+	if query := tq.withUser; query != nil {
+		if err := tq.loadUser(ctx, query, nodes, nil,
+			func(n *Task, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -484,7 +484,7 @@ func (tq *TaskQuery) loadTestcaseSets(ctx context.Context, query *TestcaseSetQue
 	}
 	return nil
 }
-func (tq *TaskQuery) loadUsers(ctx context.Context, query *UserQuery, nodes []*Task, init func(*Task), assign func(*Task, *User)) error {
+func (tq *TaskQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Task, init func(*Task), assign func(*Task, *User)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Task)
 	for i := range nodes {

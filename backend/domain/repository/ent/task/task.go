@@ -3,6 +3,8 @@
 package task
 
 import (
+	"fmt"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -22,6 +24,8 @@ const (
 	FieldExecTimeLimit = "exec_time_limit"
 	// FieldExecMemoryLimit holds the string denoting the exec_memory_limit field in the database.
 	FieldExecMemoryLimit = "exec_memory_limit"
+	// FieldJudgeType holds the string denoting the judge_type field in the database.
+	FieldJudgeType = "judge_type"
 	// FieldCaseInsensitive holds the string denoting the case_insensitive field in the database.
 	FieldCaseInsensitive = "case_insensitive"
 	// FieldNdigits holds the string denoting the ndigits field in the database.
@@ -34,8 +38,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeTestcaseSets holds the string denoting the testcase_sets edge name in mutations.
 	EdgeTestcaseSets = "testcase_sets"
-	// EdgeUsers holds the string denoting the users edge name in mutations.
-	EdgeUsers = "users"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the task in the database.
 	Table = "tasks"
 	// TestcaseSetsTable is the table that holds the testcase_sets relation/edge.
@@ -45,13 +49,13 @@ const (
 	TestcaseSetsInverseTable = "testcase_sets"
 	// TestcaseSetsColumn is the table column denoting the testcase_sets relation/edge.
 	TestcaseSetsColumn = "task_testcase_sets"
-	// UsersTable is the table that holds the users relation/edge.
-	UsersTable = "tasks"
-	// UsersInverseTable is the table name for the User entity.
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "tasks"
+	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UsersInverseTable = "users"
-	// UsersColumn is the table column denoting the users relation/edge.
-	UsersColumn = "user_tasks"
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_tasks"
 )
 
 // Columns holds all SQL columns for task fields.
@@ -62,6 +66,7 @@ var Columns = []string{
 	FieldDifficulty,
 	FieldExecTimeLimit,
 	FieldExecMemoryLimit,
+	FieldJudgeType,
 	FieldCaseInsensitive,
 	FieldNdigits,
 	FieldJudgeCodePath,
@@ -88,6 +93,31 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
+}
+
+// JudgeType defines the type for the "judge_type" enum field.
+type JudgeType string
+
+// JudgeType values.
+const (
+	JudgeTypeNormal      JudgeType = "normal"
+	JudgeTypeEps         JudgeType = "eps"
+	JudgeTypeInteractive JudgeType = "interactive"
+	JudgeTypeCustom      JudgeType = "custom"
+)
+
+func (jt JudgeType) String() string {
+	return string(jt)
+}
+
+// JudgeTypeValidator is a validator for the "judge_type" field enum values. It is called by the builders before save.
+func JudgeTypeValidator(jt JudgeType) error {
+	switch jt {
+	case JudgeTypeNormal, JudgeTypeEps, JudgeTypeInteractive, JudgeTypeCustom:
+		return nil
+	default:
+		return fmt.Errorf("task: invalid enum value for judge_type field: %q", jt)
+	}
 }
 
 // OrderOption defines the ordering options for the Task queries.
@@ -121,6 +151,11 @@ func ByExecTimeLimit(opts ...sql.OrderTermOption) OrderOption {
 // ByExecMemoryLimit orders the results by the exec_memory_limit field.
 func ByExecMemoryLimit(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExecMemoryLimit, opts...).ToFunc()
+}
+
+// ByJudgeType orders the results by the judge_type field.
+func ByJudgeType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldJudgeType, opts...).ToFunc()
 }
 
 // ByCaseInsensitive orders the results by the case_insensitive field.
@@ -162,10 +197,10 @@ func ByTestcaseSets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByUsersField orders the results by users field.
-func ByUsersField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUsersStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newTestcaseSetsStep() *sqlgraph.Step {
@@ -175,10 +210,10 @@ func newTestcaseSetsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, TestcaseSetsTable, TestcaseSetsColumn),
 	)
 }
-func newUsersStep() *sqlgraph.Step {
+func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UsersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UsersTable, UsersColumn),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
 	)
 }

@@ -81,23 +81,23 @@ func (tsu *TestcaseSetUpdate) ClearUpdatedAt() *TestcaseSetUpdate {
 	return tsu
 }
 
-// SetTasksID sets the "tasks" edge to the Task entity by ID.
-func (tsu *TestcaseSetUpdate) SetTasksID(id int) *TestcaseSetUpdate {
-	tsu.mutation.SetTasksID(id)
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (tsu *TestcaseSetUpdate) SetTaskID(id int) *TestcaseSetUpdate {
+	tsu.mutation.SetTaskID(id)
 	return tsu
 }
 
-// SetNillableTasksID sets the "tasks" edge to the Task entity by ID if the given value is not nil.
-func (tsu *TestcaseSetUpdate) SetNillableTasksID(id *int) *TestcaseSetUpdate {
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (tsu *TestcaseSetUpdate) SetNillableTaskID(id *int) *TestcaseSetUpdate {
 	if id != nil {
-		tsu = tsu.SetTasksID(*id)
+		tsu = tsu.SetTaskID(*id)
 	}
 	return tsu
 }
 
-// SetTasks sets the "tasks" edge to the Task entity.
-func (tsu *TestcaseSetUpdate) SetTasks(t *Task) *TestcaseSetUpdate {
-	return tsu.SetTasksID(t.ID)
+// SetTask sets the "task" edge to the Task entity.
+func (tsu *TestcaseSetUpdate) SetTask(t *Task) *TestcaseSetUpdate {
+	return tsu.SetTaskID(t.ID)
 }
 
 // AddTestcaseIDs adds the "testcases" edge to the Testcase entity by IDs.
@@ -120,9 +120,9 @@ func (tsu *TestcaseSetUpdate) Mutation() *TestcaseSetMutation {
 	return tsu.mutation
 }
 
-// ClearTasks clears the "tasks" edge to the Task entity.
-func (tsu *TestcaseSetUpdate) ClearTasks() *TestcaseSetUpdate {
-	tsu.mutation.ClearTasks()
+// ClearTask clears the "task" edge to the Task entity.
+func (tsu *TestcaseSetUpdate) ClearTask() *TestcaseSetUpdate {
+	tsu.mutation.ClearTask()
 	return tsu
 }
 
@@ -204,12 +204,12 @@ func (tsu *TestcaseSetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if tsu.mutation.UpdatedAtCleared() {
 		_spec.ClearField(testcaseset.FieldUpdatedAt, field.TypeTime)
 	}
-	if tsu.mutation.TasksCleared() {
+	if tsu.mutation.TaskCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   testcaseset.TasksTable,
-			Columns: []string{testcaseset.TasksColumn},
+			Table:   testcaseset.TaskTable,
+			Columns: []string{testcaseset.TaskColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
@@ -217,12 +217,12 @@ func (tsu *TestcaseSetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tsu.mutation.TasksIDs(); len(nodes) > 0 {
+	if nodes := tsu.mutation.TaskIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   testcaseset.TasksTable,
-			Columns: []string{testcaseset.TasksColumn},
+			Table:   testcaseset.TaskTable,
+			Columns: []string{testcaseset.TaskColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
@@ -349,23 +349,23 @@ func (tsuo *TestcaseSetUpdateOne) ClearUpdatedAt() *TestcaseSetUpdateOne {
 	return tsuo
 }
 
-// SetTasksID sets the "tasks" edge to the Task entity by ID.
-func (tsuo *TestcaseSetUpdateOne) SetTasksID(id int) *TestcaseSetUpdateOne {
-	tsuo.mutation.SetTasksID(id)
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (tsuo *TestcaseSetUpdateOne) SetTaskID(id int) *TestcaseSetUpdateOne {
+	tsuo.mutation.SetTaskID(id)
 	return tsuo
 }
 
-// SetNillableTasksID sets the "tasks" edge to the Task entity by ID if the given value is not nil.
-func (tsuo *TestcaseSetUpdateOne) SetNillableTasksID(id *int) *TestcaseSetUpdateOne {
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (tsuo *TestcaseSetUpdateOne) SetNillableTaskID(id *int) *TestcaseSetUpdateOne {
 	if id != nil {
-		tsuo = tsuo.SetTasksID(*id)
+		tsuo = tsuo.SetTaskID(*id)
 	}
 	return tsuo
 }
 
-// SetTasks sets the "tasks" edge to the Task entity.
-func (tsuo *TestcaseSetUpdateOne) SetTasks(t *Task) *TestcaseSetUpdateOne {
-	return tsuo.SetTasksID(t.ID)
+// SetTask sets the "task" edge to the Task entity.
+func (tsuo *TestcaseSetUpdateOne) SetTask(t *Task) *TestcaseSetUpdateOne {
+	return tsuo.SetTaskID(t.ID)
 }
 
 // AddTestcaseIDs adds the "testcases" edge to the Testcase entity by IDs.
@@ -388,9 +388,9 @@ func (tsuo *TestcaseSetUpdateOne) Mutation() *TestcaseSetMutation {
 	return tsuo.mutation
 }
 
-// ClearTasks clears the "tasks" edge to the Task entity.
-func (tsuo *TestcaseSetUpdateOne) ClearTasks() *TestcaseSetUpdateOne {
-	tsuo.mutation.ClearTasks()
+// ClearTask clears the "task" edge to the Task entity.
+func (tsuo *TestcaseSetUpdateOne) ClearTask() *TestcaseSetUpdateOne {
+	tsuo.mutation.ClearTask()
 	return tsuo
 }
 
@@ -502,12 +502,12 @@ func (tsuo *TestcaseSetUpdateOne) sqlSave(ctx context.Context) (_node *TestcaseS
 	if tsuo.mutation.UpdatedAtCleared() {
 		_spec.ClearField(testcaseset.FieldUpdatedAt, field.TypeTime)
 	}
-	if tsuo.mutation.TasksCleared() {
+	if tsuo.mutation.TaskCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   testcaseset.TasksTable,
-			Columns: []string{testcaseset.TasksColumn},
+			Table:   testcaseset.TaskTable,
+			Columns: []string{testcaseset.TaskColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
@@ -515,12 +515,12 @@ func (tsuo *TestcaseSetUpdateOne) sqlSave(ctx context.Context) (_node *TestcaseS
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tsuo.mutation.TasksIDs(); len(nodes) > 0 {
+	if nodes := tsuo.mutation.TaskIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   testcaseset.TasksTable,
-			Columns: []string{testcaseset.TasksColumn},
+			Table:   testcaseset.TaskTable,
+			Columns: []string{testcaseset.TaskColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),

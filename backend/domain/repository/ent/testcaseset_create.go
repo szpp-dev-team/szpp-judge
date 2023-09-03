@@ -66,23 +66,23 @@ func (tsc *TestcaseSetCreate) SetID(i int) *TestcaseSetCreate {
 	return tsc
 }
 
-// SetTasksID sets the "tasks" edge to the Task entity by ID.
-func (tsc *TestcaseSetCreate) SetTasksID(id int) *TestcaseSetCreate {
-	tsc.mutation.SetTasksID(id)
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (tsc *TestcaseSetCreate) SetTaskID(id int) *TestcaseSetCreate {
+	tsc.mutation.SetTaskID(id)
 	return tsc
 }
 
-// SetNillableTasksID sets the "tasks" edge to the Task entity by ID if the given value is not nil.
-func (tsc *TestcaseSetCreate) SetNillableTasksID(id *int) *TestcaseSetCreate {
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (tsc *TestcaseSetCreate) SetNillableTaskID(id *int) *TestcaseSetCreate {
 	if id != nil {
-		tsc = tsc.SetTasksID(*id)
+		tsc = tsc.SetTaskID(*id)
 	}
 	return tsc
 }
 
-// SetTasks sets the "tasks" edge to the Task entity.
-func (tsc *TestcaseSetCreate) SetTasks(t *Task) *TestcaseSetCreate {
-	return tsc.SetTasksID(t.ID)
+// SetTask sets the "task" edge to the Task entity.
+func (tsc *TestcaseSetCreate) SetTask(t *Task) *TestcaseSetCreate {
+	return tsc.SetTaskID(t.ID)
 }
 
 // AddTestcaseIDs adds the "testcases" edge to the Testcase entity by IDs.
@@ -198,12 +198,12 @@ func (tsc *TestcaseSetCreate) createSpec() (*TestcaseSet, *sqlgraph.CreateSpec) 
 		_spec.SetField(testcaseset.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = &value
 	}
-	if nodes := tsc.mutation.TasksIDs(); len(nodes) > 0 {
+	if nodes := tsc.mutation.TaskIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   testcaseset.TasksTable,
-			Columns: []string{testcaseset.TasksColumn},
+			Table:   testcaseset.TaskTable,
+			Columns: []string{testcaseset.TaskColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),

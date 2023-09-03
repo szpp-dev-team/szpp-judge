@@ -19,9 +19,10 @@ func (Task) Fields() []ent.Field {
 		field.Uint("exec_time_limit"),   // ms
 		field.Uint("exec_memory_limit"), // MiB
 
-		field.Bool("case_insensitive"),  // normal
-		field.Uint("ndigits"),           // eps
-		field.String("judge_code_path"), // interactive, custom
+		field.Enum("judge_type").Values("normal", "eps", "interactive", "custom"),
+		field.Bool("case_insensitive").Optional().Nillable(),  // normal
+		field.Uint("ndigits").Optional().Nillable(),           // eps
+		field.String("judge_code_path").Optional().Nillable(), // interactive, custom
 
 		field.Time("created_at"),
 		field.Time("updated_at").Optional().Nillable(),
@@ -31,6 +32,6 @@ func (Task) Fields() []ent.Field {
 func (Task) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("testcase_sets", TestcaseSet.Type),
-		edge.From("users", User.Type).Ref("tasks").Unique(),
+		edge.From("user", User.Type).Ref("tasks").Unique(),
 	}
 }

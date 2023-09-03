@@ -380,6 +380,26 @@ func ExecMemoryLimitLTE(v uint) predicate.Task {
 	return predicate.Task(sql.FieldLTE(FieldExecMemoryLimit, v))
 }
 
+// JudgeTypeEQ applies the EQ predicate on the "judge_type" field.
+func JudgeTypeEQ(v JudgeType) predicate.Task {
+	return predicate.Task(sql.FieldEQ(FieldJudgeType, v))
+}
+
+// JudgeTypeNEQ applies the NEQ predicate on the "judge_type" field.
+func JudgeTypeNEQ(v JudgeType) predicate.Task {
+	return predicate.Task(sql.FieldNEQ(FieldJudgeType, v))
+}
+
+// JudgeTypeIn applies the In predicate on the "judge_type" field.
+func JudgeTypeIn(vs ...JudgeType) predicate.Task {
+	return predicate.Task(sql.FieldIn(FieldJudgeType, vs...))
+}
+
+// JudgeTypeNotIn applies the NotIn predicate on the "judge_type" field.
+func JudgeTypeNotIn(vs ...JudgeType) predicate.Task {
+	return predicate.Task(sql.FieldNotIn(FieldJudgeType, vs...))
+}
+
 // CaseInsensitiveEQ applies the EQ predicate on the "case_insensitive" field.
 func CaseInsensitiveEQ(v bool) predicate.Task {
 	return predicate.Task(sql.FieldEQ(FieldCaseInsensitive, v))
@@ -388,6 +408,16 @@ func CaseInsensitiveEQ(v bool) predicate.Task {
 // CaseInsensitiveNEQ applies the NEQ predicate on the "case_insensitive" field.
 func CaseInsensitiveNEQ(v bool) predicate.Task {
 	return predicate.Task(sql.FieldNEQ(FieldCaseInsensitive, v))
+}
+
+// CaseInsensitiveIsNil applies the IsNil predicate on the "case_insensitive" field.
+func CaseInsensitiveIsNil() predicate.Task {
+	return predicate.Task(sql.FieldIsNull(FieldCaseInsensitive))
+}
+
+// CaseInsensitiveNotNil applies the NotNil predicate on the "case_insensitive" field.
+func CaseInsensitiveNotNil() predicate.Task {
+	return predicate.Task(sql.FieldNotNull(FieldCaseInsensitive))
 }
 
 // NdigitsEQ applies the EQ predicate on the "ndigits" field.
@@ -428,6 +458,16 @@ func NdigitsLT(v uint) predicate.Task {
 // NdigitsLTE applies the LTE predicate on the "ndigits" field.
 func NdigitsLTE(v uint) predicate.Task {
 	return predicate.Task(sql.FieldLTE(FieldNdigits, v))
+}
+
+// NdigitsIsNil applies the IsNil predicate on the "ndigits" field.
+func NdigitsIsNil() predicate.Task {
+	return predicate.Task(sql.FieldIsNull(FieldNdigits))
+}
+
+// NdigitsNotNil applies the NotNil predicate on the "ndigits" field.
+func NdigitsNotNil() predicate.Task {
+	return predicate.Task(sql.FieldNotNull(FieldNdigits))
 }
 
 // JudgeCodePathEQ applies the EQ predicate on the "judge_code_path" field.
@@ -483,6 +523,16 @@ func JudgeCodePathHasPrefix(v string) predicate.Task {
 // JudgeCodePathHasSuffix applies the HasSuffix predicate on the "judge_code_path" field.
 func JudgeCodePathHasSuffix(v string) predicate.Task {
 	return predicate.Task(sql.FieldHasSuffix(FieldJudgeCodePath, v))
+}
+
+// JudgeCodePathIsNil applies the IsNil predicate on the "judge_code_path" field.
+func JudgeCodePathIsNil() predicate.Task {
+	return predicate.Task(sql.FieldIsNull(FieldJudgeCodePath))
+}
+
+// JudgeCodePathNotNil applies the NotNil predicate on the "judge_code_path" field.
+func JudgeCodePathNotNil() predicate.Task {
+	return predicate.Task(sql.FieldNotNull(FieldJudgeCodePath))
 }
 
 // JudgeCodePathEqualFold applies the EqualFold predicate on the "judge_code_path" field.
@@ -608,21 +658,21 @@ func HasTestcaseSetsWith(preds ...predicate.TestcaseSet) predicate.Task {
 	})
 }
 
-// HasUsers applies the HasEdge predicate on the "users" edge.
-func HasUsers() predicate.Task {
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.Task {
 	return predicate.Task(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UsersTable, UsersColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUsersWith applies the HasEdge predicate on the "users" edge with a given conditions (other predicates).
-func HasUsersWith(preds ...predicate.User) predicate.Task {
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.Task {
 	return predicate.Task(func(s *sql.Selector) {
-		step := newUsersStep()
+		step := newUserStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -33,6 +33,14 @@ func (tc *TestcaseCreate) SetDescription(s string) *TestcaseCreate {
 	return tc
 }
 
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (tc *TestcaseCreate) SetNillableDescription(s *string) *TestcaseCreate {
+	if s != nil {
+		tc.SetDescription(*s)
+	}
+	return tc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (tc *TestcaseCreate) SetCreatedAt(t time.Time) *TestcaseCreate {
 	tc.mutation.SetCreatedAt(t)
@@ -111,9 +119,6 @@ func (tc *TestcaseCreate) check() error {
 	if _, ok := tc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Testcase.name"`)}
 	}
-	if _, ok := tc.mutation.Description(); !ok {
-		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Testcase.description"`)}
-	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Testcase.created_at"`)}
 	}
@@ -155,7 +160,7 @@ func (tc *TestcaseCreate) createSpec() (*Testcase, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := tc.mutation.Description(); ok {
 		_spec.SetField(testcase.FieldDescription, field.TypeString, value)
-		_node.Description = value
+		_node.Description = &value
 	}
 	if value, ok := tc.mutation.CreatedAt(); ok {
 		_spec.SetField(testcase.FieldCreatedAt, field.TypeTime, value)

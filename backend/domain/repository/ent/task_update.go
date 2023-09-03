@@ -74,9 +74,29 @@ func (tu *TaskUpdate) AddExecMemoryLimit(u int) *TaskUpdate {
 	return tu
 }
 
+// SetJudgeType sets the "judge_type" field.
+func (tu *TaskUpdate) SetJudgeType(tt task.JudgeType) *TaskUpdate {
+	tu.mutation.SetJudgeType(tt)
+	return tu
+}
+
 // SetCaseInsensitive sets the "case_insensitive" field.
 func (tu *TaskUpdate) SetCaseInsensitive(b bool) *TaskUpdate {
 	tu.mutation.SetCaseInsensitive(b)
+	return tu
+}
+
+// SetNillableCaseInsensitive sets the "case_insensitive" field if the given value is not nil.
+func (tu *TaskUpdate) SetNillableCaseInsensitive(b *bool) *TaskUpdate {
+	if b != nil {
+		tu.SetCaseInsensitive(*b)
+	}
+	return tu
+}
+
+// ClearCaseInsensitive clears the value of the "case_insensitive" field.
+func (tu *TaskUpdate) ClearCaseInsensitive() *TaskUpdate {
+	tu.mutation.ClearCaseInsensitive()
 	return tu
 }
 
@@ -87,15 +107,43 @@ func (tu *TaskUpdate) SetNdigits(u uint) *TaskUpdate {
 	return tu
 }
 
+// SetNillableNdigits sets the "ndigits" field if the given value is not nil.
+func (tu *TaskUpdate) SetNillableNdigits(u *uint) *TaskUpdate {
+	if u != nil {
+		tu.SetNdigits(*u)
+	}
+	return tu
+}
+
 // AddNdigits adds u to the "ndigits" field.
 func (tu *TaskUpdate) AddNdigits(u int) *TaskUpdate {
 	tu.mutation.AddNdigits(u)
 	return tu
 }
 
+// ClearNdigits clears the value of the "ndigits" field.
+func (tu *TaskUpdate) ClearNdigits() *TaskUpdate {
+	tu.mutation.ClearNdigits()
+	return tu
+}
+
 // SetJudgeCodePath sets the "judge_code_path" field.
 func (tu *TaskUpdate) SetJudgeCodePath(s string) *TaskUpdate {
 	tu.mutation.SetJudgeCodePath(s)
+	return tu
+}
+
+// SetNillableJudgeCodePath sets the "judge_code_path" field if the given value is not nil.
+func (tu *TaskUpdate) SetNillableJudgeCodePath(s *string) *TaskUpdate {
+	if s != nil {
+		tu.SetJudgeCodePath(*s)
+	}
+	return tu
+}
+
+// ClearJudgeCodePath clears the value of the "judge_code_path" field.
+func (tu *TaskUpdate) ClearJudgeCodePath() *TaskUpdate {
+	tu.mutation.ClearJudgeCodePath()
 	return tu
 }
 
@@ -140,23 +188,23 @@ func (tu *TaskUpdate) AddTestcaseSets(t ...*TestcaseSet) *TaskUpdate {
 	return tu.AddTestcaseSetIDs(ids...)
 }
 
-// SetUsersID sets the "users" edge to the User entity by ID.
-func (tu *TaskUpdate) SetUsersID(id int) *TaskUpdate {
-	tu.mutation.SetUsersID(id)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (tu *TaskUpdate) SetUserID(id int) *TaskUpdate {
+	tu.mutation.SetUserID(id)
 	return tu
 }
 
-// SetNillableUsersID sets the "users" edge to the User entity by ID if the given value is not nil.
-func (tu *TaskUpdate) SetNillableUsersID(id *int) *TaskUpdate {
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (tu *TaskUpdate) SetNillableUserID(id *int) *TaskUpdate {
 	if id != nil {
-		tu = tu.SetUsersID(*id)
+		tu = tu.SetUserID(*id)
 	}
 	return tu
 }
 
-// SetUsers sets the "users" edge to the User entity.
-func (tu *TaskUpdate) SetUsers(u *User) *TaskUpdate {
-	return tu.SetUsersID(u.ID)
+// SetUser sets the "user" edge to the User entity.
+func (tu *TaskUpdate) SetUser(u *User) *TaskUpdate {
+	return tu.SetUserID(u.ID)
 }
 
 // Mutation returns the TaskMutation object of the builder.
@@ -185,9 +233,9 @@ func (tu *TaskUpdate) RemoveTestcaseSets(t ...*TestcaseSet) *TaskUpdate {
 	return tu.RemoveTestcaseSetIDs(ids...)
 }
 
-// ClearUsers clears the "users" edge to the User entity.
-func (tu *TaskUpdate) ClearUsers() *TaskUpdate {
-	tu.mutation.ClearUsers()
+// ClearUser clears the "user" edge to the User entity.
+func (tu *TaskUpdate) ClearUser() *TaskUpdate {
+	tu.mutation.ClearUser()
 	return tu
 }
 
@@ -218,7 +266,20 @@ func (tu *TaskUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tu *TaskUpdate) check() error {
+	if v, ok := tu.mutation.JudgeType(); ok {
+		if err := task.JudgeTypeValidator(v); err != nil {
+			return &ValidationError{Name: "judge_type", err: fmt.Errorf(`ent: validator failed for field "Task.judge_type": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := tu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(task.Table, task.Columns, sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt))
 	if ps := tu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -248,8 +309,14 @@ func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.AddedExecMemoryLimit(); ok {
 		_spec.AddField(task.FieldExecMemoryLimit, field.TypeUint, value)
 	}
+	if value, ok := tu.mutation.JudgeType(); ok {
+		_spec.SetField(task.FieldJudgeType, field.TypeEnum, value)
+	}
 	if value, ok := tu.mutation.CaseInsensitive(); ok {
 		_spec.SetField(task.FieldCaseInsensitive, field.TypeBool, value)
+	}
+	if tu.mutation.CaseInsensitiveCleared() {
+		_spec.ClearField(task.FieldCaseInsensitive, field.TypeBool)
 	}
 	if value, ok := tu.mutation.Ndigits(); ok {
 		_spec.SetField(task.FieldNdigits, field.TypeUint, value)
@@ -257,8 +324,14 @@ func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.AddedNdigits(); ok {
 		_spec.AddField(task.FieldNdigits, field.TypeUint, value)
 	}
+	if tu.mutation.NdigitsCleared() {
+		_spec.ClearField(task.FieldNdigits, field.TypeUint)
+	}
 	if value, ok := tu.mutation.JudgeCodePath(); ok {
 		_spec.SetField(task.FieldJudgeCodePath, field.TypeString, value)
+	}
+	if tu.mutation.JudgeCodePathCleared() {
+		_spec.ClearField(task.FieldJudgeCodePath, field.TypeString)
 	}
 	if value, ok := tu.mutation.CreatedAt(); ok {
 		_spec.SetField(task.FieldCreatedAt, field.TypeTime, value)
@@ -314,12 +387,12 @@ func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.UsersCleared() {
+	if tu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   task.UsersTable,
-			Columns: []string{task.UsersColumn},
+			Table:   task.UserTable,
+			Columns: []string{task.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -327,12 +400,12 @@ func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := tu.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   task.UsersTable,
-			Columns: []string{task.UsersColumn},
+			Table:   task.UserTable,
+			Columns: []string{task.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -407,9 +480,29 @@ func (tuo *TaskUpdateOne) AddExecMemoryLimit(u int) *TaskUpdateOne {
 	return tuo
 }
 
+// SetJudgeType sets the "judge_type" field.
+func (tuo *TaskUpdateOne) SetJudgeType(tt task.JudgeType) *TaskUpdateOne {
+	tuo.mutation.SetJudgeType(tt)
+	return tuo
+}
+
 // SetCaseInsensitive sets the "case_insensitive" field.
 func (tuo *TaskUpdateOne) SetCaseInsensitive(b bool) *TaskUpdateOne {
 	tuo.mutation.SetCaseInsensitive(b)
+	return tuo
+}
+
+// SetNillableCaseInsensitive sets the "case_insensitive" field if the given value is not nil.
+func (tuo *TaskUpdateOne) SetNillableCaseInsensitive(b *bool) *TaskUpdateOne {
+	if b != nil {
+		tuo.SetCaseInsensitive(*b)
+	}
+	return tuo
+}
+
+// ClearCaseInsensitive clears the value of the "case_insensitive" field.
+func (tuo *TaskUpdateOne) ClearCaseInsensitive() *TaskUpdateOne {
+	tuo.mutation.ClearCaseInsensitive()
 	return tuo
 }
 
@@ -420,15 +513,43 @@ func (tuo *TaskUpdateOne) SetNdigits(u uint) *TaskUpdateOne {
 	return tuo
 }
 
+// SetNillableNdigits sets the "ndigits" field if the given value is not nil.
+func (tuo *TaskUpdateOne) SetNillableNdigits(u *uint) *TaskUpdateOne {
+	if u != nil {
+		tuo.SetNdigits(*u)
+	}
+	return tuo
+}
+
 // AddNdigits adds u to the "ndigits" field.
 func (tuo *TaskUpdateOne) AddNdigits(u int) *TaskUpdateOne {
 	tuo.mutation.AddNdigits(u)
 	return tuo
 }
 
+// ClearNdigits clears the value of the "ndigits" field.
+func (tuo *TaskUpdateOne) ClearNdigits() *TaskUpdateOne {
+	tuo.mutation.ClearNdigits()
+	return tuo
+}
+
 // SetJudgeCodePath sets the "judge_code_path" field.
 func (tuo *TaskUpdateOne) SetJudgeCodePath(s string) *TaskUpdateOne {
 	tuo.mutation.SetJudgeCodePath(s)
+	return tuo
+}
+
+// SetNillableJudgeCodePath sets the "judge_code_path" field if the given value is not nil.
+func (tuo *TaskUpdateOne) SetNillableJudgeCodePath(s *string) *TaskUpdateOne {
+	if s != nil {
+		tuo.SetJudgeCodePath(*s)
+	}
+	return tuo
+}
+
+// ClearJudgeCodePath clears the value of the "judge_code_path" field.
+func (tuo *TaskUpdateOne) ClearJudgeCodePath() *TaskUpdateOne {
+	tuo.mutation.ClearJudgeCodePath()
 	return tuo
 }
 
@@ -473,23 +594,23 @@ func (tuo *TaskUpdateOne) AddTestcaseSets(t ...*TestcaseSet) *TaskUpdateOne {
 	return tuo.AddTestcaseSetIDs(ids...)
 }
 
-// SetUsersID sets the "users" edge to the User entity by ID.
-func (tuo *TaskUpdateOne) SetUsersID(id int) *TaskUpdateOne {
-	tuo.mutation.SetUsersID(id)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (tuo *TaskUpdateOne) SetUserID(id int) *TaskUpdateOne {
+	tuo.mutation.SetUserID(id)
 	return tuo
 }
 
-// SetNillableUsersID sets the "users" edge to the User entity by ID if the given value is not nil.
-func (tuo *TaskUpdateOne) SetNillableUsersID(id *int) *TaskUpdateOne {
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (tuo *TaskUpdateOne) SetNillableUserID(id *int) *TaskUpdateOne {
 	if id != nil {
-		tuo = tuo.SetUsersID(*id)
+		tuo = tuo.SetUserID(*id)
 	}
 	return tuo
 }
 
-// SetUsers sets the "users" edge to the User entity.
-func (tuo *TaskUpdateOne) SetUsers(u *User) *TaskUpdateOne {
-	return tuo.SetUsersID(u.ID)
+// SetUser sets the "user" edge to the User entity.
+func (tuo *TaskUpdateOne) SetUser(u *User) *TaskUpdateOne {
+	return tuo.SetUserID(u.ID)
 }
 
 // Mutation returns the TaskMutation object of the builder.
@@ -518,9 +639,9 @@ func (tuo *TaskUpdateOne) RemoveTestcaseSets(t ...*TestcaseSet) *TaskUpdateOne {
 	return tuo.RemoveTestcaseSetIDs(ids...)
 }
 
-// ClearUsers clears the "users" edge to the User entity.
-func (tuo *TaskUpdateOne) ClearUsers() *TaskUpdateOne {
-	tuo.mutation.ClearUsers()
+// ClearUser clears the "user" edge to the User entity.
+func (tuo *TaskUpdateOne) ClearUser() *TaskUpdateOne {
+	tuo.mutation.ClearUser()
 	return tuo
 }
 
@@ -564,7 +685,20 @@ func (tuo *TaskUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tuo *TaskUpdateOne) check() error {
+	if v, ok := tuo.mutation.JudgeType(); ok {
+		if err := task.JudgeTypeValidator(v); err != nil {
+			return &ValidationError{Name: "judge_type", err: fmt.Errorf(`ent: validator failed for field "Task.judge_type": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) {
+	if err := tuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(task.Table, task.Columns, sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt))
 	id, ok := tuo.mutation.ID()
 	if !ok {
@@ -611,8 +745,14 @@ func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) 
 	if value, ok := tuo.mutation.AddedExecMemoryLimit(); ok {
 		_spec.AddField(task.FieldExecMemoryLimit, field.TypeUint, value)
 	}
+	if value, ok := tuo.mutation.JudgeType(); ok {
+		_spec.SetField(task.FieldJudgeType, field.TypeEnum, value)
+	}
 	if value, ok := tuo.mutation.CaseInsensitive(); ok {
 		_spec.SetField(task.FieldCaseInsensitive, field.TypeBool, value)
+	}
+	if tuo.mutation.CaseInsensitiveCleared() {
+		_spec.ClearField(task.FieldCaseInsensitive, field.TypeBool)
 	}
 	if value, ok := tuo.mutation.Ndigits(); ok {
 		_spec.SetField(task.FieldNdigits, field.TypeUint, value)
@@ -620,8 +760,14 @@ func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) 
 	if value, ok := tuo.mutation.AddedNdigits(); ok {
 		_spec.AddField(task.FieldNdigits, field.TypeUint, value)
 	}
+	if tuo.mutation.NdigitsCleared() {
+		_spec.ClearField(task.FieldNdigits, field.TypeUint)
+	}
 	if value, ok := tuo.mutation.JudgeCodePath(); ok {
 		_spec.SetField(task.FieldJudgeCodePath, field.TypeString, value)
+	}
+	if tuo.mutation.JudgeCodePathCleared() {
+		_spec.ClearField(task.FieldJudgeCodePath, field.TypeString)
 	}
 	if value, ok := tuo.mutation.CreatedAt(); ok {
 		_spec.SetField(task.FieldCreatedAt, field.TypeTime, value)
@@ -677,12 +823,12 @@ func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.UsersCleared() {
+	if tuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   task.UsersTable,
-			Columns: []string{task.UsersColumn},
+			Table:   task.UserTable,
+			Columns: []string{task.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -690,12 +836,12 @@ func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := tuo.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   task.UsersTable,
-			Columns: []string{task.UsersColumn},
+			Table:   task.UserTable,
+			Columns: []string{task.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),

@@ -37,8 +37,8 @@ type TestcaseSet struct {
 
 // TestcaseSetEdges holds the relations/edges for other nodes in the graph.
 type TestcaseSetEdges struct {
-	// Tasks holds the value of the tasks edge.
-	Tasks *Task `json:"tasks,omitempty"`
+	// Task holds the value of the task edge.
+	Task *Task `json:"task,omitempty"`
 	// Testcases holds the value of the testcases edge.
 	Testcases []*Testcase `json:"testcases,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -46,17 +46,17 @@ type TestcaseSetEdges struct {
 	loadedTypes [2]bool
 }
 
-// TasksOrErr returns the Tasks value or an error if the edge
+// TaskOrErr returns the Task value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e TestcaseSetEdges) TasksOrErr() (*Task, error) {
+func (e TestcaseSetEdges) TaskOrErr() (*Task, error) {
 	if e.loadedTypes[0] {
-		if e.Tasks == nil {
+		if e.Task == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: task.Label}
 		}
-		return e.Tasks, nil
+		return e.Task, nil
 	}
-	return nil, &NotLoadedError{edge: "tasks"}
+	return nil, &NotLoadedError{edge: "task"}
 }
 
 // TestcasesOrErr returns the Testcases value or an error if the edge
@@ -155,9 +155,9 @@ func (ts *TestcaseSet) Value(name string) (ent.Value, error) {
 	return ts.selectValues.Get(name)
 }
 
-// QueryTasks queries the "tasks" edge of the TestcaseSet entity.
-func (ts *TestcaseSet) QueryTasks() *TaskQuery {
-	return NewTestcaseSetClient(ts.config).QueryTasks(ts)
+// QueryTask queries the "task" edge of the TestcaseSet entity.
+func (ts *TestcaseSet) QueryTask() *TaskQuery {
+	return NewTestcaseSetClient(ts.config).QueryTask(ts)
 }
 
 // QueryTestcases queries the "testcases" edge of the TestcaseSet entity.

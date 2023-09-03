@@ -46,6 +46,7 @@ type TaskMutation struct {
 	addexec_time_limit   *int
 	exec_memory_limit    *uint
 	addexec_memory_limit *int
+	judge_type           *task.JudgeType
 	case_insensitive     *bool
 	ndigits              *uint
 	addndigits           *int
@@ -56,8 +57,8 @@ type TaskMutation struct {
 	testcase_sets        map[int]struct{}
 	removedtestcase_sets map[int]struct{}
 	clearedtestcase_sets bool
-	users                *int
-	clearedusers         bool
+	user                 *int
+	cleareduser          bool
 	done                 bool
 	oldValue             func(context.Context) (*Task, error)
 	predicates           []predicate.Task
@@ -387,6 +388,42 @@ func (m *TaskMutation) ResetExecMemoryLimit() {
 	m.addexec_memory_limit = nil
 }
 
+// SetJudgeType sets the "judge_type" field.
+func (m *TaskMutation) SetJudgeType(tt task.JudgeType) {
+	m.judge_type = &tt
+}
+
+// JudgeType returns the value of the "judge_type" field in the mutation.
+func (m *TaskMutation) JudgeType() (r task.JudgeType, exists bool) {
+	v := m.judge_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldJudgeType returns the old "judge_type" field's value of the Task entity.
+// If the Task object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TaskMutation) OldJudgeType(ctx context.Context) (v task.JudgeType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldJudgeType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldJudgeType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldJudgeType: %w", err)
+	}
+	return oldValue.JudgeType, nil
+}
+
+// ResetJudgeType resets all changes to the "judge_type" field.
+func (m *TaskMutation) ResetJudgeType() {
+	m.judge_type = nil
+}
+
 // SetCaseInsensitive sets the "case_insensitive" field.
 func (m *TaskMutation) SetCaseInsensitive(b bool) {
 	m.case_insensitive = &b
@@ -404,7 +441,7 @@ func (m *TaskMutation) CaseInsensitive() (r bool, exists bool) {
 // OldCaseInsensitive returns the old "case_insensitive" field's value of the Task entity.
 // If the Task object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TaskMutation) OldCaseInsensitive(ctx context.Context) (v bool, err error) {
+func (m *TaskMutation) OldCaseInsensitive(ctx context.Context) (v *bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCaseInsensitive is only allowed on UpdateOne operations")
 	}
@@ -418,9 +455,22 @@ func (m *TaskMutation) OldCaseInsensitive(ctx context.Context) (v bool, err erro
 	return oldValue.CaseInsensitive, nil
 }
 
+// ClearCaseInsensitive clears the value of the "case_insensitive" field.
+func (m *TaskMutation) ClearCaseInsensitive() {
+	m.case_insensitive = nil
+	m.clearedFields[task.FieldCaseInsensitive] = struct{}{}
+}
+
+// CaseInsensitiveCleared returns if the "case_insensitive" field was cleared in this mutation.
+func (m *TaskMutation) CaseInsensitiveCleared() bool {
+	_, ok := m.clearedFields[task.FieldCaseInsensitive]
+	return ok
+}
+
 // ResetCaseInsensitive resets all changes to the "case_insensitive" field.
 func (m *TaskMutation) ResetCaseInsensitive() {
 	m.case_insensitive = nil
+	delete(m.clearedFields, task.FieldCaseInsensitive)
 }
 
 // SetNdigits sets the "ndigits" field.
@@ -441,7 +491,7 @@ func (m *TaskMutation) Ndigits() (r uint, exists bool) {
 // OldNdigits returns the old "ndigits" field's value of the Task entity.
 // If the Task object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TaskMutation) OldNdigits(ctx context.Context) (v uint, err error) {
+func (m *TaskMutation) OldNdigits(ctx context.Context) (v *uint, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldNdigits is only allowed on UpdateOne operations")
 	}
@@ -473,10 +523,24 @@ func (m *TaskMutation) AddedNdigits() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearNdigits clears the value of the "ndigits" field.
+func (m *TaskMutation) ClearNdigits() {
+	m.ndigits = nil
+	m.addndigits = nil
+	m.clearedFields[task.FieldNdigits] = struct{}{}
+}
+
+// NdigitsCleared returns if the "ndigits" field was cleared in this mutation.
+func (m *TaskMutation) NdigitsCleared() bool {
+	_, ok := m.clearedFields[task.FieldNdigits]
+	return ok
+}
+
 // ResetNdigits resets all changes to the "ndigits" field.
 func (m *TaskMutation) ResetNdigits() {
 	m.ndigits = nil
 	m.addndigits = nil
+	delete(m.clearedFields, task.FieldNdigits)
 }
 
 // SetJudgeCodePath sets the "judge_code_path" field.
@@ -496,7 +560,7 @@ func (m *TaskMutation) JudgeCodePath() (r string, exists bool) {
 // OldJudgeCodePath returns the old "judge_code_path" field's value of the Task entity.
 // If the Task object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TaskMutation) OldJudgeCodePath(ctx context.Context) (v string, err error) {
+func (m *TaskMutation) OldJudgeCodePath(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldJudgeCodePath is only allowed on UpdateOne operations")
 	}
@@ -510,9 +574,22 @@ func (m *TaskMutation) OldJudgeCodePath(ctx context.Context) (v string, err erro
 	return oldValue.JudgeCodePath, nil
 }
 
+// ClearJudgeCodePath clears the value of the "judge_code_path" field.
+func (m *TaskMutation) ClearJudgeCodePath() {
+	m.judge_code_path = nil
+	m.clearedFields[task.FieldJudgeCodePath] = struct{}{}
+}
+
+// JudgeCodePathCleared returns if the "judge_code_path" field was cleared in this mutation.
+func (m *TaskMutation) JudgeCodePathCleared() bool {
+	_, ok := m.clearedFields[task.FieldJudgeCodePath]
+	return ok
+}
+
 // ResetJudgeCodePath resets all changes to the "judge_code_path" field.
 func (m *TaskMutation) ResetJudgeCodePath() {
 	m.judge_code_path = nil
+	delete(m.clearedFields, task.FieldJudgeCodePath)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -654,43 +731,43 @@ func (m *TaskMutation) ResetTestcaseSets() {
 	m.removedtestcase_sets = nil
 }
 
-// SetUsersID sets the "users" edge to the User entity by id.
-func (m *TaskMutation) SetUsersID(id int) {
-	m.users = &id
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *TaskMutation) SetUserID(id int) {
+	m.user = &id
 }
 
-// ClearUsers clears the "users" edge to the User entity.
-func (m *TaskMutation) ClearUsers() {
-	m.clearedusers = true
+// ClearUser clears the "user" edge to the User entity.
+func (m *TaskMutation) ClearUser() {
+	m.cleareduser = true
 }
 
-// UsersCleared reports if the "users" edge to the User entity was cleared.
-func (m *TaskMutation) UsersCleared() bool {
-	return m.clearedusers
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *TaskMutation) UserCleared() bool {
+	return m.cleareduser
 }
 
-// UsersID returns the "users" edge ID in the mutation.
-func (m *TaskMutation) UsersID() (id int, exists bool) {
-	if m.users != nil {
-		return *m.users, true
+// UserID returns the "user" edge ID in the mutation.
+func (m *TaskMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
 	}
 	return
 }
 
-// UsersIDs returns the "users" edge IDs in the mutation.
+// UserIDs returns the "user" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UsersID instead. It exists only for internal usage by the builders.
-func (m *TaskMutation) UsersIDs() (ids []int) {
-	if id := m.users; id != nil {
+// UserID instead. It exists only for internal usage by the builders.
+func (m *TaskMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUsers resets all changes to the "users" edge.
-func (m *TaskMutation) ResetUsers() {
-	m.users = nil
-	m.clearedusers = false
+// ResetUser resets all changes to the "user" edge.
+func (m *TaskMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
 }
 
 // Where appends a list predicates to the TaskMutation builder.
@@ -727,7 +804,7 @@ func (m *TaskMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TaskMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.title != nil {
 		fields = append(fields, task.FieldTitle)
 	}
@@ -742,6 +819,9 @@ func (m *TaskMutation) Fields() []string {
 	}
 	if m.exec_memory_limit != nil {
 		fields = append(fields, task.FieldExecMemoryLimit)
+	}
+	if m.judge_type != nil {
+		fields = append(fields, task.FieldJudgeType)
 	}
 	if m.case_insensitive != nil {
 		fields = append(fields, task.FieldCaseInsensitive)
@@ -776,6 +856,8 @@ func (m *TaskMutation) Field(name string) (ent.Value, bool) {
 		return m.ExecTimeLimit()
 	case task.FieldExecMemoryLimit:
 		return m.ExecMemoryLimit()
+	case task.FieldJudgeType:
+		return m.JudgeType()
 	case task.FieldCaseInsensitive:
 		return m.CaseInsensitive()
 	case task.FieldNdigits:
@@ -805,6 +887,8 @@ func (m *TaskMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldExecTimeLimit(ctx)
 	case task.FieldExecMemoryLimit:
 		return m.OldExecMemoryLimit(ctx)
+	case task.FieldJudgeType:
+		return m.OldJudgeType(ctx)
 	case task.FieldCaseInsensitive:
 		return m.OldCaseInsensitive(ctx)
 	case task.FieldNdigits:
@@ -858,6 +942,13 @@ func (m *TaskMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetExecMemoryLimit(v)
+		return nil
+	case task.FieldJudgeType:
+		v, ok := value.(task.JudgeType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetJudgeType(v)
 		return nil
 	case task.FieldCaseInsensitive:
 		v, ok := value.(bool)
@@ -963,6 +1054,15 @@ func (m *TaskMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *TaskMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(task.FieldCaseInsensitive) {
+		fields = append(fields, task.FieldCaseInsensitive)
+	}
+	if m.FieldCleared(task.FieldNdigits) {
+		fields = append(fields, task.FieldNdigits)
+	}
+	if m.FieldCleared(task.FieldJudgeCodePath) {
+		fields = append(fields, task.FieldJudgeCodePath)
+	}
 	if m.FieldCleared(task.FieldUpdatedAt) {
 		fields = append(fields, task.FieldUpdatedAt)
 	}
@@ -980,6 +1080,15 @@ func (m *TaskMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *TaskMutation) ClearField(name string) error {
 	switch name {
+	case task.FieldCaseInsensitive:
+		m.ClearCaseInsensitive()
+		return nil
+	case task.FieldNdigits:
+		m.ClearNdigits()
+		return nil
+	case task.FieldJudgeCodePath:
+		m.ClearJudgeCodePath()
+		return nil
 	case task.FieldUpdatedAt:
 		m.ClearUpdatedAt()
 		return nil
@@ -1006,6 +1115,9 @@ func (m *TaskMutation) ResetField(name string) error {
 	case task.FieldExecMemoryLimit:
 		m.ResetExecMemoryLimit()
 		return nil
+	case task.FieldJudgeType:
+		m.ResetJudgeType()
+		return nil
 	case task.FieldCaseInsensitive:
 		m.ResetCaseInsensitive()
 		return nil
@@ -1031,8 +1143,8 @@ func (m *TaskMutation) AddedEdges() []string {
 	if m.testcase_sets != nil {
 		edges = append(edges, task.EdgeTestcaseSets)
 	}
-	if m.users != nil {
-		edges = append(edges, task.EdgeUsers)
+	if m.user != nil {
+		edges = append(edges, task.EdgeUser)
 	}
 	return edges
 }
@@ -1047,8 +1159,8 @@ func (m *TaskMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case task.EdgeUsers:
-		if id := m.users; id != nil {
+	case task.EdgeUser:
+		if id := m.user; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -1084,8 +1196,8 @@ func (m *TaskMutation) ClearedEdges() []string {
 	if m.clearedtestcase_sets {
 		edges = append(edges, task.EdgeTestcaseSets)
 	}
-	if m.clearedusers {
-		edges = append(edges, task.EdgeUsers)
+	if m.cleareduser {
+		edges = append(edges, task.EdgeUser)
 	}
 	return edges
 }
@@ -1096,8 +1208,8 @@ func (m *TaskMutation) EdgeCleared(name string) bool {
 	switch name {
 	case task.EdgeTestcaseSets:
 		return m.clearedtestcase_sets
-	case task.EdgeUsers:
-		return m.clearedusers
+	case task.EdgeUser:
+		return m.cleareduser
 	}
 	return false
 }
@@ -1106,8 +1218,8 @@ func (m *TaskMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *TaskMutation) ClearEdge(name string) error {
 	switch name {
-	case task.EdgeUsers:
-		m.ClearUsers()
+	case task.EdgeUser:
+		m.ClearUser()
 		return nil
 	}
 	return fmt.Errorf("unknown Task unique edge %s", name)
@@ -1120,8 +1232,8 @@ func (m *TaskMutation) ResetEdge(name string) error {
 	case task.EdgeTestcaseSets:
 		m.ResetTestcaseSets()
 		return nil
-	case task.EdgeUsers:
-		m.ResetUsers()
+	case task.EdgeUser:
+		m.ResetUser()
 		return nil
 	}
 	return fmt.Errorf("unknown Task edge %s", name)
@@ -1303,7 +1415,7 @@ func (m *TestcaseMutation) Description() (r string, exists bool) {
 // OldDescription returns the old "description" field's value of the Testcase entity.
 // If the Testcase object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TestcaseMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *TestcaseMutation) OldDescription(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
@@ -1317,9 +1429,22 @@ func (m *TestcaseMutation) OldDescription(ctx context.Context) (v string, err er
 	return oldValue.Description, nil
 }
 
+// ClearDescription clears the value of the "description" field.
+func (m *TestcaseMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[testcase.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *TestcaseMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[testcase.FieldDescription]
+	return ok
+}
+
 // ResetDescription resets all changes to the "description" field.
 func (m *TestcaseMutation) ResetDescription() {
 	m.description = nil
+	delete(m.clearedFields, testcase.FieldDescription)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -1608,6 +1733,9 @@ func (m *TestcaseMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *TestcaseMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(testcase.FieldDescription) {
+		fields = append(fields, testcase.FieldDescription)
+	}
 	if m.FieldCleared(testcase.FieldUpdatedAt) {
 		fields = append(fields, testcase.FieldUpdatedAt)
 	}
@@ -1625,6 +1753,9 @@ func (m *TestcaseMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *TestcaseMutation) ClearField(name string) error {
 	switch name {
+	case testcase.FieldDescription:
+		m.ClearDescription()
+		return nil
 	case testcase.FieldUpdatedAt:
 		m.ClearUpdatedAt()
 		return nil
@@ -1749,8 +1880,8 @@ type TestcaseSetMutation struct {
 	created_at       *time.Time
 	updated_at       *time.Time
 	clearedFields    map[string]struct{}
-	tasks            *int
-	clearedtasks     bool
+	task             *int
+	clearedtask      bool
 	testcases        map[int]struct{}
 	removedtestcases map[int]struct{}
 	clearedtestcases bool
@@ -2076,43 +2207,43 @@ func (m *TestcaseSetMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, testcaseset.FieldUpdatedAt)
 }
 
-// SetTasksID sets the "tasks" edge to the Task entity by id.
-func (m *TestcaseSetMutation) SetTasksID(id int) {
-	m.tasks = &id
+// SetTaskID sets the "task" edge to the Task entity by id.
+func (m *TestcaseSetMutation) SetTaskID(id int) {
+	m.task = &id
 }
 
-// ClearTasks clears the "tasks" edge to the Task entity.
-func (m *TestcaseSetMutation) ClearTasks() {
-	m.clearedtasks = true
+// ClearTask clears the "task" edge to the Task entity.
+func (m *TestcaseSetMutation) ClearTask() {
+	m.clearedtask = true
 }
 
-// TasksCleared reports if the "tasks" edge to the Task entity was cleared.
-func (m *TestcaseSetMutation) TasksCleared() bool {
-	return m.clearedtasks
+// TaskCleared reports if the "task" edge to the Task entity was cleared.
+func (m *TestcaseSetMutation) TaskCleared() bool {
+	return m.clearedtask
 }
 
-// TasksID returns the "tasks" edge ID in the mutation.
-func (m *TestcaseSetMutation) TasksID() (id int, exists bool) {
-	if m.tasks != nil {
-		return *m.tasks, true
+// TaskID returns the "task" edge ID in the mutation.
+func (m *TestcaseSetMutation) TaskID() (id int, exists bool) {
+	if m.task != nil {
+		return *m.task, true
 	}
 	return
 }
 
-// TasksIDs returns the "tasks" edge IDs in the mutation.
+// TaskIDs returns the "task" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// TasksID instead. It exists only for internal usage by the builders.
-func (m *TestcaseSetMutation) TasksIDs() (ids []int) {
-	if id := m.tasks; id != nil {
+// TaskID instead. It exists only for internal usage by the builders.
+func (m *TestcaseSetMutation) TaskIDs() (ids []int) {
+	if id := m.task; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetTasks resets all changes to the "tasks" edge.
-func (m *TestcaseSetMutation) ResetTasks() {
-	m.tasks = nil
-	m.clearedtasks = false
+// ResetTask resets all changes to the "task" edge.
+func (m *TestcaseSetMutation) ResetTask() {
+	m.task = nil
+	m.clearedtask = false
 }
 
 // AddTestcaseIDs adds the "testcases" edge to the Testcase entity by ids.
@@ -2395,8 +2526,8 @@ func (m *TestcaseSetMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TestcaseSetMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.tasks != nil {
-		edges = append(edges, testcaseset.EdgeTasks)
+	if m.task != nil {
+		edges = append(edges, testcaseset.EdgeTask)
 	}
 	if m.testcases != nil {
 		edges = append(edges, testcaseset.EdgeTestcases)
@@ -2408,8 +2539,8 @@ func (m *TestcaseSetMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *TestcaseSetMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case testcaseset.EdgeTasks:
-		if id := m.tasks; id != nil {
+	case testcaseset.EdgeTask:
+		if id := m.task; id != nil {
 			return []ent.Value{*id}
 		}
 	case testcaseset.EdgeTestcases:
@@ -2448,8 +2579,8 @@ func (m *TestcaseSetMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TestcaseSetMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedtasks {
-		edges = append(edges, testcaseset.EdgeTasks)
+	if m.clearedtask {
+		edges = append(edges, testcaseset.EdgeTask)
 	}
 	if m.clearedtestcases {
 		edges = append(edges, testcaseset.EdgeTestcases)
@@ -2461,8 +2592,8 @@ func (m *TestcaseSetMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *TestcaseSetMutation) EdgeCleared(name string) bool {
 	switch name {
-	case testcaseset.EdgeTasks:
-		return m.clearedtasks
+	case testcaseset.EdgeTask:
+		return m.clearedtask
 	case testcaseset.EdgeTestcases:
 		return m.clearedtestcases
 	}
@@ -2473,8 +2604,8 @@ func (m *TestcaseSetMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *TestcaseSetMutation) ClearEdge(name string) error {
 	switch name {
-	case testcaseset.EdgeTasks:
-		m.ClearTasks()
+	case testcaseset.EdgeTask:
+		m.ClearTask()
 		return nil
 	}
 	return fmt.Errorf("unknown TestcaseSet unique edge %s", name)
@@ -2484,8 +2615,8 @@ func (m *TestcaseSetMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *TestcaseSetMutation) ResetEdge(name string) error {
 	switch name {
-	case testcaseset.EdgeTasks:
-		m.ResetTasks()
+	case testcaseset.EdgeTask:
+		m.ResetTask()
 		return nil
 	case testcaseset.EdgeTestcases:
 		m.ResetTestcases()

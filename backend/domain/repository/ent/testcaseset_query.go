@@ -24,7 +24,7 @@ type TestcaseSetQuery struct {
 	order         []testcaseset.OrderOption
 	inters        []Interceptor
 	predicates    []predicate.TestcaseSet
-	withTasks     *TaskQuery
+	withTask      *TaskQuery
 	withTestcases *TestcaseQuery
 	withFKs       bool
 	// intermediate query (i.e. traversal path).
@@ -63,8 +63,8 @@ func (tsq *TestcaseSetQuery) Order(o ...testcaseset.OrderOption) *TestcaseSetQue
 	return tsq
 }
 
-// QueryTasks chains the current query on the "tasks" edge.
-func (tsq *TestcaseSetQuery) QueryTasks() *TaskQuery {
+// QueryTask chains the current query on the "task" edge.
+func (tsq *TestcaseSetQuery) QueryTask() *TaskQuery {
 	query := (&TaskClient{config: tsq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tsq.prepareQuery(ctx); err != nil {
@@ -77,7 +77,7 @@ func (tsq *TestcaseSetQuery) QueryTasks() *TaskQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(testcaseset.Table, testcaseset.FieldID, selector),
 			sqlgraph.To(task.Table, task.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, testcaseset.TasksTable, testcaseset.TasksColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, testcaseset.TaskTable, testcaseset.TaskColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tsq.driver.Dialect(), step)
 		return fromU, nil
@@ -299,7 +299,7 @@ func (tsq *TestcaseSetQuery) Clone() *TestcaseSetQuery {
 		order:         append([]testcaseset.OrderOption{}, tsq.order...),
 		inters:        append([]Interceptor{}, tsq.inters...),
 		predicates:    append([]predicate.TestcaseSet{}, tsq.predicates...),
-		withTasks:     tsq.withTasks.Clone(),
+		withTask:      tsq.withTask.Clone(),
 		withTestcases: tsq.withTestcases.Clone(),
 		// clone intermediate query.
 		sql:  tsq.sql.Clone(),
@@ -307,14 +307,14 @@ func (tsq *TestcaseSetQuery) Clone() *TestcaseSetQuery {
 	}
 }
 
-// WithTasks tells the query-builder to eager-load the nodes that are connected to
-// the "tasks" edge. The optional arguments are used to configure the query builder of the edge.
-func (tsq *TestcaseSetQuery) WithTasks(opts ...func(*TaskQuery)) *TestcaseSetQuery {
+// WithTask tells the query-builder to eager-load the nodes that are connected to
+// the "task" edge. The optional arguments are used to configure the query builder of the edge.
+func (tsq *TestcaseSetQuery) WithTask(opts ...func(*TaskQuery)) *TestcaseSetQuery {
 	query := (&TaskClient{config: tsq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	tsq.withTasks = query
+	tsq.withTask = query
 	return tsq
 }
 
@@ -409,11 +409,11 @@ func (tsq *TestcaseSetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		withFKs     = tsq.withFKs
 		_spec       = tsq.querySpec()
 		loadedTypes = [2]bool{
-			tsq.withTasks != nil,
+			tsq.withTask != nil,
 			tsq.withTestcases != nil,
 		}
 	)
-	if tsq.withTasks != nil {
+	if tsq.withTask != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -437,9 +437,9 @@ func (tsq *TestcaseSetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := tsq.withTasks; query != nil {
-		if err := tsq.loadTasks(ctx, query, nodes, nil,
-			func(n *TestcaseSet, e *Task) { n.Edges.Tasks = e }); err != nil {
+	if query := tsq.withTask; query != nil {
+		if err := tsq.loadTask(ctx, query, nodes, nil,
+			func(n *TestcaseSet, e *Task) { n.Edges.Task = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -453,7 +453,7 @@ func (tsq *TestcaseSetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	return nodes, nil
 }
 
-func (tsq *TestcaseSetQuery) loadTasks(ctx context.Context, query *TaskQuery, nodes []*TestcaseSet, init func(*TestcaseSet), assign func(*TestcaseSet, *Task)) error {
+func (tsq *TestcaseSetQuery) loadTask(ctx context.Context, query *TaskQuery, nodes []*TestcaseSet, init func(*TestcaseSet), assign func(*TestcaseSet, *Task)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*TestcaseSet)
 	for i := range nodes {

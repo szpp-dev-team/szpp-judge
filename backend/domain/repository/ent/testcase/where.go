@@ -195,6 +195,16 @@ func DescriptionHasSuffix(v string) predicate.Testcase {
 	return predicate.Testcase(sql.FieldHasSuffix(FieldDescription, v))
 }
 
+// DescriptionIsNil applies the IsNil predicate on the "description" field.
+func DescriptionIsNil() predicate.Testcase {
+	return predicate.Testcase(sql.FieldIsNull(FieldDescription))
+}
+
+// DescriptionNotNil applies the NotNil predicate on the "description" field.
+func DescriptionNotNil() predicate.Testcase {
+	return predicate.Testcase(sql.FieldNotNull(FieldDescription))
+}
+
 // DescriptionEqualFold applies the EqualFold predicate on the "description" field.
 func DescriptionEqualFold(v string) predicate.Testcase {
 	return predicate.Testcase(sql.FieldEqualFold(FieldDescription, v))

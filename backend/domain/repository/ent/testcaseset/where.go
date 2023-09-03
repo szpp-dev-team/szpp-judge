@@ -285,21 +285,21 @@ func UpdatedAtNotNil() predicate.TestcaseSet {
 	return predicate.TestcaseSet(sql.FieldNotNull(FieldUpdatedAt))
 }
 
-// HasTasks applies the HasEdge predicate on the "tasks" edge.
-func HasTasks() predicate.TestcaseSet {
+// HasTask applies the HasEdge predicate on the "task" edge.
+func HasTask() predicate.TestcaseSet {
 	return predicate.TestcaseSet(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TasksTable, TasksColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, TaskTable, TaskColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasTasksWith applies the HasEdge predicate on the "tasks" edge with a given conditions (other predicates).
-func HasTasksWith(preds ...predicate.Task) predicate.TestcaseSet {
+// HasTaskWith applies the HasEdge predicate on the "task" edge with a given conditions (other predicates).
+func HasTaskWith(preds ...predicate.Task) predicate.TestcaseSet {
 	return predicate.TestcaseSet(func(s *sql.Selector) {
-		step := newTasksStep()
+		step := newTaskStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

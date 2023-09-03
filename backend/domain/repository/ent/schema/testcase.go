@@ -14,7 +14,7 @@ func (Testcase) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.String("name").Unique(),
-		field.String("description"),
+		field.String("description").Optional().Nillable(),
 		field.Time("created_at"),
 		field.Time("updated_at").Optional().Nillable(),
 	}

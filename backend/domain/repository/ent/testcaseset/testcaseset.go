@@ -22,19 +22,19 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeTasks holds the string denoting the tasks edge name in mutations.
-	EdgeTasks = "tasks"
+	// EdgeTask holds the string denoting the task edge name in mutations.
+	EdgeTask = "task"
 	// EdgeTestcases holds the string denoting the testcases edge name in mutations.
 	EdgeTestcases = "testcases"
 	// Table holds the table name of the testcaseset in the database.
 	Table = "testcase_sets"
-	// TasksTable is the table that holds the tasks relation/edge.
-	TasksTable = "testcase_sets"
-	// TasksInverseTable is the table name for the Task entity.
+	// TaskTable is the table that holds the task relation/edge.
+	TaskTable = "testcase_sets"
+	// TaskInverseTable is the table name for the Task entity.
 	// It exists in this package in order to avoid circular dependency with the "task" package.
-	TasksInverseTable = "tasks"
-	// TasksColumn is the table column denoting the tasks relation/edge.
-	TasksColumn = "task_testcase_sets"
+	TaskInverseTable = "tasks"
+	// TaskColumn is the table column denoting the task relation/edge.
+	TaskColumn = "task_testcase_sets"
 	// TestcasesTable is the table that holds the testcases relation/edge. The primary key declared below.
 	TestcasesTable = "testcase_set_testcases"
 	// TestcasesInverseTable is the table name for the Testcase entity.
@@ -112,10 +112,10 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByTasksField orders the results by tasks field.
-func ByTasksField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByTaskField orders the results by task field.
+func ByTaskField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTasksStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newTaskStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -132,11 +132,11 @@ func ByTestcases(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTestcasesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newTasksStep() *sqlgraph.Step {
+func newTaskStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TasksInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, TasksTable, TasksColumn),
+		sqlgraph.To(TaskInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, TaskTable, TaskColumn),
 	)
 }
 func newTestcasesStep() *sqlgraph.Step {

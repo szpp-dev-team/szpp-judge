@@ -327,15 +327,15 @@ func (c *TaskClient) QueryTestcaseSets(t *Task) *TestcaseSetQuery {
 	return query
 }
 
-// QueryUsers queries the users edge of a Task.
-func (c *TaskClient) QueryUsers(t *Task) *UserQuery {
+// QueryUser queries the user edge of a Task.
+func (c *TaskClient) QueryUser(t *Task) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(task.Table, task.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, task.UsersTable, task.UsersColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, task.UserTable, task.UserColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -595,15 +595,15 @@ func (c *TestcaseSetClient) GetX(ctx context.Context, id int) *TestcaseSet {
 	return obj
 }
 
-// QueryTasks queries the tasks edge of a TestcaseSet.
-func (c *TestcaseSetClient) QueryTasks(ts *TestcaseSet) *TaskQuery {
+// QueryTask queries the task edge of a TestcaseSet.
+func (c *TestcaseSetClient) QueryTask(ts *TestcaseSet) *TaskQuery {
 	query := (&TaskClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ts.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(testcaseset.Table, testcaseset.FieldID, id),
 			sqlgraph.To(task.Table, task.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, testcaseset.TasksTable, testcaseset.TasksColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, testcaseset.TaskTable, testcaseset.TaskColumn),
 		)
 		fromV = sqlgraph.Neighbors(ts.driver.Dialect(), step)
 		return fromV, nil

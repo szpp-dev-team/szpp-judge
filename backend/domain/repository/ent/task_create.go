@@ -52,9 +52,23 @@ func (tc *TaskCreate) SetExecMemoryLimit(u uint) *TaskCreate {
 	return tc
 }
 
+// SetJudgeType sets the "judge_type" field.
+func (tc *TaskCreate) SetJudgeType(tt task.JudgeType) *TaskCreate {
+	tc.mutation.SetJudgeType(tt)
+	return tc
+}
+
 // SetCaseInsensitive sets the "case_insensitive" field.
 func (tc *TaskCreate) SetCaseInsensitive(b bool) *TaskCreate {
 	tc.mutation.SetCaseInsensitive(b)
+	return tc
+}
+
+// SetNillableCaseInsensitive sets the "case_insensitive" field if the given value is not nil.
+func (tc *TaskCreate) SetNillableCaseInsensitive(b *bool) *TaskCreate {
+	if b != nil {
+		tc.SetCaseInsensitive(*b)
+	}
 	return tc
 }
 
@@ -64,9 +78,25 @@ func (tc *TaskCreate) SetNdigits(u uint) *TaskCreate {
 	return tc
 }
 
+// SetNillableNdigits sets the "ndigits" field if the given value is not nil.
+func (tc *TaskCreate) SetNillableNdigits(u *uint) *TaskCreate {
+	if u != nil {
+		tc.SetNdigits(*u)
+	}
+	return tc
+}
+
 // SetJudgeCodePath sets the "judge_code_path" field.
 func (tc *TaskCreate) SetJudgeCodePath(s string) *TaskCreate {
 	tc.mutation.SetJudgeCodePath(s)
+	return tc
+}
+
+// SetNillableJudgeCodePath sets the "judge_code_path" field if the given value is not nil.
+func (tc *TaskCreate) SetNillableJudgeCodePath(s *string) *TaskCreate {
+	if s != nil {
+		tc.SetJudgeCodePath(*s)
+	}
 	return tc
 }
 
@@ -111,23 +141,23 @@ func (tc *TaskCreate) AddTestcaseSets(t ...*TestcaseSet) *TaskCreate {
 	return tc.AddTestcaseSetIDs(ids...)
 }
 
-// SetUsersID sets the "users" edge to the User entity by ID.
-func (tc *TaskCreate) SetUsersID(id int) *TaskCreate {
-	tc.mutation.SetUsersID(id)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (tc *TaskCreate) SetUserID(id int) *TaskCreate {
+	tc.mutation.SetUserID(id)
 	return tc
 }
 
-// SetNillableUsersID sets the "users" edge to the User entity by ID if the given value is not nil.
-func (tc *TaskCreate) SetNillableUsersID(id *int) *TaskCreate {
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (tc *TaskCreate) SetNillableUserID(id *int) *TaskCreate {
 	if id != nil {
-		tc = tc.SetUsersID(*id)
+		tc = tc.SetUserID(*id)
 	}
 	return tc
 }
 
-// SetUsers sets the "users" edge to the User entity.
-func (tc *TaskCreate) SetUsers(u *User) *TaskCreate {
-	return tc.SetUsersID(u.ID)
+// SetUser sets the "user" edge to the User entity.
+func (tc *TaskCreate) SetUser(u *User) *TaskCreate {
+	return tc.SetUserID(u.ID)
 }
 
 // Mutation returns the TaskMutation object of the builder.
@@ -179,14 +209,13 @@ func (tc *TaskCreate) check() error {
 	if _, ok := tc.mutation.ExecMemoryLimit(); !ok {
 		return &ValidationError{Name: "exec_memory_limit", err: errors.New(`ent: missing required field "Task.exec_memory_limit"`)}
 	}
-	if _, ok := tc.mutation.CaseInsensitive(); !ok {
-		return &ValidationError{Name: "case_insensitive", err: errors.New(`ent: missing required field "Task.case_insensitive"`)}
+	if _, ok := tc.mutation.JudgeType(); !ok {
+		return &ValidationError{Name: "judge_type", err: errors.New(`ent: missing required field "Task.judge_type"`)}
 	}
-	if _, ok := tc.mutation.Ndigits(); !ok {
-		return &ValidationError{Name: "ndigits", err: errors.New(`ent: missing required field "Task.ndigits"`)}
-	}
-	if _, ok := tc.mutation.JudgeCodePath(); !ok {
-		return &ValidationError{Name: "judge_code_path", err: errors.New(`ent: missing required field "Task.judge_code_path"`)}
+	if v, ok := tc.mutation.JudgeType(); ok {
+		if err := task.JudgeTypeValidator(v); err != nil {
+			return &ValidationError{Name: "judge_type", err: fmt.Errorf(`ent: validator failed for field "Task.judge_type": %w`, err)}
+		}
 	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Task.created_at"`)}
@@ -243,17 +272,21 @@ func (tc *TaskCreate) createSpec() (*Task, *sqlgraph.CreateSpec) {
 		_spec.SetField(task.FieldExecMemoryLimit, field.TypeUint, value)
 		_node.ExecMemoryLimit = value
 	}
+	if value, ok := tc.mutation.JudgeType(); ok {
+		_spec.SetField(task.FieldJudgeType, field.TypeEnum, value)
+		_node.JudgeType = value
+	}
 	if value, ok := tc.mutation.CaseInsensitive(); ok {
 		_spec.SetField(task.FieldCaseInsensitive, field.TypeBool, value)
-		_node.CaseInsensitive = value
+		_node.CaseInsensitive = &value
 	}
 	if value, ok := tc.mutation.Ndigits(); ok {
 		_spec.SetField(task.FieldNdigits, field.TypeUint, value)
-		_node.Ndigits = value
+		_node.Ndigits = &value
 	}
 	if value, ok := tc.mutation.JudgeCodePath(); ok {
 		_spec.SetField(task.FieldJudgeCodePath, field.TypeString, value)
-		_node.JudgeCodePath = value
+		_node.JudgeCodePath = &value
 	}
 	if value, ok := tc.mutation.CreatedAt(); ok {
 		_spec.SetField(task.FieldCreatedAt, field.TypeTime, value)
@@ -279,12 +312,12 @@ func (tc *TaskCreate) createSpec() (*Task, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := tc.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   task.UsersTable,
-			Columns: []string{task.UsersColumn},
+			Table:   task.UserTable,
+			Columns: []string{task.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),

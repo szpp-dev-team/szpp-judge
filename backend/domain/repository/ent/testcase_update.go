@@ -41,6 +41,20 @@ func (tu *TestcaseUpdate) SetDescription(s string) *TestcaseUpdate {
 	return tu
 }
 
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (tu *TestcaseUpdate) SetNillableDescription(s *string) *TestcaseUpdate {
+	if s != nil {
+		tu.SetDescription(*s)
+	}
+	return tu
+}
+
+// ClearDescription clears the value of the "description" field.
+func (tu *TestcaseUpdate) ClearDescription() *TestcaseUpdate {
+	tu.mutation.ClearDescription()
+	return tu
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (tu *TestcaseUpdate) SetCreatedAt(t time.Time) *TestcaseUpdate {
 	tu.mutation.SetCreatedAt(t)
@@ -150,6 +164,9 @@ func (tu *TestcaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.Description(); ok {
 		_spec.SetField(testcase.FieldDescription, field.TypeString, value)
 	}
+	if tu.mutation.DescriptionCleared() {
+		_spec.ClearField(testcase.FieldDescription, field.TypeString)
+	}
 	if value, ok := tu.mutation.CreatedAt(); ok {
 		_spec.SetField(testcase.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -233,6 +250,20 @@ func (tuo *TestcaseUpdateOne) SetName(s string) *TestcaseUpdateOne {
 // SetDescription sets the "description" field.
 func (tuo *TestcaseUpdateOne) SetDescription(s string) *TestcaseUpdateOne {
 	tuo.mutation.SetDescription(s)
+	return tuo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (tuo *TestcaseUpdateOne) SetNillableDescription(s *string) *TestcaseUpdateOne {
+	if s != nil {
+		tuo.SetDescription(*s)
+	}
+	return tuo
+}
+
+// ClearDescription clears the value of the "description" field.
+func (tuo *TestcaseUpdateOne) ClearDescription() *TestcaseUpdateOne {
+	tuo.mutation.ClearDescription()
 	return tuo
 }
 
@@ -374,6 +405,9 @@ func (tuo *TestcaseUpdateOne) sqlSave(ctx context.Context) (_node *Testcase, err
 	}
 	if value, ok := tuo.mutation.Description(); ok {
 		_spec.SetField(testcase.FieldDescription, field.TypeString, value)
+	}
+	if tuo.mutation.DescriptionCleared() {
+		_spec.ClearField(testcase.FieldDescription, field.TypeString)
 	}
 	if value, ok := tuo.mutation.CreatedAt(); ok {
 		_spec.SetField(testcase.FieldCreatedAt, field.TypeTime, value)
