@@ -31,6 +31,8 @@ service TaskService {
   rpc GetSubmission(GetSubmissionRequest) returns (GetSubmissionResponse);
   // 提出一覧を取得
   rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissoinsResponse);
+  // ジャッジの進捗を取得
+  rpc GetJudeStatus(GetJudgeStatusRequest) returns (GetJudgeStatusResponse);
 }
 
 service HealthcheckService {

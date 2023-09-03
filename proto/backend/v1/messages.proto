@@ -125,3 +125,11 @@ message SubmissonSummary {
 
   google.protobuf.Timestamp submited_at = 12; 
 }
+
+message GetJudgeStatusRequest {
+  int32 submit_id = 1;
+}
+
+message GetJudgeStatusRequest {
+  string judge_status = 1;
+}
