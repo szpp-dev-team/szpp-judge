@@ -88,10 +88,10 @@ message SubmitResponse {
   Submit submit = 1;
 }
 
-message GetSubmitRequest {
+message GetSubmissionRequest {
   int32 id = 1;
 }
 
-message GetSubmitResponse {
+message GetSubmissionResponse {
   Submit submit = 1;
 }
