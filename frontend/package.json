@@ -9,7 +9,9 @@
     "lint": "next lint",
     "fmt": "dprint fmt",
     "fmt:check": "dprint check",
-    "postinstall": "msw init public"
+    "postinstall": "msw init public",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@bufbuild/connect": "^0.13.0",
@@ -35,11 +37,22 @@
     "zod": "3.21"
   },
   "devDependencies": {
+    "@chakra-ui/storybook-addon": "^5.0.1",
+    "@storybook/addon-essentials": "^7.4.0",
+    "@storybook/addon-interactions": "^7.4.0",
+    "@storybook/addon-links": "^7.4.0",
+    "@storybook/addon-onboarding": "^1.0.8",
+    "@storybook/blocks": "^7.4.0",
+    "@storybook/nextjs": "^7.4.0",
+    "@storybook/react": "^7.4.0",
+    "@storybook/testing-library": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "dprint": "^0.40.2",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.19",
-    "msw": "^1.2.5"
+    "eslint-plugin-storybook": "^0.6.13",
+    "msw": "^1.2.5",
+    "storybook": "^7.4.0"
   },
   "msw": {
     "workerDirectory": "public"
