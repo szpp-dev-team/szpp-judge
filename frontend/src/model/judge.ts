@@ -3,16 +3,19 @@ export type JudgeTestcaseProgress = {
   total: number;
 };
 
-export type JudgeStatus =
-  | "WJ"
-  | "IE"
-  | "AC"
-  | "CE"
-  | "MLE"
-  | "OLE"
-  | "RE"
-  | "TLE"
-  | "WA";
+export const JudgeStatusValues = [
+  "WJ",
+  "IE",
+  "AC",
+  "CE",
+  "MLE",
+  "OLE",
+  "RE",
+  "TLE",
+  "WA",
+] as const;
+
+export type JudgeStatus = (typeof JudgeStatusValues)[number];
 
 export const JudgeStatus = {
   toJapanese(s: JudgeStatus): string {

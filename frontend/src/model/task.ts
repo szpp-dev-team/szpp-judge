@@ -1,6 +1,9 @@
-export type Difficulty =
-  | "beginner"
-  | "easy"
-  | "medium"
-  | "hard"
-  | "impossible";
+export const DifficultyValues = [
+  "beginner",
+  "easy",
+  "medium",
+  "hard",
+  "impossible",
+];
+
+export type Difficulty = (typeof DifficultyValues)[number];
