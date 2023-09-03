@@ -3,6 +3,7 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/resources.proto";
+import "google/protobuf/timestamp.proto";
 
 message GetUserRequest {
   string username = 1;
@@ -93,7 +94,7 @@ message GetSubmissionRequest {
 }
 
 message GetSubmissionResponse {
-  Submision submission = 1;
+  Submission submission = 1;
 }
 
 message ListSubmissionsRequest {
@@ -101,11 +102,11 @@ message ListSubmissionsRequest {
   optional int32 user_id = 2;
 }
 
-message ListSubmissinsResponse {
-  repeated SubmissonSummary submissions = 1;
+message ListSubmissionsResponse {
+  repeated SubmissionSummary submissions = 1;
 }
 
-message SubmissonSummary {
+message SubmissionSummary {
   int32 id = 1;
 
   int32 user_id = 2;
@@ -119,7 +120,7 @@ message SubmissonSummary {
   string lang_id = 7;
 
   string status = 8;
-  int score = 9;
+  int32 score = 9;
   optional uint32 exec_time = 10;
   optional uint32 memory = 11;
 
@@ -130,6 +131,6 @@ message GetJudgeStatusRequest {
   int32 submission_id = 1;
 }
 
-message GetJudgeStatusRequest {
+message GetJudgeStatusResponse {
   string judge_status = 1;
 }
