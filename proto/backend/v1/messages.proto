@@ -85,7 +85,7 @@ message SubmitRequest {
 }
 
 message SubmitResponse {
-  Submisson submission = 1;
+  int32 submission_id = 1;
 }
 
 message GetSubmissionRequest {
