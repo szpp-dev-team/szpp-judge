@@ -102,7 +102,7 @@ message MutationTestcase {
   string output = 4;
 }
 
-message Submit {
+message Submission {
   int32 id = 1;
   int32 user_id = 2;
   string user_name = 3;

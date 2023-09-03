@@ -85,7 +85,7 @@ message SubmitRequest {
 }
 
 message SubmitResponse {
-  Submit submit = 1;
+  Submisson submission = 1;
 }
 
 message GetSubmissionRequest {
@@ -93,7 +93,7 @@ message GetSubmissionRequest {
 }
 
 message GetSubmissionResponse {
-  Submit submit = 1;
+  Submision submission = 1;
 }
 
 message ListSubmissionsRequest {
@@ -101,7 +101,7 @@ message ListSubmissionsRequest {
   optional int32 user_id = 2;
 }
 
-message ListSubmissoinsResponse {
+message ListSubmissinsResponse {
   repeated SubmissonSummary submissions = 1;
 }
 
@@ -127,7 +127,7 @@ message SubmissonSummary {
 }
 
 message GetJudgeStatusRequest {
-  int32 submit_id = 1;
+  int32 submission_id = 1;
 }
 
 message GetJudgeStatusRequest {
