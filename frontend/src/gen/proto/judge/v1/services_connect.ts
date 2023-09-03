@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { PingRequest, PingResponse } from "./messages_pb";
+import { JudgeRequest, JudgeResponse, PingRequest, PingResponse, RunRequest, RunResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -19,6 +19,33 @@ export const HealthcheckService = {
       name: "Ping",
       I: PingRequest,
       O: PingResponse,
+      kind: MethodKind.Unary,
+    },
+  }
+} as const;
+
+/**
+ * @generated from service judge.v1.JudgeService
+ */
+export const JudgeService = {
+  typeName: "judge.v1.JudgeService",
+  methods: {
+    /**
+     * @generated from rpc judge.v1.JudgeService.Judge
+     */
+    judge: {
+      name: "Judge",
+      I: JudgeRequest,
+      O: JudgeResponse,
+      kind: MethodKind.ServerStreaming,
+    },
+    /**
+     * @generated from rpc judge.v1.JudgeService.Run
+     */
+    run: {
+      name: "Run",
+      I: RunRequest,
+      O: RunResponse,
       kind: MethodKind.Unary,
     },
   }

@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateUserRequest, CreateUserResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse } from "./messages_pb";
+import { CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -63,6 +63,48 @@ export const AuthService = {
       name: "Logout",
       I: LogoutRequest,
       O: LogoutResponse,
+      kind: MethodKind.Unary,
+    },
+  }
+} as const;
+
+/**
+ * @generated from service backend.v1.TaskService
+ */
+export const TaskService = {
+  typeName: "backend.v1.TaskService",
+  methods: {
+    /**
+     * Task を作成する
+     *
+     * @generated from rpc backend.v1.TaskService.CreateTask
+     */
+    createTask: {
+      name: "CreateTask",
+      I: CreateTaskRequest,
+      O: CreateTaskResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 指定された Task を取得する
+     *
+     * @generated from rpc backend.v1.TaskService.GetTask
+     */
+    getTask: {
+      name: "GetTask",
+      I: GetTaskRequest,
+      O: GetTaskResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Task を更新する
+     *
+     * @generated from rpc backend.v1.TaskService.UpdateTask
+     */
+    updateTask: {
+      name: "UpdateTask",
+      I: UpdateTaskRequest,
+      O: UpdateTaskResponse,
       kind: MethodKind.Unary,
     },
   }
