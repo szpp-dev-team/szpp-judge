@@ -55,16 +55,18 @@ message TestcaseSet {
   int32 id = 1;
   string slug = 2; // means name
   int32 score = 3;
-  repeated string testcase_slugs = 4;
-  google.protobuf.Timestamp created_at = 5;
-  optional google.protobuf.Timestamp updated_at = 6;
-  int32 task_id = 7;
+  bool is_sample = 4;
+  repeated string testcase_slugs = 5;
+  google.protobuf.Timestamp created_at = 6;
+  optional google.protobuf.Timestamp updated_at = 7;
+  int32 task_id = 8;
 }
 
 message MutationTestcaseSet {
   string slug = 1; // means name
   int32 score = 2;
-  repeated string testcase_slugs = 3;
+  bool is_sample = 3;
+  repeated string testcase_slugs = 4;
 }
 
 // (slug, task_id) は複合 unique
