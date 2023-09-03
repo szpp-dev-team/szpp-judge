@@ -105,18 +105,20 @@ message MutationTestcase {
 message Submit {
   int32 id = 1;
   int32 user_id = 2;
-  optional int32 contest_id = 3;
-  int32 task_id = 4;
-  string source_code = 5;
-  string lang_id = 6;
-  string status = 7;
-  int score = 8;
-  optional uint32 exectime = 9;
-  optional uint32 memory = 10;
-  google.protobuf.Timestamp submited_at = 11;
-  google.protobuf.Timestamp created_at = 12;
-  optional google.protobuf.Timestamp update_at = 13;
-  repeated TestcaseResult TestcaseResult = 14;
+  string user_name = 3;
+  optional int32 contest_id = 4;
+  int32 task_id = 5;
+  string task_title = 6;
+  string source_code = 7;
+  string lang_id = 8;
+  string status = 9;
+  int score = 10;
+  optional uint32 exec_time = 11;
+  optional uint32 memory = 12;
+  google.protobuf.Timestamp submited_at = 13;
+  google.protobuf.Timestamp created_at = 14;
+  optional google.protobuf.Timestamp update_at = 15;
+  repeated TestcaseResult TestcaseResult = 16;
 }
 
 message TestcaseResult {
