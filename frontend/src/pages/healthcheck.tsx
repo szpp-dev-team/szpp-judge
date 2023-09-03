@@ -1,6 +1,6 @@
+import { backendGrpcTransport } from "@/src/config/grpc";
 import { HealthcheckService } from "@/src/gen/proto/backend/v1/services_connect";
 import { createPromiseClient } from "@bufbuild/connect";
-import { createGrpcWebTransport } from "@bufbuild/connect-web";
 import { Button, Container } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useState } from "react";
@@ -8,7 +8,7 @@ import { useState } from "react";
 const Page: NextPage = () => {
   const cli = createPromiseClient(
     HealthcheckService,
-    createGrpcWebTransport({ baseUrl: "http://localhost:8080" }),
+    backendGrpcTransport,
   );
 
   const [waitingPing, setWaitingPing] = useState(false);
