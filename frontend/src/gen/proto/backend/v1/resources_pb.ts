@@ -656,6 +656,8 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   id = 0;
 
   /**
+   * user
+   *
    * @generated from field: int32 user_id = 2;
    */
   userId = 0;
@@ -666,11 +668,15 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   userName = "";
 
   /**
+   * contest
+   *
    * @generated from field: optional int32 contest_id = 4;
    */
   contestId?: number;
 
   /**
+   * task
+   *
    * @generated from field: int32 task_id = 5;
    */
   taskId = 0;
@@ -681,56 +687,68 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   taskTitle = "";
 
   /**
-   * @generated from field: string source_code = 7;
+   * @generated from field: int32 score = 7;
    */
-  sourceCode = "";
+  score = 0;
 
   /**
+   * submission
+   *
    * @generated from field: string lang_id = 8;
    */
   langId = "";
 
   /**
-   * 全体のジャッジ結果。ジャッジ中はnull
+   * @generated from field: string source_code = 9;
+   */
+  sourceCode = "";
+
+  /**
+   * judge
    *
-   * @generated from field: optional backend.v1.JudgeStatus status = 9;
+   * ジャッジ中はnull
+   *
+   * @generated from field: optional backend.v1.JudgeStatus status = 10;
    */
   status?: JudgeStatus;
 
   /**
-   * @generated from field: int32 score = 10;
+   * ジャッジ中はnull
+   *
+   * @generated from field: optional uint32 exec_time_ms = 11;
    */
-  score = 0;
+  execTimeMs?: number;
 
   /**
-   * @generated from field: optional uint32 exec_time = 11;
+   * ジャッジ中はnull
+   *
+   * @generated from field: optional uint32 exec_memory_kib = 12;
    */
-  execTime?: number;
+  execMemoryKib?: number;
 
   /**
-   * @generated from field: optional uint32 memory = 12;
+   * ジャッジ完了したテストケースの実行情報
+   *
+   * @generated from field: repeated backend.v1.TestcaseResult testcase_results = 13;
    */
-  memory?: number;
+  testcaseResults: TestcaseResult[] = [];
 
   /**
-   * @generated from field: google.protobuf.Timestamp submited_at = 13;
+   * timestamp
+   *
+   * @generated from field: google.protobuf.Timestamp submited_at = 14;
    */
   submitedAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 14;
+   * @generated from field: google.protobuf.Timestamp created_at = 15;
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp update_at = 15;
+   * @generated from field: optional google.protobuf.Timestamp update_at = 16;
    */
   updateAt?: Timestamp;
-
-  /**
-   * @generated from field: repeated backend.v1.TestcaseResult testcase_results = 16;
-   */
-  testcaseResults: TestcaseResult[] = [];
 
   constructor(data?: PartialMessage<SubmissionDetail>) {
     super();
@@ -746,16 +764,16 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
     { no: 4, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
     { no: 5, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 6, name: "task_title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "source_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 8, name: "lang_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 9, name: "status", kind: "enum", T: proto3.getEnumType(JudgeStatus), opt: true },
-    { no: 10, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 11, name: "exec_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
-    { no: 12, name: "memory", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
-    { no: 13, name: "submited_at", kind: "message", T: Timestamp },
-    { no: 14, name: "created_at", kind: "message", T: Timestamp },
-    { no: 15, name: "update_at", kind: "message", T: Timestamp, opt: true },
-    { no: 16, name: "testcase_results", kind: "message", T: TestcaseResult, repeated: true },
+    { no: 9, name: "source_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "status", kind: "enum", T: proto3.getEnumType(JudgeStatus), opt: true },
+    { no: 11, name: "exec_time_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
+    { no: 12, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
+    { no: 13, name: "testcase_results", kind: "message", T: TestcaseResult, repeated: true },
+    { no: 14, name: "submited_at", kind: "message", T: Timestamp },
+    { no: 15, name: "created_at", kind: "message", T: Timestamp },
+    { no: 16, name: "update_at", kind: "message", T: Timestamp, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmissionDetail {
@@ -849,7 +867,7 @@ export class SubmissonSummary extends Message<SubmissonSummary> {
   execMemoryKib?: number;
 
   /**
-   * time stamp
+   * timestamp
    *
    * @generated from field: google.protobuf.Timestamp submited_at = 12;
    */
