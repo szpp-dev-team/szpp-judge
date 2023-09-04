@@ -17,7 +17,7 @@ message Contest {
   string name = 2;
   string slug = 3;
   string description = 4;
-  int32 task_id = 5;
+  repeated int32 task_ids = 5;
   google.protobuf.Timestamp start_at = 6;
   google.protobuf.Timestamp end_at = 7;
 }
