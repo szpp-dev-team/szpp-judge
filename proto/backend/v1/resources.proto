@@ -14,11 +14,10 @@ message User {
 
 message Contest {
   int32 id = 1;
-  string name = 2; // ER図から消えていたけどslugをnameとして使うわけではないはず…？
+  string name = 2;
   string slug = 3;
   string description = 4;
   int32 task_id = 5;
-  int32 clarification_id = 6;
-  google.protobuf.Timestamp start_at = 7;
-  google.protobuf.Timestamp end_at = 8;
+  google.protobuf.Timestamp start_at = 6;
+  google.protobuf.Timestamp end_at = 7;
 }
