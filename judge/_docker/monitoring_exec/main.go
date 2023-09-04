@@ -122,7 +122,20 @@ func subMain(args []string, log *slog.Logger) error {
 		ticker := time.NewTicker(RSSCheckInterval)
 		defer ticker.Stop()
 
+		// 最初の数ミリ秒間は短かい間隔で取得
 		maxRSSKib = procinfo.FetchRSSKib(log, pid)
+
+		time.Sleep(time.Microsecond * 500)
+		rss := procinfo.FetchRSSKib(log, pid)
+		if rss > maxRSSKib {
+			maxRSSKib = rss
+		}
+
+		time.Sleep(time.Microsecond * 500)
+		rss = procinfo.FetchRSSKib(log, pid)
+		if rss > maxRSSKib {
+			maxRSSKib = rss
+		}
 
 		for {
 			select {
@@ -130,7 +143,7 @@ func subMain(args []string, log *slog.Logger) error {
 				return
 
 			case <-ticker.C:
-				if rss := procinfo.FetchRSSKib(log, pid); rss > maxRSSKib {
+				if rss = procinfo.FetchRSSKib(log, pid); rss > maxRSSKib {
 					maxRSSKib = rss
 					if maxRSSKib > a.memLimitKib {
 						log.Info("Memory limit exceeded:", slog.Uint64("RSS[kiB]", uint64(maxRSSKib)))
