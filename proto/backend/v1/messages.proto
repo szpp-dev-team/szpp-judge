@@ -103,7 +103,7 @@ message ListSubmissionsRequest {
 }
 
 message ListSubmissionsResponse {
-  repeated SubmissionSummary submissions = 1;
+  repeated SubmissonSummary submissions = 1;
 }
 
 message GetJudgeProgressRequest {
