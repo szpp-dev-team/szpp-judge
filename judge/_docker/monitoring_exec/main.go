@@ -160,7 +160,7 @@ func subMain(args []string, log *slog.Logger) error {
 	cancel()
 	if err != nil {
 		// context の WithTimeout で既に kill された場合もここに引っ掛かるので無視
-		log.Warn("Failed to wait a process:", "err", err)
+		log.Info("Failed to wait a process:", "err", err)
 	}
 
 	if log.Enabled(context.Background(), slog.LevelDebug) {

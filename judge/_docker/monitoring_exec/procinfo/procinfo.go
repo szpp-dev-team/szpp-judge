@@ -15,18 +15,16 @@ func FetchRSSKibFromProcStatusFile(log *slog.Logger, pid int) uint {
 
 	f, err := os.Open(fpath)
 	if err != nil {
-		log.Error("Cannot open file:", slog.String("path", fpath), slog.Any("err", err))
 		return 0
 	}
 
 	buf := [1024]byte{}
 	_, err = f.Read(buf[:])
 	if err != nil {
-		slog.Error("Cannot read content:", slog.String("path", fpath), slog.Any("err", err))
 		return 0
 	}
 
-	// "VMRSS:" で始まる箇所を見つけ、さらに後続の空白をスキップ
+	// "VmRSS:" で始まる箇所を見つけ、さらに後続の空白をスキップ
 	p := bytes.Index(buf[:], vmRSSLiteral) + len(vmRSSLiteral)
 	for buf[p] == ' ' || buf[p] == '\t' {
 		p++
