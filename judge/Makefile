@@ -23,13 +23,23 @@ lint:
 	golangci-lint run ./...
 
 
-.PHONY:	langs/build/images
-langs/build/images:
-	docker build -t $(IMAGE_NAME_PREFIX)-gcc $(DOCKER_DIR)/gcc
-	docker build -t $(IMAGE_NAME_PREFIX)-python $(DOCKER_DIR)/python
-	docker build -t $(IMAGE_NAME_PREFIX)-java $(DOCKER_DIR)/java
+.PHONY:	docker/build/monitoring_exec
+docker/build/monitoring_exec:
+	docker build -t $(IMAGE_NAME_PREFIX)-monitoring_exec:latest $(DOCKER_DIR)/monitoring_exec
 
 
-.PHONY:	langs/ls/images
-langs/ls/images:
+.PHONY:	docker/build/langs
+docker/build/langs:	docker/build/monitoring_exec
+	docker build -t $(IMAGE_NAME_PREFIX)-gcc:latest $(DOCKER_DIR)/gcc
+	docker build -t $(IMAGE_NAME_PREFIX)-python:latest $(DOCKER_DIR)/python
+	docker build -t $(IMAGE_NAME_PREFIX)-java:latest $(DOCKER_DIR)/java
+
+
+.PHONY:	docker/image/gc
+docker/image/gc:
+	docker images -f label=szpp-judge-image=true -f dangling=true -q | xargs docker image rm
+
+
+.PHONY:	docker/image/ls
+docker/image/ls:
 	docker images -f label=szpp-judge-image=true
