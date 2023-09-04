@@ -60,3 +60,9 @@ message GetContestRequest {
 message GetContestResponse {
   Contest contest = 1;
 }
+
+message ListContestsRequest {}
+
+message ListContestsResponse {
+  repeated Contest contests = 1;
+}

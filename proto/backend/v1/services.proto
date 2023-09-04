@@ -25,4 +25,5 @@ service HealthcheckService {
 service ContestService {
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
   rpc GetContest(GetContestRequest) returns (GetContestResponse);
+  rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
 }
