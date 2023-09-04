@@ -19,14 +19,14 @@ export type JudgeStatus = (typeof JudgeStatusValues)[number];
 
 export const JudgeStatus = {
   toJapanese(s: JudgeStatus): string {
-    return jugeStatusJaDict[s];
+    return judgeStatusJaDict[s];
   },
   toEnglishAbbr(s: JudgeStatus): string {
     return s;
   },
 } as const;
 
-const jugeStatusJaDict = {
+const judgeStatusJaDict = {
   WJ: "ジャッジ待ち",
   IE: "システム不具合",
   AC: "正解",
