@@ -115,6 +115,8 @@ message DeleteClarificationRequest{
   int32 id = 1;
 }
 
+message DeleteClarificationResponse{}
+
 message CreateAnswerRequest{
   int32 clarification_id = 1;
   int32 user_id = 2;
@@ -144,3 +146,5 @@ message UpdateAnswerResponse{
 message DeleteAnswerRequest{
   int32 answer_id = 1;
 }
+
+message DeleteAnswerResponse{}
