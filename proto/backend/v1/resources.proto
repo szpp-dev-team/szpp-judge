@@ -67,6 +67,18 @@ message MutationTestcaseSet {
   repeated string testcase_slugs = 3;
 }
 
+enum JudgeStatus {
+  JUDGE_STATUS_UNSPECIFIED = 0;
+  AC = 1;
+  CE = 2;
+  IE = 3;
+  MLE = 4;
+  OLE = 5;
+  RE = 6;
+  TLE = 7;
+  WA = 8;
+}
+
 // (slug, task_id) は複合 unique
 message Testcase {
   int32 id = 1;
