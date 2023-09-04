@@ -4,6 +4,6 @@ export const DifficultyValues = [
   "medium",
   "hard",
   "impossible",
-];
+] as const;
 
 export type Difficulty = (typeof DifficultyValues)[number];
