@@ -21,3 +21,20 @@ message Contest {
   google.protobuf.Timestamp start_at = 6;
   google.protobuf.Timestamp end_at = 7;
 }
+
+message PersonalStandingsTaskDetail{
+  int32 task_id = 1;
+  bool is_solved = 2;
+  int32 penalty_cnt = 3;
+  google.protobuf.Timestamp ac_at = 4;
+}
+
+message PersonalStandings{
+  int32 rank = 1;
+  int32 user_id = 2;
+  string user_name = 3;
+  int32 total_score = 4;
+  int32 total_penalty_cnt = 5;
+  google.protobuf.Timestamp latest_ac_at = 6;
+  repeated PersonalStandingsTaskDetail task_detail_list = 7;
+}
