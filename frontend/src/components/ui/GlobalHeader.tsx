@@ -3,6 +3,11 @@ import type { LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
 import type { FC } from "react";
 
+export type GlobalHeaderProps = {
+  contestID?: number;
+  contestTitle?: string;
+};
+
 const NavItemLink: FC<LinkProps> = ({ children, ...props }) => {
   return (
     <Link
@@ -20,14 +25,18 @@ const NavItemLink: FC<LinkProps> = ({ children, ...props }) => {
   );
 };
 
-export const GlobalHeader = () => {
+export const GlobalHeader: FC<GlobalHeaderProps> = ({ contestID: contestId, contestTitle }) => {
   return (
     <Box as="header" position="sticky" width="100%" top="0" left="0" zIndex={50}>
       <Flex as="nav" justifyContent="space-between" bg="teal.500" color="white">
         <Flex>
           <NavItemLink href="/" px="1.25rem">SZPP Judge</NavItemLink>
-          <NavItemLink href="/contests">コンテスト</NavItemLink>
-          <NavItemLink href="/problems">問題</NavItemLink>
+          {contestId ? <NavItemLink href={`/contests/${contestId}`}>{contestTitle}</NavItemLink> : (
+            <>
+              <NavItemLink href="/contests">コンテスト</NavItemLink>
+              <NavItemLink href="/tasks">問題</NavItemLink>
+            </>
+          )}
         </Flex>
         <Flex>
           <NavItemLink href="/register" px="1.25rem">登録</NavItemLink>

@@ -13,6 +13,9 @@ public/mockServiceWorker.js
 /.next/
 /out/
 
+# story book
+/storybook-static/
+
 # production
 /build
 

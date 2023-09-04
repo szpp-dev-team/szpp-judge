@@ -38,7 +38,7 @@ export const Login = () => {
         title: `${resp.username} にログインしました`,
         status: "success",
       });
-      router.replace("/");
+      router.push("/");
     } catch (e) {
       toast({
         title: "ログインに失敗しました",
