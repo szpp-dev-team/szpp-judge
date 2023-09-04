@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateContestRequest, CreateContestResponse, CreateUserRequest, CreateUserResponse, GetUserRequest, GetUserResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, SearchContestRequest, SearchContestResponse } from "./messages_pb";
+import { CreateContestRequest, CreateContestResponse, CreateUserRequest, CreateUserResponse, GetContestRequest, GetContestResponse, GetUserRequest, GetUserResponse, ListContestsRequest, ListContestsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -102,12 +102,21 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
-     * @generated from rpc backend.v1.ContestService.SearchContest
+     * @generated from rpc backend.v1.ContestService.GetContest
      */
-    searchContest: {
-      name: "SearchContest",
-      I: SearchContestRequest,
-      O: SearchContestResponse,
+    getContest: {
+      name: "GetContest",
+      I: GetContestRequest,
+      O: GetContestResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc backend.v1.ContestService.ListContests
+     */
+    listContests: {
+      name: "ListContests",
+      I: ListContestsRequest,
+      O: ListContestsResponse,
       kind: MethodKind.Unary,
     },
   }

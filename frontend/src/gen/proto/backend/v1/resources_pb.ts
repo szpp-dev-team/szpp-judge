@@ -77,8 +77,6 @@ export class Contest extends Message<Contest> {
   id = 0;
 
   /**
-   * ER図から消えていたけどslugをnameとして使うわけではないはず…？
-   *
    * @generated from field: string name = 2;
    */
   name = "";
@@ -94,22 +92,17 @@ export class Contest extends Message<Contest> {
   description = "";
 
   /**
-   * @generated from field: int32 task_id = 5;
+   * @generated from field: repeated int32 task_ids = 5;
    */
-  taskId = 0;
+  taskIds: number[] = [];
 
   /**
-   * @generated from field: int32 clarification_id = 6;
-   */
-  clarificationId = 0;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp start_at = 7;
+   * @generated from field: google.protobuf.Timestamp start_at = 6;
    */
   startAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp end_at = 8;
+   * @generated from field: google.protobuf.Timestamp end_at = 7;
    */
   endAt?: Timestamp;
 
@@ -125,10 +118,9 @@ export class Contest extends Message<Contest> {
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 6, name: "clarification_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 7, name: "start_at", kind: "message", T: Timestamp },
-    { no: 8, name: "end_at", kind: "message", T: Timestamp },
+    { no: 5, name: "task_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
+    { no: 6, name: "start_at", kind: "message", T: Timestamp },
+    { no: 7, name: "end_at", kind: "message", T: Timestamp },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Contest {

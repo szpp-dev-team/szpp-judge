@@ -366,7 +366,8 @@ var HealthcheckService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	ContestService_CreateContest_FullMethodName = "/backend.v1.ContestService/CreateContest"
-	ContestService_SearchContest_FullMethodName = "/backend.v1.ContestService/SearchContest"
+	ContestService_GetContest_FullMethodName    = "/backend.v1.ContestService/GetContest"
+	ContestService_ListContests_FullMethodName  = "/backend.v1.ContestService/ListContests"
 )
 
 // ContestServiceClient is the client API for ContestService service.
@@ -374,7 +375,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ContestServiceClient interface {
 	CreateContest(ctx context.Context, in *CreateContestRequest, opts ...grpc.CallOption) (*CreateContestResponse, error)
-	SearchContest(ctx context.Context, in *SearchContestRequest, opts ...grpc.CallOption) (*SearchContestResponse, error)
+	GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error)
+	ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error)
 }
 
 type contestServiceClient struct {
@@ -394,9 +396,18 @@ func (c *contestServiceClient) CreateContest(ctx context.Context, in *CreateCont
 	return out, nil
 }
 
-func (c *contestServiceClient) SearchContest(ctx context.Context, in *SearchContestRequest, opts ...grpc.CallOption) (*SearchContestResponse, error) {
-	out := new(SearchContestResponse)
-	err := c.cc.Invoke(ctx, ContestService_SearchContest_FullMethodName, in, out, opts...)
+func (c *contestServiceClient) GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error) {
+	out := new(GetContestResponse)
+	err := c.cc.Invoke(ctx, ContestService_GetContest_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error) {
+	out := new(ListContestsResponse)
+	err := c.cc.Invoke(ctx, ContestService_ListContests_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +419,8 @@ func (c *contestServiceClient) SearchContest(ctx context.Context, in *SearchCont
 // for forward compatibility
 type ContestServiceServer interface {
 	CreateContest(context.Context, *CreateContestRequest) (*CreateContestResponse, error)
-	SearchContest(context.Context, *SearchContestRequest) (*SearchContestResponse, error)
+	GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error)
+	ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error)
 }
 
 // UnimplementedContestServiceServer should be embedded to have forward compatible implementations.
@@ -418,8 +430,11 @@ type UnimplementedContestServiceServer struct {
 func (UnimplementedContestServiceServer) CreateContest(context.Context, *CreateContestRequest) (*CreateContestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateContest not implemented")
 }
-func (UnimplementedContestServiceServer) SearchContest(context.Context, *SearchContestRequest) (*SearchContestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SearchContest not implemented")
+func (UnimplementedContestServiceServer) GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetContest not implemented")
+}
+func (UnimplementedContestServiceServer) ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListContests not implemented")
 }
 
 // UnsafeContestServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -451,20 +466,38 @@ func _ContestService_CreateContest_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContestService_SearchContest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchContestRequest)
+func _ContestService_GetContest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetContestRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContestServiceServer).SearchContest(ctx, in)
+		return srv.(ContestServiceServer).GetContest(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ContestService_SearchContest_FullMethodName,
+		FullMethod: ContestService_GetContest_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContestServiceServer).SearchContest(ctx, req.(*SearchContestRequest))
+		return srv.(ContestServiceServer).GetContest(ctx, req.(*GetContestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_ListContests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContestsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).ListContests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_ListContests_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).ListContests(ctx, req.(*ListContestsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -481,8 +514,12 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContestService_CreateContest_Handler,
 		},
 		{
-			MethodName: "SearchContest",
-			Handler:    _ContestService_SearchContest_Handler,
+			MethodName: "GetContest",
+			Handler:    _ContestService_GetContest_Handler,
+		},
+		{
+			MethodName: "ListContests",
+			Handler:    _ContestService_ListContests_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
