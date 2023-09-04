@@ -79,8 +79,8 @@ func mainSub(args []string) error {
 	r, err := runner.New(ctx, dc, langMeta.ImageName,
 		runner.WithWorkingDir("/work"),
 		runner.WithBindDir(hostWorkingDir, "/work"),
-		runner.WithMaxProcNum(20),
-		runner.WithMaxContainerMemory(10*unit.MiB),
+		runner.WithMaxProcNum(64),
+		runner.WithMaxContainerMemory(64*unit.MiB),
 		runner.WithMaxStack(-1),
 		runner.WithMaxWriteFile(30*unit.MiB),
 		runner.WithMaxOpenFiles(256),
@@ -107,7 +107,7 @@ func run(
 	stdin []byte,
 ) error {
 	slog.Info("Executing compile cmd:", "cmd", lm.CompileCmd)
-	res, err := r.Exec(ctx, runner.ExecOption{
+	res1, err := r.ExecWithMonitoring(ctx, time.Second*2, unit.GiB*10, runner.ExecOption{
 		AsRootUser:      false,
 		Stdin:           nil,
 		Cmd:             lm.CompileCmd,
@@ -118,13 +118,13 @@ func run(
 		return err
 	}
 	slog.Info("Finished compilation")
-	showExecResult(res)
-	if res.ExitCode != 0 {
-		return fmt.Errorf("compile error: exitCode=%d, msg=%s", res.ExitCode, res.Stderr)
+	showExecResult(res1)
+	if res1.ExitCode != 0 {
+		return fmt.Errorf("compile error: exitCode=%d, msg=%s", res1.ExitCode, res1.Stderr)
 	}
 
 	slog.Info("Executing exec cmd:", "cmd", lm.ExecCmd, "len(stdin)", len(stdin), "stdin", truncateStr(string(stdin), 30))
-	res, err = r.Exec(ctx, runner.ExecOption{
+	res2, err := r.ExecWithMonitoring(ctx, time.Millisecond*500, unit.MiB*64, runner.ExecOption{
 		AsRootUser:      false,
 		Stdin:           bytes.NewBuffer(stdin),
 		Cmd:             lm.ExecCmd,
@@ -135,7 +135,7 @@ func run(
 		return err
 	}
 	slog.Info("Finished execution")
-	showExecResult(res)
+	showExecResult(res2)
 
 	fmt.Fprintln(os.Stderr, "----------------- logs ------------------")
 	_ = r.PrintLogs(ctx)
@@ -152,9 +152,12 @@ func truncateStr(s string, limitLen int) string {
 	}
 }
 
-func showExecResult(r runner.ExecResult) {
+func showExecResult(r runner.ExecWithMonitoringResult) {
 	fmt.Fprintln(os.Stderr, "- - - ExecResult - - -")
-	fmt.Fprintf(os.Stderr, "len(Stdout): %d\nlen(Stderr): %d\nExitCode: %d\n", len(r.Stdout), len(r.Stderr), r.ExitCode)
+	fmt.Fprintf(os.Stderr, "len(Stdout): %d\nlen(Stderr): %d\n", len(r.Stdout), len(r.Stderr))
+	fmt.Fprintf(os.Stderr, "Time:     %d ms\n", r.ExecTime.Milliseconds())
+	fmt.Fprintf(os.Stderr, "Memory:   %d KiB\n", r.ExecMemory/unit.KiB)
+	fmt.Fprintf(os.Stderr, "ExitCode: %d\n", r.ExitCode)
 
 	write := func(prefix string, s string, limit int) {
 		if len(s) > limit {

@@ -3,9 +3,12 @@ package runner
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
+	"path"
+	"strconv"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -125,6 +128,82 @@ type ExecResult struct {
 	Stderr            string
 	StdoutIsTruncated bool
 	StderrIsTruncated bool
+}
+
+type ExecWithMonitoringResult struct {
+	ExecResult
+	ExecTime   time.Duration
+	ExecMemory unit.ByteSize
+}
+
+func (r *Runner) ExecWithMonitoring(
+	ctx context.Context,
+	execTimeLimit time.Duration,
+	execMemoryLimit unit.ByteSize,
+	opt ExecOption,
+) (ExecWithMonitoringResult, error) {
+	cmd := []string{
+		"monitoring_exec",
+		strconv.FormatInt(int64(execTimeLimit.Milliseconds()), 10),
+		strconv.FormatUint(uint64(execMemoryLimit/unit.MiB), 10),
+	}
+	cmd = append(cmd, opt.Cmd...)
+	opt.Cmd = cmd
+
+	res, err := r.Exec(ctx, opt)
+	if err != nil {
+		return ExecWithMonitoringResult{}, err
+	}
+
+	t, mem, exitCode, err := parseExecResultFile(r.HostBindDir)
+	if err != nil {
+		return ExecWithMonitoringResult{}, err
+	}
+
+	res.ExitCode = exitCode
+
+	return ExecWithMonitoringResult{
+		ExecResult: res,
+		ExecTime:   t,
+		ExecMemory: mem,
+	}, nil
+}
+
+func parseExecResultFile(dir string) (time.Duration, unit.ByteSize, int, error) {
+	const NAME = ".exec-result.txt"
+	fpath := path.Join(dir, NAME)
+	f, err := os.Open(fpath)
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("failed to open %q: %w", fpath, err)
+	}
+
+	bs, err := io.ReadAll(f)
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("failed to read content of %q: %w", fpath, err)
+	}
+
+	i := 0
+	t := uint(0)
+	for '0' <= bs[i] && bs[i] <= '9' {
+		t = t*10 + uint(bs[i]-'0')
+		i++
+	}
+
+	i++ // skip whitespace
+	mem := uint(0)
+	for '0' <= bs[i] && bs[i] <= '9' {
+		mem = mem*10 + uint(bs[i]-'0')
+		i++
+	}
+
+	i++ // skip whitespace
+	rest := string(bs[i:])
+	exitCode, err := strconv.Atoi(rest)
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("failed to parse as exitCode integer: str=%q: %w", rest, err)
+	}
+
+	return time.Duration(t) * time.Millisecond, unit.ByteSize(mem) * unit.KiB, exitCode, nil
 }
 
 func (r *Runner) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
