@@ -34,7 +34,7 @@ export const GlobalHeader: FC<GlobalHeaderProps> = ({ contestID: contestId, cont
           {contestId ? <NavItemLink href={`/contests/${contestId}`}>{contestTitle}</NavItemLink> : (
             <>
               <NavItemLink href="/contests">コンテスト</NavItemLink>
-              <NavItemLink href="/problems">問題</NavItemLink>
+              <NavItemLink href="/tasks">問題</NavItemLink>
             </>
           )}
         </Flex>
