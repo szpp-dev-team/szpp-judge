@@ -18,7 +18,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const bordered: Story = {
+export const Bordered: Story = {
   args: {
     variant: "bordered",
   },
@@ -36,7 +36,7 @@ export const bordered: Story = {
         [3, "Easy", "すずっぴー君のおつかい", "TLE"],
         [4, "Hard", "すずっぴー君のおつかい", "13/57 ..."],
       ].map(([seq, d, title, s]) => (
-        <Tr>
+        <Tr key={seq}>
           <Td textAlign="center">{seq}</Td>
           <Td textAlign="center">{d}</Td>
           <Td textAlign="left">{title}</Td>

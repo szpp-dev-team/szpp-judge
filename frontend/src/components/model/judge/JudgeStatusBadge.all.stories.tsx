@@ -6,8 +6,8 @@ import { JudgeStatusBadge } from "./JudgeStatusBadge";
 
 const View: FC = () => (
   <VStack>
-    {JudgeStatusValues.map((s) => (
-      <HStack>
+    {JudgeStatusValues.map((s, i) => (
+      <HStack key={i}>
         <JudgeStatusBadge status={s} />
         <JudgeStatusBadge status={s} abbr />
         <JudgeStatusBadge status={s} progress={{ done: 100, total: 128 }} />
@@ -28,4 +28,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const all: Story = {};
+export const All: Story = {};
