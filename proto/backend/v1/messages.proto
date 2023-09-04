@@ -3,7 +3,6 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/resources.proto";
-import "google/protobuf/empty.proto";
 
 message GetUserRequest {
   string username = 1;
@@ -81,7 +80,7 @@ message PingResponse {
 message CreateClarificationRequest{
   int32 user_id = 1;
   string content = 2;
-  bool is_public = 4;
+  bool is_public = 3;
 }
 
 message CreateClarificationResponse{
@@ -96,16 +95,16 @@ message GetClarificationResponse{
   Clarification clarification = 1;
 }
 
-message ListClarificationRequest{}
+message ListClarificationsRequest{}
 
-message ListClarificationResponse{
+message ListClarificationsResponse{
   repeated Clarification clarifications = 1;
 }
 
 message UpdateClarificationRequest{
   int32 id = 1;
   string content = 2;
-  bool is_public = 4;
+  bool is_public = 3;
 }
 
 message UpdateClarificationResponse{
@@ -114,10 +113,6 @@ message UpdateClarificationResponse{
 
 message DeleteClarificationRequest{
   int32 id = 1;
-}
-
-message DeleteClarificationResponse{
-  google.protobuf.Empty empty = 1;
 }
 
 message CreateAnswerRequest{
@@ -137,21 +132,6 @@ message GetAnswerRequest{
 message GetAnswerResponse{
   Clarification.Answer answer = 1;
 }
-
-message ListAnswerRequest{}
-
-message ListAnswerResponse{
-  repeated Clarification.Answer answers = 1;
-}
-
-message ListAnswerClarificationIdRequest{
-  int32 clarification_id = 1;
-}
-
-message ListAnswerClarificationIdResponse{
-  repeated Clarification.Answer answers = 1;
-}
-
 message UpdateAnswerRequest{
   int32 answer_id = 1;
   string content = 2;
@@ -163,8 +143,4 @@ message UpdateAnswerResponse{
 
 message DeleteAnswerRequest{
   int32 answer_id = 1;
-}
-
-message DeleteAnswerResponse{
-  google.protobuf.Empty empty = 1;
 }

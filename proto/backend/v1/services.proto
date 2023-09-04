@@ -3,6 +3,7 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/messages.proto";
+import "google/protobuf/empty.proto";
 
 service UserService {
   // 指定された User を取得する
@@ -31,24 +32,20 @@ service TaskService {
   // 指定された Clarification を取得する
   rpc GetClarification(GetClarificationRequest) returns (GetClarificationResponse);
   // ClarificationListを取得する
-  rpc ListClarification(ListClarificationRequest) returns (ListClarificationResponse);
+  rpc ListClarifications(ListClarificationsRequest) returns (ListClarificationsResponse);
   // Clarification を更新する
   rpc UpdateClarification(UpdateClarificationRequest) returns (UpdateClarificationResponse);
   // Clarification を削除する
-  rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
+  rpc DeleteClarification(DeleteClarificationRequest) returns (google.protobuf.Empty);
 
   // Answerを追加する
   rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
   // Answerを取得する
   rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
-  // AnswerListを取得する
-  rpc ListAnswer(ListAnswerRequest) returns (ListAnswerResponse);
-  // 特定のClarificationのAnswerListを取得する
-  rpc ListAnswerClarificationId(ListAnswerClarificationIdRequest) returns (ListAnswerClarificationIdResponse);
   // Answerを更新する
   rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
   // Answerを削除する
-  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
+  rpc DeleteAnswer(DeleteAnswerRequest) returns (google.protobuf.Empty);
 }
 
 service HealthcheckService {
