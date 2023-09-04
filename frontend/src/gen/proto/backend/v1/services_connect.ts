@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateContestRequest, CreateContestResponse, CreateUserRequest, CreateUserResponse, GetContestRequest, GetContestResponse, GetUserRequest, GetUserResponse, ListContestsRequest, ListContestsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse } from "./messages_pb";
+import { CreateContestRequest, CreateContestResponse, CreateUserRequest, CreateUserResponse, GetContestRequest, GetContestResponse, GetStandingsRequest, GetStandingsResponse, GetUserRequest, GetUserResponse, ListContestsRequest, ListContestsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -117,6 +117,17 @@ export const ContestService = {
       name: "ListContests",
       I: ListContestsRequest,
       O: ListContestsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 順位表取得
+     *
+     * @generated from rpc backend.v1.ContestService.GetStandings
+     */
+    getStandings: {
+      name: "GetStandings",
+      I: GetStandingsRequest,
+      O: GetStandingsResponse,
       kind: MethodKind.Unary,
     },
   }
