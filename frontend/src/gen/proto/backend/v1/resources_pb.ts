@@ -645,11 +645,11 @@ export class MutationTestcase extends Message<MutationTestcase> {
 }
 
 /**
- * 提出
+ * 提出の詳細
  *
- * @generated from message backend.v1.Submission
+ * @generated from message backend.v1.SubmissionDetail
  */
-export class Submission extends Message<Submission> {
+export class SubmissionDetail extends Message<SubmissionDetail> {
   /**
    * @generated from field: int32 id = 1;
    */
@@ -732,13 +732,13 @@ export class Submission extends Message<Submission> {
    */
   testcaseResults: TestcaseResult[] = [];
 
-  constructor(data?: PartialMessage<Submission>) {
+  constructor(data?: PartialMessage<SubmissionDetail>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.Submission";
+  static readonly typeName = "backend.v1.SubmissionDetail";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
@@ -758,20 +758,139 @@ export class Submission extends Message<Submission> {
     { no: 16, name: "testcase_results", kind: "message", T: TestcaseResult, repeated: true },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Submission {
-    return new Submission().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmissionDetail {
+    return new SubmissionDetail().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Submission {
-    return new Submission().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmissionDetail {
+    return new SubmissionDetail().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Submission {
-    return new Submission().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmissionDetail {
+    return new SubmissionDetail().fromJsonString(jsonString, options);
   }
 
-  static equals(a: Submission | PlainMessage<Submission> | undefined, b: Submission | PlainMessage<Submission> | undefined): boolean {
-    return proto3.util.equals(Submission, a, b);
+  static equals(a: SubmissionDetail | PlainMessage<SubmissionDetail> | undefined, b: SubmissionDetail | PlainMessage<SubmissionDetail> | undefined): boolean {
+    return proto3.util.equals(SubmissionDetail, a, b);
+  }
+}
+
+/**
+ * 提出一覧用
+ *
+ * @generated from message backend.v1.SubmissonSummary
+ */
+export class SubmissonSummary extends Message<SubmissonSummary> {
+  /**
+   * @generated from field: int32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * user
+   *
+   * @generated from field: int32 user_id = 2;
+   */
+  userId = 0;
+
+  /**
+   * @generated from field: string user_name = 3;
+   */
+  userName = "";
+
+  /**
+   * cnotest
+   *
+   * @generated from field: optional int32 contest_id = 4;
+   */
+  contestId?: number;
+
+  /**
+   * task
+   *
+   * @generated from field: int32 task_id = 5;
+   */
+  taskId = 0;
+
+  /**
+   * @generated from field: string task_title = 6;
+   */
+  taskTitle = "";
+
+  /**
+   * @generated from field: int32 score = 7;
+   */
+  score = 0;
+
+  /**
+   * submission
+   *
+   * @generated from field: string lang_id = 8;
+   */
+  langId = "";
+
+  /**
+   * judge
+   *
+   * ジャッジ中はnull
+   *
+   * @generated from field: optional backend.v1.JudgeStatus judge_status = 9;
+   */
+  judgeStatus?: JudgeStatus;
+
+  /**
+   * @generated from field: optional uint32 exec_time_ms = 10;
+   */
+  execTimeMs?: number;
+
+  /**
+   * @generated from field: optional uint32 exec_memory_kib = 11;
+   */
+  execMemoryKib?: number;
+
+  /**
+   * time stamp
+   *
+   * @generated from field: google.protobuf.Timestamp submited_at = 12;
+   */
+  submitedAt?: Timestamp;
+
+  constructor(data?: PartialMessage<SubmissonSummary>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.SubmissonSummary";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "user_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 5, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "task_title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 8, name: "lang_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus), opt: true },
+    { no: 10, name: "exec_time_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
+    { no: 11, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
+    { no: 12, name: "submited_at", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmissonSummary {
+    return new SubmissonSummary().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmissonSummary {
+    return new SubmissonSummary().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmissonSummary {
+    return new SubmissonSummary().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SubmissonSummary | PlainMessage<SubmissonSummary> | undefined, b: SubmissonSummary | PlainMessage<SubmissonSummary> | undefined): boolean {
+    return proto3.util.equals(SubmissonSummary, a, b);
   }
 }
 

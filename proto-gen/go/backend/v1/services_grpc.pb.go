@@ -277,13 +277,13 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	TaskService_CreateTask_FullMethodName       = "/backend.v1.TaskService/CreateTask"
-	TaskService_GetTask_FullMethodName          = "/backend.v1.TaskService/GetTask"
-	TaskService_UpdateTask_FullMethodName       = "/backend.v1.TaskService/UpdateTask"
-	TaskService_Submit_FullMethodName           = "/backend.v1.TaskService/Submit"
-	TaskService_GetSubmission_FullMethodName    = "/backend.v1.TaskService/GetSubmission"
-	TaskService_ListSubmissions_FullMethodName  = "/backend.v1.TaskService/ListSubmissions"
-	TaskService_GetJudgeProgress_FullMethodName = "/backend.v1.TaskService/GetJudgeProgress"
+	TaskService_CreateTask_FullMethodName          = "/backend.v1.TaskService/CreateTask"
+	TaskService_GetTask_FullMethodName             = "/backend.v1.TaskService/GetTask"
+	TaskService_UpdateTask_FullMethodName          = "/backend.v1.TaskService/UpdateTask"
+	TaskService_Submit_FullMethodName              = "/backend.v1.TaskService/Submit"
+	TaskService_GetSubmissionDetail_FullMethodName = "/backend.v1.TaskService/GetSubmissionDetail"
+	TaskService_ListSubmissions_FullMethodName     = "/backend.v1.TaskService/ListSubmissions"
+	TaskService_GetJudgeProgress_FullMethodName    = "/backend.v1.TaskService/GetJudgeProgress"
 )
 
 // TaskServiceClient is the client API for TaskService service.
@@ -299,7 +299,7 @@ type TaskServiceClient interface {
 	// 提出する
 	Submit(ctx context.Context, in *SubmitRequest, opts ...grpc.CallOption) (*SubmitResponse, error)
 	// 提出の詳細を取得
-	GetSubmission(ctx context.Context, in *GetSubmissionRequest, opts ...grpc.CallOption) (*GetSubmissionResponse, error)
+	GetSubmissionDetail(ctx context.Context, in *GetSubmissionDetailRequest, opts ...grpc.CallOption) (*GetSubmissionDetailResponse, error)
 	// 提出一覧を取得
 	ListSubmissions(ctx context.Context, in *ListSubmissionsRequest, opts ...grpc.CallOption) (*ListSubmissionsResponse, error)
 	// ジャッジの進捗を取得
@@ -350,9 +350,9 @@ func (c *taskServiceClient) Submit(ctx context.Context, in *SubmitRequest, opts 
 	return out, nil
 }
 
-func (c *taskServiceClient) GetSubmission(ctx context.Context, in *GetSubmissionRequest, opts ...grpc.CallOption) (*GetSubmissionResponse, error) {
-	out := new(GetSubmissionResponse)
-	err := c.cc.Invoke(ctx, TaskService_GetSubmission_FullMethodName, in, out, opts...)
+func (c *taskServiceClient) GetSubmissionDetail(ctx context.Context, in *GetSubmissionDetailRequest, opts ...grpc.CallOption) (*GetSubmissionDetailResponse, error) {
+	out := new(GetSubmissionDetailResponse)
+	err := c.cc.Invoke(ctx, TaskService_GetSubmissionDetail_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +390,7 @@ type TaskServiceServer interface {
 	// 提出する
 	Submit(context.Context, *SubmitRequest) (*SubmitResponse, error)
 	// 提出の詳細を取得
-	GetSubmission(context.Context, *GetSubmissionRequest) (*GetSubmissionResponse, error)
+	GetSubmissionDetail(context.Context, *GetSubmissionDetailRequest) (*GetSubmissionDetailResponse, error)
 	// 提出一覧を取得
 	ListSubmissions(context.Context, *ListSubmissionsRequest) (*ListSubmissionsResponse, error)
 	// ジャッジの進捗を取得
@@ -413,8 +413,8 @@ func (UnimplementedTaskServiceServer) UpdateTask(context.Context, *UpdateTaskReq
 func (UnimplementedTaskServiceServer) Submit(context.Context, *SubmitRequest) (*SubmitResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Submit not implemented")
 }
-func (UnimplementedTaskServiceServer) GetSubmission(context.Context, *GetSubmissionRequest) (*GetSubmissionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSubmission not implemented")
+func (UnimplementedTaskServiceServer) GetSubmissionDetail(context.Context, *GetSubmissionDetailRequest) (*GetSubmissionDetailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubmissionDetail not implemented")
 }
 func (UnimplementedTaskServiceServer) ListSubmissions(context.Context, *ListSubmissionsRequest) (*ListSubmissionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSubmissions not implemented")
@@ -506,20 +506,20 @@ func _TaskService_Submit_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TaskService_GetSubmission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSubmissionRequest)
+func _TaskService_GetSubmissionDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSubmissionDetailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TaskServiceServer).GetSubmission(ctx, in)
+		return srv.(TaskServiceServer).GetSubmissionDetail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TaskService_GetSubmission_FullMethodName,
+		FullMethod: TaskService_GetSubmissionDetail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TaskServiceServer).GetSubmission(ctx, req.(*GetSubmissionRequest))
+		return srv.(TaskServiceServer).GetSubmissionDetail(ctx, req.(*GetSubmissionDetailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -584,8 +584,8 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TaskService_Submit_Handler,
 		},
 		{
-			MethodName: "GetSubmission",
-			Handler:    _TaskService_GetSubmission_Handler,
+			MethodName: "GetSubmissionDetail",
+			Handler:    _TaskService_GetSubmissionDetail_Handler,
 		},
 		{
 			MethodName: "ListSubmissions",

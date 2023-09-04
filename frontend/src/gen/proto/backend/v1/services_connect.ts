@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetSubmissionRequest, GetSubmissionResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, ListSubmissionsRequest, ListSubmissionsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, SubmitRequest, SubmitResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
+import { CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetSubmissionDetailRequest, GetSubmissionDetailResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, ListSubmissionsRequest, ListSubmissionsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, SubmitRequest, SubmitResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -121,12 +121,12 @@ export const TaskService = {
     /**
      * 提出の詳細を取得
      *
-     * @generated from rpc backend.v1.TaskService.GetSubmission
+     * @generated from rpc backend.v1.TaskService.GetSubmissionDetail
      */
-    getSubmission: {
-      name: "GetSubmission",
-      I: GetSubmissionRequest,
-      O: GetSubmissionResponse,
+    getSubmissionDetail: {
+      name: "GetSubmissionDetail",
+      I: GetSubmissionDetailRequest,
+      O: GetSubmissionDetailResponse,
       kind: MethodKind.Unary,
     },
     /**
