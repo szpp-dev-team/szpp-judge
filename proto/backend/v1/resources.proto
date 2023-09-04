@@ -108,7 +108,7 @@ message Submission {
   string task_title = 6;
   string source_code = 7;
   string lang_id = 8;
-  JudgeStatus status = 9;
+  optional JudgeStatus status = 9; // 全体のジャッジ結果。ジャッジ中はnull
   int32 score = 10;
   optional uint32 exec_time = 11;
   optional uint32 memory = 12;
