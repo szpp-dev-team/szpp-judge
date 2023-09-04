@@ -3,8 +3,17 @@ import { Box, type BoxProps } from "@chakra-ui/react";
 import type { FC } from "react";
 
 export type JudgeStatusBadgeProps = {
+  /**
+   * ジャッジの状態
+   */
   status: JudgeStatus;
-  abbr?: boolean; // true なら英語の省略表記 (AC, WA, etc.) で表示する
+  /**
+   * true なら英語の省略表記 (AC, WA, etc.) で表示する
+   */
+  abbr?: boolean;
+  /**
+   * ジャッジの進捗を、完了したテストケースの個数とテストケースの総数を基準に表示する
+   */
   progress?: JudgeTestcaseProgress;
 } & Omit<BoxProps, "children">;
 
