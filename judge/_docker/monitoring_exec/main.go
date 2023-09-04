@@ -185,6 +185,6 @@ func saveResult(elapsed time.Duration, maxRSSKib uint, exitCode int) error {
 	if err != nil {
 		return fmt.Errorf("cannot create file named %q: %w", NAME, err)
 	}
-	fmt.Fprintf(f, "%d %d %d\n", elapsed.Milliseconds(), maxRSSKib, exitCode)
+	fmt.Fprintf(f, "%d %d %d", elapsed.Milliseconds(), maxRSSKib, exitCode)
 	return nil
 }
