@@ -78,6 +78,68 @@ proto3.util.setEnumType(Difficulty, "backend.v1.Difficulty", [
 ]);
 
 /**
+ * @generated from enum backend.v1.JudgeStatus
+ */
+export enum JudgeStatus {
+  /**
+   * @generated from enum value: JUDGE_STATUS_UNSPECIFIED = 0;
+   */
+  JUDGE_STATUS_UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: AC = 1;
+   */
+  AC = 1,
+
+  /**
+   * @generated from enum value: CE = 2;
+   */
+  CE = 2,
+
+  /**
+   * @generated from enum value: IE = 3;
+   */
+  IE = 3,
+
+  /**
+   * @generated from enum value: MLE = 4;
+   */
+  MLE = 4,
+
+  /**
+   * @generated from enum value: OLE = 5;
+   */
+  OLE = 5,
+
+  /**
+   * @generated from enum value: RE = 6;
+   */
+  RE = 6,
+
+  /**
+   * @generated from enum value: TLE = 7;
+   */
+  TLE = 7,
+
+  /**
+   * @generated from enum value: WA = 8;
+   */
+  WA = 8,
+}
+// Retrieve enum metadata with: proto3.getEnumType(JudgeStatus)
+proto3.util.setEnumType(JudgeStatus, "backend.v1.JudgeStatus", [
+  { no: 0, name: "JUDGE_STATUS_UNSPECIFIED" },
+  { no: 1, name: "AC" },
+  { no: 2, name: "CE" },
+  { no: 3, name: "IE" },
+  { no: 4, name: "MLE" },
+  { no: 5, name: "OLE" },
+  { no: 6, name: "RE" },
+  { no: 7, name: "TLE" },
+  { no: 8, name: "WA" },
+]);
+
+/**
  * @generated from message backend.v1.User
  */
 export class User extends Message<User> {
@@ -579,6 +641,251 @@ export class MutationTestcase extends Message<MutationTestcase> {
 
   static equals(a: MutationTestcase | PlainMessage<MutationTestcase> | undefined, b: MutationTestcase | PlainMessage<MutationTestcase> | undefined): boolean {
     return proto3.util.equals(MutationTestcase, a, b);
+  }
+}
+
+/**
+ * 提出
+ *
+ * @generated from message backend.v1.Submission
+ */
+export class Submission extends Message<Submission> {
+  /**
+   * @generated from field: int32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: int32 user_id = 2;
+   */
+  userId = 0;
+
+  /**
+   * @generated from field: string user_name = 3;
+   */
+  userName = "";
+
+  /**
+   * @generated from field: optional int32 contest_id = 4;
+   */
+  contestId?: number;
+
+  /**
+   * @generated from field: int32 task_id = 5;
+   */
+  taskId = 0;
+
+  /**
+   * @generated from field: string task_title = 6;
+   */
+  taskTitle = "";
+
+  /**
+   * @generated from field: string source_code = 7;
+   */
+  sourceCode = "";
+
+  /**
+   * @generated from field: string lang_id = 8;
+   */
+  langId = "";
+
+  /**
+   * 全体のジャッジ結果。ジャッジ中はnull
+   *
+   * @generated from field: optional backend.v1.JudgeStatus status = 9;
+   */
+  status?: JudgeStatus;
+
+  /**
+   * @generated from field: int32 score = 10;
+   */
+  score = 0;
+
+  /**
+   * @generated from field: optional uint32 exec_time = 11;
+   */
+  execTime?: number;
+
+  /**
+   * @generated from field: optional uint32 memory = 12;
+   */
+  memory?: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp submited_at = 13;
+   */
+  submitedAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 14;
+   */
+  createdAt?: Timestamp;
+
+  /**
+   * @generated from field: optional google.protobuf.Timestamp update_at = 15;
+   */
+  updateAt?: Timestamp;
+
+  /**
+   * @generated from field: repeated backend.v1.TestcaseResult testcase_results = 16;
+   */
+  testcaseResults: TestcaseResult[] = [];
+
+  constructor(data?: PartialMessage<Submission>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.Submission";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "user_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 5, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "task_title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "source_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "lang_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "status", kind: "enum", T: proto3.getEnumType(JudgeStatus), opt: true },
+    { no: 10, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 11, name: "exec_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
+    { no: 12, name: "memory", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
+    { no: 13, name: "submited_at", kind: "message", T: Timestamp },
+    { no: 14, name: "created_at", kind: "message", T: Timestamp },
+    { no: 15, name: "update_at", kind: "message", T: Timestamp, opt: true },
+    { no: 16, name: "testcase_results", kind: "message", T: TestcaseResult, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Submission {
+    return new Submission().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Submission {
+    return new Submission().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Submission {
+    return new Submission().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Submission | PlainMessage<Submission> | undefined, b: Submission | PlainMessage<Submission> | undefined): boolean {
+    return proto3.util.equals(Submission, a, b);
+  }
+}
+
+/**
+ * テストケース一つあたりの結果
+ *
+ * @generated from message backend.v1.TestcaseResult
+ */
+export class TestcaseResult extends Message<TestcaseResult> {
+  /**
+   * @generated from field: string testcase_name = 1;
+   */
+  testcaseName = "";
+
+  /**
+   * @generated from field: backend.v1.JudgeStatus judge_status = 2;
+   */
+  judgeStatus = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
+
+  /**
+   * @generated from field: uint32 exec_time_ms = 3;
+   */
+  execTimeMs = 0;
+
+  /**
+   * @generated from field: uint32 exec_memory_kib = 4;
+   */
+  execMemoryKib = 0;
+
+  constructor(data?: PartialMessage<TestcaseResult>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.TestcaseResult";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "testcase_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
+    { no: 3, name: "exec_time_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 4, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TestcaseResult {
+    return new TestcaseResult().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TestcaseResult {
+    return new TestcaseResult().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TestcaseResult {
+    return new TestcaseResult().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: TestcaseResult | PlainMessage<TestcaseResult> | undefined, b: TestcaseResult | PlainMessage<TestcaseResult> | undefined): boolean {
+    return proto3.util.equals(TestcaseResult, a, b);
+  }
+}
+
+/**
+ * ジャッジの途中経過　WA(2/10) など。
+ *
+ * @generated from message backend.v1.JudgeProgress
+ */
+export class JudgeProgress extends Message<JudgeProgress> {
+  /**
+   * ジャッジ済みのケースが全てACであれば UNSPECIFIED そうでなければ最初に出た非ACの結果
+   *
+   * @generated from field: backend.v1.JudgeStatus status = 1;
+   */
+  status = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
+
+  /**
+   * テストケースの総数
+   *
+   * @generated from field: int32 total_tesccases = 2;
+   */
+  totalTesccases = 0;
+
+  /**
+   * ジャッジ済みのテストケース数
+   *
+   * @generated from field: int32 completed_testcases = 3;
+   */
+  completedTestcases = 0;
+
+  constructor(data?: PartialMessage<JudgeProgress>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.JudgeProgress";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
+    { no: 2, name: "total_tesccases", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "completed_testcases", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): JudgeProgress {
+    return new JudgeProgress().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): JudgeProgress {
+    return new JudgeProgress().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): JudgeProgress {
+    return new JudgeProgress().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: JudgeProgress | PlainMessage<JudgeProgress> | undefined, b: JudgeProgress | PlainMessage<JudgeProgress> | undefined): boolean {
+    return proto3.util.equals(JudgeProgress, a, b);
   }
 }
 
