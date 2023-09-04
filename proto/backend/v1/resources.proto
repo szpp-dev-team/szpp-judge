@@ -115,12 +115,12 @@ message Submission {
   google.protobuf.Timestamp submited_at = 13;
   google.protobuf.Timestamp created_at = 14;
   optional google.protobuf.Timestamp update_at = 15;
-  repeated TestcaseResult testcase_result = 16;
+  repeated TestcaseResult testcase_results = 16;
 }
 
 // テストケース一つあたりの結果
 message TestcaseResult {
-  string name = 1;
+  string testcase_name = 1;
   JudgeStatus judge_status = 2;
   uint32 exec_time_ms = 3;
   uint32 exec_memory_kib = 4;
