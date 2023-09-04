@@ -101,21 +101,27 @@ message MutationTestcase {
 // 提出の詳細
 message SubmissionDetail {
   int32 id = 1;
+  // user
   int32 user_id = 2;
   string user_name = 3;
+  // contest
   optional int32 contest_id = 4;
+  // task
   int32 task_id = 5;
   string task_title = 6;
-  string source_code = 7;
+  int32 score = 7;
+  // submission
   string lang_id = 8;
-  optional JudgeStatus status = 9; // 全体のジャッジ結果。ジャッジ中はnull
-  int32 score = 10;
-  optional uint32 exec_time = 11;
-  optional uint32 memory = 12;
-  google.protobuf.Timestamp submited_at = 13;
-  google.protobuf.Timestamp created_at = 14;
-  optional google.protobuf.Timestamp update_at = 15;
-  repeated TestcaseResult testcase_results = 16;
+  string source_code = 9;
+  // judge
+  optional JudgeStatus status = 10; // ジャッジ中はnull
+  optional uint32 exec_time_ms = 11; // ジャッジ中はnull
+  optional uint32 exec_memory_kib = 12; // ジャッジ中はnull
+  repeated TestcaseResult testcase_results = 13; // ジャッジ完了したテストケースの実行情報
+  // timestamp
+  google.protobuf.Timestamp submited_at = 14;
+  google.protobuf.Timestamp created_at = 15;
+  optional google.protobuf.Timestamp update_at = 16;
 }
 
 // 提出一覧用
@@ -136,7 +142,7 @@ message SubmissonSummary {
   optional JudgeStatus judge_status = 9; // ジャッジ中はnull
   optional uint32 exec_time_ms = 10;
   optional uint32 exec_memory_kib = 11;
-  // time stamp
+  // timestamp
   google.protobuf.Timestamp submited_at = 12;
 }
 
