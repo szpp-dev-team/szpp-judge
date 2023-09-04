@@ -52,11 +52,11 @@ message CreateContestResponse {
   Contest contest = 1;
 }
 
-message SearchContestRequest {
+message GetContestRequest {
   string name = 1;
   string slug = 2;
 }
 
-message SearchContestResponse {
+message GetContestResponse {
   Contest contest = 1;
 }
