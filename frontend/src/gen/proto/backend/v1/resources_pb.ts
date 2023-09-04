@@ -857,11 +857,15 @@ export class SubmissonSummary extends Message<SubmissonSummary> {
   judgeStatus?: JudgeStatus;
 
   /**
+   * ジャッジ中はnull
+   *
    * @generated from field: optional uint32 exec_time_ms = 10;
    */
   execTimeMs?: number;
 
   /**
+   * ジャッジ中はnull
+   *
    * @generated from field: optional uint32 exec_memory_kib = 11;
    */
   execMemoryKib?: number;

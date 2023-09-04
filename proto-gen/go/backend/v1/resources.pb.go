@@ -1009,8 +1009,8 @@ type SubmissonSummary struct {
 	LangId string `protobuf:"bytes,8,opt,name=lang_id,json=langId,proto3" json:"lang_id,omitempty"`
 	// judge
 	JudgeStatus   *JudgeStatus `protobuf:"varint,9,opt,name=judge_status,json=judgeStatus,proto3,enum=backend.v1.JudgeStatus,oneof" json:"judge_status,omitempty"` // ジャッジ中はnull
-	ExecTimeMs    *uint32      `protobuf:"varint,10,opt,name=exec_time_ms,json=execTimeMs,proto3,oneof" json:"exec_time_ms,omitempty"`
-	ExecMemoryKib *uint32      `protobuf:"varint,11,opt,name=exec_memory_kib,json=execMemoryKib,proto3,oneof" json:"exec_memory_kib,omitempty"`
+	ExecTimeMs    *uint32      `protobuf:"varint,10,opt,name=exec_time_ms,json=execTimeMs,proto3,oneof" json:"exec_time_ms,omitempty"`                             // ジャッジ中はnull
+	ExecMemoryKib *uint32      `protobuf:"varint,11,opt,name=exec_memory_kib,json=execMemoryKib,proto3,oneof" json:"exec_memory_kib,omitempty"`                    // ジャッジ中はnull
 	// timestamp
 	SubmitedAt *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=submited_at,json=submitedAt,proto3" json:"submited_at,omitempty"`
 }
