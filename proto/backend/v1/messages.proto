@@ -89,12 +89,12 @@ message SubmitResponse {
   int32 submission_id = 1;
 }
 
-message GetSubmissionRequest {
+message GetSubmissionDetailRequest {
   int32 id = 1;
 }
 
-message GetSubmissionResponse {
-  Submission submission = 1;
+message GetSubmissionDetailResponse {
+  SubmissionDetail submission_detail = 1;
 }
 
 message ListSubmissionsRequest {

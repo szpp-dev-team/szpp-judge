@@ -28,7 +28,7 @@ service TaskService {
   // 提出する
   rpc Submit(SubmitRequest) returns (SubmitResponse);
   // 提出の詳細を取得
-  rpc GetSubmission(GetSubmissionRequest) returns (GetSubmissionResponse);
+  rpc GetSubmissionDetail(GetSubmissionDetailRequest) returns (GetSubmissionDetailResponse);
   // 提出一覧を取得
   rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse);
   // ジャッジの進捗を取得

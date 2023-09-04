@@ -99,7 +99,7 @@ message MutationTestcase {
 }
 
 // 提出
-message Submission {
+message SubmissionDetail {
   int32 id = 1;
   int32 user_id = 2;
   string user_name = 3;
