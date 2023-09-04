@@ -3,6 +3,7 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/resources.proto";
+import "google/protobuf/timestamp.proto";
 
 message GetUserRequest {
   string username = 1;
@@ -46,6 +47,8 @@ message PingResponse {
 message CreateContestRequest {
   string slug = 1;
   string description = 2;
+  google.protobuf.Timestamp start_at = 3;
+  google.protobuf.Timestamp end_at = 4;
 }
 
 message CreateContestResponse {
