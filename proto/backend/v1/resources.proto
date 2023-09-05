@@ -119,7 +119,7 @@ message SubmissionSummary {
   // user
   int32 user_id = 2;
   string user_name = 3;
-  // cnotest
+  // contest
   optional int32 contest_id = 4;
   // task
   int32 task_id = 5;
