@@ -2,9 +2,13 @@
   "typescript": {},
   "json": {},
   "excludes": [
+    "**/*-lock.json",
     "**/node_modules",
-    "src/gen/**",
-    "**/*-lock.json"
+    ".next/**",
+    "out/**",
+    "storybook-static/**",
+    "public/**",
+    "src/gen/**"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.86.2.wasm",

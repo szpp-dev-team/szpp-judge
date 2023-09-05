@@ -1,0 +1,34 @@
+name: buf
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - .github/workflows/buf-format.yml
+      - proto/**
+defaults:
+  run:
+    working-directory: ./proto
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: "1.25.1"
+      - uses: bufbuild/buf-lint-action@v1
+        with:
+          input: proto
+      - uses: bufbuild/buf-breaking-action@v1
+        with:
+          # The 'main' branch of the GitHub repository that defines the module.
+          against: "https://github.com/szpp-dev-team/szpp-judge.git#branch=main,subdir=proto"
+          input: proto
+      - name: format
+        run: buf format -w
+      - name: commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "style(proto): [bot] apply code formatter change"
+          ref: ${{ steps.upstreambranch.outputs.branch }}
