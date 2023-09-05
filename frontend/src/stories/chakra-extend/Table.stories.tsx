@@ -1,4 +1,4 @@
-import { Table, Td, Th, Tr } from "@chakra-ui/react";
+import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta = {
@@ -24,25 +24,29 @@ export const Bordered: Story = {
   },
   render: ({ ...props }) => (
     <Table {...props}>
-      <Tr>
-        <Th textAlign="center">#</Th>
-        <Th textAlign="center">難易度</Th>
-        <Th textAlign="left">タイトル</Th>
-        <Th textAlign="center">自分の提出結果</Th>
-      </Tr>
-      {[
-        [1, "Beginner", "すずっぴー君のおつかい", "AC"],
-        [2, "Easy", "すずっぴー君のおつかい", "WA"],
-        [3, "Easy", "すずっぴー君のおつかい", "TLE"],
-        [4, "Hard", "すずっぴー君のおつかい", "13/57 ..."],
-      ].map(([seq, d, title, s]) => (
-        <Tr key={seq}>
-          <Td textAlign="center">{seq}</Td>
-          <Td textAlign="center">{d}</Td>
-          <Td textAlign="left">{title}</Td>
-          <Td textAlign="center">{s}</Td>
+      <Thead>
+        <Tr>
+          <Th textAlign="center">#</Th>
+          <Th textAlign="center">難易度</Th>
+          <Th textAlign="left">タイトル</Th>
+          <Th textAlign="center">自分の提出結果</Th>
         </Tr>
-      ))}
+      </Thead>
+      <Tbody>
+        {[
+          [1, "Beginner", "すずっぴー君のおつかい", "AC"],
+          [2, "Easy", "すずっぴー君のおつかい", "WA"],
+          [3, "Easy", "すずっぴー君のおつかい", "TLE"],
+          [4, "Hard", "すずっぴー君のおつかい", "13/57 ..."],
+        ].map(([seq, d, title, s]) => (
+          <Tr key={seq}>
+            <Td textAlign="center">{seq}</Td>
+            <Td textAlign="center">{d}</Td>
+            <Td textAlign="left">{title}</Td>
+            <Td textAlign="center">{s}</Td>
+          </Tr>
+        ))}
+      </Tbody>
     </Table>
   ),
 };
