@@ -119,13 +119,13 @@ message SubmissionDetail {
   optional uint32 exec_memory_kib = 12; // ジャッジ中はnull
   repeated TestcaseResult testcase_results = 13; // ジャッジ完了したテストケースの実行情報
   // timestamp
-  google.protobuf.Timestamp submited_at = 14;
+  google.protobuf.Timestamp submitted_at = 14;
   google.protobuf.Timestamp created_at = 15;
   optional google.protobuf.Timestamp update_at = 16;
 }
 
 // 提出一覧用
-message SubmissonSummary {
+message SubmissionSummary {
   int32 id = 1;
   // user
   int32 user_id = 2;
@@ -143,7 +143,7 @@ message SubmissonSummary {
   optional uint32 exec_time_ms = 10; // ジャッジ中はnull
   optional uint32 exec_memory_kib = 11; // ジャッジ中はnull
   // timestamp
-  google.protobuf.Timestamp submited_at = 12;
+  google.protobuf.Timestamp submitted_at = 12;
 }
 
 // テストケース一つあたりの結果
