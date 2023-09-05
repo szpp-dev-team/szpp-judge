@@ -2,8 +2,17 @@ package langs
 
 type LangID string
 
+// 定数名のフォーマット： `言語名_バージョン_処理系`
+// 定数値ののフォーマット： `言語名/バージョン/処理系`
+//
+// 整数値の enum で実装すると、将来、enum 列挙の行の途中に新たに言語を追加したとき、
+// その行以降の言語の ID が変わってしまう。
+// そのため文字列型で実装した。
 const (
-	ImagePrefix = "szpp-judge-image-"
+	C_11_GCC13         = LangID("c/11/gcc")
+	CPP_20_GCC13       = LangID("cpp/20/gcc")
+	JAVA_21_OPENJDK    = LangID("java/21/openjdk")
+	PYTHON_311_CPYTHON = LangID("python/3.11/cpython")
 )
 
 type Meta struct {
@@ -16,9 +25,11 @@ type Meta struct {
 	ExecCmd     []string
 }
 
+const ImagePrefix = "szpp-judge-image-"
+
 var langMetas = []Meta{
 	{
-		ID:          "c/11/gcc13.2",
+		ID:          C_11_GCC13,
 		Name:        "C11 (GCC 13.2)",
 		Active:      true,
 		DockerImage: ImagePrefix + "gcc13.2",
@@ -38,7 +49,7 @@ var langMetas = []Meta{
 		ExecCmd: []string{"./a.out"},
 	},
 	{
-		ID:          "cpp/20/gcc13.2",
+		ID:          CPP_20_GCC13,
 		Name:        "C++20 (GCC 13.2)",
 		Active:      true,
 		DockerImage: ImagePrefix + "gcc13.2",
@@ -58,7 +69,7 @@ var langMetas = []Meta{
 		ExecCmd: []string{"./a.out"},
 	},
 	{
-		ID:          "java/21/openjdk",
+		ID:          JAVA_21_OPENJDK,
 		Name:        "Java (OpenJDK 21)",
 		Active:      true,
 		DockerImage: ImagePrefix + "openjdk21",
@@ -67,7 +78,7 @@ var langMetas = []Meta{
 		ExecCmd:     []string{"java", "-Xss1G", "-Xmx1G", "Main"},
 	},
 	{
-		ID:          "python/3.11/cpython",
+		ID:          PYTHON_311_CPYTHON,
 		Name:        "Python (CPython 3.11)",
 		Active:      true,
 		DockerImage: ImagePrefix + "cpython3.11",
