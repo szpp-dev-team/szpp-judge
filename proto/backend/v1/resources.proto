@@ -4,6 +4,7 @@ package backend.v1;
 
 import "google/protobuf/timestamp.proto";
 import "judge/v1/judge_type.proto";
+import "judge/v1/resources.proto";
 
 message User {
   int32 id = 1;
@@ -67,18 +68,6 @@ message MutationTestcaseSet {
   repeated string testcase_slugs = 3;
 }
 
-enum JudgeStatus {
-  JUDGE_STATUS_UNSPECIFIED = 0;
-  AC = 1;
-  CE = 2;
-  IE = 3;
-  MLE = 4;
-  OLE = 5;
-  RE = 6;
-  TLE = 7;
-  WA = 8;
-}
-
 // (slug, task_id) は複合 unique
 message Testcase {
   int32 id = 1;
@@ -114,7 +103,7 @@ message SubmissionDetail {
   string lang_id = 8;
   string source_code = 9;
   // judge
-  optional JudgeStatus status = 10; // ジャッジ中はnull
+  optional judge.v1.JudgeStatus status = 10; // ジャッジ中はnull
   optional uint32 exec_time_ms = 11; // ジャッジ中はnull
   optional uint32 exec_memory_kib = 12; // ジャッジ中はnull
   repeated TestcaseResult testcase_results = 13; // ジャッジ完了したテストケースの実行情報
@@ -139,7 +128,7 @@ message SubmissionSummary {
   // submission
   string lang_id = 8;
   // judge
-  optional JudgeStatus judge_status = 9; // ジャッジ中はnull
+  optional judge.v1.JudgeStatus judge_status = 9; // ジャッジ中はnull
   optional uint32 exec_time_ms = 10; // ジャッジ中はnull
   optional uint32 exec_memory_kib = 11; // ジャッジ中はnull
   // timestamp
@@ -149,14 +138,14 @@ message SubmissionSummary {
 // テストケース一つあたりの結果
 message TestcaseResult {
   string testcase_name = 1;
-  JudgeStatus judge_status = 2;
+  judge.v1.JudgeStatus judge_status = 2;
   uint32 exec_time_ms = 3;
   uint32 exec_memory_kib = 4;
 }
 
 // ジャッジの途中経過　WA(2/10) など。
 message JudgeProgress {
-  JudgeStatus status = 1; // ジャッジ済みのケースが全てACであれば UNSPECIFIED そうでなければ最初に出た非ACの結果
+  judge.v1.JudgeStatus status = 1; // ジャッジ済みのケースが全てACであれば UNSPECIFIED そうでなければ最初に出た非ACの結果
   int32 total_tesccases = 2; // テストケースの総数
   int32 completed_testcases = 3; // ジャッジ済みのテストケース数
 }
