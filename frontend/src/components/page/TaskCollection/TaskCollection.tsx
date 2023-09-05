@@ -24,8 +24,8 @@ export type TaskCollectionProps = {
 
 export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
   return (
-    <Box px={16}>
-      <Card px={3} py={4}>
+    <Box px={16} h="inherit">
+      <Card px={3} py={4} h="100%">
         <CardHeader>
           <Heading as="h1">問題一覧 / 得点状況</Heading>
         </CardHeader>
