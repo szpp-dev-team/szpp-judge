@@ -5,7 +5,6 @@
 vendor
 .data
 
-/judge/_workdir/
 /judge/tmp/
 
 .venv
