@@ -25,6 +25,25 @@ service TaskService {
   rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
   // Task を更新する
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+  // Clarification を作成する
+  rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
+  // 指定された Clarification を取得する
+  rpc GetClarification(GetClarificationRequest) returns (GetClarificationResponse);
+  // ClarificationListを取得する
+  rpc ListClarifications(ListClarificationsRequest) returns (ListClarificationsResponse);
+  // Clarification を更新する
+  rpc UpdateClarification(UpdateClarificationRequest) returns (UpdateClarificationResponse);
+  // Clarification を削除する
+  rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
+
+  // Answerを追加する
+  rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
+  // Answerを取得する
+  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
+  // Answerを更新する
+  rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
+  // Answerを削除する
+  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
 }
 
 service HealthcheckService {

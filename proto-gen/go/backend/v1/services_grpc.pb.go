@@ -277,9 +277,18 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	TaskService_CreateTask_FullMethodName = "/backend.v1.TaskService/CreateTask"
-	TaskService_GetTask_FullMethodName    = "/backend.v1.TaskService/GetTask"
-	TaskService_UpdateTask_FullMethodName = "/backend.v1.TaskService/UpdateTask"
+	TaskService_CreateTask_FullMethodName          = "/backend.v1.TaskService/CreateTask"
+	TaskService_GetTask_FullMethodName             = "/backend.v1.TaskService/GetTask"
+	TaskService_UpdateTask_FullMethodName          = "/backend.v1.TaskService/UpdateTask"
+	TaskService_CreateClarification_FullMethodName = "/backend.v1.TaskService/CreateClarification"
+	TaskService_GetClarification_FullMethodName    = "/backend.v1.TaskService/GetClarification"
+	TaskService_ListClarifications_FullMethodName  = "/backend.v1.TaskService/ListClarifications"
+	TaskService_UpdateClarification_FullMethodName = "/backend.v1.TaskService/UpdateClarification"
+	TaskService_DeleteClarification_FullMethodName = "/backend.v1.TaskService/DeleteClarification"
+	TaskService_CreateAnswer_FullMethodName        = "/backend.v1.TaskService/CreateAnswer"
+	TaskService_GetAnswer_FullMethodName           = "/backend.v1.TaskService/GetAnswer"
+	TaskService_UpdateAnswer_FullMethodName        = "/backend.v1.TaskService/UpdateAnswer"
+	TaskService_DeleteAnswer_FullMethodName        = "/backend.v1.TaskService/DeleteAnswer"
 )
 
 // TaskServiceClient is the client API for TaskService service.
@@ -292,6 +301,24 @@ type TaskServiceClient interface {
 	GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*GetTaskResponse, error)
 	// Task を更新する
 	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error)
+	// Clarification を作成する
+	CreateClarification(ctx context.Context, in *CreateClarificationRequest, opts ...grpc.CallOption) (*CreateClarificationResponse, error)
+	// 指定された Clarification を取得する
+	GetClarification(ctx context.Context, in *GetClarificationRequest, opts ...grpc.CallOption) (*GetClarificationResponse, error)
+	// ClarificationListを取得する
+	ListClarifications(ctx context.Context, in *ListClarificationsRequest, opts ...grpc.CallOption) (*ListClarificationsResponse, error)
+	// Clarification を更新する
+	UpdateClarification(ctx context.Context, in *UpdateClarificationRequest, opts ...grpc.CallOption) (*UpdateClarificationResponse, error)
+	// Clarification を削除する
+	DeleteClarification(ctx context.Context, in *DeleteClarificationRequest, opts ...grpc.CallOption) (*DeleteClarificationResponse, error)
+	// Answerを追加する
+	CreateAnswer(ctx context.Context, in *CreateAnswerRequest, opts ...grpc.CallOption) (*CreateAnswerResponse, error)
+	// Answerを取得する
+	GetAnswer(ctx context.Context, in *GetAnswerRequest, opts ...grpc.CallOption) (*GetAnswerResponse, error)
+	// Answerを更新する
+	UpdateAnswer(ctx context.Context, in *UpdateAnswerRequest, opts ...grpc.CallOption) (*UpdateAnswerResponse, error)
+	// Answerを削除する
+	DeleteAnswer(ctx context.Context, in *DeleteAnswerRequest, opts ...grpc.CallOption) (*DeleteAnswerResponse, error)
 }
 
 type taskServiceClient struct {
@@ -329,6 +356,87 @@ func (c *taskServiceClient) UpdateTask(ctx context.Context, in *UpdateTaskReques
 	return out, nil
 }
 
+func (c *taskServiceClient) CreateClarification(ctx context.Context, in *CreateClarificationRequest, opts ...grpc.CallOption) (*CreateClarificationResponse, error) {
+	out := new(CreateClarificationResponse)
+	err := c.cc.Invoke(ctx, TaskService_CreateClarification_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) GetClarification(ctx context.Context, in *GetClarificationRequest, opts ...grpc.CallOption) (*GetClarificationResponse, error) {
+	out := new(GetClarificationResponse)
+	err := c.cc.Invoke(ctx, TaskService_GetClarification_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) ListClarifications(ctx context.Context, in *ListClarificationsRequest, opts ...grpc.CallOption) (*ListClarificationsResponse, error) {
+	out := new(ListClarificationsResponse)
+	err := c.cc.Invoke(ctx, TaskService_ListClarifications_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) UpdateClarification(ctx context.Context, in *UpdateClarificationRequest, opts ...grpc.CallOption) (*UpdateClarificationResponse, error) {
+	out := new(UpdateClarificationResponse)
+	err := c.cc.Invoke(ctx, TaskService_UpdateClarification_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) DeleteClarification(ctx context.Context, in *DeleteClarificationRequest, opts ...grpc.CallOption) (*DeleteClarificationResponse, error) {
+	out := new(DeleteClarificationResponse)
+	err := c.cc.Invoke(ctx, TaskService_DeleteClarification_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) CreateAnswer(ctx context.Context, in *CreateAnswerRequest, opts ...grpc.CallOption) (*CreateAnswerResponse, error) {
+	out := new(CreateAnswerResponse)
+	err := c.cc.Invoke(ctx, TaskService_CreateAnswer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) GetAnswer(ctx context.Context, in *GetAnswerRequest, opts ...grpc.CallOption) (*GetAnswerResponse, error) {
+	out := new(GetAnswerResponse)
+	err := c.cc.Invoke(ctx, TaskService_GetAnswer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) UpdateAnswer(ctx context.Context, in *UpdateAnswerRequest, opts ...grpc.CallOption) (*UpdateAnswerResponse, error) {
+	out := new(UpdateAnswerResponse)
+	err := c.cc.Invoke(ctx, TaskService_UpdateAnswer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) DeleteAnswer(ctx context.Context, in *DeleteAnswerRequest, opts ...grpc.CallOption) (*DeleteAnswerResponse, error) {
+	out := new(DeleteAnswerResponse)
+	err := c.cc.Invoke(ctx, TaskService_DeleteAnswer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskServiceServer is the server API for TaskService service.
 // All implementations should embed UnimplementedTaskServiceServer
 // for forward compatibility
@@ -339,6 +447,24 @@ type TaskServiceServer interface {
 	GetTask(context.Context, *GetTaskRequest) (*GetTaskResponse, error)
 	// Task を更新する
 	UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error)
+	// Clarification を作成する
+	CreateClarification(context.Context, *CreateClarificationRequest) (*CreateClarificationResponse, error)
+	// 指定された Clarification を取得する
+	GetClarification(context.Context, *GetClarificationRequest) (*GetClarificationResponse, error)
+	// ClarificationListを取得する
+	ListClarifications(context.Context, *ListClarificationsRequest) (*ListClarificationsResponse, error)
+	// Clarification を更新する
+	UpdateClarification(context.Context, *UpdateClarificationRequest) (*UpdateClarificationResponse, error)
+	// Clarification を削除する
+	DeleteClarification(context.Context, *DeleteClarificationRequest) (*DeleteClarificationResponse, error)
+	// Answerを追加する
+	CreateAnswer(context.Context, *CreateAnswerRequest) (*CreateAnswerResponse, error)
+	// Answerを取得する
+	GetAnswer(context.Context, *GetAnswerRequest) (*GetAnswerResponse, error)
+	// Answerを更新する
+	UpdateAnswer(context.Context, *UpdateAnswerRequest) (*UpdateAnswerResponse, error)
+	// Answerを削除する
+	DeleteAnswer(context.Context, *DeleteAnswerRequest) (*DeleteAnswerResponse, error)
 }
 
 // UnimplementedTaskServiceServer should be embedded to have forward compatible implementations.
@@ -353,6 +479,33 @@ func (UnimplementedTaskServiceServer) GetTask(context.Context, *GetTaskRequest) 
 }
 func (UnimplementedTaskServiceServer) UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTask not implemented")
+}
+func (UnimplementedTaskServiceServer) CreateClarification(context.Context, *CreateClarificationRequest) (*CreateClarificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateClarification not implemented")
+}
+func (UnimplementedTaskServiceServer) GetClarification(context.Context, *GetClarificationRequest) (*GetClarificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetClarification not implemented")
+}
+func (UnimplementedTaskServiceServer) ListClarifications(context.Context, *ListClarificationsRequest) (*ListClarificationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListClarifications not implemented")
+}
+func (UnimplementedTaskServiceServer) UpdateClarification(context.Context, *UpdateClarificationRequest) (*UpdateClarificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateClarification not implemented")
+}
+func (UnimplementedTaskServiceServer) DeleteClarification(context.Context, *DeleteClarificationRequest) (*DeleteClarificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteClarification not implemented")
+}
+func (UnimplementedTaskServiceServer) CreateAnswer(context.Context, *CreateAnswerRequest) (*CreateAnswerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAnswer not implemented")
+}
+func (UnimplementedTaskServiceServer) GetAnswer(context.Context, *GetAnswerRequest) (*GetAnswerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAnswer not implemented")
+}
+func (UnimplementedTaskServiceServer) UpdateAnswer(context.Context, *UpdateAnswerRequest) (*UpdateAnswerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAnswer not implemented")
+}
+func (UnimplementedTaskServiceServer) DeleteAnswer(context.Context, *DeleteAnswerRequest) (*DeleteAnswerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAnswer not implemented")
 }
 
 // UnsafeTaskServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -420,6 +573,168 @@ func _TaskService_UpdateTask_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskService_CreateClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateClarificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).CreateClarification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_CreateClarification_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).CreateClarification(ctx, req.(*CreateClarificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_GetClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetClarificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).GetClarification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_GetClarification_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).GetClarification(ctx, req.(*GetClarificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_ListClarifications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListClarificationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).ListClarifications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_ListClarifications_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).ListClarifications(ctx, req.(*ListClarificationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_UpdateClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateClarificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).UpdateClarification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_UpdateClarification_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).UpdateClarification(ctx, req.(*UpdateClarificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_DeleteClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteClarificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).DeleteClarification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_DeleteClarification_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).DeleteClarification(ctx, req.(*DeleteClarificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_CreateAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAnswerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).CreateAnswer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_CreateAnswer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).CreateAnswer(ctx, req.(*CreateAnswerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_GetAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAnswerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).GetAnswer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_GetAnswer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).GetAnswer(ctx, req.(*GetAnswerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_UpdateAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAnswerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).UpdateAnswer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_UpdateAnswer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).UpdateAnswer(ctx, req.(*UpdateAnswerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_DeleteAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAnswerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).DeleteAnswer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_DeleteAnswer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).DeleteAnswer(ctx, req.(*DeleteAnswerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskService_ServiceDesc is the grpc.ServiceDesc for TaskService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -438,6 +753,42 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateTask",
 			Handler:    _TaskService_UpdateTask_Handler,
+		},
+		{
+			MethodName: "CreateClarification",
+			Handler:    _TaskService_CreateClarification_Handler,
+		},
+		{
+			MethodName: "GetClarification",
+			Handler:    _TaskService_GetClarification_Handler,
+		},
+		{
+			MethodName: "ListClarifications",
+			Handler:    _TaskService_ListClarifications_Handler,
+		},
+		{
+			MethodName: "UpdateClarification",
+			Handler:    _TaskService_UpdateClarification_Handler,
+		},
+		{
+			MethodName: "DeleteClarification",
+			Handler:    _TaskService_DeleteClarification_Handler,
+		},
+		{
+			MethodName: "CreateAnswer",
+			Handler:    _TaskService_CreateAnswer_Handler,
+		},
+		{
+			MethodName: "GetAnswer",
+			Handler:    _TaskService_GetAnswer_Handler,
+		},
+		{
+			MethodName: "UpdateAnswer",
+			Handler:    _TaskService_UpdateAnswer_Handler,
+		},
+		{
+			MethodName: "DeleteAnswer",
+			Handler:    _TaskService_DeleteAnswer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
