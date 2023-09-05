@@ -15,10 +15,10 @@ message User {
 message Clarification {
   int32 id = 1;
   int32 user_id = 2;
-  int32 content = 3;
+  string content = 3;
   int32 contest_id = 4;
   bool is_public = 5;
-  repeated Answer answers = 6;
+  Answer answer = 6;
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;
 
