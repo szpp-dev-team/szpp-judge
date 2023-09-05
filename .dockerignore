@@ -1,0 +1,10 @@
+.venv
+__pycache__
+*.py[cod]
+node_modules
+vendor
+.data
+build
+frontned
+_workdir
+_docker
