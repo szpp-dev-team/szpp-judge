@@ -7,7 +7,7 @@ import { TaskCollection } from "./TaskCollection";
 const tasks: TaskWithMySubmissionSummary[] = [
   {
     id: "A",
-    difficulty: "Begginer",
+    difficulty: "beginner",
     haiten: 100,
     title: "すずっぴー君のおつかい",
     status: "正解",
@@ -15,7 +15,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "B",
-    difficulty: "Begginer",
+    difficulty: "beginner",
     haiten: 200,
     title: "すずっぴー君の怒り",
     status: "出力値不正解",
@@ -23,7 +23,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "C",
-    difficulty: "Easy",
+    difficulty: "easy",
     haiten: 300,
     title: "すずっぴー君の分裂",
     status: "正解",
@@ -31,13 +31,13 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "D",
-    difficulty: "Easy",
+    difficulty: "easy",
     haiten: 314,
     title: "すずっぴー君の爆散",
   },
   {
     id: "E",
-    difficulty: "Medium",
+    difficulty: "medium",
     haiten: 400,
     title: "師匠との出会い",
     status: "出力値不正解",
@@ -45,7 +45,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "F",
-    difficulty: "Begginer",
+    difficulty: "beginner",
     haiten: 500,
     title: "師匠の爆散",
     status: "時間制限エラー",
@@ -53,7 +53,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "G",
-    difficulty: "Hard",
+    difficulty: "hard",
     haiten: 600,
     title: "すずっぴー君の凝固",
     status: "実行時エラー",
@@ -61,7 +61,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "Ex",
-    difficulty: "Impossible",
+    difficulty: "impossible",
     haiten: 1333,
     title:
       "長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル",

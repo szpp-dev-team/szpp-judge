@@ -12,6 +12,7 @@ import {
   Tbody,
   Td,
   Text,
+  Th,
   Thead,
   Tr,
 } from "@chakra-ui/react";
@@ -37,26 +38,26 @@ export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
             </Flex>
           </Flex>
           <TableContainer>
-            <Table variant="unstyled">
+            <Table variant="bordered">
               <Thead>
                 <Tr>
-                  <Td>#</Td>
-                  <Td>難易度</Td>
-                  <Td>配点</Td>
-                  <Td>問題名</Td>
-                  <Td>自分の結果</Td>
-                  <Td>得点</Td>
+                  <Th textAlign="center">#</Th>
+                  <Th textAlign="center">難易度</Th>
+                  <Th textAlign="center">配点</Th>
+                  <Th textAlign="left">問題名</Th>
+                  <Th textAlign="center">自分の結果</Th>
+                  <Th textAlign="center">得点</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {tasks.map(t => (
                   <Tr key={t.id}>
-                    <Td>{t.id}</Td>
-                    <Td>{t.difficulty}</Td>
-                    <Td>{t.haiten}</Td>
-                    <Td>{t.title}</Td>
-                    <Td>{t?.status ?? "-"}</Td>
-                    <Td>{t?.score ?? "-"}</Td>
+                    <Td textAlign="center">{t.id}</Td>
+                    <Td textAlign="center">{t.difficulty}</Td>
+                    <Td textAlign="center">{t.haiten}</Td>
+                    <Td textAlign="left">{t.title}</Td>
+                    <Td textAlign="center">{t?.status ?? "-"}</Td>
+                    <Td textAlign="center">{t?.score ?? "-"}</Td>
                   </Tr>
                 ))}
               </Tbody>
