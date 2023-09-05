@@ -736,9 +736,9 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   /**
    * timestamp
    *
-   * @generated from field: google.protobuf.Timestamp submited_at = 14;
+   * @generated from field: google.protobuf.Timestamp submitted_at = 14;
    */
-  submitedAt?: Timestamp;
+  submittedAt?: Timestamp;
 
   /**
    * @generated from field: google.protobuf.Timestamp created_at = 15;
@@ -771,7 +771,7 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
     { no: 11, name: "exec_time_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 12, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 13, name: "testcase_results", kind: "message", T: TestcaseResult, repeated: true },
-    { no: 14, name: "submited_at", kind: "message", T: Timestamp },
+    { no: 14, name: "submitted_at", kind: "message", T: Timestamp },
     { no: 15, name: "created_at", kind: "message", T: Timestamp },
     { no: 16, name: "update_at", kind: "message", T: Timestamp, opt: true },
   ]);
@@ -796,9 +796,9 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
 /**
  * 提出一覧用
  *
- * @generated from message backend.v1.SubmissonSummary
+ * @generated from message backend.v1.SubmissionSummary
  */
-export class SubmissonSummary extends Message<SubmissonSummary> {
+export class SubmissionSummary extends Message<SubmissionSummary> {
   /**
    * @generated from field: int32 id = 1;
    */
@@ -873,17 +873,17 @@ export class SubmissonSummary extends Message<SubmissonSummary> {
   /**
    * timestamp
    *
-   * @generated from field: google.protobuf.Timestamp submited_at = 12;
+   * @generated from field: google.protobuf.Timestamp submitted_at = 12;
    */
-  submitedAt?: Timestamp;
+  submittedAt?: Timestamp;
 
-  constructor(data?: PartialMessage<SubmissonSummary>) {
+  constructor(data?: PartialMessage<SubmissionSummary>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.SubmissonSummary";
+  static readonly typeName = "backend.v1.SubmissionSummary";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
@@ -896,23 +896,23 @@ export class SubmissonSummary extends Message<SubmissonSummary> {
     { no: 9, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus), opt: true },
     { no: 10, name: "exec_time_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 11, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
-    { no: 12, name: "submited_at", kind: "message", T: Timestamp },
+    { no: 12, name: "submitted_at", kind: "message", T: Timestamp },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmissonSummary {
-    return new SubmissonSummary().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmissionSummary {
+    return new SubmissionSummary().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmissonSummary {
-    return new SubmissonSummary().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmissionSummary {
+    return new SubmissionSummary().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmissonSummary {
-    return new SubmissonSummary().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmissionSummary {
+    return new SubmissionSummary().fromJsonString(jsonString, options);
   }
 
-  static equals(a: SubmissonSummary | PlainMessage<SubmissonSummary> | undefined, b: SubmissonSummary | PlainMessage<SubmissonSummary> | undefined): boolean {
-    return proto3.util.equals(SubmissonSummary, a, b);
+  static equals(a: SubmissionSummary | PlainMessage<SubmissionSummary> | undefined, b: SubmissionSummary | PlainMessage<SubmissionSummary> | undefined): boolean {
+    return proto3.util.equals(SubmissionSummary, a, b);
   }
 }
 

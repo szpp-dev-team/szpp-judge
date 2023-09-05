@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, SubmissionDetail, SubmissonSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
+import { JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, SubmissionDetail, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
 
 /**
  * @generated from message backend.v1.GetUserRequest
@@ -879,9 +879,9 @@ export class ListSubmissionsRequest extends Message<ListSubmissionsRequest> {
  */
 export class ListSubmissionsResponse extends Message<ListSubmissionsResponse> {
   /**
-   * @generated from field: repeated backend.v1.SubmissonSummary submissions = 1;
+   * @generated from field: repeated backend.v1.SubmissionSummary submissions = 1;
    */
-  submissions: SubmissonSummary[] = [];
+  submissions: SubmissionSummary[] = [];
 
   constructor(data?: PartialMessage<ListSubmissionsResponse>) {
     super();
@@ -891,7 +891,7 @@ export class ListSubmissionsResponse extends Message<ListSubmissionsResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.ListSubmissionsResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "submissions", kind: "message", T: SubmissonSummary, repeated: true },
+    { no: 1, name: "submissions", kind: "message", T: SubmissionSummary, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSubmissionsResponse {
