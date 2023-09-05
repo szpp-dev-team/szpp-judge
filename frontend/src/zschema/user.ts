@@ -35,4 +35,13 @@ export const userRegistrationSchema = z.object({
   email,
   username,
   password: registrationPassword,
+  confPassword: loginPassword,
+}).superRefine((values, ctx) => {
+    if (values.password !== values.confPassword) {
+        ctx.addIssue({
+            path: ["confPassword"],
+            code: "custom",
+            message: "パスワードが一致しません",
+        });
+    }
 });
