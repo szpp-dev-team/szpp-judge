@@ -4,10 +4,14 @@ go 1.21.0
 
 replace github.com/szpp-dev-team/szpp-judge/proto-gen/go => ../proto-gen/go
 
+replace github.com/szpp-dev-team/szpp-judge/langs => ../langs
+
 require (
 	github.com/docker/docker v24.0.5+incompatible
+	github.com/docker/go-units v0.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/szpp-dev-team/szpp-judge/langs v0.0.0-00010101000000-000000000000
 	github.com/szpp-dev-team/szpp-judge/proto-gen/go v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.57.0
 )
@@ -17,7 +21,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
-	github.com/docker/go-units v0.5.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/moby/term v0.5.0 // indirect
