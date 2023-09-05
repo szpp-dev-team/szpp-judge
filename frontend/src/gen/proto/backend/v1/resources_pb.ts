@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { JudgeType } from "../../judge/v1/judge_type_pb";
+import { JudgeStatus } from "../../judge/v1/resources_pb";
 
 /**
  * @generated from enum backend.v1.Visibility
@@ -78,68 +79,6 @@ proto3.util.setEnumType(Difficulty, "backend.v1.Difficulty", [
 ]);
 
 /**
- * @generated from enum backend.v1.JudgeStatus
- */
-export enum JudgeStatus {
-  /**
-   * @generated from enum value: JUDGE_STATUS_UNSPECIFIED = 0;
-   */
-  JUDGE_STATUS_UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: AC = 1;
-   */
-  AC = 1,
-
-  /**
-   * @generated from enum value: CE = 2;
-   */
-  CE = 2,
-
-  /**
-   * @generated from enum value: IE = 3;
-   */
-  IE = 3,
-
-  /**
-   * @generated from enum value: MLE = 4;
-   */
-  MLE = 4,
-
-  /**
-   * @generated from enum value: OLE = 5;
-   */
-  OLE = 5,
-
-  /**
-   * @generated from enum value: RE = 6;
-   */
-  RE = 6,
-
-  /**
-   * @generated from enum value: TLE = 7;
-   */
-  TLE = 7,
-
-  /**
-   * @generated from enum value: WA = 8;
-   */
-  WA = 8,
-}
-// Retrieve enum metadata with: proto3.getEnumType(JudgeStatus)
-proto3.util.setEnumType(JudgeStatus, "backend.v1.JudgeStatus", [
-  { no: 0, name: "JUDGE_STATUS_UNSPECIFIED" },
-  { no: 1, name: "AC" },
-  { no: 2, name: "CE" },
-  { no: 3, name: "IE" },
-  { no: 4, name: "MLE" },
-  { no: 5, name: "OLE" },
-  { no: 6, name: "RE" },
-  { no: 7, name: "TLE" },
-  { no: 8, name: "WA" },
-]);
-
-/**
  * @generated from message backend.v1.User
  */
 export class User extends Message<User> {
@@ -149,9 +88,9 @@ export class User extends Message<User> {
   id = 0;
 
   /**
-   * @generated from field: string username = 2;
+   * @generated from field: string name = 2;
    */
-  username = "";
+  name = "";
 
   /**
    * @generated from field: bool is_admin = 4;
@@ -177,7 +116,7 @@ export class User extends Message<User> {
   static readonly typeName = "backend.v1.User";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "is_admin", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "created_at", kind: "message", T: Timestamp },
     { no: 6, name: "updated_at", kind: "message", T: Timestamp, opt: true },
@@ -670,6 +609,8 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   /**
    * contest
    *
+   * コンテスト中の提出でなければ null
+   *
    * @generated from field: optional int32 contest_id = 4;
    */
   contestId?: number;
@@ -708,7 +649,7 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
    *
    * ジャッジ中はnull
    *
-   * @generated from field: optional backend.v1.JudgeStatus status = 10;
+   * @generated from field: optional judge.v1.JudgeStatus status = 10;
    */
   status?: JudgeStatus;
 
@@ -817,7 +758,7 @@ export class SubmissionSummary extends Message<SubmissionSummary> {
   userName = "";
 
   /**
-   * cnotest
+   * contest
    *
    * @generated from field: optional int32 contest_id = 4;
    */
@@ -852,7 +793,7 @@ export class SubmissionSummary extends Message<SubmissionSummary> {
    *
    * ジャッジ中はnull
    *
-   * @generated from field: optional backend.v1.JudgeStatus judge_status = 9;
+   * @generated from field: optional judge.v1.JudgeStatus judge_status = 9;
    */
   judgeStatus?: JudgeStatus;
 
@@ -928,7 +869,7 @@ export class TestcaseResult extends Message<TestcaseResult> {
   testcaseName = "";
 
   /**
-   * @generated from field: backend.v1.JudgeStatus judge_status = 2;
+   * @generated from field: judge.v1.JudgeStatus judge_status = 2;
    */
   judgeStatus = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
 
@@ -982,16 +923,16 @@ export class JudgeProgress extends Message<JudgeProgress> {
   /**
    * ジャッジ済みのケースが全てACであれば UNSPECIFIED そうでなければ最初に出た非ACの結果
    *
-   * @generated from field: backend.v1.JudgeStatus status = 1;
+   * @generated from field: judge.v1.JudgeStatus status = 1;
    */
   status = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
 
   /**
    * テストケースの総数
    *
-   * @generated from field: int32 total_tesccases = 2;
+   * @generated from field: int32 total_testcases = 2;
    */
-  totalTesccases = 0;
+  totalTestcases = 0;
 
   /**
    * ジャッジ済みのテストケース数
@@ -1009,7 +950,7 @@ export class JudgeProgress extends Message<JudgeProgress> {
   static readonly typeName = "backend.v1.JudgeProgress";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
-    { no: 2, name: "total_tesccases", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "total_testcases", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 3, name: "completed_testcases", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 

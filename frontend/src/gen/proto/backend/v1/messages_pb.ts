@@ -680,9 +680,9 @@ export class SubmitRequest extends Message<SubmitRequest> {
   taskId = 0;
 
   /**
-   * @generated from field: string langage = 3;
+   * @generated from field: string lang_id = 3;
    */
-  langage = "";
+  langId = "";
 
   /**
    * @generated from field: string source_code = 4;
@@ -699,7 +699,7 @@ export class SubmitRequest extends Message<SubmitRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
     { no: 2, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "langage", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "lang_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "source_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
