@@ -37,11 +37,11 @@ export const userRegistrationSchema = z.object({
   password: registrationPassword,
   confPassword: loginPassword,
 }).superRefine((values, ctx) => {
-    if (values.password !== values.confPassword) {
-        ctx.addIssue({
-            path: ["confPassword"],
-            code: "custom",
-            message: "パスワードが一致しません",
-        });
-    }
+  if (values.password !== values.confPassword) {
+    ctx.addIssue({
+      path: ["confPassword"],
+      code: "custom",
+      message: "パスワードが一致しません",
+    });
+  }
 });
