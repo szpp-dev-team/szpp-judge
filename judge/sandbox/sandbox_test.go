@@ -9,18 +9,18 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/judge/config"
 )
 
-func loadConfig() *config.Config {
-	c, err := config.New()
+func loadDevConfig() *config.DevConfig {
+	c, err := config.NewDevConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Loaded config: %#+v", c)
+	log.Printf("Loaded dev config: %#+v", c)
 	return c
 }
 
 func TestNew_Close(t *testing.T) {
 	ctx := context.Background()
-	cfg := loadConfig()
+	cfg := loadDevConfig()
 
 	dc, err := docker.NewClientWithOpts(docker.FromEnv, docker.WithAPIVersionNegotiation())
 	if err != nil {
