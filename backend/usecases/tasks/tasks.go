@@ -11,6 +11,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	enttask "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
+	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"google.golang.org/grpc/codes"
@@ -85,6 +86,7 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 			SetDifficulty(req.Task.Difficulty.String()).
 			SetExecTimeLimit(uint(req.Task.ExecTimeLimit)).
 			SetExecMemoryLimit(uint(req.Task.ExecMemoryLimit)).
+			AddTestcases(testcases...).
 			AddTestcaseSets(testcaseSets...).
 			SetCreatedAt(now)
 			// TODO: SetUser
@@ -115,10 +117,25 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	i.logger.Info("succeeded to register task information", slog.Int("task_id", task.ID))
+
+	for _, testcase := range req.Testcases {
+		if err := i.repository.UploadTestcase(ctx, task.ID, &testcases_repo.Testcase{
+			Name: testcase.Slug,
+			In:   []byte(testcase.Input),
+			Out:  []byte(testcase.Output),
+		}); err != nil {
+			i.logger.Error("failed to upload a testcase", slog.Any("error", err))
+			return nil, err
+		}
+	}
+
+	i.logger.Info("succeeded to upload testcases", slog.Int("task_id", task.ID))
+
 	return &backendv1.CreateTaskResponse{
 		Task: toPbTask(task),
-		Testcases: lo.Map(testcases, func(t *ent.Testcase, _ int) *backendv1.Testcase {
-			return toPbTestcase(t, nil, nil)
+		Testcases: lo.Map(testcases, func(t *ent.Testcase, i int) *backendv1.Testcase {
+			return toPbTestcase(t, []byte(req.Testcases[i].Input), []byte(req.Testcases[i].Output))
 		}),
 		TestcaseSets: lo.Map(testcaseSets, func(t *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
 			return toPbTestcaseSet(t)
@@ -138,13 +155,23 @@ func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	testcases := make([]*testcases_repo.Testcase, 0, len(task.Edges.Testcases))
+	for _, t := range task.Edges.Testcases {
+		testcase, err := i.repository.DownloadTestcase(ctx, int(req.Id), t.Name)
+		if err != nil {
+			i.logger.Error("failed to download testcase", slog.Int("task_id", int(req.Id)), slog.String("testcase_name", t.Name))
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		testcases = append(testcases, testcase)
+	}
+
 	return &backendv1.GetTaskResponse{
 		Task: toPbTask(task),
 		TestcaseSets: lo.Map(task.Edges.TestcaseSets, func(t *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
 			return toPbTestcaseSet(t)
 		}),
-		Testcases: lo.Map(task.Edges.Testcases, func(t *ent.Testcase, _ int) *backendv1.Testcase {
-			return toPbTestcase(t, nil, nil) // TODO: set input, output
+		Testcases: lo.Map(task.Edges.Testcases, func(t *ent.Testcase, i int) *backendv1.Testcase {
+			return toPbTestcase(t, testcases[i].In, testcases[i].Out)
 		}),
 	}, nil
 }
