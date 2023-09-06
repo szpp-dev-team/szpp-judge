@@ -10,6 +10,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	enttask "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"google.golang.org/grpc/codes"
@@ -18,13 +19,14 @@ import (
 )
 
 type Interactor struct {
-	entClient *ent.Client
-	logger    *slog.Logger
+	entClient  *ent.Client
+	repository testcases.Repository
+	logger     *slog.Logger
 }
 
-func NewInteractor(entClient *ent.Client) *Interactor {
+func NewInteractor(entClient *ent.Client, repository testcases.Repository) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "tasks"))
-	return &Interactor{entClient, logger}
+	return &Interactor{entClient, repository, logger}
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
@@ -135,6 +137,7 @@ func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest)
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+
 	return &backendv1.GetTaskResponse{
 		Task: toPbTask(task),
 		TestcaseSets: lo.Map(task.Edges.TestcaseSets, func(t *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
