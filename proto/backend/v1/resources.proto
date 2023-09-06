@@ -146,7 +146,7 @@ message SubmissionDetail {
   // timestamp
   google.protobuf.Timestamp submitted_at = 14;
   google.protobuf.Timestamp created_at = 15;
-  optional google.protobuf.Timestamp update_at = 16;
+  optional google.protobuf.Timestamp updated_at = 16;
 }
 
 // 提出一覧用
