@@ -83,7 +83,7 @@ var langMetas = []Meta{
 		Active:      true,
 		DockerImage: ImagePrefix + "cpython3.11",
 		SourceFile:  "main.py",
-		CompileCmd:  []string{"python3", "-m", "compileall", "main.py"},
+		CompileCmd:  []string{"python3", "-m", "compileall", "-q", "main.py"},
 		ExecCmd:     []string{"python3", "main.py"},
 	},
 }
