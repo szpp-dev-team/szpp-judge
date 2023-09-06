@@ -19,9 +19,8 @@ func (s *taskServiceServer) CreateTask(ctx context.Context, req *backendv1.Creat
 	return s.interactor.CreateTask(ctx, req)
 }
 
-// GetTask implements backendv1.TaskServiceServer.
-func (*taskServiceServer) GetTask(context.Context, *backendv1.GetTaskRequest) (*backendv1.GetTaskResponse, error) {
-	panic("unimplemented")
+func (s *taskServiceServer) GetTask(ctx context.Context, req *backendv1.GetTaskRequest) (*backendv1.GetTaskResponse, error) {
+	return s.interactor.GetTask(ctx, req)
 }
 
 // UpdateTask implements backendv1.TaskServiceServer.

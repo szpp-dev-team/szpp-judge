@@ -124,6 +124,28 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 	}, nil
 }
 
+func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest) (*backendv1.GetTaskResponse, error) {
+	q := i.entClient.Task.Query()
+	task, err := q.WithTestcaseSets().
+		WithTestcases().
+		Where(enttask.ID(int(req.Id))).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Errorf(codes.NotFound, "the user(id: %d) is not found", req.Id)
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &backendv1.GetTaskResponse{
+		Task: toPbTask(task),
+		TestcaseSets: lo.Map(task.Edges.TestcaseSets, func(t *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
+			return toPbTestcaseSet(t)
+		}),
+		Testcases: lo.Map(task.Edges.Testcases, func(t *ent.Testcase, _ int) *backendv1.Testcase {
+			return toPbTestcase(t, nil, nil) // TODO: set input, output
+		}),
+	}, nil
+}
+
 func toPbTask(t *ent.Task) *backendv1.Task {
 	var updatedAt *timestamppb.Timestamp
 	if t.UpdatedAt != nil {
