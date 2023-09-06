@@ -1,7 +1,11 @@
+#define _DEFAULT_SOURCE
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/resource.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -46,17 +50,9 @@ int main() {
     return 1;
   }
 
-  // malloc() しただけでは物理メモリの割り当ては行われないので乱数を書き込む
-  srand((unsigned)time(NULL));
-  for (size_t i = 0; i < len; ++i) {
-    a[i] = rand() % 128;
-  }
+  // malloc() しただけでは物理メモリの割り当ては行われないので適当に値を書き込む
+  memset(a, 'x', len);
 
-  // 書き込むだけでは最適化で省略される可能性があるのでランダムに場所を選んで表示
-  for (int i = 0; i < 5; ++i) {
-    int j = rand() % len;
-    printf("a[%d] = %d\n", j, a[j]);
-  }
   printf("a[%d] = %d\n", 0, a[0]);
   printf("a[%zu] = %d\n", len - 1, a[len - 1]);
 

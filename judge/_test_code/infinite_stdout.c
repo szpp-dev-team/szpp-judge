@@ -2,8 +2,7 @@
 
 int main() {
   for (;;) {
-    fputc('o', stdout);
-    fputc('e', stderr);
+    fputc('#', stdout);
   }
   return 0;
 }
