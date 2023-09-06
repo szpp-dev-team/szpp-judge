@@ -105,3 +105,156 @@ var HealthcheckService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "judge/v1/services.proto",
 }
+
+const (
+	JudgeService_Judge_FullMethodName = "/judge.v1.JudgeService/Judge"
+	JudgeService_Run_FullMethodName   = "/judge.v1.JudgeService/Run"
+)
+
+// JudgeServiceClient is the client API for JudgeService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type JudgeServiceClient interface {
+	Judge(ctx context.Context, in *JudgeRequest, opts ...grpc.CallOption) (JudgeService_JudgeClient, error)
+	Run(ctx context.Context, in *RunRequest, opts ...grpc.CallOption) (*RunResponse, error)
+}
+
+type judgeServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewJudgeServiceClient(cc grpc.ClientConnInterface) JudgeServiceClient {
+	return &judgeServiceClient{cc}
+}
+
+func (c *judgeServiceClient) Judge(ctx context.Context, in *JudgeRequest, opts ...grpc.CallOption) (JudgeService_JudgeClient, error) {
+	stream, err := c.cc.NewStream(ctx, &JudgeService_ServiceDesc.Streams[0], JudgeService_Judge_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &judgeServiceJudgeClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type JudgeService_JudgeClient interface {
+	Recv() (*JudgeResponse, error)
+	grpc.ClientStream
+}
+
+type judgeServiceJudgeClient struct {
+	grpc.ClientStream
+}
+
+func (x *judgeServiceJudgeClient) Recv() (*JudgeResponse, error) {
+	m := new(JudgeResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *judgeServiceClient) Run(ctx context.Context, in *RunRequest, opts ...grpc.CallOption) (*RunResponse, error) {
+	out := new(RunResponse)
+	err := c.cc.Invoke(ctx, JudgeService_Run_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// JudgeServiceServer is the server API for JudgeService service.
+// All implementations should embed UnimplementedJudgeServiceServer
+// for forward compatibility
+type JudgeServiceServer interface {
+	Judge(*JudgeRequest, JudgeService_JudgeServer) error
+	Run(context.Context, *RunRequest) (*RunResponse, error)
+}
+
+// UnimplementedJudgeServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedJudgeServiceServer struct {
+}
+
+func (UnimplementedJudgeServiceServer) Judge(*JudgeRequest, JudgeService_JudgeServer) error {
+	return status.Errorf(codes.Unimplemented, "method Judge not implemented")
+}
+func (UnimplementedJudgeServiceServer) Run(context.Context, *RunRequest) (*RunResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Run not implemented")
+}
+
+// UnsafeJudgeServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to JudgeServiceServer will
+// result in compilation errors.
+type UnsafeJudgeServiceServer interface {
+	mustEmbedUnimplementedJudgeServiceServer()
+}
+
+func RegisterJudgeServiceServer(s grpc.ServiceRegistrar, srv JudgeServiceServer) {
+	s.RegisterService(&JudgeService_ServiceDesc, srv)
+}
+
+func _JudgeService_Judge_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(JudgeRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(JudgeServiceServer).Judge(m, &judgeServiceJudgeServer{stream})
+}
+
+type JudgeService_JudgeServer interface {
+	Send(*JudgeResponse) error
+	grpc.ServerStream
+}
+
+type judgeServiceJudgeServer struct {
+	grpc.ServerStream
+}
+
+func (x *judgeServiceJudgeServer) Send(m *JudgeResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _JudgeService_Run_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RunRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JudgeServiceServer).Run(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JudgeService_Run_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JudgeServiceServer).Run(ctx, req.(*RunRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// JudgeService_ServiceDesc is the grpc.ServiceDesc for JudgeService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var JudgeService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "judge.v1.JudgeService",
+	HandlerType: (*JudgeServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Run",
+			Handler:    _JudgeService_Run_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Judge",
+			Handler:       _JudgeService_Judge_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "judge/v1/services.proto",
+}

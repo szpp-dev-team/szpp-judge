@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateContestRequest, CreateContestResponse, CreateUserRequest, CreateUserResponse, GetContestRequest, GetContestResponse, GetUserRequest, GetUserResponse, ListContestsRequest, ListContestsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse } from "./messages_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -63,6 +63,147 @@ export const AuthService = {
       name: "Logout",
       I: LogoutRequest,
       O: LogoutResponse,
+      kind: MethodKind.Unary,
+    },
+  }
+} as const;
+
+/**
+ * @generated from service backend.v1.TaskService
+ */
+export const TaskService = {
+  typeName: "backend.v1.TaskService",
+  methods: {
+    /**
+     * Task を作成する
+     *
+     * @generated from rpc backend.v1.TaskService.CreateTask
+     */
+    createTask: {
+      name: "CreateTask",
+      I: CreateTaskRequest,
+      O: CreateTaskResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 指定された Task を取得する
+     *
+     * @generated from rpc backend.v1.TaskService.GetTask
+     */
+    getTask: {
+      name: "GetTask",
+      I: GetTaskRequest,
+      O: GetTaskResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Task を更新する
+     *
+     * @generated from rpc backend.v1.TaskService.UpdateTask
+     */
+    updateTask: {
+      name: "UpdateTask",
+      I: UpdateTaskRequest,
+      O: UpdateTaskResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Clarification を作成する
+     *
+     * @generated from rpc backend.v1.TaskService.CreateClarification
+     */
+    createClarification: {
+      name: "CreateClarification",
+      I: CreateClarificationRequest,
+      O: CreateClarificationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 指定された Clarification を取得する
+     *
+     * @generated from rpc backend.v1.TaskService.GetClarification
+     */
+    getClarification: {
+      name: "GetClarification",
+      I: GetClarificationRequest,
+      O: GetClarificationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ClarificationListを取得する
+     *
+     * @generated from rpc backend.v1.TaskService.ListClarifications
+     */
+    listClarifications: {
+      name: "ListClarifications",
+      I: ListClarificationsRequest,
+      O: ListClarificationsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Clarification を更新する
+     *
+     * @generated from rpc backend.v1.TaskService.UpdateClarification
+     */
+    updateClarification: {
+      name: "UpdateClarification",
+      I: UpdateClarificationRequest,
+      O: UpdateClarificationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Clarification を削除する
+     *
+     * @generated from rpc backend.v1.TaskService.DeleteClarification
+     */
+    deleteClarification: {
+      name: "DeleteClarification",
+      I: DeleteClarificationRequest,
+      O: DeleteClarificationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Answerを追加する
+     *
+     * @generated from rpc backend.v1.TaskService.CreateAnswer
+     */
+    createAnswer: {
+      name: "CreateAnswer",
+      I: CreateAnswerRequest,
+      O: CreateAnswerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Answerを取得する
+     *
+     * @generated from rpc backend.v1.TaskService.GetAnswer
+     */
+    getAnswer: {
+      name: "GetAnswer",
+      I: GetAnswerRequest,
+      O: GetAnswerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Answerを更新する
+     *
+     * @generated from rpc backend.v1.TaskService.UpdateAnswer
+     */
+    updateAnswer: {
+      name: "UpdateAnswer",
+      I: UpdateAnswerRequest,
+      O: UpdateAnswerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Answerを削除する
+     *
+     * @generated from rpc backend.v1.TaskService.DeleteAnswer
+     */
+    deleteAnswer: {
+      name: "DeleteAnswer",
+      I: DeleteAnswerRequest,
+      O: DeleteAnswerResponse,
       kind: MethodKind.Unary,
     },
   }
