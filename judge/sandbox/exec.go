@@ -164,7 +164,7 @@ func (sb *Sandbox) Exec(
 		return ExecResult{}, err
 	}
 
-	t, mem, exitCode, err := parseExecResultFile(sb.HostBindDir)
+	t, mem, exitCode, err := parseSzpprunResultFile(sb.HostBindDir)
 	if err != nil {
 		return ExecResult{}, err
 	}

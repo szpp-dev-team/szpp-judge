@@ -206,7 +206,7 @@ func subMain(args []string, log *slog.Logger) error {
 }
 
 func saveResult(elapsed time.Duration, maxRSSKib uint, exitCode int) error {
-	const NAME string = ".exec-result.txt"
+	const NAME string = ".szpprun-result.txt"
 	f, err := os.Create(NAME)
 	if err != nil {
 		return fmt.Errorf("cannot create file named %q: %w", NAME, err)

@@ -11,10 +11,10 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/judge/util/unit"
 )
 
-// szpprun が生成する .exec-result.txt を読み取る。
+// szpprun が生成する .szpprun-result.txt を読み取る。
 // 実行時間、メモリ使用量、exitCode を返す
-func parseExecResultFile(dir string) (time.Duration, unit.Byte, int, error) {
-	const NAME = ".exec-result.txt"
+func parseSzpprunResultFile(dir string) (time.Duration, unit.Byte, int, error) {
+	const NAME = ".szpprun-result.txt"
 	fpath := path.Join(dir, NAME)
 	f, err := os.Open(fpath)
 	if err != nil {
@@ -26,7 +26,7 @@ func parseExecResultFile(dir string) (time.Duration, unit.Byte, int, error) {
 		return 0, 0, 0, fmt.Errorf("failed to read content of %q: %w", fpath, err)
 	}
 
-	// .exec-result.txt は実行時間、メモリ使用量、exitCodeがこの順に空白区切りで書きこまれている
+	// .szpprun-result.txt は実行時間、メモリ使用量、exitCodeがこの順に空白区切りで書きこまれている
 	// 実行時間、メモリ使用量は負数で記述されていることはないが、exitCode は負数で保存されている可能性があるので注意
 	// 末尾の改行はない
 
