@@ -212,6 +212,13 @@ func saveResult(elapsed time.Duration, maxRSSKib uint, exitCode int) error {
 		return fmt.Errorf("cannot create file named %q: %w", NAME, err)
 	}
 	defer f.Close()
-	fmt.Fprintf(f, "%d %d %d", elapsed.Milliseconds(), maxRSSKib, exitCode)
+
+	// ミリ秒に切り捨てると 0 になることがあるのでその場合は 1 ms とする
+	ms := elapsed.Milliseconds()
+	if ms <= 0 {
+		ms = 1
+	}
+
+	fmt.Fprintf(f, "%d %d %d", ms, maxRSSKib, exitCode)
 	return nil
 }
