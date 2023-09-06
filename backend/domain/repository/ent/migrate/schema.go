@@ -41,7 +41,7 @@ var (
 	// TestcasesColumns holds the columns for the "testcases" table.
 	TestcasesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
@@ -60,11 +60,18 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "testcase_name_task_testcases",
+				Unique:  true,
+				Columns: []*schema.Column{TestcasesColumns[1], TestcasesColumns[5]},
+			},
+		},
 	}
 	// TestcaseSetsColumns holds the columns for the "testcase_sets" table.
 	TestcaseSetsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
 		{Name: "score", Type: field.TypeInt},
 		{Name: "is_sample", Type: field.TypeBool},
 		{Name: "created_at", Type: field.TypeTime},
@@ -82,6 +89,13 @@ var (
 				Columns:    []*schema.Column{TestcaseSetsColumns[6]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "testcaseset_name_task_testcase_sets",
+				Unique:  true,
+				Columns: []*schema.Column{TestcaseSetsColumns[1], TestcaseSetsColumns[6]},
 			},
 		},
 	}
