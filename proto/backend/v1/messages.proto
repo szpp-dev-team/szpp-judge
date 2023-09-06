@@ -56,8 +56,7 @@ message CreateContestResponse {
 }
 
 message GetContestRequest {
-  string name = 1;
-  string slug = 2;
+  string slug = 1;
 }
 
 message GetContestResponse {
