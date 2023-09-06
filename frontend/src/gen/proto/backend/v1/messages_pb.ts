@@ -388,22 +388,27 @@ export class PingResponse extends Message<PingResponse> {
  */
 export class CreateContestRequest extends Message<CreateContestRequest> {
   /**
-   * @generated from field: string slug = 1;
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string slug = 2;
    */
   slug = "";
 
   /**
-   * @generated from field: string description = 2;
+   * @generated from field: string description = 3;
    */
   description = "";
 
   /**
-   * @generated from field: google.protobuf.Timestamp start_at = 3;
+   * @generated from field: google.protobuf.Timestamp start_at = 4;
    */
   startAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp end_at = 4;
+   * @generated from field: google.protobuf.Timestamp end_at = 5;
    */
   endAt?: Timestamp;
 
@@ -415,10 +420,11 @@ export class CreateContestRequest extends Message<CreateContestRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.CreateContestRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "start_at", kind: "message", T: Timestamp },
-    { no: 4, name: "end_at", kind: "message", T: Timestamp },
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "start_at", kind: "message", T: Timestamp },
+    { no: 5, name: "end_at", kind: "message", T: Timestamp },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateContestRequest {
