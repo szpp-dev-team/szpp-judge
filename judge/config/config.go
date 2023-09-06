@@ -7,20 +7,8 @@ type Config struct {
 	ModeDev  bool   `envconfig:"MODE_DEV" default:"true"`
 }
 
-type DevConfig struct {
-	WorkingDirAbsRoot string `envconfig:"JUDGE_DEV_WORKING_DIR_ABS_ROOT" required:"true"`
-}
-
 func New() (*Config, error) {
 	c := &Config{}
-	if err := envconfig.Process("", c); err != nil {
-		return nil, err
-	}
-	return c, nil
-}
-
-func NewDevConfig() (*DevConfig, error) {
-	c := &DevConfig{}
 	if err := envconfig.Process("", c); err != nil {
 		return nil, err
 	}

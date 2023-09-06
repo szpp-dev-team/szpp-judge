@@ -42,12 +42,7 @@ func mainSub(args []string) error {
 		return err
 	}
 
-	devCfg, err := config.NewDevConfig()
-	if err != nil {
-		return err
-	}
-
-	hostWorkingDir := path.Join(devCfg.WorkingDirAbsRoot, "sandbox")
+	hostWorkingDir := path.Join(fsutil.GetGoModAbsDir(), "_workdir", "sandbox-demo")
 	_ = os.RemoveAll(hostWorkingDir)
 	if err = os.MkdirAll(hostWorkingDir, 0750); err != nil {
 		return err

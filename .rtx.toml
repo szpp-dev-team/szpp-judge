@@ -1,2 +1,0 @@
-[env]
-JUDGE_DEV_WORKING_DIR_ABS_ROOT = '{{config_root}}/judge/_workdir'
