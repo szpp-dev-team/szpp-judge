@@ -12,6 +12,7 @@ export type Difficulty = (typeof DifficultyValues)[number];
 
 export type Task = {
   id: string;
+  slug: string;
   difficulty: Difficulty;
   haiten: number;
   title: string;

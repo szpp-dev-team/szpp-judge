@@ -7,6 +7,7 @@ import { TaskCollection } from "./TaskCollection";
 const tasks: TaskWithMySubmissionSummary[] = [
   {
     id: "A",
+    slug: "sbc1_a",
     difficulty: "beginner",
     haiten: 100,
     title: "すずっぴー君のおつかい",
@@ -15,6 +16,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "B",
+    slug: "sbc1_b",
     difficulty: "beginner",
     haiten: 200,
     title: "すずっぴー君の怒り",
@@ -23,6 +25,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "C",
+    slug: "sbc1_c",
     difficulty: "easy",
     haiten: 300,
     title: "すずっぴー君の分裂",
@@ -31,12 +34,14 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "D",
+    slug: "sbc1_d",
     difficulty: "easy",
     haiten: 314,
     title: "すずっぴー君の爆散",
   },
   {
     id: "E",
+    slug: "sbc1_e",
     difficulty: "medium",
     haiten: 400,
     title: "師匠との出会い",
@@ -48,6 +53,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "F",
+    slug: "sbc1_f",
     difficulty: "beginner",
     haiten: 500,
     title: "師匠の爆散",
@@ -56,6 +62,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "G",
+    slug: "sbc1_g",
     difficulty: "hard",
     haiten: 600,
     title: "すずっぴー君の凝固",
@@ -64,6 +71,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
   },
   {
     id: "Ex",
+    slug: "sbc1_ex",
     difficulty: "impossible",
     haiten: 1333,
     title:
