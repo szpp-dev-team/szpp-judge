@@ -5,6 +5,33 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
+import { JudgeType } from "../../judge/v1/judge_type_pb";
+
+/**
+ * @generated from enum backend.v1.Visibility
+ */
+export enum Visibility {
+  /**
+   * @generated from enum value: VISIBILITY_UNSPECIFIED = 0;
+   */
+  VISIBILITY_UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: PUBLIC = 1;
+   */
+  PUBLIC = 1,
+
+  /**
+   * @generated from enum value: PRIVATE = 2;
+   */
+  PRIVATE = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(Visibility)
+proto3.util.setEnumType(Visibility, "backend.v1.Visibility", [
+  { no: 0, name: "VISIBILITY_UNSPECIFIED" },
+  { no: 1, name: "PUBLIC" },
+  { no: 2, name: "PRIVATE" },
+]);
 
 /**
  * @generated from enum backend.v1.Difficulty
@@ -275,9 +302,9 @@ export class Task extends Message<Task> {
   statement = "";
 
   /**
-   * 実行時間制限[s]
+   * 実行時間制限[ms]
    *
-   * @generated from field: double exec_time_limit = 4;
+   * @generated from field: int32 exec_time_limit = 4;
    */
   execTimeLimit = 0;
 
@@ -291,41 +318,29 @@ export class Task extends Message<Task> {
   /**
    * 属するコンテストの ID
    *
-   * @generated from field: optional int32 contest_id = 6;
+   * @generated from field: repeated int32 contest_ids = 6;
    */
-  contestId?: number;
+  contestIds: number[] = [];
 
   /**
-   * TODO: judge の型を使う(testlib-checkers or custom)
+   * Judge の type(完全一致、誤差など)
    *
-   * @generated from field: string checker = 7;
+   * @generated from field: judge.v1.JudgeType judge_type = 7;
    */
-  checker = "";
+  judgeType?: JudgeType;
 
   /**
-   * @generated from oneof backend.v1.Task.task_type
+   * @generated from field: backend.v1.Difficulty difficulty = 8;
    */
-  taskType: {
-    /**
-     * @generated from field: backend.v1.TaskContest contest = 8;
-     */
-    value: TaskContest;
-    case: "contest";
-  } | {
-    /**
-     * @generated from field: backend.v1.TaskNormal normal = 9;
-     */
-    value: TaskNormal;
-    case: "normal";
-  } | { case: undefined; value?: undefined } = { case: undefined };
+  difficulty = Difficulty.DIFFICULTY_UNSPECIFIED;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 10;
+   * @generated from field: google.protobuf.Timestamp created_at = 9;
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp updated_at = 11;
+   * @generated from field: optional google.protobuf.Timestamp updated_at = 10;
    */
   updatedAt?: Timestamp;
 
@@ -340,14 +355,13 @@ export class Task extends Message<Task> {
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "exec_time_limit", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 4, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 6, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
-    { no: 7, name: "checker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 8, name: "contest", kind: "message", T: TaskContest, oneof: "task_type" },
-    { no: 9, name: "normal", kind: "message", T: TaskNormal, oneof: "task_type" },
-    { no: 10, name: "created_at", kind: "message", T: Timestamp },
-    { no: 11, name: "updated_at", kind: "message", T: Timestamp, opt: true },
+    { no: 6, name: "contest_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
+    { no: 7, name: "judge_type", kind: "message", T: JudgeType },
+    { no: 8, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
+    { no: 9, name: "created_at", kind: "message", T: Timestamp },
+    { no: 10, name: "updated_at", kind: "message", T: Timestamp, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Task {
@@ -368,111 +382,6 @@ export class Task extends Message<Task> {
 }
 
 /**
- * コンテスト用の問題
- * GitHub Actions or Admin からのリクエストしか受け付けない
- *
- * @generated from message backend.v1.TaskContest
- */
-export class TaskContest extends Message<TaskContest> {
-  /**
-   * @generated from field: string contest_slug = 1;
-   */
-  contestSlug = "";
-
-  constructor(data?: PartialMessage<TaskContest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.TaskContest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskContest {
-    return new TaskContest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TaskContest {
-    return new TaskContest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TaskContest {
-    return new TaskContest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: TaskContest | PlainMessage<TaskContest> | undefined, b: TaskContest | PlainMessage<TaskContest> | undefined): boolean {
-    return proto3.util.equals(TaskContest, a, b);
-  }
-}
-
-/**
- * 単発の問題
- *
- * @generated from message backend.v1.TaskNormal
- */
-export class TaskNormal extends Message<TaskNormal> {
-  /**
-   * @generated from field: backend.v1.TaskNormal.Visibility visibility = 3;
-   */
-  visibility = TaskNormal_Visibility.VISIBILITY_UNSPECIFIED;
-
-  constructor(data?: PartialMessage<TaskNormal>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.TaskNormal";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 3, name: "visibility", kind: "enum", T: proto3.getEnumType(TaskNormal_Visibility) },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskNormal {
-    return new TaskNormal().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TaskNormal {
-    return new TaskNormal().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TaskNormal {
-    return new TaskNormal().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: TaskNormal | PlainMessage<TaskNormal> | undefined, b: TaskNormal | PlainMessage<TaskNormal> | undefined): boolean {
-    return proto3.util.equals(TaskNormal, a, b);
-  }
-}
-
-/**
- * @generated from enum backend.v1.TaskNormal.Visibility
- */
-export enum TaskNormal_Visibility {
-  /**
-   * @generated from enum value: VISIBILITY_UNSPECIFIED = 0;
-   */
-  VISIBILITY_UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: PUBLIC = 1;
-   */
-  PUBLIC = 1,
-
-  /**
-   * @generated from enum value: PRIVATE = 2;
-   */
-  PRIVATE = 2,
-}
-// Retrieve enum metadata with: proto3.getEnumType(TaskNormal_Visibility)
-proto3.util.setEnumType(TaskNormal_Visibility, "backend.v1.TaskNormal.Visibility", [
-  { no: 0, name: "VISIBILITY_UNSPECIFIED" },
-  { no: 1, name: "PUBLIC" },
-  { no: 2, name: "PRIVATE" },
-]);
-
-/**
  * @generated from message backend.v1.MutationTask
  */
 export class MutationTask extends Message<MutationTask> {
@@ -491,9 +400,9 @@ export class MutationTask extends Message<MutationTask> {
   statement = "";
 
   /**
-   * 実行時間制限[s]
+   * 実行時間制限[ms]
    *
-   * @generated from field: double exec_time_limit = 3;
+   * @generated from field: int32 exec_time_limit = 3;
    */
   execTimeLimit = 0;
 
@@ -505,35 +414,16 @@ export class MutationTask extends Message<MutationTask> {
   execMemoryLimit = 0;
 
   /**
-   * 属するコンテストの ID
+   * Judge の type(完全一致、誤差など)
    *
-   * @generated from field: optional int32 contest_id = 5;
+   * @generated from field: judge.v1.JudgeType judge_type = 5;
    */
-  contestId?: number;
+  judgeType?: JudgeType;
 
   /**
-   * TODO: judge の型を使う(testlib-checkers or custom)
-   *
-   * @generated from field: string checker = 6;
+   * @generated from field: backend.v1.Difficulty difficulty = 6;
    */
-  checker = "";
-
-  /**
-   * @generated from oneof backend.v1.MutationTask.task_type
-   */
-  taskType: {
-    /**
-     * @generated from field: backend.v1.TaskContest contest = 7;
-     */
-    value: TaskContest;
-    case: "contest";
-  } | {
-    /**
-     * @generated from field: backend.v1.TaskNormal normal = 8;
-     */
-    value: TaskNormal;
-    case: "normal";
-  } | { case: undefined; value?: undefined } = { case: undefined };
+  difficulty = Difficulty.DIFFICULTY_UNSPECIFIED;
 
   constructor(data?: PartialMessage<MutationTask>) {
     super();
@@ -545,12 +435,10 @@ export class MutationTask extends Message<MutationTask> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "exec_time_limit", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 3, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
-    { no: 6, name: "checker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "contest", kind: "message", T: TaskContest, oneof: "task_type" },
-    { no: 8, name: "normal", kind: "message", T: TaskNormal, oneof: "task_type" },
+    { no: 5, name: "judge_type", kind: "message", T: JudgeType },
+    { no: 6, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationTask {
