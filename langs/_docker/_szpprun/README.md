@@ -1,6 +1,7 @@
 # SZPP Run
 
 ## これは何？
+
 以下の機能を持った、コマンド実行用のコマンドです。
 
 - コマンドを時間・メモリ・ファイル書き出しサイズなどの制限付きでサブプロセスとして実行する
@@ -13,14 +14,23 @@
 ## 実行書式
 
 ```sh
-szpprun TIME_LIMIT_ms MEM_LIMIT_MiB CMD...
+szpprun timeLimit_ms memLimit_MiB fileSizeLimit_MiB numOpenFileLimit CMD...
 ```
 
 例：
 ```sh
-# 1000 ms , 256 MiB の制限つきで実行する場合:
-szpprun 1000 256 python3 main.py
+# 実行時間制限 1000 ms
+# メモリ制限 256 MiB
+# ファイル書き出し制限 1 MiB
+# 同時ファイルオープン数上限 128
+szpprun 1000 256 1 128 python3 main.py
 ```
 
-内部で rlimit による制限をしていますが、それは実行時には設定できません。
-プログラム内で定数として設定しています。
+## 注意
+
+以下の項目は、szpprun 自身にも制約を課すことになるので注意してください。
+理由は、以下の制約は szpprun のプロセス自身に rlimit をかけることで実現しているからです。
+(rlimit 制約はサブプロセスにも受け継がれることを利用している)
+
+- ファイル書き出し制限
+- 同時ファイルオープン数

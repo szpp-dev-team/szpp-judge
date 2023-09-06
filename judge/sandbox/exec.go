@@ -14,6 +14,13 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/judge/util/unit"
 )
 
+type SzpprunOption struct {
+	TimeLimit        time.Duration
+	MemoryLimit      unit.Byte
+	FileWriteLimit   unit.Byte
+	NumOpenFileLimit uint
+}
+
 type ExecOption struct {
 	// nil の場合は stdin への入力をしない
 	Stdin *bytes.Buffer
@@ -31,7 +38,7 @@ type ExecOption struct {
 	Env []string
 }
 
-type ExecResult struct {
+type ExecRawResult struct {
 	// -1 の場合は ExitCode が得られなかったことを示す (TLEやMLEで強制終了させたときなど)
 	ExitCode int
 	Stdout   string
@@ -42,13 +49,13 @@ type ExecResult struct {
 	StderrOverflowed bool
 }
 
-type ExecWithSzppRunResult struct {
-	ExecResult
+type ExecResult struct {
+	ExecRawResult
 	ExecTime   time.Duration
 	ExecMemory unit.Byte
 }
 
-func (sb *Sandbox) Exec(ctx context.Context, opt ExecOption) (ExecResult, error) {
+func (sb *Sandbox) ExecRaw(ctx context.Context, opt ExecOption) (ExecRawResult, error) {
 	user := ""
 	if !opt.AsRootUser {
 		user = "1234:1234"
@@ -63,12 +70,12 @@ func (sb *Sandbox) Exec(ctx context.Context, opt ExecOption) (ExecResult, error)
 		Env:          opt.Env,
 	})
 	if err != nil {
-		return ExecResult{}, err
+		return ExecRawResult{}, err
 	}
 
 	resp, err := sb.docker.ContainerExecAttach(ctx, execID.ID, types.ExecStartCheck{})
 	if err != nil {
-		return ExecResult{}, err
+		return ExecRawResult{}, err
 	}
 	defer resp.Close()
 
@@ -101,19 +108,19 @@ func (sb *Sandbox) Exec(ctx context.Context, opt ExecOption) (ExecResult, error)
 	select {
 	case err := <-outputDone:
 		if err != nil {
-			return ExecResult{}, err
+			return ExecRawResult{}, err
 		}
 	case <-inputDone:
 		if err := <-outputDone; err != nil {
-			return ExecResult{}, err
+			return ExecRawResult{}, err
 		}
 	case <-ctx.Done():
-		return ExecResult{}, ctx.Err()
+		return ExecRawResult{}, ctx.Err()
 	}
 
 	res, err := sb.docker.ContainerExecInspect(ctx, execID.ID)
 	if err != nil {
-		return ExecResult{}, err
+		return ExecRawResult{}, err
 	}
 
 	stdoutStr := string(stdout.Buf)
@@ -122,7 +129,7 @@ func (sb *Sandbox) Exec(ctx context.Context, opt ExecOption) (ExecResult, error)
 		stderrStr = string(stderr.Buf)
 	}
 
-	return ExecResult{
+	return ExecRawResult{
 		ExitCode:         res.ExitCode,
 		Stdout:           stdoutStr,
 		Stderr:           stderrStr,
@@ -133,39 +140,40 @@ func (sb *Sandbox) Exec(ctx context.Context, opt ExecOption) (ExecResult, error)
 
 // szpprun 配下で実行する。
 // szpprun については {GitRepoRoot}/lang/_docker/_szpprun/ を参照。
-func (sb *Sandbox) ExecWithSzppRun(
+func (sb *Sandbox) Exec(
 	ctx context.Context,
-	execTimeLimit time.Duration,
-	execMemoryLimit unit.Byte,
-	opt ExecOption,
-) (ExecWithSzppRunResult, error) {
+	eopt ExecOption,
+	sopt SzpprunOption,
+) (ExecResult, error) {
 	cmd := []string{
 		"szpprun",
-		strconv.FormatInt(int64(execTimeLimit.Milliseconds()), 10),
-		strconv.FormatUint(uint64(execMemoryLimit/unit.MiB), 10),
+		strconv.FormatInt(int64(sopt.TimeLimit.Milliseconds()), 10),
+		strconv.FormatUint(uint64(sopt.MemoryLimit/unit.MiB), 10),
+		strconv.FormatUint(uint64(sopt.FileWriteLimit/unit.MiB), 10),
+		strconv.FormatUint(uint64(sopt.NumOpenFileLimit), 10),
 	}
-	cmd = append(cmd, opt.Cmd...)
-	opt.Cmd = cmd
+	cmd = append(cmd, eopt.Cmd...)
+	eopt.Cmd = cmd
 
 	if !sb.DevMode {
-		opt.Env = append(opt.Env, "SZPPRUN_LOG_LEVEL=warn")
+		eopt.Env = append(eopt.Env, "SZPPRUN_LOG_LEVEL=warn")
 	}
 
-	res, err := sb.Exec(ctx, opt)
+	res, err := sb.ExecRaw(ctx, eopt)
 	if err != nil {
-		return ExecWithSzppRunResult{}, err
+		return ExecResult{}, err
 	}
 
 	t, mem, exitCode, err := parseExecResultFile(sb.HostBindDir)
 	if err != nil {
-		return ExecWithSzppRunResult{}, err
+		return ExecResult{}, err
 	}
 
 	res.ExitCode = exitCode
 
-	return ExecWithSzppRunResult{
-		ExecResult: res,
-		ExecTime:   t,
-		ExecMemory: mem,
+	return ExecResult{
+		ExecRawResult: res,
+		ExecTime:      t,
+		ExecMemory:    mem,
 	}, nil
 }

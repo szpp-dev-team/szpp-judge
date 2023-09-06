@@ -19,14 +19,12 @@ const (
 	MemUsageCheckInterval        = 3 * time.Millisecond
 	LogLevelEnvKey               = "SZPPRUN_LOG_LEVEL"
 	RlimitStackSize       uint64 = unix.RLIM_INFINITY // スタックサイズ制限なし
-	RlimitFileSize        uint64 = 20 * 1024 * 1024   // 20 MiB
-	RlimitNumOpenFiles    uint64 = 256
 )
 
 func printUsage() {
 	fmt.Fprintf(os.Stderr,
 		`
-  Usage: szpprun TIME_LIMI_ms MEM_LIMIT_MiB CMD...
+  Usage: szpprun timeLimit_ms memLimit_MiB fileSizeLimit_MiB numOpenFileLimit CMD...
 
   ENVIRONMENT:
 		%s  error|warn|info|debug  (default: info)
@@ -66,13 +64,15 @@ func newLoggerFromEnv() *slog.Logger {
 }
 
 type parseArgResult struct {
-	timeLimit   time.Duration
-	memLimitKib uint
-	cmd         []string
+	timeLimit          time.Duration
+	memLimitKib        uint
+	rlimitFileSizeByte uint64
+	rlimitNumOpenFiles uint64
+	cmd                []string
 }
 
 func parseArg(args []string) (parseArgResult, error) {
-	if len(args) < 4 {
+	if len(args) <= 5 {
 		return parseArgResult{}, fmt.Errorf("Too few arguments")
 	}
 
@@ -90,10 +90,26 @@ func parseArg(args []string) (parseArgResult, error) {
 	}
 	memLimitKib := uint(n) << 10
 
+	// parse fileSizeLimit as [MiB]
+	n, err = strconv.ParseUint(args[3], 10, 32)
+	if err != nil {
+		return parseArgResult{}, fmt.Errorf("Expected file size limit [MiB] in args[3], but got %v", args[3])
+	}
+	fileSizeLimitByte := n << 20
+
+	// parse numOpenFileLimit
+	n, err = strconv.ParseUint(args[4], 10, 32)
+	if err != nil {
+		return parseArgResult{}, fmt.Errorf("Expected num of open files limit in args[4], but got %v", args[4])
+	}
+	numOpenFileLimit := n
+
 	return parseArgResult{
-		timeLimit:   timeLimit,
-		memLimitKib: memLimitKib,
-		cmd:         args[3:],
+		timeLimit:          timeLimit,
+		memLimitKib:        memLimitKib,
+		rlimitFileSizeByte: fileSizeLimitByte,
+		rlimitNumOpenFiles: numOpenFileLimit,
+		cmd:                args[5:],
 	}, nil
 }
 
@@ -108,8 +124,8 @@ func subMain(args []string, log *slog.Logger) error {
 
 	// set ulimit (この親プロセス自身にも ulimit 制約が課せられるので注意)
 	unix.Setrlimit(unix.RLIMIT_STACK, &unix.Rlimit{Cur: RlimitStackSize, Max: RlimitStackSize})
-	unix.Setrlimit(unix.RLIMIT_FSIZE, &unix.Rlimit{Cur: RlimitFileSize, Max: RlimitFileSize})
-	unix.Setrlimit(unix.RLIMIT_NOFILE, &unix.Rlimit{Cur: RlimitNumOpenFiles, Max: RlimitNumOpenFiles})
+	unix.Setrlimit(unix.RLIMIT_FSIZE, &unix.Rlimit{Cur: a.rlimitFileSizeByte, Max: a.rlimitFileSizeByte})
+	unix.Setrlimit(unix.RLIMIT_NOFILE, &unix.Rlimit{Cur: a.rlimitNumOpenFiles, Max: a.rlimitNumOpenFiles})
 
 	ctx, cancel := context.WithTimeout(context.Background(), a.timeLimit+100*time.Millisecond)
 

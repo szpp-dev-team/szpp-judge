@@ -110,12 +110,17 @@ func run(
 	stdin []byte,
 ) error {
 	slog.Info("Executing compile cmd:", "cmd", lm.CompileCmd)
-	res, err := r.ExecWithSzppRun(ctx, time.Second*2, unit.GiB*1, sandbox.ExecOption{
+	res, err := r.Exec(ctx, sandbox.ExecOption{
 		AsRootUser:          true,
 		Stdin:               nil,
 		Cmd:                 lm.CompileCmd,
 		StdoutReadLimit:     16 * unit.KiB,
 		MergeStderrToStdout: true,
+	}, sandbox.SzpprunOption{
+		TimeLimit:        time.Second * 1,
+		MemoryLimit:      unit.GiB * 1,
+		FileWriteLimit:   unit.GiB * 2,
+		NumOpenFileLimit: 1024,
 	})
 	if err != nil {
 		return err
@@ -127,12 +132,17 @@ func run(
 	}
 
 	slog.Info("Executing exec cmd:", "cmd", lm.ExecCmd, "len(stdin)", len(stdin), "stdin", truncateStr(string(stdin), 30))
-	res, err = r.ExecWithSzppRun(ctx, time.Millisecond*500, unit.MiB*64, sandbox.ExecOption{
+	res, err = r.Exec(ctx, sandbox.ExecOption{
 		AsRootUser:      false,
 		Stdin:           bytes.NewBuffer(stdin),
 		Cmd:             lm.ExecCmd,
 		StdoutReadLimit: 256 * unit.KiB,
 		StderrReadLimit: 64 * unit.KiB,
+	}, sandbox.SzpprunOption{
+		TimeLimit:        time.Millisecond * 500,
+		MemoryLimit:      unit.MiB * 64,
+		FileWriteLimit:   unit.MiB * 8,
+		NumOpenFileLimit: 128,
 	})
 	if err != nil {
 		return err
@@ -151,7 +161,7 @@ func truncateStr(s string, limitLen int) string {
 	}
 }
 
-func showExecResult(r sandbox.ExecWithSzppRunResult) {
+func showExecResult(r sandbox.ExecResult) {
 	fmt.Fprintln(os.Stderr, "- - - ExecResult - - -")
 	fmt.Fprintf(os.Stderr, "len(Stdout): %d\nlen(Stderr): %d\n", len(r.Stdout), len(r.Stderr))
 	fmt.Fprintf(os.Stderr, "Time:     %d ms\n", r.ExecTime.Milliseconds())

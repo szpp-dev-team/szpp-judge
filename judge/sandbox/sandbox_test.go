@@ -38,7 +38,7 @@ func TestNew_Close(t *testing.T) {
 	}
 	t.Logf("Successfully created a container: ID=%s, hostWorkingDir=%s\n", sb.ContainerID, sb.HostBindDir)
 
-	execResult, err := sb.Exec(ctx, ExecOption{
+	execResult, err := sb.ExecRaw(ctx, ExecOption{
 		AsRootUser: false,
 		Stdin:      nil,
 		Cmd:        []string{"curl", "http://example.com"},
