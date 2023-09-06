@@ -3,12 +3,12 @@ package testcases
 import "context"
 
 type Repository interface {
-	DownloadTestcases(ctx context.Context, taskID int) ([]*Testcase, error)
+	DownloadTestcase(ctx context.Context, taskID int, name string) (*Testcase, error)
+	UploadTestcase(ctx context.Context, taskID int, testcase *Testcase) error
 }
 
 type Testcase struct {
-	TaskID int
-	Name   string
-	In     []byte
-	Out    []byte
+	Name string
+	In   []byte
+	Out  []byte
 }
