@@ -139,6 +139,146 @@ export class User extends Message<User> {
 }
 
 /**
+ * @generated from message backend.v1.Clarification
+ */
+export class Clarification extends Message<Clarification> {
+  /**
+   * @generated from field: int32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: int32 user_id = 2;
+   */
+  userId = 0;
+
+  /**
+   * @generated from field: string content = 3;
+   */
+  content = "";
+
+  /**
+   * @generated from field: int32 contest_id = 4;
+   */
+  contestId = 0;
+
+  /**
+   * @generated from field: bool is_public = 5;
+   */
+  isPublic = false;
+
+  /**
+   * @generated from field: backend.v1.Clarification.Answer answer = 6;
+   */
+  answer?: Clarification_Answer;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 7;
+   */
+  createdAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp updated_at = 8;
+   */
+  updatedAt?: Timestamp;
+
+  constructor(data?: PartialMessage<Clarification>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.Clarification";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "answer", kind: "message", T: Clarification_Answer },
+    { no: 7, name: "created_at", kind: "message", T: Timestamp },
+    { no: 8, name: "updated_at", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Clarification {
+    return new Clarification().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Clarification {
+    return new Clarification().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Clarification {
+    return new Clarification().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Clarification | PlainMessage<Clarification> | undefined, b: Clarification | PlainMessage<Clarification> | undefined): boolean {
+    return proto3.util.equals(Clarification, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.Clarification.Answer
+ */
+export class Clarification_Answer extends Message<Clarification_Answer> {
+  /**
+   * @generated from field: int32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: int32 user_id = 2;
+   */
+  userId = 0;
+
+  /**
+   * @generated from field: string content = 3;
+   */
+  content = "";
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 4;
+   */
+  createdAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp updated_at = 5;
+   */
+  updatedAt?: Timestamp;
+
+  constructor(data?: PartialMessage<Clarification_Answer>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.Clarification.Answer";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "created_at", kind: "message", T: Timestamp },
+    { no: 5, name: "updated_at", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Clarification_Answer {
+    return new Clarification_Answer().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Clarification_Answer {
+    return new Clarification_Answer().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Clarification_Answer {
+    return new Clarification_Answer().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Clarification_Answer | PlainMessage<Clarification_Answer> | undefined, b: Clarification_Answer | PlainMessage<Clarification_Answer> | undefined): boolean {
+    return proto3.util.equals(Clarification_Answer, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.Task
  */
 export class Task extends Message<Task> {

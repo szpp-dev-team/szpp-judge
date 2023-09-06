@@ -13,6 +13,25 @@ message User {
   optional google.protobuf.Timestamp updated_at = 6;
 }
 
+message Clarification {
+  int32 id = 1;
+  int32 user_id = 2;
+  string content = 3;
+  int32 contest_id = 4;
+  bool is_public = 5;
+  Answer answer = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+
+  message Answer {
+    int32 id = 1;
+    int32 user_id = 2;
+    string content = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+  }
+}
+
 message Task {
   int32 id = 1;
   string title = 2; // 問題名
