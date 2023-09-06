@@ -658,6 +658,29 @@ func HasTestcaseSetsWith(preds ...predicate.TestcaseSet) predicate.Task {
 	})
 }
 
+// HasTestcases applies the HasEdge predicate on the "testcases" edge.
+func HasTestcases() predicate.Task {
+	return predicate.Task(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TestcasesTable, TestcasesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTestcasesWith applies the HasEdge predicate on the "testcases" edge with a given conditions (other predicates).
+func HasTestcasesWith(preds ...predicate.Testcase) predicate.Task {
+	return predicate.Task(func(s *sql.Selector) {
+		step := newTestcasesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.Task {
 	return predicate.Task(func(s *sql.Selector) {

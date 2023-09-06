@@ -51,11 +51,13 @@ type Task struct {
 type TaskEdges struct {
 	// TestcaseSets holds the value of the testcase_sets edge.
 	TestcaseSets []*TestcaseSet `json:"testcase_sets,omitempty"`
+	// Testcases holds the value of the testcases edge.
+	Testcases []*Testcase `json:"testcases,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // TestcaseSetsOrErr returns the TestcaseSets value or an error if the edge
@@ -67,10 +69,19 @@ func (e TaskEdges) TestcaseSetsOrErr() ([]*TestcaseSet, error) {
 	return nil, &NotLoadedError{edge: "testcase_sets"}
 }
 
+// TestcasesOrErr returns the Testcases value or an error if the edge
+// was not loaded in eager-loading.
+func (e TaskEdges) TestcasesOrErr() ([]*Testcase, error) {
+	if e.loadedTypes[1] {
+		return e.Testcases, nil
+	}
+	return nil, &NotLoadedError{edge: "testcases"}
+}
+
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e TaskEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -209,6 +220,11 @@ func (t *Task) Value(name string) (ent.Value, error) {
 // QueryTestcaseSets queries the "testcase_sets" edge of the Task entity.
 func (t *Task) QueryTestcaseSets() *TestcaseSetQuery {
 	return NewTaskClient(t.config).QueryTestcaseSets(t)
+}
+
+// QueryTestcases queries the "testcases" edge of the Task entity.
+func (t *Task) QueryTestcases() *TestcaseQuery {
+	return NewTaskClient(t.config).QueryTestcases(t)
 }
 
 // QueryUser queries the "user" edge of the Task entity.

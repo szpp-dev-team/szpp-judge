@@ -57,6 +57,9 @@ type TaskMutation struct {
 	testcase_sets        map[int]struct{}
 	removedtestcase_sets map[int]struct{}
 	clearedtestcase_sets bool
+	testcases            map[int]struct{}
+	removedtestcases     map[int]struct{}
+	clearedtestcases     bool
 	user                 *int
 	cleareduser          bool
 	done                 bool
@@ -731,6 +734,60 @@ func (m *TaskMutation) ResetTestcaseSets() {
 	m.removedtestcase_sets = nil
 }
 
+// AddTestcaseIDs adds the "testcases" edge to the Testcase entity by ids.
+func (m *TaskMutation) AddTestcaseIDs(ids ...int) {
+	if m.testcases == nil {
+		m.testcases = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.testcases[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTestcases clears the "testcases" edge to the Testcase entity.
+func (m *TaskMutation) ClearTestcases() {
+	m.clearedtestcases = true
+}
+
+// TestcasesCleared reports if the "testcases" edge to the Testcase entity was cleared.
+func (m *TaskMutation) TestcasesCleared() bool {
+	return m.clearedtestcases
+}
+
+// RemoveTestcaseIDs removes the "testcases" edge to the Testcase entity by IDs.
+func (m *TaskMutation) RemoveTestcaseIDs(ids ...int) {
+	if m.removedtestcases == nil {
+		m.removedtestcases = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.testcases, ids[i])
+		m.removedtestcases[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTestcases returns the removed IDs of the "testcases" edge to the Testcase entity.
+func (m *TaskMutation) RemovedTestcasesIDs() (ids []int) {
+	for id := range m.removedtestcases {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TestcasesIDs returns the "testcases" edge IDs in the mutation.
+func (m *TaskMutation) TestcasesIDs() (ids []int) {
+	for id := range m.testcases {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTestcases resets all changes to the "testcases" edge.
+func (m *TaskMutation) ResetTestcases() {
+	m.testcases = nil
+	m.clearedtestcases = false
+	m.removedtestcases = nil
+}
+
 // SetUserID sets the "user" edge to the User entity by id.
 func (m *TaskMutation) SetUserID(id int) {
 	m.user = &id
@@ -1139,9 +1196,12 @@ func (m *TaskMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TaskMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.testcase_sets != nil {
 		edges = append(edges, task.EdgeTestcaseSets)
+	}
+	if m.testcases != nil {
+		edges = append(edges, task.EdgeTestcases)
 	}
 	if m.user != nil {
 		edges = append(edges, task.EdgeUser)
@@ -1159,6 +1219,12 @@ func (m *TaskMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case task.EdgeTestcases:
+		ids := make([]ent.Value, 0, len(m.testcases))
+		for id := range m.testcases {
+			ids = append(ids, id)
+		}
+		return ids
 	case task.EdgeUser:
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
@@ -1169,9 +1235,12 @@ func (m *TaskMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TaskMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedtestcase_sets != nil {
 		edges = append(edges, task.EdgeTestcaseSets)
+	}
+	if m.removedtestcases != nil {
+		edges = append(edges, task.EdgeTestcases)
 	}
 	return edges
 }
@@ -1186,15 +1255,24 @@ func (m *TaskMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case task.EdgeTestcases:
+		ids := make([]ent.Value, 0, len(m.removedtestcases))
+		for id := range m.removedtestcases {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TaskMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedtestcase_sets {
 		edges = append(edges, task.EdgeTestcaseSets)
+	}
+	if m.clearedtestcases {
+		edges = append(edges, task.EdgeTestcases)
 	}
 	if m.cleareduser {
 		edges = append(edges, task.EdgeUser)
@@ -1208,6 +1286,8 @@ func (m *TaskMutation) EdgeCleared(name string) bool {
 	switch name {
 	case task.EdgeTestcaseSets:
 		return m.clearedtestcase_sets
+	case task.EdgeTestcases:
+		return m.clearedtestcases
 	case task.EdgeUser:
 		return m.cleareduser
 	}
@@ -1232,6 +1312,9 @@ func (m *TaskMutation) ResetEdge(name string) error {
 	case task.EdgeTestcaseSets:
 		m.ResetTestcaseSets()
 		return nil
+	case task.EdgeTestcases:
+		m.ResetTestcases()
+		return nil
 	case task.EdgeUser:
 		m.ResetUser()
 		return nil
@@ -1253,6 +1336,8 @@ type TestcaseMutation struct {
 	testcase_sets        map[int]struct{}
 	removedtestcase_sets map[int]struct{}
 	clearedtestcase_sets bool
+	task                 *int
+	clearedtask          bool
 	done                 bool
 	oldValue             func(context.Context) (*Testcase, error)
 	predicates           []predicate.Testcase
@@ -1586,6 +1671,45 @@ func (m *TestcaseMutation) ResetTestcaseSets() {
 	m.removedtestcase_sets = nil
 }
 
+// SetTaskID sets the "task" edge to the Task entity by id.
+func (m *TestcaseMutation) SetTaskID(id int) {
+	m.task = &id
+}
+
+// ClearTask clears the "task" edge to the Task entity.
+func (m *TestcaseMutation) ClearTask() {
+	m.clearedtask = true
+}
+
+// TaskCleared reports if the "task" edge to the Task entity was cleared.
+func (m *TestcaseMutation) TaskCleared() bool {
+	return m.clearedtask
+}
+
+// TaskID returns the "task" edge ID in the mutation.
+func (m *TestcaseMutation) TaskID() (id int, exists bool) {
+	if m.task != nil {
+		return *m.task, true
+	}
+	return
+}
+
+// TaskIDs returns the "task" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TaskID instead. It exists only for internal usage by the builders.
+func (m *TestcaseMutation) TaskIDs() (ids []int) {
+	if id := m.task; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTask resets all changes to the "task" edge.
+func (m *TestcaseMutation) ResetTask() {
+	m.task = nil
+	m.clearedtask = false
+}
+
 // Where appends a list predicates to the TestcaseMutation builder.
 func (m *TestcaseMutation) Where(ps ...predicate.Testcase) {
 	m.predicates = append(m.predicates, ps...)
@@ -1785,9 +1909,12 @@ func (m *TestcaseMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TestcaseMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.testcase_sets != nil {
 		edges = append(edges, testcase.EdgeTestcaseSets)
+	}
+	if m.task != nil {
+		edges = append(edges, testcase.EdgeTask)
 	}
 	return edges
 }
@@ -1802,13 +1929,17 @@ func (m *TestcaseMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case testcase.EdgeTask:
+		if id := m.task; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TestcaseMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedtestcase_sets != nil {
 		edges = append(edges, testcase.EdgeTestcaseSets)
 	}
@@ -1831,9 +1962,12 @@ func (m *TestcaseMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TestcaseMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedtestcase_sets {
 		edges = append(edges, testcase.EdgeTestcaseSets)
+	}
+	if m.clearedtask {
+		edges = append(edges, testcase.EdgeTask)
 	}
 	return edges
 }
@@ -1844,6 +1978,8 @@ func (m *TestcaseMutation) EdgeCleared(name string) bool {
 	switch name {
 	case testcase.EdgeTestcaseSets:
 		return m.clearedtestcase_sets
+	case testcase.EdgeTask:
+		return m.clearedtask
 	}
 	return false
 }
@@ -1852,6 +1988,9 @@ func (m *TestcaseMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *TestcaseMutation) ClearEdge(name string) error {
 	switch name {
+	case testcase.EdgeTask:
+		m.ClearTask()
+		return nil
 	}
 	return fmt.Errorf("unknown Testcase unique edge %s", name)
 }
@@ -1862,6 +2001,9 @@ func (m *TestcaseMutation) ResetEdge(name string) error {
 	switch name {
 	case testcase.EdgeTestcaseSets:
 		m.ResetTestcaseSets()
+		return nil
+	case testcase.EdgeTask:
+		m.ResetTask()
 		return nil
 	}
 	return fmt.Errorf("unknown Testcase edge %s", name)

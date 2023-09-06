@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -25,6 +26,7 @@ type TaskQuery struct {
 	inters           []Interceptor
 	predicates       []predicate.Task
 	withTestcaseSets *TestcaseSetQuery
+	withTestcases    *TestcaseQuery
 	withUser         *UserQuery
 	withFKs          bool
 	// intermediate query (i.e. traversal path).
@@ -78,6 +80,28 @@ func (tq *TaskQuery) QueryTestcaseSets() *TestcaseSetQuery {
 			sqlgraph.From(task.Table, task.FieldID, selector),
 			sqlgraph.To(testcaseset.Table, testcaseset.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, task.TestcaseSetsTable, task.TestcaseSetsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTestcases chains the current query on the "testcases" edge.
+func (tq *TaskQuery) QueryTestcases() *TestcaseQuery {
+	query := (&TestcaseClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, selector),
+			sqlgraph.To(testcase.Table, testcase.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, task.TestcasesTable, task.TestcasesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -300,6 +324,7 @@ func (tq *TaskQuery) Clone() *TaskQuery {
 		inters:           append([]Interceptor{}, tq.inters...),
 		predicates:       append([]predicate.Task{}, tq.predicates...),
 		withTestcaseSets: tq.withTestcaseSets.Clone(),
+		withTestcases:    tq.withTestcases.Clone(),
 		withUser:         tq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
@@ -315,6 +340,17 @@ func (tq *TaskQuery) WithTestcaseSets(opts ...func(*TestcaseSetQuery)) *TaskQuer
 		opt(query)
 	}
 	tq.withTestcaseSets = query
+	return tq
+}
+
+// WithTestcases tells the query-builder to eager-load the nodes that are connected to
+// the "testcases" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TaskQuery) WithTestcases(opts ...func(*TestcaseQuery)) *TaskQuery {
+	query := (&TestcaseClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withTestcases = query
 	return tq
 }
 
@@ -408,8 +444,9 @@ func (tq *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 		nodes       = []*Task{}
 		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			tq.withTestcaseSets != nil,
+			tq.withTestcases != nil,
 			tq.withUser != nil,
 		}
 	)
@@ -441,6 +478,13 @@ func (tq *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 		if err := tq.loadTestcaseSets(ctx, query, nodes,
 			func(n *Task) { n.Edges.TestcaseSets = []*TestcaseSet{} },
 			func(n *Task, e *TestcaseSet) { n.Edges.TestcaseSets = append(n.Edges.TestcaseSets, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withTestcases; query != nil {
+		if err := tq.loadTestcases(ctx, query, nodes,
+			func(n *Task) { n.Edges.Testcases = []*Testcase{} },
+			func(n *Task, e *Testcase) { n.Edges.Testcases = append(n.Edges.Testcases, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -479,6 +523,37 @@ func (tq *TaskQuery) loadTestcaseSets(ctx context.Context, query *TestcaseSetQue
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "task_testcase_sets" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (tq *TaskQuery) loadTestcases(ctx context.Context, query *TestcaseQuery, nodes []*Task, init func(*Task), assign func(*Task, *Testcase)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Task)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Testcase(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(task.TestcasesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.task_testcases
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "task_testcases" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "task_testcases" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

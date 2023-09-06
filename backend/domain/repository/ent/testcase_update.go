@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 )
@@ -96,6 +97,25 @@ func (tu *TestcaseUpdate) AddTestcaseSets(t ...*TestcaseSet) *TestcaseUpdate {
 	return tu.AddTestcaseSetIDs(ids...)
 }
 
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (tu *TestcaseUpdate) SetTaskID(id int) *TestcaseUpdate {
+	tu.mutation.SetTaskID(id)
+	return tu
+}
+
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (tu *TestcaseUpdate) SetNillableTaskID(id *int) *TestcaseUpdate {
+	if id != nil {
+		tu = tu.SetTaskID(*id)
+	}
+	return tu
+}
+
+// SetTask sets the "task" edge to the Task entity.
+func (tu *TestcaseUpdate) SetTask(t *Task) *TestcaseUpdate {
+	return tu.SetTaskID(t.ID)
+}
+
 // Mutation returns the TestcaseMutation object of the builder.
 func (tu *TestcaseUpdate) Mutation() *TestcaseMutation {
 	return tu.mutation
@@ -120,6 +140,12 @@ func (tu *TestcaseUpdate) RemoveTestcaseSets(t ...*TestcaseSet) *TestcaseUpdate 
 		ids[i] = t[i].ID
 	}
 	return tu.RemoveTestcaseSetIDs(ids...)
+}
+
+// ClearTask clears the "task" edge to the Task entity.
+func (tu *TestcaseUpdate) ClearTask() *TestcaseUpdate {
+	tu.mutation.ClearTask()
+	return tu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -221,6 +247,35 @@ func (tu *TestcaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.TaskCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcase.TaskTable,
+			Columns: []string{testcase.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.TaskIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcase.TaskTable,
+			Columns: []string{testcase.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{testcase.Label}
@@ -308,6 +363,25 @@ func (tuo *TestcaseUpdateOne) AddTestcaseSets(t ...*TestcaseSet) *TestcaseUpdate
 	return tuo.AddTestcaseSetIDs(ids...)
 }
 
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (tuo *TestcaseUpdateOne) SetTaskID(id int) *TestcaseUpdateOne {
+	tuo.mutation.SetTaskID(id)
+	return tuo
+}
+
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (tuo *TestcaseUpdateOne) SetNillableTaskID(id *int) *TestcaseUpdateOne {
+	if id != nil {
+		tuo = tuo.SetTaskID(*id)
+	}
+	return tuo
+}
+
+// SetTask sets the "task" edge to the Task entity.
+func (tuo *TestcaseUpdateOne) SetTask(t *Task) *TestcaseUpdateOne {
+	return tuo.SetTaskID(t.ID)
+}
+
 // Mutation returns the TestcaseMutation object of the builder.
 func (tuo *TestcaseUpdateOne) Mutation() *TestcaseMutation {
 	return tuo.mutation
@@ -332,6 +406,12 @@ func (tuo *TestcaseUpdateOne) RemoveTestcaseSets(t ...*TestcaseSet) *TestcaseUpd
 		ids[i] = t[i].ID
 	}
 	return tuo.RemoveTestcaseSetIDs(ids...)
+}
+
+// ClearTask clears the "task" edge to the Task entity.
+func (tuo *TestcaseUpdateOne) ClearTask() *TestcaseUpdateOne {
+	tuo.mutation.ClearTask()
+	return tuo
 }
 
 // Where appends a list predicates to the TestcaseUpdate builder.
@@ -456,6 +536,35 @@ func (tuo *TestcaseUpdateOne) sqlSave(ctx context.Context) (_node *Testcase, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseset.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.TaskCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcase.TaskTable,
+			Columns: []string{testcase.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.TaskIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcase.TaskTable,
+			Columns: []string{testcase.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

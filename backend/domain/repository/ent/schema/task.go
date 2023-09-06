@@ -32,6 +32,7 @@ func (Task) Fields() []ent.Field {
 func (Task) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("testcase_sets", TestcaseSet.Type),
+		edge.To("testcases", Testcase.Type),
 		edge.From("user", User.Type).Ref("tasks").Unique(),
 	}
 }

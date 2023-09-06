@@ -45,12 +45,21 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "task_testcases", Type: field.TypeInt, Nullable: true},
 	}
 	// TestcasesTable holds the schema information for the "testcases" table.
 	TestcasesTable = &schema.Table{
 		Name:       "testcases",
 		Columns:    TestcasesColumns,
 		PrimaryKey: []*schema.Column{TestcasesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "testcases_tasks_testcases",
+				Columns:    []*schema.Column{TestcasesColumns[5]},
+				RefColumns: []*schema.Column{TasksColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// TestcaseSetsColumns holds the columns for the "testcase_sets" table.
 	TestcaseSetsColumns = []*schema.Column{
@@ -128,6 +137,7 @@ var (
 
 func init() {
 	TasksTable.ForeignKeys[0].RefTable = UsersTable
+	TestcasesTable.ForeignKeys[0].RefTable = TasksTable
 	TestcaseSetsTable.ForeignKeys[0].RefTable = TasksTable
 	TestcaseSetTestcasesTable.ForeignKeys[0].RefTable = TestcaseSetsTable
 	TestcaseSetTestcasesTable.ForeignKeys[1].RefTable = TestcasesTable

@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 )
 
@@ -27,17 +28,20 @@ type Testcase struct {
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TestcaseQuery when eager-loading is set.
-	Edges        TestcaseEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges          TestcaseEdges `json:"edges"`
+	task_testcases *int
+	selectValues   sql.SelectValues
 }
 
 // TestcaseEdges holds the relations/edges for other nodes in the graph.
 type TestcaseEdges struct {
 	// TestcaseSets holds the value of the testcase_sets edge.
 	TestcaseSets []*TestcaseSet `json:"testcase_sets,omitempty"`
+	// Task holds the value of the task edge.
+	Task *Task `json:"task,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // TestcaseSetsOrErr returns the TestcaseSets value or an error if the edge
@@ -47,6 +51,19 @@ func (e TestcaseEdges) TestcaseSetsOrErr() ([]*TestcaseSet, error) {
 		return e.TestcaseSets, nil
 	}
 	return nil, &NotLoadedError{edge: "testcase_sets"}
+}
+
+// TaskOrErr returns the Task value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TestcaseEdges) TaskOrErr() (*Task, error) {
+	if e.loadedTypes[1] {
+		if e.Task == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: task.Label}
+		}
+		return e.Task, nil
+	}
+	return nil, &NotLoadedError{edge: "task"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -60,6 +77,8 @@ func (*Testcase) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case testcase.FieldCreatedAt, testcase.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case testcase.ForeignKeys[0]: // task_testcases
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -107,6 +126,13 @@ func (t *Testcase) assignValues(columns []string, values []any) error {
 				t.UpdatedAt = new(time.Time)
 				*t.UpdatedAt = value.Time
 			}
+		case testcase.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field task_testcases", value)
+			} else if value.Valid {
+				t.task_testcases = new(int)
+				*t.task_testcases = int(value.Int64)
+			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
 		}
@@ -123,6 +149,11 @@ func (t *Testcase) Value(name string) (ent.Value, error) {
 // QueryTestcaseSets queries the "testcase_sets" edge of the Testcase entity.
 func (t *Testcase) QueryTestcaseSets() *TestcaseSetQuery {
 	return NewTestcaseClient(t.config).QueryTestcaseSets(t)
+}
+
+// QueryTask queries the "task" edge of the Testcase entity.
+func (t *Testcase) QueryTask() *TaskQuery {
+	return NewTestcaseClient(t.config).QueryTask(t)
 }
 
 // Update returns a builder for updating this Testcase.

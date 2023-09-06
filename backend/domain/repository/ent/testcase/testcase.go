@@ -22,6 +22,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeTestcaseSets holds the string denoting the testcase_sets edge name in mutations.
 	EdgeTestcaseSets = "testcase_sets"
+	// EdgeTask holds the string denoting the task edge name in mutations.
+	EdgeTask = "task"
 	// Table holds the table name of the testcase in the database.
 	Table = "testcases"
 	// TestcaseSetsTable is the table that holds the testcase_sets relation/edge. The primary key declared below.
@@ -29,6 +31,13 @@ const (
 	// TestcaseSetsInverseTable is the table name for the TestcaseSet entity.
 	// It exists in this package in order to avoid circular dependency with the "testcaseset" package.
 	TestcaseSetsInverseTable = "testcase_sets"
+	// TaskTable is the table that holds the task relation/edge.
+	TaskTable = "testcases"
+	// TaskInverseTable is the table name for the Task entity.
+	// It exists in this package in order to avoid circular dependency with the "task" package.
+	TaskInverseTable = "tasks"
+	// TaskColumn is the table column denoting the task relation/edge.
+	TaskColumn = "task_testcases"
 )
 
 // Columns holds all SQL columns for testcase fields.
@@ -38,6 +47,12 @@ var Columns = []string{
 	FieldDescription,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "testcases"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"task_testcases",
 }
 
 var (
@@ -50,6 +65,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -97,10 +117,24 @@ func ByTestcaseSets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTestcaseSetsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByTaskField orders the results by task field.
+func ByTaskField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTaskStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newTestcaseSetsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TestcaseSetsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, TestcaseSetsTable, TestcaseSetsPrimaryKey...),
+	)
+}
+func newTaskStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TaskInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, TaskTable, TaskColumn),
 	)
 }

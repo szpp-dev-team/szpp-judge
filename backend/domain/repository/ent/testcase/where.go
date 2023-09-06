@@ -328,6 +328,29 @@ func HasTestcaseSetsWith(preds ...predicate.TestcaseSet) predicate.Testcase {
 	})
 }
 
+// HasTask applies the HasEdge predicate on the "task" edge.
+func HasTask() predicate.Testcase {
+	return predicate.Testcase(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, TaskTable, TaskColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTaskWith applies the HasEdge predicate on the "task" edge with a given conditions (other predicates).
+func HasTaskWith(preds ...predicate.Task) predicate.Testcase {
+	return predicate.Testcase(func(s *sql.Selector) {
+		step := newTaskStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Testcase) predicate.Testcase {
 	return predicate.Testcase(func(s *sql.Selector) {

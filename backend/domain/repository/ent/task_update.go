@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -188,6 +189,21 @@ func (tu *TaskUpdate) AddTestcaseSets(t ...*TestcaseSet) *TaskUpdate {
 	return tu.AddTestcaseSetIDs(ids...)
 }
 
+// AddTestcaseIDs adds the "testcases" edge to the Testcase entity by IDs.
+func (tu *TaskUpdate) AddTestcaseIDs(ids ...int) *TaskUpdate {
+	tu.mutation.AddTestcaseIDs(ids...)
+	return tu
+}
+
+// AddTestcases adds the "testcases" edges to the Testcase entity.
+func (tu *TaskUpdate) AddTestcases(t ...*Testcase) *TaskUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return tu.AddTestcaseIDs(ids...)
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tu *TaskUpdate) SetUserID(id int) *TaskUpdate {
 	tu.mutation.SetUserID(id)
@@ -231,6 +247,27 @@ func (tu *TaskUpdate) RemoveTestcaseSets(t ...*TestcaseSet) *TaskUpdate {
 		ids[i] = t[i].ID
 	}
 	return tu.RemoveTestcaseSetIDs(ids...)
+}
+
+// ClearTestcases clears all "testcases" edges to the Testcase entity.
+func (tu *TaskUpdate) ClearTestcases() *TaskUpdate {
+	tu.mutation.ClearTestcases()
+	return tu
+}
+
+// RemoveTestcaseIDs removes the "testcases" edge to Testcase entities by IDs.
+func (tu *TaskUpdate) RemoveTestcaseIDs(ids ...int) *TaskUpdate {
+	tu.mutation.RemoveTestcaseIDs(ids...)
+	return tu
+}
+
+// RemoveTestcases removes "testcases" edges to Testcase entities.
+func (tu *TaskUpdate) RemoveTestcases(t ...*Testcase) *TaskUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return tu.RemoveTestcaseIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -380,6 +417,51 @@ func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseset.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tu.mutation.TestcasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.TestcasesTable,
+			Columns: []string{task.TestcasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedTestcasesIDs(); len(nodes) > 0 && !tu.mutation.TestcasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.TestcasesTable,
+			Columns: []string{task.TestcasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.TestcasesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.TestcasesTable,
+			Columns: []string{task.TestcasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -594,6 +676,21 @@ func (tuo *TaskUpdateOne) AddTestcaseSets(t ...*TestcaseSet) *TaskUpdateOne {
 	return tuo.AddTestcaseSetIDs(ids...)
 }
 
+// AddTestcaseIDs adds the "testcases" edge to the Testcase entity by IDs.
+func (tuo *TaskUpdateOne) AddTestcaseIDs(ids ...int) *TaskUpdateOne {
+	tuo.mutation.AddTestcaseIDs(ids...)
+	return tuo
+}
+
+// AddTestcases adds the "testcases" edges to the Testcase entity.
+func (tuo *TaskUpdateOne) AddTestcases(t ...*Testcase) *TaskUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return tuo.AddTestcaseIDs(ids...)
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tuo *TaskUpdateOne) SetUserID(id int) *TaskUpdateOne {
 	tuo.mutation.SetUserID(id)
@@ -637,6 +734,27 @@ func (tuo *TaskUpdateOne) RemoveTestcaseSets(t ...*TestcaseSet) *TaskUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return tuo.RemoveTestcaseSetIDs(ids...)
+}
+
+// ClearTestcases clears all "testcases" edges to the Testcase entity.
+func (tuo *TaskUpdateOne) ClearTestcases() *TaskUpdateOne {
+	tuo.mutation.ClearTestcases()
+	return tuo
+}
+
+// RemoveTestcaseIDs removes the "testcases" edge to Testcase entities by IDs.
+func (tuo *TaskUpdateOne) RemoveTestcaseIDs(ids ...int) *TaskUpdateOne {
+	tuo.mutation.RemoveTestcaseIDs(ids...)
+	return tuo
+}
+
+// RemoveTestcases removes "testcases" edges to Testcase entities.
+func (tuo *TaskUpdateOne) RemoveTestcases(t ...*Testcase) *TaskUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return tuo.RemoveTestcaseIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -816,6 +934,51 @@ func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseset.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.TestcasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.TestcasesTable,
+			Columns: []string{task.TestcasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedTestcasesIDs(); len(nodes) > 0 && !tuo.mutation.TestcasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.TestcasesTable,
+			Columns: []string{task.TestcasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.TestcasesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.TestcasesTable,
+			Columns: []string{task.TestcasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
