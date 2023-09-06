@@ -61,9 +61,9 @@ export class User extends Message<User> {
   id = 0;
 
   /**
-   * @generated from field: string name = 2;
+   * @generated from field: string username = 2;
    */
-  name = "";
+  username = "";
 
   /**
    * @generated from field: bool is_admin = 4;
@@ -89,7 +89,7 @@ export class User extends Message<User> {
   static readonly typeName = "backend.v1.User";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "is_admin", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "created_at", kind: "message", T: Timestamp },
     { no: 6, name: "updated_at", kind: "message", T: Timestamp, opt: true },
@@ -939,9 +939,9 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp update_at = 16;
+   * @generated from field: optional google.protobuf.Timestamp updated_at = 16;
    */
-  updateAt?: Timestamp;
+  updatedAt?: Timestamp;
 
   constructor(data?: PartialMessage<SubmissionDetail>) {
     super();
@@ -966,7 +966,7 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
     { no: 13, name: "testcase_results", kind: "message", T: TestcaseResult, repeated: true },
     { no: 14, name: "submitted_at", kind: "message", T: Timestamp },
     { no: 15, name: "created_at", kind: "message", T: Timestamp },
-    { no: 16, name: "update_at", kind: "message", T: Timestamp, opt: true },
+    { no: 16, name: "updated_at", kind: "message", T: Timestamp, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmissionDetail {
