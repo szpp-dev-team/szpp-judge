@@ -18,13 +18,18 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { FC } from "react";
+import { Link } from "../../ui/Link";
 
 export type TaskCollectionProps = {
   tasks: TaskWithMySubmissionSummary[];
 };
 
 export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
+  const { query } = useRouter();
+  const { contest_slug } = query;
+
   return (
     <Box px={16} h="inherit">
       <Card px={3} py={4} h="100%">
@@ -54,12 +59,16 @@ export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
               <Tbody>
                 {tasks.map(t => (
                   <Tr key={t.id}>
-                    <Td textAlign="center">{t.id}</Td>
+                    <Td textAlign="center">
+                      <Link href={`/contests/${contest_slug}/tasks/${t.slug}`}>{t.id}</Link>
+                    </Td>
                     <Td textAlign="center">
                       <DifficultyBadge dif={t.difficulty} />
                     </Td>
                     <Td textAlign="center">{t.haiten}</Td>
-                    <Td textAlign="left">{t.title}</Td>
+                    <Td textAlign="left">
+                      <Link href={`/contests/${contest_slug}/tasks/${t.slug}`}>{t.title}</Link>
+                    </Td>
                     <Td textAlign="center">
                       {t?.status ? <JudgeStatusBadge status={t.status} progress={t?.progress} /> : "-"}
                     </Td>
