@@ -7,6 +7,8 @@ import (
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases/mock"
 	"github.com/szpp-dev-team/szpp-judge/backend/test/utils"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
@@ -15,7 +17,8 @@ import (
 func Test_CreateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient)
+	testcasesRepo := mock.NewMock()
+	interactor := NewInteractor(entClient, testcasesRepo)
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.CreateTaskRequest)
@@ -25,9 +28,23 @@ func Test_CreateTask(t *testing.T) {
 	}{
 		"success": {
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.CreateTaskRequest, resp *backendv1.CreateTaskResponse) {
-				task, err := entClient.Task.Get(ctx, int(resp.Task.Id))
+				task, err := entClient.Task.Query().
+					WithTestcases().
+					WithTestcaseSets().
+					Where(ent_task.ID(int(resp.Task.Id))).Only(ctx)
 				require.NoError(t, err)
+
 				assert.Equal(t, req.Task.Title, task.Title)
+
+				assert.Equal(t, len(req.Testcases), len(task.Edges.Testcases))
+				for _, testcase := range req.Testcases {
+					testcase2, err := testcasesRepo.DownloadTestcase(ctx, task.ID, testcase.Slug)
+					require.NoError(t, err)
+					assert.Equal(t, testcase.Input, string(testcase2.In))
+					assert.Equal(t, testcase.Output, string(testcase2.Out))
+				}
+
+				assert.Equal(t, len(req.TestcaseSets), len(task.Edges.TestcaseSets))
 			},
 		},
 	}
