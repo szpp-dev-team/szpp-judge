@@ -53,7 +53,8 @@ message GetTaskRequest {
 
 message GetTaskResponse {
   Task task = 1;
-  repeated Testcase testcases = 2;
+  repeated TestcaseSet testcase_sets = 2; // writer, admin によるリクエストのみ
+  repeated Testcase testcases = 3; // sample ケースは必ず含むが、全てのケースは writer, admin によるリクエストのみ
 }
 
 message UpdateTaskRequest {
