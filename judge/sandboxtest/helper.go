@@ -45,7 +45,7 @@ func CompileAndExec(t *testing.T, ctx context.Context, sb *sandbox.Sandbox, file
 		t.Fatalf("Compile error:\n%s", compileRes.Stdout)
 	}
 	t.Logf(
-		"Compilation done: time=%3d[ms], mem=%4d[kiB] exitCode=%d, len(out)=%d, len(err)=%d",
+		"Execution   done: time=%3d[ms], mem=%5d[kiB] exitCode=%d, len(out)=%d, len(err)=%d",
 		compileRes.ExecTime.Milliseconds(),
 		compileRes.ExecMemory/unit.KiB,
 		compileRes.ExitCode,

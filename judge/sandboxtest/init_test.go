@@ -20,15 +20,19 @@ var (
 	sbGcc        *sandbox.Sandbox
 	sbGccDev     *sandbox.Sandbox
 	sbPython     *sandbox.Sandbox
+	sbPythonDev  *sandbox.Sandbox
 )
 
 const (
-	containerWorkingDir   = "/work"
-	containerProcNumLimit = 32
-	containerMemoryLimit  = unit.MiB * 256
+	containerWorkingDir = "/work"
 )
 
 func TestMain(m *testing.M) {
+	// GitHub Actions などの CI では docker が使えないのでテストをスキップ
+	if os.Getenv("CI") == "" {
+		os.Exit(0)
+	}
+
 	code, err := testMainSub(m)
 	if err != nil {
 		log.Println("Test failed:", err)
@@ -42,6 +46,9 @@ func TestMain(m *testing.M) {
 // defer を使うためのサブ関数
 func testMainSub(m *testing.M) (int, error) {
 	defer func() {
+		if sbPythonDev != nil {
+			sbPythonDev.Close()
+		}
 		if sbPython != nil {
 			sbPython.Close()
 		}
@@ -77,8 +84,8 @@ func initSandbox(ctx context.Context) error {
 	slog.Info("initializing sandboxes",
 		slog.String("hostBindDir", hostBindDir),
 		slog.String("containerWorkingDir", containerWorkingDir),
-		slog.Int("containerProcNumLimit", containerProcNumLimit),
-		slog.Int64("containerMemoryLimit[MiB]", int64(containerMemoryLimit/unit.MiB)),
+		slog.Int("containerProcNumLimit", ContainerProcNumLimit),
+		slog.Int64("containerMemoryLimit[MiB]", int64(ContainerMemoryLimit/unit.MiB)),
 	)
 
 	if err := os.RemoveAll(hostBindDir); err != nil {
@@ -90,8 +97,8 @@ func initSandbox(ctx context.Context) error {
 
 	setupWorkingDir := sandbox.WithWorkingDir(containerWorkingDir)
 	setupBindDir := sandbox.WithBindDir(hostBindDir, containerWorkingDir)
-	setupMemoryLimit := sandbox.WithContainerMemoryLimit(containerMemoryLimit)
-	setupProcNumLimit := sandbox.WithProcNumLimit(containerProcNumLimit)
+	setupMemoryLimit := sandbox.WithContainerMemoryLimit(ContainerMemoryLimit)
+	setupProcNumLimit := sandbox.WithProcNumLimit(ContainerProcNumLimit)
 	disableDevMode := sandbox.WithDevMode(false)
 
 	sbGcc, err = sandbox.New(ctx, dc, "szpp-judge-image-gcc13.2",
@@ -129,6 +136,18 @@ func initSandbox(ctx context.Context) error {
 		return err
 	}
 	slog.Info("Created Python container", slog.String("ID", sbPython.ContainerID[:6]))
+
+	sbPythonDev, err = sandbox.New(ctx, dc, "szpp-judge-image-cpython3.11",
+		setupWorkingDir,
+		setupBindDir,
+		setupMemoryLimit,
+		setupProcNumLimit,
+		sandbox.WithDevMode(true),
+	)
+	if err != nil {
+		return err
+	}
+	slog.Info("Created Python container (devMode)", slog.String("ID", sbPythonDev.ContainerID[:6]))
 
 	return nil
 }
