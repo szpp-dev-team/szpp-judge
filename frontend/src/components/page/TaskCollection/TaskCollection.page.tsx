@@ -10,7 +10,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
     difficulty: "beginner",
     haiten: 100,
     title: "すずっぴー君のおつかい",
-    status: "正解",
+    status: "AC",
     score: 100,
   },
   {
@@ -18,7 +18,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
     difficulty: "beginner",
     haiten: 200,
     title: "すずっぴー君の怒り",
-    status: "出力値不正解",
+    status: "WA",
     score: 0,
   },
   {
@@ -26,7 +26,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
     difficulty: "easy",
     haiten: 300,
     title: "すずっぴー君の分裂",
-    status: "正解",
+    status: "AC",
     score: 300,
   },
   {
@@ -40,15 +40,18 @@ const tasks: TaskWithMySubmissionSummary[] = [
     difficulty: "medium",
     haiten: 400,
     title: "師匠との出会い",
-    status: "出力値不正解",
-    score: 0,
+    status: "WJ",
+    progress: {
+      done: 12,
+      total: 40,
+    },
   },
   {
     id: "F",
     difficulty: "beginner",
     haiten: 500,
     title: "師匠の爆散",
-    status: "時間制限エラー",
+    status: "TLE",
     score: 50,
   },
   {
@@ -56,7 +59,7 @@ const tasks: TaskWithMySubmissionSummary[] = [
     difficulty: "hard",
     haiten: 600,
     title: "すずっぴー君の凝固",
-    status: "実行時エラー",
+    status: "RE",
     score: 0,
   },
   {

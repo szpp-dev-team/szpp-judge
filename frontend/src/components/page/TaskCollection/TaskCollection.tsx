@@ -1,3 +1,5 @@
+import { JudgeStatusBadge } from "@/src/components/model/judge/JudgeStatusBadge";
+import { DifficultyBadge } from "@/src/components/model/task/DifficultyBadge";
 import { TaskWithMySubmissionSummary } from "@/src/model/task";
 import { QuestionIcon } from "@chakra-ui/icons";
 import {
@@ -53,10 +55,14 @@ export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
                 {tasks.map(t => (
                   <Tr key={t.id}>
                     <Td textAlign="center">{t.id}</Td>
-                    <Td textAlign="center">{t.difficulty}</Td>
+                    <Td textAlign="center">
+                      <DifficultyBadge dif={t.difficulty} />
+                    </Td>
                     <Td textAlign="center">{t.haiten}</Td>
                     <Td textAlign="left">{t.title}</Td>
-                    <Td textAlign="center">{t?.status ?? "-"}</Td>
+                    <Td textAlign="center">
+                      {t?.status ? <JudgeStatusBadge status={t.status} progress={t?.progress} /> : "-"}
+                    </Td>
                     <Td textAlign="center">{t?.score ?? "-"}</Td>
                   </Tr>
                 ))}

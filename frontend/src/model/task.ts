@@ -1,3 +1,5 @@
+import { JudgeStatus, JudgeTestcaseProgress } from "@/src/model/judge";
+
 export const DifficultyValues = [
   "beginner",
   "easy",
@@ -7,19 +9,6 @@ export const DifficultyValues = [
 ] as const;
 
 export type Difficulty = (typeof DifficultyValues)[number];
-
-const judgeStatuses = [
-  "ジャッジ待ち",
-  "正解",
-  "コンパイルエラー",
-  "メモリ制限エラー",
-  "出力量制限エラー",
-  "実行時エラー",
-  "時間制限エラー",
-  "出力値不正解",
-  "システム不具合",
-] as const;
-type JudgeStatus = (typeof judgeStatuses)[number];
 
 export type Task = {
   id: string;
@@ -31,6 +20,7 @@ export type Task = {
 type withSubmissionSummary = {
   status?: JudgeStatus;
   score?: number;
+  progress?: JudgeTestcaseProgress;
 };
 
 export type TaskWithMySubmissionSummary = Task & withSubmissionSummary;
