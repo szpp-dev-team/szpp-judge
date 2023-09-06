@@ -8,7 +8,7 @@ import "judge/v1/resources.proto";
 
 message User {
   int32 id = 1;
-  string name = 2;
+  string username = 2;
   bool is_admin = 4;
   google.protobuf.Timestamp created_at = 5;
   optional google.protobuf.Timestamp updated_at = 6;
