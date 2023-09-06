@@ -480,12 +480,7 @@ export class CreateContestResponse extends Message<CreateContestResponse> {
  */
 export class GetContestRequest extends Message<GetContestRequest> {
   /**
-   * @generated from field: string name = 1;
-   */
-  name = "";
-
-  /**
-   * @generated from field: string slug = 2;
+   * @generated from field: string slug = 1;
    */
   slug = "";
 
@@ -497,8 +492,7 @@ export class GetContestRequest extends Message<GetContestRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.GetContestRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetContestRequest {
