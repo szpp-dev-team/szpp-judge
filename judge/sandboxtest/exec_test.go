@@ -1,11 +1,13 @@
 package sandboxtest
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/szpp-dev-team/szpp-judge/judge/sandbox"
 )
 
 func TestHelloC(t *testing.T) {
@@ -294,5 +296,53 @@ func TestFileWriteLimit(t *testing.T) {
 		assert.False(t, res.Exec.StdoutOverflowed)
 		assert.False(t, res.Exec.StderrOverflowed)
 		assertExecutionTimeAndMemoryOK(t, res)
+	})
+}
+
+func TestStdoutStderrMerge(t *testing.T) {
+	ctx := context.Background()
+
+	// merge しない場合は stdout, stderr の両方に出力されるはず
+	t.Run("Check stdout and stderr are isolated", func(t *testing.T) {
+		res := CompileAndExec(t, ctx, sbPython, "write_odd_to_stdout_even_to_stderr.py", []byte("5"))
+		assertCompilationNoOutput(t, res)
+		assertCompilationTimeAndMemoryOK(t, res)
+
+		assert.Zero(t, res.Exec.ExitCode)
+		assert.Equal(t, "1\n3\n", res.Exec.Stdout)
+		assert.Equal(t, "0\n2\n4\n", res.Exec.Stderr)
+		assert.False(t, res.Exec.StdoutOverflowed)
+		assert.False(t, res.Exec.StderrOverflowed)
+		assertExecutionTimeAndMemoryOK(t, res)
+	})
+
+	t.Run("Merge stderr to stdout", func(t *testing.T) {
+		langMeta := prepare(t, sbPython, "write_odd_to_stdout_even_to_stderr.py")
+
+		res, err := sbPython.Exec(ctx, sandbox.ExecOption{
+			Stdin:               bytes.NewBuffer([]byte("5")),
+			Cmd:                 langMeta.ExecCmd,
+			StdoutReadLimit:     ExecStdoutReadLimit,
+			StderrReadLimit:     0,
+			MergeStderrToStdout: true,
+		}, ExecLimit)
+		if err != nil {
+			t.Fatalf("Failied to run: %v", err)
+		}
+
+		// 提出コード側 (write_odd_to_stdout_even_to_stderr.py 側)
+		// で明示的に stdout と stderr の同期 (flush) をしない限り、どちらが先に出力されるかは分からない
+		t.Logf("Execution Done: stdout=%q, stderr=%q\n", res.Stdout, res.Stderr)
+		assert.Zero(t, res.ExitCode)
+		assert.Contains(t, res.Stdout, "0\n")
+		assert.Contains(t, res.Stdout, "1\n")
+		assert.Contains(t, res.Stdout, "2\n")
+		assert.Contains(t, res.Stdout, "3\n")
+		assert.Contains(t, res.Stdout, "4\n")
+		assert.Empty(t, res.Stderr)
+		assert.False(t, res.StdoutOverflowed)
+		assert.False(t, res.StderrOverflowed)
+		assert.NotZero(t, res.ExecTime)
+		assert.NotZero(t, res.ExecMemory)
 	})
 }

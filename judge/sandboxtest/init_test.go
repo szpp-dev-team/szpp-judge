@@ -29,7 +29,7 @@ const (
 
 func TestMain(m *testing.M) {
 	// GitHub Actions などの CI では docker が使えないのでテストをスキップ
-	if os.Getenv("CI") == "" {
+	if os.Getenv("CI") != "" {
 		os.Exit(0)
 	}
 

@@ -20,18 +20,7 @@ type Result struct {
 func CompileAndExec(t *testing.T, ctx context.Context, sb *sandbox.Sandbox, filename string, stdin []byte) *Result {
 	t.Helper()
 
-	langID := DetectLang(t, filename)
-	t.Logf("CompileAndExec(): filename=%s, langID=%s", filename, langID)
-
-	langMeta := GetLangMeta(t, langID)
-
-	{
-		src := path.Join(fsutil.GetGoModAbsDir(), "_test_code", filename)
-		dst := path.Join(sb.HostBindDir, langMeta.SourceFile)
-		if err := fsutil.CopyFile(src, dst); err != nil {
-			t.Fatalf("Cannot copy file: %v", err)
-		}
-	}
+	langMeta := prepare(t, sb, filename)
 
 	compileRes, err := sb.Exec(ctx, sandbox.ExecOption{
 		Cmd:                 langMeta.CompileCmd,
@@ -80,6 +69,25 @@ func CompileAndExec(t *testing.T, ctx context.Context, sb *sandbox.Sandbox, file
 		Compile: compileRes,
 		Exec:    execRes,
 	}
+}
+
+func prepare(t *testing.T, sb *sandbox.Sandbox, filename string) *langs.Meta {
+	t.Helper()
+
+	langID := DetectLang(t, filename)
+	t.Logf("CompileAndExec(): filename=%s, langID=%s", filename, langID)
+
+	langMeta := GetLangMeta(t, langID)
+
+	{
+		src := path.Join(fsutil.GetGoModAbsDir(), "_test_code", filename)
+		dst := path.Join(sb.HostBindDir, langMeta.SourceFile)
+		if err := fsutil.CopyFile(src, dst); err != nil {
+			t.Fatalf("Cannot copy file: %v", err)
+		}
+	}
+
+	return langMeta
 }
 
 func GetLangMeta(t *testing.T, id langs.LangID) *langs.Meta {
