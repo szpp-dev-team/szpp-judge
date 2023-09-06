@@ -45,10 +45,11 @@ message PingResponse {
 }
 
 message CreateContestRequest {
-  string slug = 1;
-  string description = 2;
-  google.protobuf.Timestamp start_at = 3;
-  google.protobuf.Timestamp end_at = 4;
+  string name = 1;
+  string slug = 2;
+  string description = 3;
+  google.protobuf.Timestamp start_at = 4;
+  google.protobuf.Timestamp end_at = 5;
 }
 
 message CreateContestResponse {
