@@ -22,7 +22,6 @@ export const Register = () => {
   const {
     register,
     handleSubmit,
-    setError: setFormError,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
     mode: "onChange",
