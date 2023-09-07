@@ -9,6 +9,7 @@ import { z } from "zod";
 import { InputOrganism } from "../../ui/InputOrganism";
 import { Link } from "../../ui/Link";
 import { PasswordInput } from "../../ui/PasswordInput";
+import { useState } from "react";
 
 type FormFields = z.infer<typeof userRegistrationSchema>;
 
@@ -48,6 +49,8 @@ export const Register = () => {
   });
 
   const formId = "register-form";
+
+  const [policyAgreed, setPolicyAgreed] = useState(false);
 
   return (
     <Container maxW="48rem" py="7rem" px="2rem">
@@ -95,13 +98,13 @@ export const Register = () => {
             >
               <PasswordInput {...register("confPassword")} />
             </InputOrganism>
-            <Checkbox>
-              <Link href = "/tos">利用規約</Link> および <Link href = "/privacy"> 個人情報の取り扱い</Link> に同意する
+            <Checkbox required isChecked={policyAgreed} onChange={() => setPolicyAgreed(!policyAgreed)}>
+              <Link href="/tos">利用規約</Link> および <Link href="/privacy"> 個人情報の取り扱い</Link> に同意する
             </Checkbox>
           </form>
         </CardBody>
         <CardFooter flexDirection="column" alignItems="center" gap={2}>
-          <Button type="submit" form={formId} size="lg" colorScheme="teal" isLoading={isSubmitting}>
+        <Button type="submit" form={formId} size="lg" colorScheme={policyAgreed ? "teal" : "blackAlpha"} isLoading={isSubmitting}>
             登録
           </Button>
         </CardFooter>
