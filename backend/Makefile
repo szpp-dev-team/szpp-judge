@@ -9,12 +9,15 @@ tbls/generate:
 
 .PHONY: mysql/start
 mysql/start:
-	$(eval CONTAINER_ID := $(shell docker run -d -P \
+	ifeq ($(CI),true)
+		$(eval CONTAINER_ID := docker ps | grep mariadb | awk '{print $1}')
+	else
+		$(eval CONTAINER_ID := $(shell docker run -d -P \
 		-e MYSQL_DATABASE=szpp-judge-db \
 		-e MYSQL_ROOT_PASSWORD=szpp \
-		mysql:8.0))
+		mariadb:11.1))
+	endif
 	@echo $(CONTAINER_ID)
-
 
 .PHONY: test
 test: mysql/start
