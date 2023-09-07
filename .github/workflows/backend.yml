@@ -72,7 +72,8 @@ jobs:
         with:
           go-version-file: backend/go.mod
       - name: Run tests with coverage report output
-        run: go test ./... -coverprofile=coverage.out
+        working-directory: backend
+        run: make test-ci
       - name: Report coverage
         uses: k1LoW/octocov-action@v0
         with:
