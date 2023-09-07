@@ -139,6 +139,79 @@ export class User extends Message<User> {
 }
 
 /**
+ * @generated from message backend.v1.Contest
+ */
+export class Contest extends Message<Contest> {
+  /**
+   * @generated from field: int32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string slug = 3;
+   */
+  slug = "";
+
+  /**
+   * @generated from field: string description = 4;
+   */
+  description = "";
+
+  /**
+   * @generated from field: repeated int32 task_ids = 5;
+   */
+  taskIds: number[] = [];
+
+  /**
+   * @generated from field: google.protobuf.Timestamp start_at = 6;
+   */
+  startAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp end_at = 7;
+   */
+  endAt?: Timestamp;
+
+  constructor(data?: PartialMessage<Contest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.Contest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "task_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
+    { no: 6, name: "start_at", kind: "message", T: Timestamp },
+    { no: 7, name: "end_at", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Contest {
+    return new Contest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Contest {
+    return new Contest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Contest {
+    return new Contest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Contest | PlainMessage<Contest> | undefined, b: Contest | PlainMessage<Contest> | undefined): boolean {
+    return proto3.util.equals(Contest, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.Clarification
  */
 export class Clarification extends Message<Clarification> {

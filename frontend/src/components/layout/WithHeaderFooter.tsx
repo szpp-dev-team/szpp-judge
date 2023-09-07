@@ -11,9 +11,9 @@ export const WithHeaderFooter: FC<WithHeaderFooterProps> = ({ children }) => {
   // 子要素で height=100% がうまく機能するためには、親要素で height が auto になってはならない
   // そこで、適当に height=1px を設定することで非 auto にするというトリックを施している
   return (
-    <Flex flexDirection="column" minH="100vh" h="1px" bg="gray.200">
+    <Flex flexDirection="column" minH="100vh" h="1px">
       <GlobalHeader />
-      <Box as="main" height="100%">{children}</Box>
+      <Box as="main" bg="gray.200">{children}</Box>
       <GlobalFooter mt="auto" />
     </Flex>
   );
