@@ -5,6 +5,7 @@ on:
       - develop
     paths:
       - frontend/**
+      - '!frontend/src/gen/**'
       - .github/workflows/frontend.yml
   pull_request:
     branches:
