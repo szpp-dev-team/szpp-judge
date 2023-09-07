@@ -22,9 +22,8 @@ message Contest {
   google.protobuf.Timestamp end_at = 7;
 }
 
-
-message StandingsElement{
-  message TaskDetail{
+message StandingsElement {
+  message TaskDetail {
     int32 task_id = 1;
     int32 penalty_count = 2;
     int32 ac_submit_id = 3;
