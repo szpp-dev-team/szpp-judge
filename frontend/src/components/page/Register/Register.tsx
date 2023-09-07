@@ -37,7 +37,7 @@ export const Register = () => {
         title: `${resp.username} で登録しました`,
         status: "success",
       });
-      router.replace("/");
+      router.push("/");
     } catch (e) {
       toast({
         title: "登録に失敗しました",
