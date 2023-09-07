@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -20,6 +21,7 @@ type TestcaseSetCreate struct {
 	config
 	mutation *TestcaseSetMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetName sets the "name" field.
@@ -174,6 +176,7 @@ func (tsc *TestcaseSetCreate) createSpec() (*TestcaseSet, *sqlgraph.CreateSpec) 
 		_node = &TestcaseSet{config: tsc.config}
 		_spec = sqlgraph.NewCreateSpec(testcaseset.Table, sqlgraph.NewFieldSpec(testcaseset.FieldID, field.TypeInt))
 	)
+	_spec.OnConflict = tsc.conflict
 	if id, ok := tsc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -234,10 +237,297 @@ func (tsc *TestcaseSetCreate) createSpec() (*TestcaseSet, *sqlgraph.CreateSpec) 
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TestcaseSet.Create().
+//		SetName(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestcaseSetUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+func (tsc *TestcaseSetCreate) OnConflict(opts ...sql.ConflictOption) *TestcaseSetUpsertOne {
+	tsc.conflict = opts
+	return &TestcaseSetUpsertOne{
+		create: tsc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TestcaseSet.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (tsc *TestcaseSetCreate) OnConflictColumns(columns ...string) *TestcaseSetUpsertOne {
+	tsc.conflict = append(tsc.conflict, sql.ConflictColumns(columns...))
+	return &TestcaseSetUpsertOne{
+		create: tsc,
+	}
+}
+
+type (
+	// TestcaseSetUpsertOne is the builder for "upsert"-ing
+	//  one TestcaseSet node.
+	TestcaseSetUpsertOne struct {
+		create *TestcaseSetCreate
+	}
+
+	// TestcaseSetUpsert is the "OnConflict" setter.
+	TestcaseSetUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetName sets the "name" field.
+func (u *TestcaseSetUpsert) SetName(v string) *TestcaseSetUpsert {
+	u.Set(testcaseset.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TestcaseSetUpsert) UpdateName() *TestcaseSetUpsert {
+	u.SetExcluded(testcaseset.FieldName)
+	return u
+}
+
+// SetScore sets the "score" field.
+func (u *TestcaseSetUpsert) SetScore(v int) *TestcaseSetUpsert {
+	u.Set(testcaseset.FieldScore, v)
+	return u
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *TestcaseSetUpsert) UpdateScore() *TestcaseSetUpsert {
+	u.SetExcluded(testcaseset.FieldScore)
+	return u
+}
+
+// AddScore adds v to the "score" field.
+func (u *TestcaseSetUpsert) AddScore(v int) *TestcaseSetUpsert {
+	u.Add(testcaseset.FieldScore, v)
+	return u
+}
+
+// SetIsSample sets the "is_sample" field.
+func (u *TestcaseSetUpsert) SetIsSample(v bool) *TestcaseSetUpsert {
+	u.Set(testcaseset.FieldIsSample, v)
+	return u
+}
+
+// UpdateIsSample sets the "is_sample" field to the value that was provided on create.
+func (u *TestcaseSetUpsert) UpdateIsSample() *TestcaseSetUpsert {
+	u.SetExcluded(testcaseset.FieldIsSample)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TestcaseSetUpsert) SetCreatedAt(v time.Time) *TestcaseSetUpsert {
+	u.Set(testcaseset.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TestcaseSetUpsert) UpdateCreatedAt() *TestcaseSetUpsert {
+	u.SetExcluded(testcaseset.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestcaseSetUpsert) SetUpdatedAt(v time.Time) *TestcaseSetUpsert {
+	u.Set(testcaseset.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestcaseSetUpsert) UpdateUpdatedAt() *TestcaseSetUpsert {
+	u.SetExcluded(testcaseset.FieldUpdatedAt)
+	return u
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (u *TestcaseSetUpsert) ClearUpdatedAt() *TestcaseSetUpsert {
+	u.SetNull(testcaseset.FieldUpdatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.TestcaseSet.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(testcaseset.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *TestcaseSetUpsertOne) UpdateNewValues() *TestcaseSetUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(testcaseset.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TestcaseSet.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *TestcaseSetUpsertOne) Ignore() *TestcaseSetUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestcaseSetUpsertOne) DoNothing() *TestcaseSetUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestcaseSetCreate.OnConflict
+// documentation for more info.
+func (u *TestcaseSetUpsertOne) Update(set func(*TestcaseSetUpsert)) *TestcaseSetUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestcaseSetUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *TestcaseSetUpsertOne) SetName(v string) *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TestcaseSetUpsertOne) UpdateName() *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetScore sets the "score" field.
+func (u *TestcaseSetUpsertOne) SetScore(v int) *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetScore(v)
+	})
+}
+
+// AddScore adds v to the "score" field.
+func (u *TestcaseSetUpsertOne) AddScore(v int) *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.AddScore(v)
+	})
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *TestcaseSetUpsertOne) UpdateScore() *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateScore()
+	})
+}
+
+// SetIsSample sets the "is_sample" field.
+func (u *TestcaseSetUpsertOne) SetIsSample(v bool) *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetIsSample(v)
+	})
+}
+
+// UpdateIsSample sets the "is_sample" field to the value that was provided on create.
+func (u *TestcaseSetUpsertOne) UpdateIsSample() *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateIsSample()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TestcaseSetUpsertOne) SetCreatedAt(v time.Time) *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TestcaseSetUpsertOne) UpdateCreatedAt() *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestcaseSetUpsertOne) SetUpdatedAt(v time.Time) *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestcaseSetUpsertOne) UpdateUpdatedAt() *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (u *TestcaseSetUpsertOne) ClearUpdatedAt() *TestcaseSetUpsertOne {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.ClearUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *TestcaseSetUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestcaseSetCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestcaseSetUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *TestcaseSetUpsertOne) ID(ctx context.Context) (id int, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *TestcaseSetUpsertOne) IDX(ctx context.Context) int {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // TestcaseSetCreateBulk is the builder for creating many TestcaseSet entities in bulk.
 type TestcaseSetCreateBulk struct {
 	config
 	builders []*TestcaseSetCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the TestcaseSet entities in the database.
@@ -263,6 +553,7 @@ func (tscb *TestcaseSetCreateBulk) Save(ctx context.Context) ([]*TestcaseSet, er
 					_, err = mutators[i+1].Mutate(root, tscb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = tscb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, tscb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -313,6 +604,201 @@ func (tscb *TestcaseSetCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (tscb *TestcaseSetCreateBulk) ExecX(ctx context.Context) {
 	if err := tscb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TestcaseSet.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestcaseSetUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+func (tscb *TestcaseSetCreateBulk) OnConflict(opts ...sql.ConflictOption) *TestcaseSetUpsertBulk {
+	tscb.conflict = opts
+	return &TestcaseSetUpsertBulk{
+		create: tscb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TestcaseSet.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (tscb *TestcaseSetCreateBulk) OnConflictColumns(columns ...string) *TestcaseSetUpsertBulk {
+	tscb.conflict = append(tscb.conflict, sql.ConflictColumns(columns...))
+	return &TestcaseSetUpsertBulk{
+		create: tscb,
+	}
+}
+
+// TestcaseSetUpsertBulk is the builder for "upsert"-ing
+// a bulk of TestcaseSet nodes.
+type TestcaseSetUpsertBulk struct {
+	create *TestcaseSetCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.TestcaseSet.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(testcaseset.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *TestcaseSetUpsertBulk) UpdateNewValues() *TestcaseSetUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(testcaseset.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TestcaseSet.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *TestcaseSetUpsertBulk) Ignore() *TestcaseSetUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestcaseSetUpsertBulk) DoNothing() *TestcaseSetUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestcaseSetCreateBulk.OnConflict
+// documentation for more info.
+func (u *TestcaseSetUpsertBulk) Update(set func(*TestcaseSetUpsert)) *TestcaseSetUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestcaseSetUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *TestcaseSetUpsertBulk) SetName(v string) *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TestcaseSetUpsertBulk) UpdateName() *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetScore sets the "score" field.
+func (u *TestcaseSetUpsertBulk) SetScore(v int) *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetScore(v)
+	})
+}
+
+// AddScore adds v to the "score" field.
+func (u *TestcaseSetUpsertBulk) AddScore(v int) *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.AddScore(v)
+	})
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *TestcaseSetUpsertBulk) UpdateScore() *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateScore()
+	})
+}
+
+// SetIsSample sets the "is_sample" field.
+func (u *TestcaseSetUpsertBulk) SetIsSample(v bool) *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetIsSample(v)
+	})
+}
+
+// UpdateIsSample sets the "is_sample" field to the value that was provided on create.
+func (u *TestcaseSetUpsertBulk) UpdateIsSample() *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateIsSample()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TestcaseSetUpsertBulk) SetCreatedAt(v time.Time) *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TestcaseSetUpsertBulk) UpdateCreatedAt() *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestcaseSetUpsertBulk) SetUpdatedAt(v time.Time) *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestcaseSetUpsertBulk) UpdateUpdatedAt() *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (u *TestcaseSetUpsertBulk) ClearUpdatedAt() *TestcaseSetUpsertBulk {
+	return u.Update(func(s *TestcaseSetUpsert) {
+		s.ClearUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *TestcaseSetUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TestcaseSetCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestcaseSetCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestcaseSetUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
