@@ -11,7 +11,7 @@ export const userHandlers: RequestHandler[] = [
     if (!ok) {
       return res(
         ctx.delay(500),
-        ctx.status(401), // 401 Unauthorized
+        ctx.status(400), // 400 Bad Request
       );
     }
     return res(
