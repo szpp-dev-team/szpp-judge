@@ -24,6 +24,7 @@ func NewTestClient(t *testing.T) *ent.Client {
 		Addr:      "0.0.0.0:" + os.Getenv("TEST_MYSQL_PORT"),
 		Net:       "tcp",
 		ParseTime: true,
+		AllowNativePasswords: true,
 	}
 	db, err := sql.Open("mysql", mysqlConfig.FormatDSN())
 	require.NoError(t, err)
