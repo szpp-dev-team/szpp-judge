@@ -228,9 +228,14 @@ export class PersonalStandings_TaskDetail extends Message<PersonalStandings_Task
   penaltyCount = 0;
 
   /**
-   * @generated from field: google.protobuf.Timestamp ac_at = 3;
+   * @generated from field: int32 ac_submit_id = 3;
    */
-  acAt?: Timestamp;
+  acSubmitId = 0;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp ac_required = 4;
+   */
+  acRequired?: Timestamp;
 
   constructor(data?: PartialMessage<PersonalStandings_TaskDetail>) {
     super();
@@ -242,7 +247,8 @@ export class PersonalStandings_TaskDetail extends Message<PersonalStandings_Task
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "penalty_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "ac_at", kind: "message", T: Timestamp },
+    { no: 3, name: "ac_submit_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "ac_required", kind: "message", T: Timestamp },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PersonalStandings_TaskDetail {
