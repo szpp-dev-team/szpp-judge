@@ -45,7 +45,7 @@ export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
             </Flex>
           </Flex>
           <TableContainer>
-            <Table variant="bordered">
+            <Table variant="bordered-narrow">
               <Thead>
                 <Tr>
                   <Th textAlign="center">#</Th>
@@ -66,7 +66,7 @@ export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
                       <DifficultyBadge dif={t.difficulty} />
                     </Td>
                     <Td textAlign="center">{t.haiten}</Td>
-                    <Td textAlign="left">
+                    <Td textAlign="left" whiteSpace="normal" minW={56}>
                       <Link href={`/contests/${contest_slug}/tasks/${t.slug}`}>{t.title}</Link>
                     </Td>
                     <Td textAlign="center">
