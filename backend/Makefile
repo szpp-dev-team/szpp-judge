@@ -10,7 +10,7 @@ tbls/generate:
 .PHONY: mysql/start
 mysql/start:
 ifeq ($(CI),true)
-	$(eval CONTAINER_ID := docker ps | grep mariadb | awk '{print $1}')
+	$(eval CONTAINER_ID := $(shell docker ps | grep mariadb | awk '{print $$1}'))
 else
 	$(eval CONTAINER_ID := $(shell docker run -d -P \
 		-e MYSQL_DATABASE=szpp-judge-test-db \
