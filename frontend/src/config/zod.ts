@@ -10,6 +10,12 @@ export const defaultErrorMap: ZodErrorMap = (issue, ctx) => {
       }
       return defaultMessage;
 
+    case ZodIssueCode.invalid_string:
+      if (issue.validation === "email") {
+        return { message: "メールアドレスの形式が正しくありません" };
+      }
+      return defaultMessage;
+
     case ZodIssueCode.too_big: {
       if (issue.type === "string") {
         return {
