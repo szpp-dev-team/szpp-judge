@@ -5,10 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-<<<<<<< HEAD
 import { JudgeStatus } from "../../judge/v1/resources_pb";
-=======
-import { JudgeType } from "../../judge/v1/judge_type_pb";
 
 /**
  * @generated from enum backend.v1.Visibility
@@ -35,7 +32,6 @@ proto3.util.setEnumType(Visibility, "backend.v1.Visibility", [
   { no: 1, name: "PUBLIC" },
   { no: 2, name: "PRIVATE" },
 ]);
->>>>>>> develop
 
 /**
  * @generated from enum backend.v1.Difficulty
@@ -400,11 +396,11 @@ export class Task extends Message<Task> {
   contestIds: number[] = [];
 
   /**
-   * Judge の type(完全一致、誤差など)
+   * Judge の status(完全一致、誤差など)
    *
-   * @generated from field: judge.v1.JudgeType judge_type = 7;
+   * @generated from field: judge.v1.JudgeStatus judge_status = 7;
    */
-  judgeType?: JudgeType;
+  judgeStatus = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
 
   /**
    * @generated from field: backend.v1.Difficulty difficulty = 8;
@@ -435,7 +431,7 @@ export class Task extends Message<Task> {
     { no: 4, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 6, name: "contest_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
-    { no: 7, name: "judge_type", kind: "message", T: JudgeType },
+    { no: 7, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
     { no: 8, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
     { no: 9, name: "created_at", kind: "message", T: Timestamp },
     { no: 10, name: "updated_at", kind: "message", T: Timestamp, opt: true },
@@ -491,11 +487,11 @@ export class MutationTask extends Message<MutationTask> {
   execMemoryLimit = 0;
 
   /**
-   * Judge の type(完全一致、誤差など)
+   * Judge の status(完全一致、誤差など)
    *
-   * @generated from field: judge.v1.JudgeType judge_type = 5;
+   * @generated from field: judge.v1.JudgeStatus judge_status = 5;
    */
-  judgeType?: JudgeType;
+  judgeStatus = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
 
   /**
    * @generated from field: backend.v1.Difficulty difficulty = 6;
@@ -514,7 +510,7 @@ export class MutationTask extends Message<MutationTask> {
     { no: 2, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "judge_type", kind: "message", T: JudgeType },
+    { no: 5, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
     { no: 6, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
   ]);
 
