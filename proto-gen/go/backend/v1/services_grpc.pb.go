@@ -882,3 +882,165 @@ var HealthcheckService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "backend/v1/services.proto",
 }
+
+const (
+	ContestService_CreateContest_FullMethodName = "/backend.v1.ContestService/CreateContest"
+	ContestService_GetContest_FullMethodName    = "/backend.v1.ContestService/GetContest"
+	ContestService_ListContests_FullMethodName  = "/backend.v1.ContestService/ListContests"
+)
+
+// ContestServiceClient is the client API for ContestService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ContestServiceClient interface {
+	CreateContest(ctx context.Context, in *CreateContestRequest, opts ...grpc.CallOption) (*CreateContestResponse, error)
+	GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error)
+	ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error)
+}
+
+type contestServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewContestServiceClient(cc grpc.ClientConnInterface) ContestServiceClient {
+	return &contestServiceClient{cc}
+}
+
+func (c *contestServiceClient) CreateContest(ctx context.Context, in *CreateContestRequest, opts ...grpc.CallOption) (*CreateContestResponse, error) {
+	out := new(CreateContestResponse)
+	err := c.cc.Invoke(ctx, ContestService_CreateContest_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error) {
+	out := new(GetContestResponse)
+	err := c.cc.Invoke(ctx, ContestService_GetContest_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error) {
+	out := new(ListContestsResponse)
+	err := c.cc.Invoke(ctx, ContestService_ListContests_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ContestServiceServer is the server API for ContestService service.
+// All implementations should embed UnimplementedContestServiceServer
+// for forward compatibility
+type ContestServiceServer interface {
+	CreateContest(context.Context, *CreateContestRequest) (*CreateContestResponse, error)
+	GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error)
+	ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error)
+}
+
+// UnimplementedContestServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedContestServiceServer struct {
+}
+
+func (UnimplementedContestServiceServer) CreateContest(context.Context, *CreateContestRequest) (*CreateContestResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateContest not implemented")
+}
+func (UnimplementedContestServiceServer) GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetContest not implemented")
+}
+func (UnimplementedContestServiceServer) ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListContests not implemented")
+}
+
+// UnsafeContestServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ContestServiceServer will
+// result in compilation errors.
+type UnsafeContestServiceServer interface {
+	mustEmbedUnimplementedContestServiceServer()
+}
+
+func RegisterContestServiceServer(s grpc.ServiceRegistrar, srv ContestServiceServer) {
+	s.RegisterService(&ContestService_ServiceDesc, srv)
+}
+
+func _ContestService_CreateContest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateContestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).CreateContest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_CreateContest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).CreateContest(ctx, req.(*CreateContestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_GetContest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetContestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).GetContest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_GetContest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).GetContest(ctx, req.(*GetContestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_ListContests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContestsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).ListContests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_ListContests_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).ListContests(ctx, req.(*ListContestsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ContestService_ServiceDesc is the grpc.ServiceDesc for ContestService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ContestService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "backend.v1.ContestService",
+	HandlerType: (*ContestServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateContest",
+			Handler:    _ContestService_CreateContest_Handler,
+		},
+		{
+			MethodName: "GetContest",
+			Handler:    _ContestService_GetContest_Handler,
+		},
+		{
+			MethodName: "ListContests",
+			Handler:    _ContestService_ListContests_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "backend/v1/services.proto",
+}
