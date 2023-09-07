@@ -1,15 +1,26 @@
 import { CreateUserRequest } from "@/src/gen/proto/backend/v1/messages_pb";
 import { userRepo } from "@/src/repository/user";
 import { userRegistrationSchema } from "@/src/zschema/user";
-import { Button, Card, CardBody, CardFooter, CardHeader, Container, Heading, Input, useToast, Checkbox } from "@chakra-ui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Checkbox,
+  Container,
+  Heading,
+  Input,
+  useToast,
+} from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { InputOrganism } from "../../ui/InputOrganism";
 import { Link } from "../../ui/Link";
 import { PasswordInput } from "../../ui/PasswordInput";
-import { useState } from "react";
 
 type FormFields = z.infer<typeof userRegistrationSchema>;
 
@@ -98,12 +109,18 @@ export const Register = () => {
               <PasswordInput {...register("confPassword")} />
             </InputOrganism>
             <Checkbox required isChecked={policyAgreed} onChange={() => setPolicyAgreed(!policyAgreed)}>
-              <Link href="/tos">利用規約</Link> および <Link href="/privacy"> 個人情報の取り扱い</Link> に同意する
+              <Link href="/tos">利用規約</Link> および <Link href="/privacy">個人情報の取り扱い</Link> に同意する
             </Checkbox>
           </form>
         </CardBody>
         <CardFooter flexDirection="column" alignItems="center" gap={2}>
-        <Button type="submit" form={formId} size="lg" colorScheme={policyAgreed ? "teal" : "blackAlpha"} isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            form={formId}
+            size="lg"
+            colorScheme={policyAgreed ? "teal" : "blackAlpha"}
+            isLoading={isSubmitting}
+          >
             登録
           </Button>
         </CardFooter>
