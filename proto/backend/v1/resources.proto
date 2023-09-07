@@ -55,7 +55,7 @@ message Task {
 }
 
 message MutationTask {
-  optional int32 id = 1;  // Update 時のみ set
+  optional int32 id = 1; // Update 時のみ set
   string title = 2; // 問題名
   string statement = 3; // 問題文
   int32 exec_time_limit = 4; // 実行時間制限[ms]
