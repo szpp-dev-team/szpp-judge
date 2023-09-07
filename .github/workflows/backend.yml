@@ -58,6 +58,14 @@ jobs:
           ref: ${{ steps.upstreambranch.outputs.branch }}
   test:
     runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.1
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: szpp-judge-db
+          MYSQL_ROOT_PASSWORD: szpp
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
