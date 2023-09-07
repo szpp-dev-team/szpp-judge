@@ -75,5 +75,5 @@ message GetStandingsRequest{
 }
 
 message GetStandingsResponse{
-  repeated PersonalStandings standings_list = 1;
+  repeated StandingsElement standings_list = 1;
 }
