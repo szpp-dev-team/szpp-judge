@@ -21,15 +21,11 @@ endif
 
 .PHONY: test
 test: mysql/start
-	@TEST_MYSQL_PORT=$(shell docker port $(CONTAINER_ID) | rg 3306/tcp | awk -F ' -> ' '{print $$2}' | awk -F ':' '{print $$2}') \
-	MYSQL_DATABASE=szpp-judge-db \
-	MYSQL_ROOT_PASSWORD=root \
+	@TEST_MYSQL_PORT=$(shell docker port $(CONTAINER_ID) | grep 3306/tcp | awk -F ' -> ' '{print $$2}' | awk -F ':' '{print $$2}') \
 	go test ./... -v \
 	; docker rm -f $(CONTAINER_ID)
 
 .PHONY: test-ci
 test-ci: mysql/start
-	@TEST_MYSQL_PORT=$(shell docker port $(CONTAINER_ID) | rg 3306/tcp | awk -F ' -> ' '{print $$2}' | awk -F ':' '{print $$2}') \
-	MYSQL_DATABASE=szpp-judge-db \
-	MYSQL_ROOT_PASSWORD=root \
+	@TEST_MYSQL_PORT=$(shell docker port $(CONTAINER_ID) | grep 3306/tcp | awk -F ' -> ' '{print $$2}' | awk -F ':' '{print $$2}') \
 	go test ./... -v -coverprofile=coverage.out
