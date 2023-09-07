@@ -24,6 +24,7 @@ const registrationPassword = loginPassword
   .regex(/[\x20-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/, "半角記号を含めてください");
 
 const email = z.string()
+  .min(1)
   .email();
 
 export const userLoginSchema = z.object({
@@ -35,4 +36,13 @@ export const userRegistrationSchema = z.object({
   email,
   username,
   password: registrationPassword,
+  confPassword: loginPassword,
+}).superRefine((values, ctx) => {
+  if (values.password !== values.confPassword) {
+    ctx.addIssue({
+      path: ["confPassword"],
+      code: "custom",
+      message: "パスワードが一致しません",
+    });
+  }
 });

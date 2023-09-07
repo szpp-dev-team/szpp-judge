@@ -5,6 +5,7 @@ on:
       - develop
     paths:
       - frontend/**
+      - '!frontend/src/gen/**'
       - .github/workflows/frontend-deploy-preview.yml
 defaults:
   run:

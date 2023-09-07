@@ -57,3 +57,9 @@ service TaskService {
 service HealthcheckService {
   rpc Ping(PingRequest) returns (PingResponse);
 }
+
+service ContestService {
+  rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
+  rpc GetContest(GetContestRequest) returns (GetContestResponse);
+  rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
+}
