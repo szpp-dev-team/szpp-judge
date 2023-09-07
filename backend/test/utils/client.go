@@ -18,12 +18,12 @@ func NewTestClient(t *testing.T) *ent.Client {
 	t.Helper()
 
 	mysqlConfig := &mysql.Config{
-		DBName:    "szpp-judge-test-db",
-		User:      "root",
-		Passwd:    "root",
-		Addr:      "0.0.0.0:" + os.Getenv("TEST_MYSQL_PORT"),
-		Net:       "tcp",
-		ParseTime: true,
+		DBName:               "szpp-judge-test-db",
+		User:                 "root",
+		Passwd:               "root",
+		Addr:                 "0.0.0.0:" + os.Getenv("TEST_MYSQL_PORT"),
+		Net:                  "tcp",
+		ParseTime:            true,
 		AllowNativePasswords: true,
 	}
 	db, err := sql.Open("mysql", mysqlConfig.FormatDSN())
