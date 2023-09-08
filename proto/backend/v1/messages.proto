@@ -30,6 +30,8 @@ message LoginRequest {
 
 message LoginResponse {
   User user = 1;
+  string access_token = 2;
+  string refresh_token = 3;
 }
 
 message RefreshAccessTokenRequest {
