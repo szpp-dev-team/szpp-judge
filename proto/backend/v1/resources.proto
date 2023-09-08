@@ -3,8 +3,8 @@ syntax = "proto3";
 package backend.v1;
 
 import "google/protobuf/timestamp.proto";
-import "judge/v1/judge_type.proto";
 import "judge/v1/resources.proto";
+import "judge/v1/judge_type.proto";
 
 message User {
   int32 id = 1;
@@ -120,7 +120,7 @@ message SubmissionDetail {
   int32 id = 1;
   // user
   int32 user_id = 2;
-  string user_name = 3;
+  string username = 3;
   // contest
   optional int32 contest_id = 4; // コンテスト中の提出でなければ null
   // task
@@ -146,7 +146,7 @@ message SubmissionSummary {
   int32 id = 1;
   // user
   int32 user_id = 2;
-  string user_name = 3;
+  string username = 3;
   // contest
   optional int32 contest_id = 4;
   // task
