@@ -16,13 +16,13 @@ func (TestcaseResult) Field() []ent.Field {
 		field.Int("submission_id"),
 		field.Int("testcase_id"),
 		field.String("status"),
-		field.Int("exec_time"), // ms
+		field.Int("exec_time"),   // ms
 		field.Int("exec_memory"), // kib
 	}
 }
 
 func (TestcaseResult) Edge() []ent.Edge {
-	return []ent.Edge {
+	return []ent.Edge{
 		edge.From("submit", Submit.Type),
 	}
 }

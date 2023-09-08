@@ -11,14 +11,14 @@ type Submit struct {
 }
 
 func (Submit) Field() []ent.Field {
-	return []ent.Field {
+	return []ent.Field{
 		field.Int("id"),
 		field.Int("user_id"),
 		field.Int("contest_id").Optional(),
 		field.Int("task_id"),
 		field.Int("language_id"),
 		field.String("status"),
-		field.Int("exec_time"), // ms
+		field.Int("exec_time"),   // ms
 		field.Int("exec_memory"), // kib
 		field.Time("submitted_at"),
 		field.Time("created_at"),
@@ -27,7 +27,7 @@ func (Submit) Field() []ent.Field {
 }
 
 func (Submit) Edges() []ent.Edge {
-	return []ent.Edge {
+	return []ent.Edge{
 		edge.To("user", User.Type),
 		// edge.To("task", Task.Type),
 		edge.To("language", Language.Type),
