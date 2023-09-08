@@ -139,7 +139,7 @@ var file_backend_v1_services_proto_rawDesc = []byte{
 	0x67, 0x12, 0x17, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x50,
 	0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x62, 0x61, 0x63,
 	0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x32, 0x86, 0x02, 0x0a, 0x0e, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74,
+	0x6f, 0x6e, 0x73, 0x65, 0x32, 0xd9, 0x02, 0x0a, 0x0e, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74,
 	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x54, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74,
 	0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x12, 0x20, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65,
 	0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74,
@@ -155,19 +155,24 @@ var file_backend_v1_services_proto_rawDesc = []byte{
 	0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6f, 0x6e, 0x74,
 	0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x62, 0x61,
 	0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6f, 0x6e,
-	0x74, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0xaf, 0x01,
-	0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31,
-	0x42, 0x0d, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
-	0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x7a,
-	0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d, 0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70,
-	0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65, 0x6e,
-	0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b, 0x62,
-	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02,
-	0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a, 0x42, 0x61,
-	0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63, 0x6b, 0x65,
-	0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74,
-	0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x51, 0x0a,
+	0x0c, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x1f, 0x2e,
+	0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x74,
+	0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20,
+	0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x53,
+	0x74, 0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x42, 0xaf, 0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64,
+	0x2e, 0x76, 0x31, 0x42, 0x0d, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d, 0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73,
+	0x7a, 0x70, 0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d,
+	0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76,
+	0x31, 0x3b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x42, 0x58,
+	0x58, 0xaa, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02,
+	0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x16, 0x42, 0x61,
+	0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
+	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a,
+	0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var file_backend_v1_services_proto_goTypes = []interface{}{
@@ -195,30 +200,32 @@ var file_backend_v1_services_proto_goTypes = []interface{}{
 	(*CreateContestRequest)(nil),        // 21: backend.v1.CreateContestRequest
 	(*GetContestRequest)(nil),           // 22: backend.v1.GetContestRequest
 	(*ListContestsRequest)(nil),         // 23: backend.v1.ListContestsRequest
-	(*GetUserResponse)(nil),             // 24: backend.v1.GetUserResponse
-	(*CreateUserResponse)(nil),          // 25: backend.v1.CreateUserResponse
-	(*LoginResponse)(nil),               // 26: backend.v1.LoginResponse
-	(*LogoutResponse)(nil),              // 27: backend.v1.LogoutResponse
-	(*CreateTaskResponse)(nil),          // 28: backend.v1.CreateTaskResponse
-	(*GetTaskResponse)(nil),             // 29: backend.v1.GetTaskResponse
-	(*UpdateTaskResponse)(nil),          // 30: backend.v1.UpdateTaskResponse
-	(*SubmitResponse)(nil),              // 31: backend.v1.SubmitResponse
-	(*GetSubmissionDetailResponse)(nil), // 32: backend.v1.GetSubmissionDetailResponse
-	(*ListSubmissionsResponse)(nil),     // 33: backend.v1.ListSubmissionsResponse
-	(*GetJudgeProgressResponse)(nil),    // 34: backend.v1.GetJudgeProgressResponse
-	(*CreateClarificationResponse)(nil), // 35: backend.v1.CreateClarificationResponse
-	(*GetClarificationResponse)(nil),    // 36: backend.v1.GetClarificationResponse
-	(*ListClarificationsResponse)(nil),  // 37: backend.v1.ListClarificationsResponse
-	(*UpdateClarificationResponse)(nil), // 38: backend.v1.UpdateClarificationResponse
-	(*DeleteClarificationResponse)(nil), // 39: backend.v1.DeleteClarificationResponse
-	(*CreateAnswerResponse)(nil),        // 40: backend.v1.CreateAnswerResponse
-	(*GetAnswerResponse)(nil),           // 41: backend.v1.GetAnswerResponse
-	(*UpdateAnswerResponse)(nil),        // 42: backend.v1.UpdateAnswerResponse
-	(*DeleteAnswerResponse)(nil),        // 43: backend.v1.DeleteAnswerResponse
-	(*PingResponse)(nil),                // 44: backend.v1.PingResponse
-	(*CreateContestResponse)(nil),       // 45: backend.v1.CreateContestResponse
-	(*GetContestResponse)(nil),          // 46: backend.v1.GetContestResponse
-	(*ListContestsResponse)(nil),        // 47: backend.v1.ListContestsResponse
+	(*GetStandingsRequest)(nil),         // 24: backend.v1.GetStandingsRequest
+	(*GetUserResponse)(nil),             // 25: backend.v1.GetUserResponse
+	(*CreateUserResponse)(nil),          // 26: backend.v1.CreateUserResponse
+	(*LoginResponse)(nil),               // 27: backend.v1.LoginResponse
+	(*LogoutResponse)(nil),              // 28: backend.v1.LogoutResponse
+	(*CreateTaskResponse)(nil),          // 29: backend.v1.CreateTaskResponse
+	(*GetTaskResponse)(nil),             // 30: backend.v1.GetTaskResponse
+	(*UpdateTaskResponse)(nil),          // 31: backend.v1.UpdateTaskResponse
+	(*SubmitResponse)(nil),              // 32: backend.v1.SubmitResponse
+	(*GetSubmissionDetailResponse)(nil), // 33: backend.v1.GetSubmissionDetailResponse
+	(*ListSubmissionsResponse)(nil),     // 34: backend.v1.ListSubmissionsResponse
+	(*GetJudgeProgressResponse)(nil),    // 35: backend.v1.GetJudgeProgressResponse
+	(*CreateClarificationResponse)(nil), // 36: backend.v1.CreateClarificationResponse
+	(*GetClarificationResponse)(nil),    // 37: backend.v1.GetClarificationResponse
+	(*ListClarificationsResponse)(nil),  // 38: backend.v1.ListClarificationsResponse
+	(*UpdateClarificationResponse)(nil), // 39: backend.v1.UpdateClarificationResponse
+	(*DeleteClarificationResponse)(nil), // 40: backend.v1.DeleteClarificationResponse
+	(*CreateAnswerResponse)(nil),        // 41: backend.v1.CreateAnswerResponse
+	(*GetAnswerResponse)(nil),           // 42: backend.v1.GetAnswerResponse
+	(*UpdateAnswerResponse)(nil),        // 43: backend.v1.UpdateAnswerResponse
+	(*DeleteAnswerResponse)(nil),        // 44: backend.v1.DeleteAnswerResponse
+	(*PingResponse)(nil),                // 45: backend.v1.PingResponse
+	(*CreateContestResponse)(nil),       // 46: backend.v1.CreateContestResponse
+	(*GetContestResponse)(nil),          // 47: backend.v1.GetContestResponse
+	(*ListContestsResponse)(nil),        // 48: backend.v1.ListContestsResponse
+	(*GetStandingsResponse)(nil),        // 49: backend.v1.GetStandingsResponse
 }
 var file_backend_v1_services_proto_depIdxs = []int32{
 	0,  // 0: backend.v1.UserService.GetUser:input_type -> backend.v1.GetUserRequest
@@ -245,32 +252,34 @@ var file_backend_v1_services_proto_depIdxs = []int32{
 	21, // 21: backend.v1.ContestService.CreateContest:input_type -> backend.v1.CreateContestRequest
 	22, // 22: backend.v1.ContestService.GetContest:input_type -> backend.v1.GetContestRequest
 	23, // 23: backend.v1.ContestService.ListContests:input_type -> backend.v1.ListContestsRequest
-	24, // 24: backend.v1.UserService.GetUser:output_type -> backend.v1.GetUserResponse
-	25, // 25: backend.v1.UserService.CreateUser:output_type -> backend.v1.CreateUserResponse
-	26, // 26: backend.v1.AuthService.Login:output_type -> backend.v1.LoginResponse
-	27, // 27: backend.v1.AuthService.Logout:output_type -> backend.v1.LogoutResponse
-	28, // 28: backend.v1.TaskService.CreateTask:output_type -> backend.v1.CreateTaskResponse
-	29, // 29: backend.v1.TaskService.GetTask:output_type -> backend.v1.GetTaskResponse
-	30, // 30: backend.v1.TaskService.UpdateTask:output_type -> backend.v1.UpdateTaskResponse
-	31, // 31: backend.v1.TaskService.Submit:output_type -> backend.v1.SubmitResponse
-	32, // 32: backend.v1.TaskService.GetSubmissionDetail:output_type -> backend.v1.GetSubmissionDetailResponse
-	33, // 33: backend.v1.TaskService.ListSubmissions:output_type -> backend.v1.ListSubmissionsResponse
-	34, // 34: backend.v1.TaskService.GetJudgeProgress:output_type -> backend.v1.GetJudgeProgressResponse
-	35, // 35: backend.v1.TaskService.CreateClarification:output_type -> backend.v1.CreateClarificationResponse
-	36, // 36: backend.v1.TaskService.GetClarification:output_type -> backend.v1.GetClarificationResponse
-	37, // 37: backend.v1.TaskService.ListClarifications:output_type -> backend.v1.ListClarificationsResponse
-	38, // 38: backend.v1.TaskService.UpdateClarification:output_type -> backend.v1.UpdateClarificationResponse
-	39, // 39: backend.v1.TaskService.DeleteClarification:output_type -> backend.v1.DeleteClarificationResponse
-	40, // 40: backend.v1.TaskService.CreateAnswer:output_type -> backend.v1.CreateAnswerResponse
-	41, // 41: backend.v1.TaskService.GetAnswer:output_type -> backend.v1.GetAnswerResponse
-	42, // 42: backend.v1.TaskService.UpdateAnswer:output_type -> backend.v1.UpdateAnswerResponse
-	43, // 43: backend.v1.TaskService.DeleteAnswer:output_type -> backend.v1.DeleteAnswerResponse
-	44, // 44: backend.v1.HealthcheckService.Ping:output_type -> backend.v1.PingResponse
-	45, // 45: backend.v1.ContestService.CreateContest:output_type -> backend.v1.CreateContestResponse
-	46, // 46: backend.v1.ContestService.GetContest:output_type -> backend.v1.GetContestResponse
-	47, // 47: backend.v1.ContestService.ListContests:output_type -> backend.v1.ListContestsResponse
-	24, // [24:48] is the sub-list for method output_type
-	0,  // [0:24] is the sub-list for method input_type
+	24, // 24: backend.v1.ContestService.GetStandings:input_type -> backend.v1.GetStandingsRequest
+	25, // 25: backend.v1.UserService.GetUser:output_type -> backend.v1.GetUserResponse
+	26, // 26: backend.v1.UserService.CreateUser:output_type -> backend.v1.CreateUserResponse
+	27, // 27: backend.v1.AuthService.Login:output_type -> backend.v1.LoginResponse
+	28, // 28: backend.v1.AuthService.Logout:output_type -> backend.v1.LogoutResponse
+	29, // 29: backend.v1.TaskService.CreateTask:output_type -> backend.v1.CreateTaskResponse
+	30, // 30: backend.v1.TaskService.GetTask:output_type -> backend.v1.GetTaskResponse
+	31, // 31: backend.v1.TaskService.UpdateTask:output_type -> backend.v1.UpdateTaskResponse
+	32, // 32: backend.v1.TaskService.Submit:output_type -> backend.v1.SubmitResponse
+	33, // 33: backend.v1.TaskService.GetSubmissionDetail:output_type -> backend.v1.GetSubmissionDetailResponse
+	34, // 34: backend.v1.TaskService.ListSubmissions:output_type -> backend.v1.ListSubmissionsResponse
+	35, // 35: backend.v1.TaskService.GetJudgeProgress:output_type -> backend.v1.GetJudgeProgressResponse
+	36, // 36: backend.v1.TaskService.CreateClarification:output_type -> backend.v1.CreateClarificationResponse
+	37, // 37: backend.v1.TaskService.GetClarification:output_type -> backend.v1.GetClarificationResponse
+	38, // 38: backend.v1.TaskService.ListClarifications:output_type -> backend.v1.ListClarificationsResponse
+	39, // 39: backend.v1.TaskService.UpdateClarification:output_type -> backend.v1.UpdateClarificationResponse
+	40, // 40: backend.v1.TaskService.DeleteClarification:output_type -> backend.v1.DeleteClarificationResponse
+	41, // 41: backend.v1.TaskService.CreateAnswer:output_type -> backend.v1.CreateAnswerResponse
+	42, // 42: backend.v1.TaskService.GetAnswer:output_type -> backend.v1.GetAnswerResponse
+	43, // 43: backend.v1.TaskService.UpdateAnswer:output_type -> backend.v1.UpdateAnswerResponse
+	44, // 44: backend.v1.TaskService.DeleteAnswer:output_type -> backend.v1.DeleteAnswerResponse
+	45, // 45: backend.v1.HealthcheckService.Ping:output_type -> backend.v1.PingResponse
+	46, // 46: backend.v1.ContestService.CreateContest:output_type -> backend.v1.CreateContestResponse
+	47, // 47: backend.v1.ContestService.GetContest:output_type -> backend.v1.GetContestResponse
+	48, // 48: backend.v1.ContestService.ListContests:output_type -> backend.v1.ListContestsResponse
+	49, // 49: backend.v1.ContestService.GetStandings:output_type -> backend.v1.GetStandingsResponse
+	25, // [25:50] is the sub-list for method output_type
+	0,  // [0:25] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

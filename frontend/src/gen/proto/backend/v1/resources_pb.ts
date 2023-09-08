@@ -213,6 +213,134 @@ export class Contest extends Message<Contest> {
 }
 
 /**
+ * @generated from message backend.v1.StandingsElement
+ */
+export class StandingsElement extends Message<StandingsElement> {
+  /**
+   * @generated from field: int32 rank = 1;
+   */
+  rank = 0;
+
+  /**
+   * @generated from field: int32 user_id = 2;
+   */
+  userId = 0;
+
+  /**
+   * @generated from field: string user_name = 3;
+   */
+  userName = "";
+
+  /**
+   * @generated from field: int32 total_score = 4;
+   */
+  totalScore = 0;
+
+  /**
+   * @generated from field: int32 total_penalty_count = 5;
+   */
+  totalPenaltyCount = 0;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp latest_ac_at = 6;
+   */
+  latestAcAt?: Timestamp;
+
+  /**
+   * @generated from field: repeated backend.v1.StandingsElement.TaskDetail task_detail_list = 7;
+   */
+  taskDetailList: StandingsElement_TaskDetail[] = [];
+
+  constructor(data?: PartialMessage<StandingsElement>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.StandingsElement";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "rank", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "user_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "total_score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "total_penalty_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "latest_ac_at", kind: "message", T: Timestamp },
+    { no: 7, name: "task_detail_list", kind: "message", T: StandingsElement_TaskDetail, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StandingsElement {
+    return new StandingsElement().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StandingsElement {
+    return new StandingsElement().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StandingsElement {
+    return new StandingsElement().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StandingsElement | PlainMessage<StandingsElement> | undefined, b: StandingsElement | PlainMessage<StandingsElement> | undefined): boolean {
+    return proto3.util.equals(StandingsElement, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.StandingsElement.TaskDetail
+ */
+export class StandingsElement_TaskDetail extends Message<StandingsElement_TaskDetail> {
+  /**
+   * @generated from field: int32 task_id = 1;
+   */
+  taskId = 0;
+
+  /**
+   * @generated from field: int32 penalty_count = 2;
+   */
+  penaltyCount = 0;
+
+  /**
+   * @generated from field: int32 ac_submit_id = 3;
+   */
+  acSubmitId = 0;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp ac_elapsed = 4;
+   */
+  acElapsed?: Timestamp;
+
+  constructor(data?: PartialMessage<StandingsElement_TaskDetail>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.StandingsElement.TaskDetail";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "penalty_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "ac_submit_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "ac_elapsed", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StandingsElement_TaskDetail {
+    return new StandingsElement_TaskDetail().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StandingsElement_TaskDetail {
+    return new StandingsElement_TaskDetail().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StandingsElement_TaskDetail {
+    return new StandingsElement_TaskDetail().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StandingsElement_TaskDetail | PlainMessage<StandingsElement_TaskDetail> | undefined, b: StandingsElement_TaskDetail | PlainMessage<StandingsElement_TaskDetail> | undefined): boolean {
+    return proto3.util.equals(StandingsElement_TaskDetail, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.Clarification
  */
 export class Clarification extends Message<Clarification> {

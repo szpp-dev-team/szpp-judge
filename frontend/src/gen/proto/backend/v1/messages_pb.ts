@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Clarification, Clarification_Answer, Contest, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, SubmissionDetail, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
+import { Clarification, Clarification_Answer, Contest, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, StandingsElement, SubmissionDetail, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
 
 /**
  * @generated from message backend.v1.GetUserRequest
@@ -1222,6 +1222,80 @@ export class ListContestsResponse extends Message<ListContestsResponse> {
 
   static equals(a: ListContestsResponse | PlainMessage<ListContestsResponse> | undefined, b: ListContestsResponse | PlainMessage<ListContestsResponse> | undefined): boolean {
     return proto3.util.equals(ListContestsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetStandingsRequest
+ */
+export class GetStandingsRequest extends Message<GetStandingsRequest> {
+  /**
+   * @generated from field: int32 contest_id = 1;
+   */
+  contestId = 0;
+
+  constructor(data?: PartialMessage<GetStandingsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetStandingsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetStandingsRequest {
+    return new GetStandingsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetStandingsRequest {
+    return new GetStandingsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetStandingsRequest {
+    return new GetStandingsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetStandingsRequest | PlainMessage<GetStandingsRequest> | undefined, b: GetStandingsRequest | PlainMessage<GetStandingsRequest> | undefined): boolean {
+    return proto3.util.equals(GetStandingsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetStandingsResponse
+ */
+export class GetStandingsResponse extends Message<GetStandingsResponse> {
+  /**
+   * @generated from field: repeated backend.v1.StandingsElement standings_list = 1;
+   */
+  standingsList: StandingsElement[] = [];
+
+  constructor(data?: PartialMessage<GetStandingsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetStandingsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "standings_list", kind: "message", T: StandingsElement, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetStandingsResponse {
+    return new GetStandingsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetStandingsResponse {
+    return new GetStandingsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetStandingsResponse {
+    return new GetStandingsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetStandingsResponse | PlainMessage<GetStandingsResponse> | undefined, b: GetStandingsResponse | PlainMessage<GetStandingsResponse> | undefined): boolean {
+    return proto3.util.equals(GetStandingsResponse, a, b);
   }
 }
 

@@ -1572,6 +1572,100 @@ func (x *ListContestsResponse) GetContests() []*Contest {
 	return nil
 }
 
+type GetStandingsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ContestId int32 `protobuf:"varint,1,opt,name=contest_id,json=contestId,proto3" json:"contest_id,omitempty"`
+}
+
+func (x *GetStandingsRequest) Reset() {
+	*x = GetStandingsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetStandingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStandingsRequest) ProtoMessage() {}
+
+func (x *GetStandingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStandingsRequest.ProtoReflect.Descriptor instead.
+func (*GetStandingsRequest) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *GetStandingsRequest) GetContestId() int32 {
+	if x != nil {
+		return x.ContestId
+	}
+	return 0
+}
+
+type GetStandingsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	StandingsList []*StandingsElement `protobuf:"bytes,1,rep,name=standings_list,json=standingsList,proto3" json:"standings_list,omitempty"`
+}
+
+func (x *GetStandingsResponse) Reset() {
+	*x = GetStandingsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[31]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetStandingsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStandingsResponse) ProtoMessage() {}
+
+func (x *GetStandingsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[31]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStandingsResponse.ProtoReflect.Descriptor instead.
+func (*GetStandingsResponse) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *GetStandingsResponse) GetStandingsList() []*StandingsElement {
+	if x != nil {
+		return x.StandingsList
+	}
+	return nil
+}
+
 type CreateClarificationRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1585,7 +1679,7 @@ type CreateClarificationRequest struct {
 func (x *CreateClarificationRequest) Reset() {
 	*x = CreateClarificationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[30]
+		mi := &file_backend_v1_messages_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1598,7 +1692,7 @@ func (x *CreateClarificationRequest) String() string {
 func (*CreateClarificationRequest) ProtoMessage() {}
 
 func (x *CreateClarificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[30]
+	mi := &file_backend_v1_messages_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1611,7 +1705,7 @@ func (x *CreateClarificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateClarificationRequest.ProtoReflect.Descriptor instead.
 func (*CreateClarificationRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{30}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *CreateClarificationRequest) GetUserId() int32 {
@@ -1646,7 +1740,7 @@ type CreateClarificationResponse struct {
 func (x *CreateClarificationResponse) Reset() {
 	*x = CreateClarificationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[31]
+		mi := &file_backend_v1_messages_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1659,7 +1753,7 @@ func (x *CreateClarificationResponse) String() string {
 func (*CreateClarificationResponse) ProtoMessage() {}
 
 func (x *CreateClarificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[31]
+	mi := &file_backend_v1_messages_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1672,7 +1766,7 @@ func (x *CreateClarificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateClarificationResponse.ProtoReflect.Descriptor instead.
 func (*CreateClarificationResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{31}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *CreateClarificationResponse) GetClarification() *Clarification {
@@ -1693,7 +1787,7 @@ type GetClarificationRequest struct {
 func (x *GetClarificationRequest) Reset() {
 	*x = GetClarificationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[32]
+		mi := &file_backend_v1_messages_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1706,7 +1800,7 @@ func (x *GetClarificationRequest) String() string {
 func (*GetClarificationRequest) ProtoMessage() {}
 
 func (x *GetClarificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[32]
+	mi := &file_backend_v1_messages_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1719,7 +1813,7 @@ func (x *GetClarificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetClarificationRequest.ProtoReflect.Descriptor instead.
 func (*GetClarificationRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{32}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *GetClarificationRequest) GetId() int32 {
@@ -1740,7 +1834,7 @@ type GetClarificationResponse struct {
 func (x *GetClarificationResponse) Reset() {
 	*x = GetClarificationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[33]
+		mi := &file_backend_v1_messages_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1753,7 +1847,7 @@ func (x *GetClarificationResponse) String() string {
 func (*GetClarificationResponse) ProtoMessage() {}
 
 func (x *GetClarificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[33]
+	mi := &file_backend_v1_messages_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1766,7 +1860,7 @@ func (x *GetClarificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetClarificationResponse.ProtoReflect.Descriptor instead.
 func (*GetClarificationResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{33}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *GetClarificationResponse) GetClarification() *Clarification {
@@ -1785,7 +1879,7 @@ type ListClarificationsRequest struct {
 func (x *ListClarificationsRequest) Reset() {
 	*x = ListClarificationsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[34]
+		mi := &file_backend_v1_messages_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1798,7 +1892,7 @@ func (x *ListClarificationsRequest) String() string {
 func (*ListClarificationsRequest) ProtoMessage() {}
 
 func (x *ListClarificationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[34]
+	mi := &file_backend_v1_messages_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1811,7 +1905,7 @@ func (x *ListClarificationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListClarificationsRequest.ProtoReflect.Descriptor instead.
 func (*ListClarificationsRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{34}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{36}
 }
 
 type ListClarificationsResponse struct {
@@ -1825,7 +1919,7 @@ type ListClarificationsResponse struct {
 func (x *ListClarificationsResponse) Reset() {
 	*x = ListClarificationsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[35]
+		mi := &file_backend_v1_messages_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1838,7 +1932,7 @@ func (x *ListClarificationsResponse) String() string {
 func (*ListClarificationsResponse) ProtoMessage() {}
 
 func (x *ListClarificationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[35]
+	mi := &file_backend_v1_messages_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1851,7 +1945,7 @@ func (x *ListClarificationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListClarificationsResponse.ProtoReflect.Descriptor instead.
 func (*ListClarificationsResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{35}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ListClarificationsResponse) GetClarifications() []*Clarification {
@@ -1874,7 +1968,7 @@ type UpdateClarificationRequest struct {
 func (x *UpdateClarificationRequest) Reset() {
 	*x = UpdateClarificationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[36]
+		mi := &file_backend_v1_messages_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1887,7 +1981,7 @@ func (x *UpdateClarificationRequest) String() string {
 func (*UpdateClarificationRequest) ProtoMessage() {}
 
 func (x *UpdateClarificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[36]
+	mi := &file_backend_v1_messages_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1900,7 +1994,7 @@ func (x *UpdateClarificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateClarificationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateClarificationRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{36}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *UpdateClarificationRequest) GetId() int32 {
@@ -1935,7 +2029,7 @@ type UpdateClarificationResponse struct {
 func (x *UpdateClarificationResponse) Reset() {
 	*x = UpdateClarificationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[37]
+		mi := &file_backend_v1_messages_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1948,7 +2042,7 @@ func (x *UpdateClarificationResponse) String() string {
 func (*UpdateClarificationResponse) ProtoMessage() {}
 
 func (x *UpdateClarificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[37]
+	mi := &file_backend_v1_messages_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1961,7 +2055,7 @@ func (x *UpdateClarificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateClarificationResponse.ProtoReflect.Descriptor instead.
 func (*UpdateClarificationResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{37}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *UpdateClarificationResponse) GetClarification() *Clarification {
@@ -1982,7 +2076,7 @@ type DeleteClarificationRequest struct {
 func (x *DeleteClarificationRequest) Reset() {
 	*x = DeleteClarificationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[38]
+		mi := &file_backend_v1_messages_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1995,7 +2089,7 @@ func (x *DeleteClarificationRequest) String() string {
 func (*DeleteClarificationRequest) ProtoMessage() {}
 
 func (x *DeleteClarificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[38]
+	mi := &file_backend_v1_messages_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2008,7 +2102,7 @@ func (x *DeleteClarificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteClarificationRequest.ProtoReflect.Descriptor instead.
 func (*DeleteClarificationRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{38}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *DeleteClarificationRequest) GetId() int32 {
@@ -2027,7 +2121,7 @@ type DeleteClarificationResponse struct {
 func (x *DeleteClarificationResponse) Reset() {
 	*x = DeleteClarificationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[39]
+		mi := &file_backend_v1_messages_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2040,7 +2134,7 @@ func (x *DeleteClarificationResponse) String() string {
 func (*DeleteClarificationResponse) ProtoMessage() {}
 
 func (x *DeleteClarificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[39]
+	mi := &file_backend_v1_messages_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2053,7 +2147,7 @@ func (x *DeleteClarificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteClarificationResponse.ProtoReflect.Descriptor instead.
 func (*DeleteClarificationResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{39}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{41}
 }
 
 type CreateAnswerRequest struct {
@@ -2069,7 +2163,7 @@ type CreateAnswerRequest struct {
 func (x *CreateAnswerRequest) Reset() {
 	*x = CreateAnswerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[40]
+		mi := &file_backend_v1_messages_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2082,7 +2176,7 @@ func (x *CreateAnswerRequest) String() string {
 func (*CreateAnswerRequest) ProtoMessage() {}
 
 func (x *CreateAnswerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[40]
+	mi := &file_backend_v1_messages_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2095,7 +2189,7 @@ func (x *CreateAnswerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAnswerRequest.ProtoReflect.Descriptor instead.
 func (*CreateAnswerRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{40}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *CreateAnswerRequest) GetClarificationId() int32 {
@@ -2130,7 +2224,7 @@ type CreateAnswerResponse struct {
 func (x *CreateAnswerResponse) Reset() {
 	*x = CreateAnswerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[41]
+		mi := &file_backend_v1_messages_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2143,7 +2237,7 @@ func (x *CreateAnswerResponse) String() string {
 func (*CreateAnswerResponse) ProtoMessage() {}
 
 func (x *CreateAnswerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[41]
+	mi := &file_backend_v1_messages_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2156,7 +2250,7 @@ func (x *CreateAnswerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAnswerResponse.ProtoReflect.Descriptor instead.
 func (*CreateAnswerResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{41}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *CreateAnswerResponse) GetAnswer() *Clarification_Answer {
@@ -2177,7 +2271,7 @@ type GetAnswerRequest struct {
 func (x *GetAnswerRequest) Reset() {
 	*x = GetAnswerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[42]
+		mi := &file_backend_v1_messages_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2190,7 +2284,7 @@ func (x *GetAnswerRequest) String() string {
 func (*GetAnswerRequest) ProtoMessage() {}
 
 func (x *GetAnswerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[42]
+	mi := &file_backend_v1_messages_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2203,7 +2297,7 @@ func (x *GetAnswerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAnswerRequest.ProtoReflect.Descriptor instead.
 func (*GetAnswerRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{42}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *GetAnswerRequest) GetAnswerId() int32 {
@@ -2224,7 +2318,7 @@ type GetAnswerResponse struct {
 func (x *GetAnswerResponse) Reset() {
 	*x = GetAnswerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[43]
+		mi := &file_backend_v1_messages_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2237,7 +2331,7 @@ func (x *GetAnswerResponse) String() string {
 func (*GetAnswerResponse) ProtoMessage() {}
 
 func (x *GetAnswerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[43]
+	mi := &file_backend_v1_messages_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2250,7 +2344,7 @@ func (x *GetAnswerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAnswerResponse.ProtoReflect.Descriptor instead.
 func (*GetAnswerResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{43}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *GetAnswerResponse) GetAnswer() *Clarification_Answer {
@@ -2272,7 +2366,7 @@ type UpdateAnswerRequest struct {
 func (x *UpdateAnswerRequest) Reset() {
 	*x = UpdateAnswerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[44]
+		mi := &file_backend_v1_messages_proto_msgTypes[46]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2285,7 +2379,7 @@ func (x *UpdateAnswerRequest) String() string {
 func (*UpdateAnswerRequest) ProtoMessage() {}
 
 func (x *UpdateAnswerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[44]
+	mi := &file_backend_v1_messages_proto_msgTypes[46]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2298,7 +2392,7 @@ func (x *UpdateAnswerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAnswerRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAnswerRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{44}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *UpdateAnswerRequest) GetAnswerId() int32 {
@@ -2326,7 +2420,7 @@ type UpdateAnswerResponse struct {
 func (x *UpdateAnswerResponse) Reset() {
 	*x = UpdateAnswerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[45]
+		mi := &file_backend_v1_messages_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2339,7 +2433,7 @@ func (x *UpdateAnswerResponse) String() string {
 func (*UpdateAnswerResponse) ProtoMessage() {}
 
 func (x *UpdateAnswerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[45]
+	mi := &file_backend_v1_messages_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2352,7 +2446,7 @@ func (x *UpdateAnswerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAnswerResponse.ProtoReflect.Descriptor instead.
 func (*UpdateAnswerResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{45}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *UpdateAnswerResponse) GetAnswer() *Clarification_Answer {
@@ -2373,7 +2467,7 @@ type DeleteAnswerRequest struct {
 func (x *DeleteAnswerRequest) Reset() {
 	*x = DeleteAnswerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[46]
+		mi := &file_backend_v1_messages_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2386,7 +2480,7 @@ func (x *DeleteAnswerRequest) String() string {
 func (*DeleteAnswerRequest) ProtoMessage() {}
 
 func (x *DeleteAnswerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[46]
+	mi := &file_backend_v1_messages_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2399,7 +2493,7 @@ func (x *DeleteAnswerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAnswerRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAnswerRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{46}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *DeleteAnswerRequest) GetAnswerId() int32 {
@@ -2418,7 +2512,7 @@ type DeleteAnswerResponse struct {
 func (x *DeleteAnswerResponse) Reset() {
 	*x = DeleteAnswerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[47]
+		mi := &file_backend_v1_messages_proto_msgTypes[49]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2431,7 +2525,7 @@ func (x *DeleteAnswerResponse) String() string {
 func (*DeleteAnswerResponse) ProtoMessage() {}
 
 func (x *DeleteAnswerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[47]
+	mi := &file_backend_v1_messages_proto_msgTypes[49]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2444,7 +2538,7 @@ func (x *DeleteAnswerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAnswerResponse.ProtoReflect.Descriptor instead.
 func (*DeleteAnswerResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{47}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{49}
 }
 
 var File_backend_v1_messages_proto protoreflect.FileDescriptor
@@ -2619,100 +2713,110 @@ var file_backend_v1_messages_proto_rawDesc = []byte{
 	0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2f, 0x0a, 0x08,
 	0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x13,
 	0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x74,
-	0x65, 0x73, 0x74, 0x52, 0x08, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x22, 0x6c, 0x0a,
-	0x1a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x75,
-	0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73,
-	0x65, 0x72, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12, 0x1b,
-	0x0a, 0x09, 0x69, 0x73, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x08, 0x52, 0x08, 0x69, 0x73, 0x50, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x22, 0x5e, 0x0a, 0x1b, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a, 0x0d, 0x63, 0x6c,
-	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x19, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43,
-	0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0d, 0x63, 0x6c,
-	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x29, 0x0a, 0x17, 0x47,
-	0x65, 0x74, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x22, 0x5b, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x43, 0x6c, 0x61,
-	0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x3f, 0x0a, 0x0d, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x62, 0x61, 0x63, 0x6b,
-	0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0d, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x22, 0x1b, 0x0a, 0x19, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6c, 0x61, 0x72, 0x69,
-	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x22, 0x5f, 0x0a, 0x1a, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41,
-	0x0a, 0x0e, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64,
-	0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x52, 0x0e, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x73, 0x22, 0x63, 0x0a, 0x1a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6c, 0x61, 0x72, 0x69,
-	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
-	0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12,
-	0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x69, 0x73, 0x5f,
-	0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x69, 0x73,
-	0x50, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x22, 0x5e, 0x0a, 0x1b, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x65, 0x73, 0x74, 0x52, 0x08, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x22, 0x34, 0x0a,
+	0x13, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73,
+	0x74, 0x49, 0x64, 0x22, 0x5b, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x6e, 0x64, 0x69,
+	0x6e, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x43, 0x0a, 0x0e, 0x73,
+	0x74, 0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x73, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31,
+	0x2e, 0x53, 0x74, 0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x73, 0x45, 0x6c, 0x65, 0x6d, 0x65, 0x6e,
+	0x74, 0x52, 0x0d, 0x73, 0x74, 0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x73, 0x4c, 0x69, 0x73, 0x74,
+	0x22, 0x6c, 0x0a, 0x1a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17,
+	0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x12, 0x1b, 0x0a, 0x09, 0x69, 0x73, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x69, 0x73, 0x50, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x22, 0x5e,
+	0x0a, 0x1b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a,
+	0x0d, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76,
+	0x31, 0x2e, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52,
+	0x0d, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x29,
+	0x0a, 0x17, 0x47, 0x65, 0x74, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x22, 0x5b, 0x0a, 0x18, 0x47, 0x65, 0x74,
 	0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73,
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a, 0x0d, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69,
 	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x62,
 	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66,
 	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0d, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69,
-	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x2c, 0x0a, 0x1a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
-	0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05,
-	0x52, 0x02, 0x69, 0x64, 0x22, 0x1d, 0x0a, 0x1b, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6c,
-	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x73, 0x0a, 0x13, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x6e, 0x73,
-	0x77, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x29, 0x0a, 0x10, 0x63, 0x6c,
-	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x05, 0x52, 0x0f, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x18,
-	0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x50, 0x0a, 0x14, 0x43, 0x72, 0x65, 0x61,
-	0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x38, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x20, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c,
-	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x41, 0x6e, 0x73, 0x77,
-	0x65, 0x72, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x2f, 0x0a, 0x10, 0x47, 0x65,
-	0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b,
-	0x0a, 0x09, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x05, 0x52, 0x08, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x49, 0x64, 0x22, 0x4d, 0x0a, 0x11, 0x47,
-	0x65, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x38, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x20, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c,
-	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x41, 0x6e, 0x73, 0x77,
-	0x65, 0x72, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x4c, 0x0a, 0x13, 0x55, 0x70,
-	0x64, 0x61, 0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x1b, 0x0a, 0x19, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6c,
+	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x22, 0x5f, 0x0a, 0x1a, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6c, 0x61, 0x72, 0x69,
+	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x41, 0x0a, 0x0e, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x62, 0x61, 0x63, 0x6b,
+	0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0e, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x22, 0x63, 0x0a, 0x1a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6c,
+	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02,
+	0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12, 0x1b, 0x0a, 0x09,
+	0x69, 0x73, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x08, 0x69, 0x73, 0x50, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x22, 0x5e, 0x0a, 0x1b, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a, 0x0d, 0x63, 0x6c, 0x61, 0x72,
+	0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x19, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x61,
+	0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0d, 0x63, 0x6c, 0x61, 0x72,
+	0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x2c, 0x0a, 0x1a, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x22, 0x1d, 0x0a, 0x1b, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x73, 0x0a, 0x13, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x29, 0x0a,
+	0x10, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0f, 0x63, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69,
+	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72,
+	0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49,
+	0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x50, 0x0a, 0x14, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31,
+	0x2e, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x41,
+	0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x2f, 0x0a,
+	0x10, 0x47, 0x65, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x12, 0x1b, 0x0a, 0x09, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x49, 0x64, 0x12, 0x18,
-	0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x50, 0x0a, 0x14, 0x55, 0x70, 0x64, 0x61,
-	0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x38, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x20, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c,
-	0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x41, 0x6e, 0x73, 0x77,
-	0x65, 0x72, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x32, 0x0a, 0x13, 0x44, 0x65,
-	0x6c, 0x65, 0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x1b, 0x0a, 0x09, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x49, 0x64, 0x22, 0x16,
-	0x0a, 0x14, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0xaf, 0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62,
-	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x42, 0x0d, 0x4d, 0x65, 0x73, 0x73, 0x61,
-	0x67, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d,
-	0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63,
-	0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76,
-	0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e,
-	0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56,
-	0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47,
-	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63,
-	0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x49, 0x64, 0x22, 0x4d,
+	0x0a, 0x11, 0x47, 0x65, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31,
+	0x2e, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x41,
+	0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x4c, 0x0a,
+	0x13, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x49,
+	0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x50, 0x0a, 0x14, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31,
+	0x2e, 0x43, 0x6c, 0x61, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x41,
+	0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x32, 0x0a,
+	0x13, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x49,
+	0x64, 0x22, 0x16, 0x0a, 0x14, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41, 0x6e, 0x73, 0x77, 0x65,
+	0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0xaf, 0x01, 0x0a, 0x0e, 0x63, 0x6f,
+	0x6d, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x42, 0x0d, 0x4d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x45, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x64,
+	0x65, 0x76, 0x2d, 0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x6a, 0x75, 0x64,
+	0x67, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f,
+	0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b, 0x62, 0x61, 0x63, 0x6b, 0x65,
+	0x6e, 0x64, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x0a, 0x42, 0x61, 0x63,
+	0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e,
+	0x64, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56,
+	0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0b,
+	0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2727,7 +2831,7 @@ func file_backend_v1_messages_proto_rawDescGZIP() []byte {
 	return file_backend_v1_messages_proto_rawDescData
 }
 
-var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 48)
+var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 50)
 var file_backend_v1_messages_proto_goTypes = []interface{}{
 	(*GetUserRequest)(nil),              // 0: backend.v1.GetUserRequest
 	(*GetUserResponse)(nil),             // 1: backend.v1.GetUserResponse
@@ -2759,77 +2863,81 @@ var file_backend_v1_messages_proto_goTypes = []interface{}{
 	(*GetContestResponse)(nil),          // 27: backend.v1.GetContestResponse
 	(*ListContestsRequest)(nil),         // 28: backend.v1.ListContestsRequest
 	(*ListContestsResponse)(nil),        // 29: backend.v1.ListContestsResponse
-	(*CreateClarificationRequest)(nil),  // 30: backend.v1.CreateClarificationRequest
-	(*CreateClarificationResponse)(nil), // 31: backend.v1.CreateClarificationResponse
-	(*GetClarificationRequest)(nil),     // 32: backend.v1.GetClarificationRequest
-	(*GetClarificationResponse)(nil),    // 33: backend.v1.GetClarificationResponse
-	(*ListClarificationsRequest)(nil),   // 34: backend.v1.ListClarificationsRequest
-	(*ListClarificationsResponse)(nil),  // 35: backend.v1.ListClarificationsResponse
-	(*UpdateClarificationRequest)(nil),  // 36: backend.v1.UpdateClarificationRequest
-	(*UpdateClarificationResponse)(nil), // 37: backend.v1.UpdateClarificationResponse
-	(*DeleteClarificationRequest)(nil),  // 38: backend.v1.DeleteClarificationRequest
-	(*DeleteClarificationResponse)(nil), // 39: backend.v1.DeleteClarificationResponse
-	(*CreateAnswerRequest)(nil),         // 40: backend.v1.CreateAnswerRequest
-	(*CreateAnswerResponse)(nil),        // 41: backend.v1.CreateAnswerResponse
-	(*GetAnswerRequest)(nil),            // 42: backend.v1.GetAnswerRequest
-	(*GetAnswerResponse)(nil),           // 43: backend.v1.GetAnswerResponse
-	(*UpdateAnswerRequest)(nil),         // 44: backend.v1.UpdateAnswerRequest
-	(*UpdateAnswerResponse)(nil),        // 45: backend.v1.UpdateAnswerResponse
-	(*DeleteAnswerRequest)(nil),         // 46: backend.v1.DeleteAnswerRequest
-	(*DeleteAnswerResponse)(nil),        // 47: backend.v1.DeleteAnswerResponse
-	(*User)(nil),                        // 48: backend.v1.User
-	(*MutationTask)(nil),                // 49: backend.v1.MutationTask
-	(*MutationTestcaseSet)(nil),         // 50: backend.v1.MutationTestcaseSet
-	(*MutationTestcase)(nil),            // 51: backend.v1.MutationTestcase
-	(*Task)(nil),                        // 52: backend.v1.Task
-	(*TestcaseSet)(nil),                 // 53: backend.v1.TestcaseSet
-	(*Testcase)(nil),                    // 54: backend.v1.Testcase
-	(*SubmissionDetail)(nil),            // 55: backend.v1.SubmissionDetail
-	(*SubmissionSummary)(nil),           // 56: backend.v1.SubmissionSummary
-	(*JudgeProgress)(nil),               // 57: backend.v1.JudgeProgress
-	(*timestamppb.Timestamp)(nil),       // 58: google.protobuf.Timestamp
-	(*Contest)(nil),                     // 59: backend.v1.Contest
-	(*Clarification)(nil),               // 60: backend.v1.Clarification
-	(*Clarification_Answer)(nil),        // 61: backend.v1.Clarification.Answer
+	(*GetStandingsRequest)(nil),         // 30: backend.v1.GetStandingsRequest
+	(*GetStandingsResponse)(nil),        // 31: backend.v1.GetStandingsResponse
+	(*CreateClarificationRequest)(nil),  // 32: backend.v1.CreateClarificationRequest
+	(*CreateClarificationResponse)(nil), // 33: backend.v1.CreateClarificationResponse
+	(*GetClarificationRequest)(nil),     // 34: backend.v1.GetClarificationRequest
+	(*GetClarificationResponse)(nil),    // 35: backend.v1.GetClarificationResponse
+	(*ListClarificationsRequest)(nil),   // 36: backend.v1.ListClarificationsRequest
+	(*ListClarificationsResponse)(nil),  // 37: backend.v1.ListClarificationsResponse
+	(*UpdateClarificationRequest)(nil),  // 38: backend.v1.UpdateClarificationRequest
+	(*UpdateClarificationResponse)(nil), // 39: backend.v1.UpdateClarificationResponse
+	(*DeleteClarificationRequest)(nil),  // 40: backend.v1.DeleteClarificationRequest
+	(*DeleteClarificationResponse)(nil), // 41: backend.v1.DeleteClarificationResponse
+	(*CreateAnswerRequest)(nil),         // 42: backend.v1.CreateAnswerRequest
+	(*CreateAnswerResponse)(nil),        // 43: backend.v1.CreateAnswerResponse
+	(*GetAnswerRequest)(nil),            // 44: backend.v1.GetAnswerRequest
+	(*GetAnswerResponse)(nil),           // 45: backend.v1.GetAnswerResponse
+	(*UpdateAnswerRequest)(nil),         // 46: backend.v1.UpdateAnswerRequest
+	(*UpdateAnswerResponse)(nil),        // 47: backend.v1.UpdateAnswerResponse
+	(*DeleteAnswerRequest)(nil),         // 48: backend.v1.DeleteAnswerRequest
+	(*DeleteAnswerResponse)(nil),        // 49: backend.v1.DeleteAnswerResponse
+	(*User)(nil),                        // 50: backend.v1.User
+	(*MutationTask)(nil),                // 51: backend.v1.MutationTask
+	(*MutationTestcaseSet)(nil),         // 52: backend.v1.MutationTestcaseSet
+	(*MutationTestcase)(nil),            // 53: backend.v1.MutationTestcase
+	(*Task)(nil),                        // 54: backend.v1.Task
+	(*TestcaseSet)(nil),                 // 55: backend.v1.TestcaseSet
+	(*Testcase)(nil),                    // 56: backend.v1.Testcase
+	(*SubmissionDetail)(nil),            // 57: backend.v1.SubmissionDetail
+	(*SubmissionSummary)(nil),           // 58: backend.v1.SubmissionSummary
+	(*JudgeProgress)(nil),               // 59: backend.v1.JudgeProgress
+	(*timestamppb.Timestamp)(nil),       // 60: google.protobuf.Timestamp
+	(*Contest)(nil),                     // 61: backend.v1.Contest
+	(*StandingsElement)(nil),            // 62: backend.v1.StandingsElement
+	(*Clarification)(nil),               // 63: backend.v1.Clarification
+	(*Clarification_Answer)(nil),        // 64: backend.v1.Clarification.Answer
 }
 var file_backend_v1_messages_proto_depIdxs = []int32{
-	48, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
-	48, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
-	48, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
-	49, // 3: backend.v1.CreateTaskRequest.task:type_name -> backend.v1.MutationTask
-	50, // 4: backend.v1.CreateTaskRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
-	51, // 5: backend.v1.CreateTaskRequest.testcases:type_name -> backend.v1.MutationTestcase
-	52, // 6: backend.v1.CreateTaskResponse.task:type_name -> backend.v1.Task
-	53, // 7: backend.v1.CreateTaskResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
-	54, // 8: backend.v1.CreateTaskResponse.testcases:type_name -> backend.v1.Testcase
-	52, // 9: backend.v1.GetTaskResponse.task:type_name -> backend.v1.Task
-	54, // 10: backend.v1.GetTaskResponse.testcases:type_name -> backend.v1.Testcase
-	49, // 11: backend.v1.UpdateTaskRequest.task:type_name -> backend.v1.MutationTask
-	50, // 12: backend.v1.UpdateTaskRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
-	51, // 13: backend.v1.UpdateTaskRequest.testcases:type_name -> backend.v1.MutationTestcase
-	52, // 14: backend.v1.UpdateTaskResponse.task:type_name -> backend.v1.Task
-	53, // 15: backend.v1.UpdateTaskResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
-	54, // 16: backend.v1.UpdateTaskResponse.testcases:type_name -> backend.v1.Testcase
-	55, // 17: backend.v1.GetSubmissionDetailResponse.submission_detail:type_name -> backend.v1.SubmissionDetail
-	56, // 18: backend.v1.ListSubmissionsResponse.submissions:type_name -> backend.v1.SubmissionSummary
-	57, // 19: backend.v1.GetJudgeProgressResponse.judge_progress:type_name -> backend.v1.JudgeProgress
-	58, // 20: backend.v1.CreateContestRequest.start_at:type_name -> google.protobuf.Timestamp
-	58, // 21: backend.v1.CreateContestRequest.end_at:type_name -> google.protobuf.Timestamp
-	59, // 22: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
-	59, // 23: backend.v1.GetContestResponse.contest:type_name -> backend.v1.Contest
-	59, // 24: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
-	60, // 25: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	60, // 26: backend.v1.GetClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	60, // 27: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
-	60, // 28: backend.v1.UpdateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	61, // 29: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	61, // 30: backend.v1.GetAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	61, // 31: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	50, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
+	50, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
+	50, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
+	51, // 3: backend.v1.CreateTaskRequest.task:type_name -> backend.v1.MutationTask
+	52, // 4: backend.v1.CreateTaskRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
+	53, // 5: backend.v1.CreateTaskRequest.testcases:type_name -> backend.v1.MutationTestcase
+	54, // 6: backend.v1.CreateTaskResponse.task:type_name -> backend.v1.Task
+	55, // 7: backend.v1.CreateTaskResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
+	56, // 8: backend.v1.CreateTaskResponse.testcases:type_name -> backend.v1.Testcase
+	54, // 9: backend.v1.GetTaskResponse.task:type_name -> backend.v1.Task
+	56, // 10: backend.v1.GetTaskResponse.testcases:type_name -> backend.v1.Testcase
+	51, // 11: backend.v1.UpdateTaskRequest.task:type_name -> backend.v1.MutationTask
+	52, // 12: backend.v1.UpdateTaskRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
+	53, // 13: backend.v1.UpdateTaskRequest.testcases:type_name -> backend.v1.MutationTestcase
+	54, // 14: backend.v1.UpdateTaskResponse.task:type_name -> backend.v1.Task
+	55, // 15: backend.v1.UpdateTaskResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
+	56, // 16: backend.v1.UpdateTaskResponse.testcases:type_name -> backend.v1.Testcase
+	57, // 17: backend.v1.GetSubmissionDetailResponse.submission_detail:type_name -> backend.v1.SubmissionDetail
+	58, // 18: backend.v1.ListSubmissionsResponse.submissions:type_name -> backend.v1.SubmissionSummary
+	59, // 19: backend.v1.GetJudgeProgressResponse.judge_progress:type_name -> backend.v1.JudgeProgress
+	60, // 20: backend.v1.CreateContestRequest.start_at:type_name -> google.protobuf.Timestamp
+	60, // 21: backend.v1.CreateContestRequest.end_at:type_name -> google.protobuf.Timestamp
+	61, // 22: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
+	61, // 23: backend.v1.GetContestResponse.contest:type_name -> backend.v1.Contest
+	61, // 24: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
+	62, // 25: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsElement
+	63, // 26: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	63, // 27: backend.v1.GetClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	63, // 28: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
+	63, // 29: backend.v1.UpdateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	64, // 30: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	64, // 31: backend.v1.GetAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	64, // 32: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	33, // [33:33] is the sub-list for method output_type
+	33, // [33:33] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_backend_v1_messages_proto_init() }
@@ -3200,7 +3308,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateClarificationRequest); i {
+			switch v := v.(*GetStandingsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3212,7 +3320,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateClarificationResponse); i {
+			switch v := v.(*GetStandingsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3224,7 +3332,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetClarificationRequest); i {
+			switch v := v.(*CreateClarificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3236,7 +3344,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetClarificationResponse); i {
+			switch v := v.(*CreateClarificationResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3248,7 +3356,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListClarificationsRequest); i {
+			switch v := v.(*GetClarificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3260,7 +3368,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListClarificationsResponse); i {
+			switch v := v.(*GetClarificationResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3272,7 +3380,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateClarificationRequest); i {
+			switch v := v.(*ListClarificationsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3284,7 +3392,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateClarificationResponse); i {
+			switch v := v.(*ListClarificationsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3296,7 +3404,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteClarificationRequest); i {
+			switch v := v.(*UpdateClarificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3308,7 +3416,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteClarificationResponse); i {
+			switch v := v.(*UpdateClarificationResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3320,7 +3428,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateAnswerRequest); i {
+			switch v := v.(*DeleteClarificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3332,7 +3440,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateAnswerResponse); i {
+			switch v := v.(*DeleteClarificationResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3344,7 +3452,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAnswerRequest); i {
+			switch v := v.(*CreateAnswerRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3356,7 +3464,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAnswerResponse); i {
+			switch v := v.(*CreateAnswerResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3368,7 +3476,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateAnswerRequest); i {
+			switch v := v.(*GetAnswerRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3380,7 +3488,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateAnswerResponse); i {
+			switch v := v.(*GetAnswerResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3392,7 +3500,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteAnswerRequest); i {
+			switch v := v.(*UpdateAnswerRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3404,6 +3512,30 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateAnswerResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_v1_messages_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteAnswerRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_v1_messages_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteAnswerResponse); i {
 			case 0:
 				return &v.state
@@ -3424,7 +3556,7 @@ func file_backend_v1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_v1_messages_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   48,
+			NumMessages:   50,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
