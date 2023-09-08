@@ -488,11 +488,11 @@ export class MutationTask extends Message<MutationTask> {
   execMemoryLimit = 0;
 
   /**
-   * Judge の status(完全一致、誤差など)
+   * Judge の type(完全一致、誤差など)
    *
-   * @generated from field: judge.v1.JudgeStatus judge_status = 5;
+   * @generated from field: judge.v1.JudgeType judge_type = 5;
    */
-  judgeStatus = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
+  judgeType?: JudgeType;
 
   /**
    * @generated from field: backend.v1.Difficulty difficulty = 6;
@@ -511,7 +511,7 @@ export class MutationTask extends Message<MutationTask> {
     { no: 2, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
+    { no: 5, name: "judge_type", kind: "message", T: JudgeType },
     { no: 6, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
   ]);
 
