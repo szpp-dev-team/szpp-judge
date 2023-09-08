@@ -6,5 +6,14 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Language is the predicate function for language builders.
+type Language func(*sql.Selector)
+
+// Submit is the predicate function for submit builders.
+type Submit func(*sql.Selector)
+
+// TestcaseResult is the predicate function for testcaseresult builders.
+type TestcaseResult func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

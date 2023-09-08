@@ -9,6 +9,42 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 )
 
+// The LanguageFunc type is an adapter to allow the use of ordinary
+// function as Language mutator.
+type LanguageFunc func(context.Context, *ent.LanguageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LanguageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.LanguageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LanguageMutation", m)
+}
+
+// The SubmitFunc type is an adapter to allow the use of ordinary
+// function as Submit mutator.
+type SubmitFunc func(context.Context, *ent.SubmitMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubmitFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubmitMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubmitMutation", m)
+}
+
+// The TestcaseResultFunc type is an adapter to allow the use of ordinary
+// function as TestcaseResult mutator.
+type TestcaseResultFunc func(context.Context, *ent.TestcaseResultMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestcaseResultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestcaseResultMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestcaseResultMutation", m)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
