@@ -7,6 +7,9 @@
       "**/node_modules/**"
     ],
     "cleanUrls": true,
-    "rewrites": []
+    "rewrites": [{
+      "regex": "^/contests/([^/]+?)/tasks(?:/)?$",
+      "destination": "/contests/[contest_slug]/tasks.html"
+    }]
   }
 }
