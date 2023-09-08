@@ -48,7 +48,7 @@ message Task {
   int32 exec_time_limit = 4; // 実行時間制限[ms]
   int32 exec_memory_limit = 5; // 実行メモリ制限[MB]
   repeated int32 contest_ids = 6; // 属するコンテストの ID
-  judge.v1.JudgeStatus judge_status = 7; // Judge の status(完全一致、誤差など)
+  judge.v1.JudgeType judge_type = 7; // Judge の status(完全一致、誤差など)
   Difficulty difficulty = 8;
   google.protobuf.Timestamp created_at = 9;
   optional google.protobuf.Timestamp updated_at = 10;
