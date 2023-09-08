@@ -148,8 +148,9 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	AuthService_Login_FullMethodName  = "/backend.v1.AuthService/Login"
-	AuthService_Logout_FullMethodName = "/backend.v1.AuthService/Logout"
+	AuthService_Login_FullMethodName              = "/backend.v1.AuthService/Login"
+	AuthService_Logout_FullMethodName             = "/backend.v1.AuthService/Logout"
+	AuthService_RefreshAccessToken_FullMethodName = "/backend.v1.AuthService/RefreshAccessToken"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -160,6 +161,8 @@ type AuthServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	// ログアウト
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
+	// refresh token を使って access token を更新する
+	RefreshAccessToken(ctx context.Context, in *RefreshAccessTokenRequest, opts ...grpc.CallOption) (*RefreshAccessTokenResponse, error)
 }
 
 type authServiceClient struct {
@@ -188,6 +191,15 @@ func (c *authServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts 
 	return out, nil
 }
 
+func (c *authServiceClient) RefreshAccessToken(ctx context.Context, in *RefreshAccessTokenRequest, opts ...grpc.CallOption) (*RefreshAccessTokenResponse, error) {
+	out := new(RefreshAccessTokenResponse)
+	err := c.cc.Invoke(ctx, AuthService_RefreshAccessToken_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations should embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -196,6 +208,8 @@ type AuthServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	// ログアウト
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	// refresh token を使って access token を更新する
+	RefreshAccessToken(context.Context, *RefreshAccessTokenRequest) (*RefreshAccessTokenResponse, error)
 }
 
 // UnimplementedAuthServiceServer should be embedded to have forward compatible implementations.
@@ -207,6 +221,9 @@ func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*Lo
 }
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedAuthServiceServer) RefreshAccessToken(context.Context, *RefreshAccessTokenRequest) (*RefreshAccessTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefreshAccessToken not implemented")
 }
 
 // UnsafeAuthServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -256,6 +273,24 @@ func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_RefreshAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefreshAccessTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).RefreshAccessToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_RefreshAccessToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).RefreshAccessToken(ctx, req.(*RefreshAccessTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -270,6 +305,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Logout",
 			Handler:    _AuthService_Logout_Handler,
+		},
+		{
+			MethodName: "RefreshAccessToken",
+			Handler:    _AuthService_RefreshAccessToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
