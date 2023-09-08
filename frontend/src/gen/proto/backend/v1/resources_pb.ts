@@ -815,9 +815,9 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   userId = 0;
 
   /**
-   * @generated from field: string user_name = 3;
+   * @generated from field: string username = 3;
    */
-  userName = "";
+  username = "";
 
   /**
    * contest
@@ -914,7 +914,7 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "user_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
     { no: 5, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 6, name: "task_title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -966,9 +966,9 @@ export class SubmissionSummary extends Message<SubmissionSummary> {
   userId = 0;
 
   /**
-   * @generated from field: string user_name = 3;
+   * @generated from field: string username = 3;
    */
-  userName = "";
+  username = "";
 
   /**
    * contest
@@ -1041,7 +1041,7 @@ export class SubmissionSummary extends Message<SubmissionSummary> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "user_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
     { no: 5, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 6, name: "task_title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
