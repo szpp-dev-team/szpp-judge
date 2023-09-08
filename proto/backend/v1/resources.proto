@@ -4,6 +4,7 @@ package backend.v1;
 
 import "google/protobuf/timestamp.proto";
 import "judge/v1/resources.proto";
+import "judge/v1/judge_type.proto";
 
 message User {
   int32 id = 1;
