@@ -16,6 +16,8 @@ service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse);
   // ログアウト
   rpc Logout(LogoutRequest) returns (LogoutResponse);
+  // refresh token を使って access token を更新する
+  rpc RefreshAccessToken(RefreshAccessTokenRequest) returns (RefreshAccessTokenResponse);
 }
 
 service TaskService {

@@ -32,6 +32,14 @@ message LoginResponse {
   User user = 1;
 }
 
+message RefreshAccessTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshAccessTokenResponse {
+  string access_token = 1;
+}
+
 message LogoutRequest {}
 
 message LogoutResponse {}
