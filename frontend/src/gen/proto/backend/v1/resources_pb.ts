@@ -397,7 +397,7 @@ export class Task extends Message<Task> {
   contestIds: number[] = [];
 
   /**
-   * Judge の status(完全一致、誤差など)
+   * Judge の type(完全一致、誤差など)
    *
    * @generated from field: judge.v1.JudgeType judge_type = 7;
    */
