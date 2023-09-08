@@ -37,17 +37,28 @@ type Contest struct {
 
 // ContestEdges holds the relations/edges for other nodes in the graph.
 type ContestEdges struct {
+	// Tasks holds the value of the tasks edge.
+	Tasks []*Task `json:"tasks,omitempty"`
 	// ContestUsers holds the value of the contest_users edge.
 	ContestUsers []*User `json:"contest_users,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
+}
+
+// TasksOrErr returns the Tasks value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContestEdges) TasksOrErr() ([]*Task, error) {
+	if e.loadedTypes[0] {
+		return e.Tasks, nil
+	}
+	return nil, &NotLoadedError{edge: "tasks"}
 }
 
 // ContestUsersOrErr returns the ContestUsers value or an error if the edge
 // was not loaded in eager-loading.
 func (e ContestEdges) ContestUsersOrErr() ([]*User, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		return e.ContestUsers, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_users"}
@@ -132,6 +143,11 @@ func (c *Contest) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (c *Contest) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
+}
+
+// QueryTasks queries the "tasks" edge of the Contest entity.
+func (c *Contest) QueryTasks() *TaskQuery {
+	return NewContestClient(c.config).QueryTasks(c)
 }
 
 // QueryContestUsers queries the "contest_users" edge of the Contest entity.

@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
@@ -79,6 +80,21 @@ func (cu *ContestUpdate) SetEndAt(t time.Time) *ContestUpdate {
 	return cu
 }
 
+// AddTaskIDs adds the "tasks" edge to the Task entity by IDs.
+func (cu *ContestUpdate) AddTaskIDs(ids ...int) *ContestUpdate {
+	cu.mutation.AddTaskIDs(ids...)
+	return cu
+}
+
+// AddTasks adds the "tasks" edges to the Task entity.
+func (cu *ContestUpdate) AddTasks(t ...*Task) *ContestUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return cu.AddTaskIDs(ids...)
+}
+
 // AddContestUserIDs adds the "contest_users" edge to the User entity by IDs.
 func (cu *ContestUpdate) AddContestUserIDs(ids ...int) *ContestUpdate {
 	cu.mutation.AddContestUserIDs(ids...)
@@ -97,6 +113,27 @@ func (cu *ContestUpdate) AddContestUsers(u ...*User) *ContestUpdate {
 // Mutation returns the ContestMutation object of the builder.
 func (cu *ContestUpdate) Mutation() *ContestMutation {
 	return cu.mutation
+}
+
+// ClearTasks clears all "tasks" edges to the Task entity.
+func (cu *ContestUpdate) ClearTasks() *ContestUpdate {
+	cu.mutation.ClearTasks()
+	return cu
+}
+
+// RemoveTaskIDs removes the "tasks" edge to Task entities by IDs.
+func (cu *ContestUpdate) RemoveTaskIDs(ids ...int) *ContestUpdate {
+	cu.mutation.RemoveTaskIDs(ids...)
+	return cu
+}
+
+// RemoveTasks removes "tasks" edges to Task entities.
+func (cu *ContestUpdate) RemoveTasks(t ...*Task) *ContestUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return cu.RemoveTaskIDs(ids...)
 }
 
 // ClearContestUsers clears all "contest_users" edges to the User entity.
@@ -179,6 +216,51 @@ func (cu *ContestUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.EndAt(); ok {
 		_spec.SetField(contest.FieldEndAt, field.TypeTime, value)
+	}
+	if cu.mutation.TasksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   contest.TasksTable,
+			Columns: contest.TasksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedTasksIDs(); len(nodes) > 0 && !cu.mutation.TasksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   contest.TasksTable,
+			Columns: contest.TasksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.TasksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   contest.TasksTable,
+			Columns: contest.TasksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if cu.mutation.ContestUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -295,6 +377,21 @@ func (cuo *ContestUpdateOne) SetEndAt(t time.Time) *ContestUpdateOne {
 	return cuo
 }
 
+// AddTaskIDs adds the "tasks" edge to the Task entity by IDs.
+func (cuo *ContestUpdateOne) AddTaskIDs(ids ...int) *ContestUpdateOne {
+	cuo.mutation.AddTaskIDs(ids...)
+	return cuo
+}
+
+// AddTasks adds the "tasks" edges to the Task entity.
+func (cuo *ContestUpdateOne) AddTasks(t ...*Task) *ContestUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return cuo.AddTaskIDs(ids...)
+}
+
 // AddContestUserIDs adds the "contest_users" edge to the User entity by IDs.
 func (cuo *ContestUpdateOne) AddContestUserIDs(ids ...int) *ContestUpdateOne {
 	cuo.mutation.AddContestUserIDs(ids...)
@@ -313,6 +410,27 @@ func (cuo *ContestUpdateOne) AddContestUsers(u ...*User) *ContestUpdateOne {
 // Mutation returns the ContestMutation object of the builder.
 func (cuo *ContestUpdateOne) Mutation() *ContestMutation {
 	return cuo.mutation
+}
+
+// ClearTasks clears all "tasks" edges to the Task entity.
+func (cuo *ContestUpdateOne) ClearTasks() *ContestUpdateOne {
+	cuo.mutation.ClearTasks()
+	return cuo
+}
+
+// RemoveTaskIDs removes the "tasks" edge to Task entities by IDs.
+func (cuo *ContestUpdateOne) RemoveTaskIDs(ids ...int) *ContestUpdateOne {
+	cuo.mutation.RemoveTaskIDs(ids...)
+	return cuo
+}
+
+// RemoveTasks removes "tasks" edges to Task entities.
+func (cuo *ContestUpdateOne) RemoveTasks(t ...*Task) *ContestUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return cuo.RemoveTaskIDs(ids...)
 }
 
 // ClearContestUsers clears all "contest_users" edges to the User entity.
@@ -425,6 +543,51 @@ func (cuo *ContestUpdateOne) sqlSave(ctx context.Context) (_node *Contest, err e
 	}
 	if value, ok := cuo.mutation.EndAt(); ok {
 		_spec.SetField(contest.FieldEndAt, field.TypeTime, value)
+	}
+	if cuo.mutation.TasksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   contest.TasksTable,
+			Columns: contest.TasksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedTasksIDs(); len(nodes) > 0 && !cuo.mutation.TasksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   contest.TasksTable,
+			Columns: contest.TasksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.TasksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   contest.TasksTable,
+			Columns: contest.TasksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if cuo.mutation.ContestUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{

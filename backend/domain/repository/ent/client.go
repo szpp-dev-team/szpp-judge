@@ -321,6 +321,22 @@ func (c *ContestClient) GetX(ctx context.Context, id int) *Contest {
 	return obj
 }
 
+// QueryTasks queries the tasks edge of a Contest.
+func (c *ContestClient) QueryTasks(co *Contest) *TaskQuery {
+	query := (&TaskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contest.Table, contest.FieldID, id),
+			sqlgraph.To(task.Table, task.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, contest.TasksTable, contest.TasksPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryContestUsers queries the contest_users edge of a Contest.
 func (c *ContestClient) QueryContestUsers(co *Contest) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
@@ -496,6 +512,22 @@ func (c *TaskClient) QueryUser(t *Task) *UserQuery {
 			sqlgraph.From(task.Table, task.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, task.UserTable, task.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTaskContests queries the task_contests edge of a Task.
+func (c *TaskClient) QueryTaskContests(t *Task) *ContestQuery {
+	query := (&ContestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, id),
+			sqlgraph.To(contest.Table, contest.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, task.TaskContestsTable, task.TaskContestsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil

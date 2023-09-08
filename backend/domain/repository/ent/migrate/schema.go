@@ -130,6 +130,31 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// ContestTasksColumns holds the columns for the "contest_tasks" table.
+	ContestTasksColumns = []*schema.Column{
+		{Name: "contest_id", Type: field.TypeInt},
+		{Name: "task_id", Type: field.TypeInt},
+	}
+	// ContestTasksTable holds the schema information for the "contest_tasks" table.
+	ContestTasksTable = &schema.Table{
+		Name:       "contest_tasks",
+		Columns:    ContestTasksColumns,
+		PrimaryKey: []*schema.Column{ContestTasksColumns[0], ContestTasksColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "contest_tasks_contest_id",
+				Columns:    []*schema.Column{ContestTasksColumns[0]},
+				RefColumns: []*schema.Column{ContestsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "contest_tasks_task_id",
+				Columns:    []*schema.Column{ContestTasksColumns[1]},
+				RefColumns: []*schema.Column{TasksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// TestcaseSetTestcasesColumns holds the columns for the "testcase_set_testcases" table.
 	TestcaseSetTestcasesColumns = []*schema.Column{
 		{Name: "testcase_set_id", Type: field.TypeInt},
@@ -187,6 +212,7 @@ var (
 		TestcasesTable,
 		TestcaseSetsTable,
 		UsersTable,
+		ContestTasksTable,
 		TestcaseSetTestcasesTable,
 		UserContestsTable,
 	}
@@ -196,6 +222,8 @@ func init() {
 	TasksTable.ForeignKeys[0].RefTable = UsersTable
 	TestcasesTable.ForeignKeys[0].RefTable = TasksTable
 	TestcaseSetsTable.ForeignKeys[0].RefTable = TasksTable
+	ContestTasksTable.ForeignKeys[0].RefTable = ContestsTable
+	ContestTasksTable.ForeignKeys[1].RefTable = TasksTable
 	TestcaseSetTestcasesTable.ForeignKeys[0].RefTable = TestcaseSetsTable
 	TestcaseSetTestcasesTable.ForeignKeys[1].RefTable = TestcasesTable
 	UserContestsTable.ForeignKeys[0].RefTable = UsersTable

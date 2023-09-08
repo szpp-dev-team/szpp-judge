@@ -24,10 +24,17 @@ const (
 	FieldStartAt = "start_at"
 	// FieldEndAt holds the string denoting the end_at field in the database.
 	FieldEndAt = "end_at"
+	// EdgeTasks holds the string denoting the tasks edge name in mutations.
+	EdgeTasks = "tasks"
 	// EdgeContestUsers holds the string denoting the contest_users edge name in mutations.
 	EdgeContestUsers = "contest_users"
 	// Table holds the table name of the contest in the database.
 	Table = "contests"
+	// TasksTable is the table that holds the tasks relation/edge. The primary key declared below.
+	TasksTable = "contest_tasks"
+	// TasksInverseTable is the table name for the Task entity.
+	// It exists in this package in order to avoid circular dependency with the "task" package.
+	TasksInverseTable = "tasks"
 	// ContestUsersTable is the table that holds the contest_users relation/edge. The primary key declared below.
 	ContestUsersTable = "user_contests"
 	// ContestUsersInverseTable is the table name for the User entity.
@@ -47,6 +54,9 @@ var Columns = []string{
 }
 
 var (
+	// TasksPrimaryKey and TasksColumn2 are the table columns denoting the
+	// primary key for the tasks relation (M2M).
+	TasksPrimaryKey = []string{"contest_id", "task_id"}
 	// ContestUsersPrimaryKey and ContestUsersColumn2 are the table columns denoting the
 	// primary key for the contest_users relation (M2M).
 	ContestUsersPrimaryKey = []string{"user_id", "contest_id"}
@@ -100,6 +110,20 @@ func ByEndAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEndAt, opts...).ToFunc()
 }
 
+// ByTasksCount orders the results by tasks count.
+func ByTasksCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTasksStep(), opts...)
+	}
+}
+
+// ByTasks orders the results by tasks terms.
+func ByTasks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTasksStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByContestUsersCount orders the results by contest_users count.
 func ByContestUsersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -112,6 +136,13 @@ func ByContestUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newContestUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
+}
+func newTasksStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TasksInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, TasksTable, TasksPrimaryKey...),
+	)
 }
 func newContestUsersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

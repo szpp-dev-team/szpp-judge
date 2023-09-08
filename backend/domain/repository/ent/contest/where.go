@@ -375,6 +375,29 @@ func EndAtLTE(v time.Time) predicate.Contest {
 	return predicate.Contest(sql.FieldLTE(FieldEndAt, v))
 }
 
+// HasTasks applies the HasEdge predicate on the "tasks" edge.
+func HasTasks() predicate.Contest {
+	return predicate.Contest(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, TasksTable, TasksPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTasksWith applies the HasEdge predicate on the "tasks" edge with a given conditions (other predicates).
+func HasTasksWith(preds ...predicate.Task) predicate.Contest {
+	return predicate.Contest(func(s *sql.Selector) {
+		step := newTasksStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasContestUsers applies the HasEdge predicate on the "contest_users" edge.
 func HasContestUsers() predicate.Contest {
 	return predicate.Contest(func(s *sql.Selector) {

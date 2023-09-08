@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
@@ -176,6 +177,21 @@ func (tc *TaskCreate) SetNillableUserID(id *int) *TaskCreate {
 // SetUser sets the "user" edge to the User entity.
 func (tc *TaskCreate) SetUser(u *User) *TaskCreate {
 	return tc.SetUserID(u.ID)
+}
+
+// AddTaskContestIDs adds the "task_contests" edge to the Contest entity by IDs.
+func (tc *TaskCreate) AddTaskContestIDs(ids ...int) *TaskCreate {
+	tc.mutation.AddTaskContestIDs(ids...)
+	return tc
+}
+
+// AddTaskContests adds the "task_contests" edges to the Contest entity.
+func (tc *TaskCreate) AddTaskContests(c ...*Contest) *TaskCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tc.AddTaskContestIDs(ids...)
 }
 
 // Mutation returns the TaskMutation object of the builder.
@@ -362,6 +378,22 @@ func (tc *TaskCreate) createSpec() (*Task, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.user_tasks = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.TaskContestsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   task.TaskContestsTable,
+			Columns: task.TaskContestsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

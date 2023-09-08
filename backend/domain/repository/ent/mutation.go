@@ -50,6 +50,9 @@ type ContestMutation struct {
 	start_at             *time.Time
 	end_at               *time.Time
 	clearedFields        map[string]struct{}
+	tasks                map[int]struct{}
+	removedtasks         map[int]struct{}
+	clearedtasks         bool
 	contest_users        map[int]struct{}
 	removedcontest_users map[int]struct{}
 	clearedcontest_users bool
@@ -418,6 +421,60 @@ func (m *ContestMutation) ResetEndAt() {
 	m.end_at = nil
 }
 
+// AddTaskIDs adds the "tasks" edge to the Task entity by ids.
+func (m *ContestMutation) AddTaskIDs(ids ...int) {
+	if m.tasks == nil {
+		m.tasks = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.tasks[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTasks clears the "tasks" edge to the Task entity.
+func (m *ContestMutation) ClearTasks() {
+	m.clearedtasks = true
+}
+
+// TasksCleared reports if the "tasks" edge to the Task entity was cleared.
+func (m *ContestMutation) TasksCleared() bool {
+	return m.clearedtasks
+}
+
+// RemoveTaskIDs removes the "tasks" edge to the Task entity by IDs.
+func (m *ContestMutation) RemoveTaskIDs(ids ...int) {
+	if m.removedtasks == nil {
+		m.removedtasks = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.tasks, ids[i])
+		m.removedtasks[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTasks returns the removed IDs of the "tasks" edge to the Task entity.
+func (m *ContestMutation) RemovedTasksIDs() (ids []int) {
+	for id := range m.removedtasks {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TasksIDs returns the "tasks" edge IDs in the mutation.
+func (m *ContestMutation) TasksIDs() (ids []int) {
+	for id := range m.tasks {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTasks resets all changes to the "tasks" edge.
+func (m *ContestMutation) ResetTasks() {
+	m.tasks = nil
+	m.clearedtasks = false
+	m.removedtasks = nil
+}
+
 // AddContestUserIDs adds the "contest_users" edge to the User entity by ids.
 func (m *ContestMutation) AddContestUserIDs(ids ...int) {
 	if m.contest_users == nil {
@@ -717,7 +774,10 @@ func (m *ContestMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ContestMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.tasks != nil {
+		edges = append(edges, contest.EdgeTasks)
+	}
 	if m.contest_users != nil {
 		edges = append(edges, contest.EdgeContestUsers)
 	}
@@ -728,6 +788,12 @@ func (m *ContestMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ContestMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case contest.EdgeTasks:
+		ids := make([]ent.Value, 0, len(m.tasks))
+		for id := range m.tasks {
+			ids = append(ids, id)
+		}
+		return ids
 	case contest.EdgeContestUsers:
 		ids := make([]ent.Value, 0, len(m.contest_users))
 		for id := range m.contest_users {
@@ -740,7 +806,10 @@ func (m *ContestMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ContestMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.removedtasks != nil {
+		edges = append(edges, contest.EdgeTasks)
+	}
 	if m.removedcontest_users != nil {
 		edges = append(edges, contest.EdgeContestUsers)
 	}
@@ -751,6 +820,12 @@ func (m *ContestMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *ContestMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case contest.EdgeTasks:
+		ids := make([]ent.Value, 0, len(m.removedtasks))
+		for id := range m.removedtasks {
+			ids = append(ids, id)
+		}
+		return ids
 	case contest.EdgeContestUsers:
 		ids := make([]ent.Value, 0, len(m.removedcontest_users))
 		for id := range m.removedcontest_users {
@@ -763,7 +838,10 @@ func (m *ContestMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ContestMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.clearedtasks {
+		edges = append(edges, contest.EdgeTasks)
+	}
 	if m.clearedcontest_users {
 		edges = append(edges, contest.EdgeContestUsers)
 	}
@@ -774,6 +852,8 @@ func (m *ContestMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ContestMutation) EdgeCleared(name string) bool {
 	switch name {
+	case contest.EdgeTasks:
+		return m.clearedtasks
 	case contest.EdgeContestUsers:
 		return m.clearedcontest_users
 	}
@@ -792,6 +872,9 @@ func (m *ContestMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ContestMutation) ResetEdge(name string) error {
 	switch name {
+	case contest.EdgeTasks:
+		m.ResetTasks()
+		return nil
 	case contest.EdgeContestUsers:
 		m.ResetContestUsers()
 		return nil
@@ -828,6 +911,9 @@ type TaskMutation struct {
 	clearedtestcases     bool
 	user                 *int
 	cleareduser          bool
+	task_contests        map[int]struct{}
+	removedtask_contests map[int]struct{}
+	clearedtask_contests bool
 	done                 bool
 	oldValue             func(context.Context) (*Task, error)
 	predicates           []predicate.Task
@@ -1593,6 +1679,60 @@ func (m *TaskMutation) ResetUser() {
 	m.cleareduser = false
 }
 
+// AddTaskContestIDs adds the "task_contests" edge to the Contest entity by ids.
+func (m *TaskMutation) AddTaskContestIDs(ids ...int) {
+	if m.task_contests == nil {
+		m.task_contests = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.task_contests[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTaskContests clears the "task_contests" edge to the Contest entity.
+func (m *TaskMutation) ClearTaskContests() {
+	m.clearedtask_contests = true
+}
+
+// TaskContestsCleared reports if the "task_contests" edge to the Contest entity was cleared.
+func (m *TaskMutation) TaskContestsCleared() bool {
+	return m.clearedtask_contests
+}
+
+// RemoveTaskContestIDs removes the "task_contests" edge to the Contest entity by IDs.
+func (m *TaskMutation) RemoveTaskContestIDs(ids ...int) {
+	if m.removedtask_contests == nil {
+		m.removedtask_contests = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.task_contests, ids[i])
+		m.removedtask_contests[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTaskContests returns the removed IDs of the "task_contests" edge to the Contest entity.
+func (m *TaskMutation) RemovedTaskContestsIDs() (ids []int) {
+	for id := range m.removedtask_contests {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TaskContestsIDs returns the "task_contests" edge IDs in the mutation.
+func (m *TaskMutation) TaskContestsIDs() (ids []int) {
+	for id := range m.task_contests {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTaskContests resets all changes to the "task_contests" edge.
+func (m *TaskMutation) ResetTaskContests() {
+	m.task_contests = nil
+	m.clearedtask_contests = false
+	m.removedtask_contests = nil
+}
+
 // Where appends a list predicates to the TaskMutation builder.
 func (m *TaskMutation) Where(ps ...predicate.Task) {
 	m.predicates = append(m.predicates, ps...)
@@ -1962,7 +2102,7 @@ func (m *TaskMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TaskMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.testcase_sets != nil {
 		edges = append(edges, task.EdgeTestcaseSets)
 	}
@@ -1971,6 +2111,9 @@ func (m *TaskMutation) AddedEdges() []string {
 	}
 	if m.user != nil {
 		edges = append(edges, task.EdgeUser)
+	}
+	if m.task_contests != nil {
+		edges = append(edges, task.EdgeTaskContests)
 	}
 	return edges
 }
@@ -1995,18 +2138,27 @@ func (m *TaskMutation) AddedIDs(name string) []ent.Value {
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
 		}
+	case task.EdgeTaskContests:
+		ids := make([]ent.Value, 0, len(m.task_contests))
+		for id := range m.task_contests {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TaskMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedtestcase_sets != nil {
 		edges = append(edges, task.EdgeTestcaseSets)
 	}
 	if m.removedtestcases != nil {
 		edges = append(edges, task.EdgeTestcases)
+	}
+	if m.removedtask_contests != nil {
+		edges = append(edges, task.EdgeTaskContests)
 	}
 	return edges
 }
@@ -2027,13 +2179,19 @@ func (m *TaskMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case task.EdgeTaskContests:
+		ids := make([]ent.Value, 0, len(m.removedtask_contests))
+		for id := range m.removedtask_contests {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TaskMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedtestcase_sets {
 		edges = append(edges, task.EdgeTestcaseSets)
 	}
@@ -2042,6 +2200,9 @@ func (m *TaskMutation) ClearedEdges() []string {
 	}
 	if m.cleareduser {
 		edges = append(edges, task.EdgeUser)
+	}
+	if m.clearedtask_contests {
+		edges = append(edges, task.EdgeTaskContests)
 	}
 	return edges
 }
@@ -2056,6 +2217,8 @@ func (m *TaskMutation) EdgeCleared(name string) bool {
 		return m.clearedtestcases
 	case task.EdgeUser:
 		return m.cleareduser
+	case task.EdgeTaskContests:
+		return m.clearedtask_contests
 	}
 	return false
 }
@@ -2083,6 +2246,9 @@ func (m *TaskMutation) ResetEdge(name string) error {
 		return nil
 	case task.EdgeUser:
 		m.ResetUser()
+		return nil
+	case task.EdgeTaskContests:
+		m.ResetTaskContests()
 		return nil
 	}
 	return fmt.Errorf("unknown Task edge %s", name)

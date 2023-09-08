@@ -55,9 +55,11 @@ type TaskEdges struct {
 	Testcases []*Testcase `json:"testcases,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
+	// TaskContests holds the value of the task_contests edge.
+	TaskContests []*Contest `json:"task_contests,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // TestcaseSetsOrErr returns the TestcaseSets value or an error if the edge
@@ -89,6 +91,15 @@ func (e TaskEdges) UserOrErr() (*User, error) {
 		return e.User, nil
 	}
 	return nil, &NotLoadedError{edge: "user"}
+}
+
+// TaskContestsOrErr returns the TaskContests value or an error if the edge
+// was not loaded in eager-loading.
+func (e TaskEdges) TaskContestsOrErr() ([]*Contest, error) {
+	if e.loadedTypes[3] {
+		return e.TaskContests, nil
+	}
+	return nil, &NotLoadedError{edge: "task_contests"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -230,6 +241,11 @@ func (t *Task) QueryTestcases() *TestcaseQuery {
 // QueryUser queries the "user" edge of the Task entity.
 func (t *Task) QueryUser() *UserQuery {
 	return NewTaskClient(t.config).QueryUser(t)
+}
+
+// QueryTaskContests queries the "task_contests" edge of the Task entity.
+func (t *Task) QueryTaskContests() *ContestQuery {
+	return NewTaskClient(t.config).QueryTaskContests(t)
 }
 
 // Update returns a builder for updating this Task.
