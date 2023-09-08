@@ -13,6 +13,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
@@ -21,6 +23,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Contest is the client for interacting with the Contest builders.
+	Contest *ContestClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -36,6 +40,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Contest = NewContestClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -117,9 +122,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		Contest: NewContestClient(cfg),
+		User:    NewUserClient(cfg),
 	}, nil
 }
 
@@ -137,16 +143,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		Contest: NewContestClient(cfg),
+		User:    NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		Contest.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -168,22 +175,160 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Contest.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.Contest.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *ContestMutation:
+		return c.Contest.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// ContestClient is a client for the Contest schema.
+type ContestClient struct {
+	config
+}
+
+// NewContestClient returns a client for the Contest from the given config.
+func NewContestClient(c config) *ContestClient {
+	return &ContestClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `contest.Hooks(f(g(h())))`.
+func (c *ContestClient) Use(hooks ...Hook) {
+	c.hooks.Contest = append(c.hooks.Contest, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `contest.Intercept(f(g(h())))`.
+func (c *ContestClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Contest = append(c.inters.Contest, interceptors...)
+}
+
+// Create returns a builder for creating a Contest entity.
+func (c *ContestClient) Create() *ContestCreate {
+	mutation := newContestMutation(c.config, OpCreate)
+	return &ContestCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Contest entities.
+func (c *ContestClient) CreateBulk(builders ...*ContestCreate) *ContestCreateBulk {
+	return &ContestCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Contest.
+func (c *ContestClient) Update() *ContestUpdate {
+	mutation := newContestMutation(c.config, OpUpdate)
+	return &ContestUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ContestClient) UpdateOne(co *Contest) *ContestUpdateOne {
+	mutation := newContestMutation(c.config, OpUpdateOne, withContest(co))
+	return &ContestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ContestClient) UpdateOneID(id int) *ContestUpdateOne {
+	mutation := newContestMutation(c.config, OpUpdateOne, withContestID(id))
+	return &ContestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Contest.
+func (c *ContestClient) Delete() *ContestDelete {
+	mutation := newContestMutation(c.config, OpDelete)
+	return &ContestDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ContestClient) DeleteOne(co *Contest) *ContestDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ContestClient) DeleteOneID(id int) *ContestDeleteOne {
+	builder := c.Delete().Where(contest.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ContestDeleteOne{builder}
+}
+
+// Query returns a query builder for Contest.
+func (c *ContestClient) Query() *ContestQuery {
+	return &ContestQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeContest},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Contest entity by its id.
+func (c *ContestClient) Get(ctx context.Context, id int) (*Contest, error) {
+	return c.Query().Where(contest.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ContestClient) GetX(ctx context.Context, id int) *Contest {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryContestUsers queries the contest_users edge of a Contest.
+func (c *ContestClient) QueryContestUsers(co *Contest) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contest.Table, contest.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, contest.ContestUsersTable, contest.ContestUsersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ContestClient) Hooks() []Hook {
+	return c.hooks.Contest
+}
+
+// Interceptors returns the client interceptors.
+func (c *ContestClient) Interceptors() []Interceptor {
+	return c.inters.Contest
+}
+
+func (c *ContestClient) mutate(ctx context.Context, m *ContestMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ContestCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ContestUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ContestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ContestDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Contest mutation op: %q", m.Op())
 	}
 }
 
@@ -280,6 +425,22 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QueryContests queries the contests edge of a User.
+func (c *UserClient) QueryContests(u *User) *ContestQuery {
+	query := (&ContestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(contest.Table, contest.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.ContestsTable, user.ContestsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -308,9 +469,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		User []ent.Hook
+		Contest, User []ent.Hook
 	}
 	inters struct {
-		User []ent.Interceptor
+		Contest, User []ent.Interceptor
 	}
 )

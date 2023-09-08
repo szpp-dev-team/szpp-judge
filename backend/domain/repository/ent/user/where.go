@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 )
 
@@ -362,6 +363,29 @@ func UpdatedAtIsNil() predicate.User {
 // UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
 func UpdatedAtNotNil() predicate.User {
 	return predicate.User(sql.FieldNotNull(FieldUpdatedAt))
+}
+
+// HasContests applies the HasEdge predicate on the "contests" edge.
+func HasContests() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, ContestsTable, ContestsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasContestsWith applies the HasEdge predicate on the "contests" edge with a given conditions (other predicates).
+func HasContestsWith(preds ...predicate.Contest) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newContestsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

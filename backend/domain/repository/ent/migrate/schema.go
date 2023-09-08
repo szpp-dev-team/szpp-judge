@@ -8,6 +8,22 @@ import (
 )
 
 var (
+	// ContestsColumns holds the columns for the "contests" table.
+	ContestsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "slug", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "task_id", Type: field.TypeInt},
+		{Name: "clarification_id", Type: field.TypeInt},
+		{Name: "start_at", Type: field.TypeTime},
+		{Name: "end_at", Type: field.TypeTime},
+	}
+	// ContestsTable holds the schema information for the "contests" table.
+	ContestsTable = &schema.Table{
+		Name:       "contests",
+		Columns:    ContestsColumns,
+		PrimaryKey: []*schema.Column{ContestsColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -23,11 +39,40 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// UserContestsColumns holds the columns for the "user_contests" table.
+	UserContestsColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "contest_id", Type: field.TypeInt},
+	}
+	// UserContestsTable holds the schema information for the "user_contests" table.
+	UserContestsTable = &schema.Table{
+		Name:       "user_contests",
+		Columns:    UserContestsColumns,
+		PrimaryKey: []*schema.Column{UserContestsColumns[0], UserContestsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_contests_user_id",
+				Columns:    []*schema.Column{UserContestsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_contests_contest_id",
+				Columns:    []*schema.Column{UserContestsColumns[1]},
+				RefColumns: []*schema.Column{ContestsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		ContestsTable,
 		UsersTable,
+		UserContestsTable,
 	}
 )
 
 func init() {
+	UserContestsTable.ForeignKeys[0].RefTable = UsersTable
+	UserContestsTable.ForeignKeys[1].RefTable = ContestsTable
 }
