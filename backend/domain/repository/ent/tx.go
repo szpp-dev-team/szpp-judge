@@ -14,6 +14,12 @@ type Tx struct {
 	config
 	// Contest is the client for interacting with the Contest builders.
 	Contest *ContestClient
+	// Task is the client for interacting with the Task builders.
+	Task *TaskClient
+	// Testcase is the client for interacting with the Testcase builders.
+	Testcase *TestcaseClient
+	// TestcaseSet is the client for interacting with the TestcaseSet builders.
+	TestcaseSet *TestcaseSetClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -148,6 +154,9 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Contest = NewContestClient(tx.config)
+	tx.Task = NewTaskClient(tx.config)
+	tx.Testcase = NewTestcaseClient(tx.config)
+	tx.TestcaseSet = NewTestcaseSetClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

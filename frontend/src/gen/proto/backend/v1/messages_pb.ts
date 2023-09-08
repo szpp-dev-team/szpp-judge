@@ -454,7 +454,16 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
   task?: Task;
 
   /**
-   * @generated from field: repeated backend.v1.Testcase testcases = 2;
+   * writer, admin によるリクエストのみ
+   *
+   * @generated from field: repeated backend.v1.TestcaseSet testcase_sets = 2;
+   */
+  testcaseSets: TestcaseSet[] = [];
+
+  /**
+   * sample ケースは必ず含むが、全てのケースは writer, admin によるリクエストのみ
+   *
+   * @generated from field: repeated backend.v1.Testcase testcases = 3;
    */
   testcases: Testcase[] = [];
 
@@ -467,7 +476,8 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
   static readonly typeName = "backend.v1.GetTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
-    { no: 2, name: "testcases", kind: "message", T: Testcase, repeated: true },
+    { no: 2, name: "testcase_sets", kind: "message", T: TestcaseSet, repeated: true },
+    { no: 3, name: "testcases", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskResponse {
