@@ -50,8 +50,47 @@ const variantBordered = definePartsStyle((props) => {
   };
 });
 
+const variantBorderedNarrow = definePartsStyle((props) => {
+  const { colorScheme: c } = props;
+  const borderColor = `${c}.300`;
+
+  return {
+    table: {
+      borderTop: "1px",
+      borderLeft: "1px",
+      borderColor,
+    },
+    th: {
+      px: "1rem",
+      fontSize: "sm",
+      color: "gray.700",
+      bg: "gray.50",
+      borderBottom: "1px",
+      borderRight: "1px",
+      borderColor,
+      ...numericStyles,
+    },
+    td: {
+      px: "0.75rem",
+      py: "0.75rem",
+      borderBottom: "1px",
+      borderRight: "1px",
+      borderColor,
+      ...numericStyles,
+    },
+    tfoot: {
+      tr: {
+        "&:last-of-type": {
+          th: { borderBottomWidth: 0 },
+        },
+      },
+    },
+  };
+});
+
 export const tableTheme = defineMultiStyleConfig({
   variants: {
-    bordered: variantBordered,
+    "bordered": variantBordered,
+    "bordered-narrow": variantBorderedNarrow,
   },
 });
