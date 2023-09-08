@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetStandingsRequest, GetStandingsResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetStandingsRequest, GetStandingsResponse, GetSubmissionDetailRequest, GetSubmissionDetailResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListSubmissionsRequest, ListSubmissionsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, SubmitRequest, SubmitResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -105,6 +105,50 @@ export const TaskService = {
       name: "UpdateTask",
       I: UpdateTaskRequest,
       O: UpdateTaskResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 提出する
+     *
+     * @generated from rpc backend.v1.TaskService.Submit
+     */
+    submit: {
+      name: "Submit",
+      I: SubmitRequest,
+      O: SubmitResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 提出の詳細を取得
+     *
+     * @generated from rpc backend.v1.TaskService.GetSubmissionDetail
+     */
+    getSubmissionDetail: {
+      name: "GetSubmissionDetail",
+      I: GetSubmissionDetailRequest,
+      O: GetSubmissionDetailResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 提出一覧を取得
+     *
+     * @generated from rpc backend.v1.TaskService.ListSubmissions
+     */
+    listSubmissions: {
+      name: "ListSubmissions",
+      I: ListSubmissionsRequest,
+      O: ListSubmissionsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ジャッジの進捗を取得
+     *
+     * @generated from rpc backend.v1.TaskService.GetJudgeProgress
+     */
+    getJudgeProgress: {
+      name: "GetJudgeProgress",
+      I: GetJudgeProgressRequest,
+      O: GetJudgeProgressResponse,
       kind: MethodKind.Unary,
     },
     /**

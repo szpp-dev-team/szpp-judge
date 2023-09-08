@@ -39,11 +39,13 @@ type Contest struct {
 type ContestEdges struct {
 	// Tasks holds the value of the tasks edge.
 	Tasks []*Task `json:"tasks,omitempty"`
+	// Submits holds the value of the submits edge.
+	Submits []*Submit `json:"submits,omitempty"`
 	// ContestUsers holds the value of the contest_users edge.
 	ContestUsers []*User `json:"contest_users,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // TasksOrErr returns the Tasks value or an error if the edge
@@ -55,10 +57,19 @@ func (e ContestEdges) TasksOrErr() ([]*Task, error) {
 	return nil, &NotLoadedError{edge: "tasks"}
 }
 
+// SubmitsOrErr returns the Submits value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContestEdges) SubmitsOrErr() ([]*Submit, error) {
+	if e.loadedTypes[1] {
+		return e.Submits, nil
+	}
+	return nil, &NotLoadedError{edge: "submits"}
+}
+
 // ContestUsersOrErr returns the ContestUsers value or an error if the edge
 // was not loaded in eager-loading.
 func (e ContestEdges) ContestUsersOrErr() ([]*User, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.ContestUsers, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_users"}
@@ -148,6 +159,11 @@ func (c *Contest) Value(name string) (ent.Value, error) {
 // QueryTasks queries the "tasks" edge of the Contest entity.
 func (c *Contest) QueryTasks() *TaskQuery {
 	return NewContestClient(c.config).QueryTasks(c)
+}
+
+// QuerySubmits queries the "submits" edge of the Contest entity.
+func (c *Contest) QuerySubmits() *SubmitQuery {
+	return NewContestClient(c.config).QuerySubmits(c)
 }
 
 // QueryContestUsers queries the "contest_users" edge of the Contest entity.

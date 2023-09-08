@@ -21,6 +21,30 @@ func (f ContestFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ContestMutation", m)
 }
 
+// The LanguageFunc type is an adapter to allow the use of ordinary
+// function as Language mutator.
+type LanguageFunc func(context.Context, *ent.LanguageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LanguageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.LanguageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LanguageMutation", m)
+}
+
+// The SubmitFunc type is an adapter to allow the use of ordinary
+// function as Submit mutator.
+type SubmitFunc func(context.Context, *ent.SubmitMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubmitFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubmitMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubmitMutation", m)
+}
+
 // The TaskFunc type is an adapter to allow the use of ordinary
 // function as Task mutator.
 type TaskFunc func(context.Context, *ent.TaskMutation) (ent.Value, error)
@@ -43,6 +67,18 @@ func (f TestcaseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestcaseMutation", m)
+}
+
+// The TestcaseResultFunc type is an adapter to allow the use of ordinary
+// function as TestcaseResult mutator.
+type TestcaseResultFunc func(context.Context, *ent.TestcaseResultMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestcaseResultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestcaseResultMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestcaseResultMutation", m)
 }
 
 // The TestcaseSetFunc type is an adapter to allow the use of ordinary

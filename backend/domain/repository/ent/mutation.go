@@ -12,7 +12,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
@@ -28,11 +30,14 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeContest     = "Contest"
-	TypeTask        = "Task"
-	TypeTestcase    = "Testcase"
-	TypeTestcaseSet = "TestcaseSet"
-	TypeUser        = "User"
+	TypeContest        = "Contest"
+	TypeLanguage       = "Language"
+	TypeSubmit         = "Submit"
+	TypeTask           = "Task"
+	TypeTestcase       = "Testcase"
+	TypeTestcaseResult = "TestcaseResult"
+	TypeTestcaseSet    = "TestcaseSet"
+	TypeUser           = "User"
 )
 
 // ContestMutation represents an operation that mutates the Contest nodes in the graph.
@@ -53,6 +58,9 @@ type ContestMutation struct {
 	tasks                map[int]struct{}
 	removedtasks         map[int]struct{}
 	clearedtasks         bool
+	submits              map[int]struct{}
+	removedsubmits       map[int]struct{}
+	clearedsubmits       bool
 	contest_users        map[int]struct{}
 	removedcontest_users map[int]struct{}
 	clearedcontest_users bool
@@ -475,6 +483,60 @@ func (m *ContestMutation) ResetTasks() {
 	m.removedtasks = nil
 }
 
+// AddSubmitIDs adds the "submits" edge to the Submit entity by ids.
+func (m *ContestMutation) AddSubmitIDs(ids ...int) {
+	if m.submits == nil {
+		m.submits = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.submits[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubmits clears the "submits" edge to the Submit entity.
+func (m *ContestMutation) ClearSubmits() {
+	m.clearedsubmits = true
+}
+
+// SubmitsCleared reports if the "submits" edge to the Submit entity was cleared.
+func (m *ContestMutation) SubmitsCleared() bool {
+	return m.clearedsubmits
+}
+
+// RemoveSubmitIDs removes the "submits" edge to the Submit entity by IDs.
+func (m *ContestMutation) RemoveSubmitIDs(ids ...int) {
+	if m.removedsubmits == nil {
+		m.removedsubmits = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.submits, ids[i])
+		m.removedsubmits[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubmits returns the removed IDs of the "submits" edge to the Submit entity.
+func (m *ContestMutation) RemovedSubmitsIDs() (ids []int) {
+	for id := range m.removedsubmits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubmitsIDs returns the "submits" edge IDs in the mutation.
+func (m *ContestMutation) SubmitsIDs() (ids []int) {
+	for id := range m.submits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubmits resets all changes to the "submits" edge.
+func (m *ContestMutation) ResetSubmits() {
+	m.submits = nil
+	m.clearedsubmits = false
+	m.removedsubmits = nil
+}
+
 // AddContestUserIDs adds the "contest_users" edge to the User entity by ids.
 func (m *ContestMutation) AddContestUserIDs(ids ...int) {
 	if m.contest_users == nil {
@@ -774,9 +836,12 @@ func (m *ContestMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ContestMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.tasks != nil {
 		edges = append(edges, contest.EdgeTasks)
+	}
+	if m.submits != nil {
+		edges = append(edges, contest.EdgeSubmits)
 	}
 	if m.contest_users != nil {
 		edges = append(edges, contest.EdgeContestUsers)
@@ -794,6 +859,12 @@ func (m *ContestMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case contest.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.submits))
+		for id := range m.submits {
+			ids = append(ids, id)
+		}
+		return ids
 	case contest.EdgeContestUsers:
 		ids := make([]ent.Value, 0, len(m.contest_users))
 		for id := range m.contest_users {
@@ -806,9 +877,12 @@ func (m *ContestMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ContestMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedtasks != nil {
 		edges = append(edges, contest.EdgeTasks)
+	}
+	if m.removedsubmits != nil {
+		edges = append(edges, contest.EdgeSubmits)
 	}
 	if m.removedcontest_users != nil {
 		edges = append(edges, contest.EdgeContestUsers)
@@ -826,6 +900,12 @@ func (m *ContestMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case contest.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.removedsubmits))
+		for id := range m.removedsubmits {
+			ids = append(ids, id)
+		}
+		return ids
 	case contest.EdgeContestUsers:
 		ids := make([]ent.Value, 0, len(m.removedcontest_users))
 		for id := range m.removedcontest_users {
@@ -838,9 +918,12 @@ func (m *ContestMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ContestMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedtasks {
 		edges = append(edges, contest.EdgeTasks)
+	}
+	if m.clearedsubmits {
+		edges = append(edges, contest.EdgeSubmits)
 	}
 	if m.clearedcontest_users {
 		edges = append(edges, contest.EdgeContestUsers)
@@ -854,6 +937,8 @@ func (m *ContestMutation) EdgeCleared(name string) bool {
 	switch name {
 	case contest.EdgeTasks:
 		return m.clearedtasks
+	case contest.EdgeSubmits:
+		return m.clearedsubmits
 	case contest.EdgeContestUsers:
 		return m.clearedcontest_users
 	}
@@ -875,11 +960,951 @@ func (m *ContestMutation) ResetEdge(name string) error {
 	case contest.EdgeTasks:
 		m.ResetTasks()
 		return nil
+	case contest.EdgeSubmits:
+		m.ResetSubmits()
+		return nil
 	case contest.EdgeContestUsers:
 		m.ResetContestUsers()
 		return nil
 	}
 	return fmt.Errorf("unknown Contest edge %s", name)
+}
+
+// LanguageMutation represents an operation that mutates the Language nodes in the graph.
+type LanguageMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	clearedFields map[string]struct{}
+	submit        *int
+	clearedsubmit bool
+	done          bool
+	oldValue      func(context.Context) (*Language, error)
+	predicates    []predicate.Language
+}
+
+var _ ent.Mutation = (*LanguageMutation)(nil)
+
+// languageOption allows management of the mutation configuration using functional options.
+type languageOption func(*LanguageMutation)
+
+// newLanguageMutation creates new mutation for the Language entity.
+func newLanguageMutation(c config, op Op, opts ...languageOption) *LanguageMutation {
+	m := &LanguageMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeLanguage,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withLanguageID sets the ID field of the mutation.
+func withLanguageID(id int) languageOption {
+	return func(m *LanguageMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Language
+		)
+		m.oldValue = func(ctx context.Context) (*Language, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Language.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withLanguage sets the old Language of the mutation.
+func withLanguage(node *Language) languageOption {
+	return func(m *LanguageMutation) {
+		m.oldValue = func(context.Context) (*Language, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m LanguageMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m LanguageMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *LanguageMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *LanguageMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Language.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetSubmitID sets the "submit" edge to the Submit entity by id.
+func (m *LanguageMutation) SetSubmitID(id int) {
+	m.submit = &id
+}
+
+// ClearSubmit clears the "submit" edge to the Submit entity.
+func (m *LanguageMutation) ClearSubmit() {
+	m.clearedsubmit = true
+}
+
+// SubmitCleared reports if the "submit" edge to the Submit entity was cleared.
+func (m *LanguageMutation) SubmitCleared() bool {
+	return m.clearedsubmit
+}
+
+// SubmitID returns the "submit" edge ID in the mutation.
+func (m *LanguageMutation) SubmitID() (id int, exists bool) {
+	if m.submit != nil {
+		return *m.submit, true
+	}
+	return
+}
+
+// SubmitIDs returns the "submit" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SubmitID instead. It exists only for internal usage by the builders.
+func (m *LanguageMutation) SubmitIDs() (ids []int) {
+	if id := m.submit; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSubmit resets all changes to the "submit" edge.
+func (m *LanguageMutation) ResetSubmit() {
+	m.submit = nil
+	m.clearedsubmit = false
+}
+
+// Where appends a list predicates to the LanguageMutation builder.
+func (m *LanguageMutation) Where(ps ...predicate.Language) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the LanguageMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *LanguageMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Language, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *LanguageMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *LanguageMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Language).
+func (m *LanguageMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *LanguageMutation) Fields() []string {
+	fields := make([]string, 0, 0)
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *LanguageMutation) Field(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *LanguageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, fmt.Errorf("unknown Language field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LanguageMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Language field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *LanguageMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *LanguageMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LanguageMutation) AddField(name string, value ent.Value) error {
+	return fmt.Errorf("unknown Language numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *LanguageMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *LanguageMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *LanguageMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Language nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *LanguageMutation) ResetField(name string) error {
+	return fmt.Errorf("unknown Language field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *LanguageMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.submit != nil {
+		edges = append(edges, language.EdgeSubmit)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case language.EdgeSubmit:
+		if id := m.submit; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *LanguageMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *LanguageMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *LanguageMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedsubmit {
+		edges = append(edges, language.EdgeSubmit)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *LanguageMutation) EdgeCleared(name string) bool {
+	switch name {
+	case language.EdgeSubmit:
+		return m.clearedsubmit
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *LanguageMutation) ClearEdge(name string) error {
+	switch name {
+	case language.EdgeSubmit:
+		m.ClearSubmit()
+		return nil
+	}
+	return fmt.Errorf("unknown Language unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *LanguageMutation) ResetEdge(name string) error {
+	switch name {
+	case language.EdgeSubmit:
+		m.ResetSubmit()
+		return nil
+	}
+	return fmt.Errorf("unknown Language edge %s", name)
+}
+
+// SubmitMutation represents an operation that mutates the Submit nodes in the graph.
+type SubmitMutation struct {
+	config
+	op                     Op
+	typ                    string
+	id                     *int
+	clearedFields          map[string]struct{}
+	user                   map[int]struct{}
+	removeduser            map[int]struct{}
+	cleareduser            bool
+	language               map[int]struct{}
+	removedlanguage        map[int]struct{}
+	clearedlanguage        bool
+	testcase_result        map[int]struct{}
+	removedtestcase_result map[int]struct{}
+	clearedtestcase_result bool
+	submit_contests        map[int]struct{}
+	removedsubmit_contests map[int]struct{}
+	clearedsubmit_contests bool
+	done                   bool
+	oldValue               func(context.Context) (*Submit, error)
+	predicates             []predicate.Submit
+}
+
+var _ ent.Mutation = (*SubmitMutation)(nil)
+
+// submitOption allows management of the mutation configuration using functional options.
+type submitOption func(*SubmitMutation)
+
+// newSubmitMutation creates new mutation for the Submit entity.
+func newSubmitMutation(c config, op Op, opts ...submitOption) *SubmitMutation {
+	m := &SubmitMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSubmit,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSubmitID sets the ID field of the mutation.
+func withSubmitID(id int) submitOption {
+	return func(m *SubmitMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Submit
+		)
+		m.oldValue = func(ctx context.Context) (*Submit, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Submit.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSubmit sets the old Submit of the mutation.
+func withSubmit(node *Submit) submitOption {
+	return func(m *SubmitMutation) {
+		m.oldValue = func(context.Context) (*Submit, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SubmitMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SubmitMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SubmitMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SubmitMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Submit.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// AddUserIDs adds the "user" edge to the User entity by ids.
+func (m *SubmitMutation) AddUserIDs(ids ...int) {
+	if m.user == nil {
+		m.user = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.user[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *SubmitMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *SubmitMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// RemoveUserIDs removes the "user" edge to the User entity by IDs.
+func (m *SubmitMutation) RemoveUserIDs(ids ...int) {
+	if m.removeduser == nil {
+		m.removeduser = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.user, ids[i])
+		m.removeduser[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUser returns the removed IDs of the "user" edge to the User entity.
+func (m *SubmitMutation) RemovedUserIDs() (ids []int) {
+	for id := range m.removeduser {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+func (m *SubmitMutation) UserIDs() (ids []int) {
+	for id := range m.user {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *SubmitMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+	m.removeduser = nil
+}
+
+// AddLanguageIDs adds the "language" edge to the Language entity by ids.
+func (m *SubmitMutation) AddLanguageIDs(ids ...int) {
+	if m.language == nil {
+		m.language = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.language[ids[i]] = struct{}{}
+	}
+}
+
+// ClearLanguage clears the "language" edge to the Language entity.
+func (m *SubmitMutation) ClearLanguage() {
+	m.clearedlanguage = true
+}
+
+// LanguageCleared reports if the "language" edge to the Language entity was cleared.
+func (m *SubmitMutation) LanguageCleared() bool {
+	return m.clearedlanguage
+}
+
+// RemoveLanguageIDs removes the "language" edge to the Language entity by IDs.
+func (m *SubmitMutation) RemoveLanguageIDs(ids ...int) {
+	if m.removedlanguage == nil {
+		m.removedlanguage = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.language, ids[i])
+		m.removedlanguage[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedLanguage returns the removed IDs of the "language" edge to the Language entity.
+func (m *SubmitMutation) RemovedLanguageIDs() (ids []int) {
+	for id := range m.removedlanguage {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// LanguageIDs returns the "language" edge IDs in the mutation.
+func (m *SubmitMutation) LanguageIDs() (ids []int) {
+	for id := range m.language {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetLanguage resets all changes to the "language" edge.
+func (m *SubmitMutation) ResetLanguage() {
+	m.language = nil
+	m.clearedlanguage = false
+	m.removedlanguage = nil
+}
+
+// AddTestcaseResultIDs adds the "testcase_result" edge to the TestcaseResult entity by ids.
+func (m *SubmitMutation) AddTestcaseResultIDs(ids ...int) {
+	if m.testcase_result == nil {
+		m.testcase_result = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.testcase_result[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTestcaseResult clears the "testcase_result" edge to the TestcaseResult entity.
+func (m *SubmitMutation) ClearTestcaseResult() {
+	m.clearedtestcase_result = true
+}
+
+// TestcaseResultCleared reports if the "testcase_result" edge to the TestcaseResult entity was cleared.
+func (m *SubmitMutation) TestcaseResultCleared() bool {
+	return m.clearedtestcase_result
+}
+
+// RemoveTestcaseResultIDs removes the "testcase_result" edge to the TestcaseResult entity by IDs.
+func (m *SubmitMutation) RemoveTestcaseResultIDs(ids ...int) {
+	if m.removedtestcase_result == nil {
+		m.removedtestcase_result = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.testcase_result, ids[i])
+		m.removedtestcase_result[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTestcaseResult returns the removed IDs of the "testcase_result" edge to the TestcaseResult entity.
+func (m *SubmitMutation) RemovedTestcaseResultIDs() (ids []int) {
+	for id := range m.removedtestcase_result {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TestcaseResultIDs returns the "testcase_result" edge IDs in the mutation.
+func (m *SubmitMutation) TestcaseResultIDs() (ids []int) {
+	for id := range m.testcase_result {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTestcaseResult resets all changes to the "testcase_result" edge.
+func (m *SubmitMutation) ResetTestcaseResult() {
+	m.testcase_result = nil
+	m.clearedtestcase_result = false
+	m.removedtestcase_result = nil
+}
+
+// AddSubmitContestIDs adds the "submit_contests" edge to the Contest entity by ids.
+func (m *SubmitMutation) AddSubmitContestIDs(ids ...int) {
+	if m.submit_contests == nil {
+		m.submit_contests = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.submit_contests[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubmitContests clears the "submit_contests" edge to the Contest entity.
+func (m *SubmitMutation) ClearSubmitContests() {
+	m.clearedsubmit_contests = true
+}
+
+// SubmitContestsCleared reports if the "submit_contests" edge to the Contest entity was cleared.
+func (m *SubmitMutation) SubmitContestsCleared() bool {
+	return m.clearedsubmit_contests
+}
+
+// RemoveSubmitContestIDs removes the "submit_contests" edge to the Contest entity by IDs.
+func (m *SubmitMutation) RemoveSubmitContestIDs(ids ...int) {
+	if m.removedsubmit_contests == nil {
+		m.removedsubmit_contests = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.submit_contests, ids[i])
+		m.removedsubmit_contests[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubmitContests returns the removed IDs of the "submit_contests" edge to the Contest entity.
+func (m *SubmitMutation) RemovedSubmitContestsIDs() (ids []int) {
+	for id := range m.removedsubmit_contests {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubmitContestsIDs returns the "submit_contests" edge IDs in the mutation.
+func (m *SubmitMutation) SubmitContestsIDs() (ids []int) {
+	for id := range m.submit_contests {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubmitContests resets all changes to the "submit_contests" edge.
+func (m *SubmitMutation) ResetSubmitContests() {
+	m.submit_contests = nil
+	m.clearedsubmit_contests = false
+	m.removedsubmit_contests = nil
+}
+
+// Where appends a list predicates to the SubmitMutation builder.
+func (m *SubmitMutation) Where(ps ...predicate.Submit) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SubmitMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SubmitMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Submit, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SubmitMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SubmitMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Submit).
+func (m *SubmitMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SubmitMutation) Fields() []string {
+	fields := make([]string, 0, 0)
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SubmitMutation) Field(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SubmitMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, fmt.Errorf("unknown Submit field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SubmitMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Submit field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SubmitMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SubmitMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SubmitMutation) AddField(name string, value ent.Value) error {
+	return fmt.Errorf("unknown Submit numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SubmitMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SubmitMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SubmitMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Submit nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SubmitMutation) ResetField(name string) error {
+	return fmt.Errorf("unknown Submit field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SubmitMutation) AddedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.user != nil {
+		edges = append(edges, submit.EdgeUser)
+	}
+	if m.language != nil {
+		edges = append(edges, submit.EdgeLanguage)
+	}
+	if m.testcase_result != nil {
+		edges = append(edges, submit.EdgeTestcaseResult)
+	}
+	if m.submit_contests != nil {
+		edges = append(edges, submit.EdgeSubmitContests)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SubmitMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case submit.EdgeUser:
+		ids := make([]ent.Value, 0, len(m.user))
+		for id := range m.user {
+			ids = append(ids, id)
+		}
+		return ids
+	case submit.EdgeLanguage:
+		ids := make([]ent.Value, 0, len(m.language))
+		for id := range m.language {
+			ids = append(ids, id)
+		}
+		return ids
+	case submit.EdgeTestcaseResult:
+		ids := make([]ent.Value, 0, len(m.testcase_result))
+		for id := range m.testcase_result {
+			ids = append(ids, id)
+		}
+		return ids
+	case submit.EdgeSubmitContests:
+		ids := make([]ent.Value, 0, len(m.submit_contests))
+		for id := range m.submit_contests {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SubmitMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.removeduser != nil {
+		edges = append(edges, submit.EdgeUser)
+	}
+	if m.removedlanguage != nil {
+		edges = append(edges, submit.EdgeLanguage)
+	}
+	if m.removedtestcase_result != nil {
+		edges = append(edges, submit.EdgeTestcaseResult)
+	}
+	if m.removedsubmit_contests != nil {
+		edges = append(edges, submit.EdgeSubmitContests)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SubmitMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case submit.EdgeUser:
+		ids := make([]ent.Value, 0, len(m.removeduser))
+		for id := range m.removeduser {
+			ids = append(ids, id)
+		}
+		return ids
+	case submit.EdgeLanguage:
+		ids := make([]ent.Value, 0, len(m.removedlanguage))
+		for id := range m.removedlanguage {
+			ids = append(ids, id)
+		}
+		return ids
+	case submit.EdgeTestcaseResult:
+		ids := make([]ent.Value, 0, len(m.removedtestcase_result))
+		for id := range m.removedtestcase_result {
+			ids = append(ids, id)
+		}
+		return ids
+	case submit.EdgeSubmitContests:
+		ids := make([]ent.Value, 0, len(m.removedsubmit_contests))
+		for id := range m.removedsubmit_contests {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SubmitMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.cleareduser {
+		edges = append(edges, submit.EdgeUser)
+	}
+	if m.clearedlanguage {
+		edges = append(edges, submit.EdgeLanguage)
+	}
+	if m.clearedtestcase_result {
+		edges = append(edges, submit.EdgeTestcaseResult)
+	}
+	if m.clearedsubmit_contests {
+		edges = append(edges, submit.EdgeSubmitContests)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SubmitMutation) EdgeCleared(name string) bool {
+	switch name {
+	case submit.EdgeUser:
+		return m.cleareduser
+	case submit.EdgeLanguage:
+		return m.clearedlanguage
+	case submit.EdgeTestcaseResult:
+		return m.clearedtestcase_result
+	case submit.EdgeSubmitContests:
+		return m.clearedsubmit_contests
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SubmitMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Submit unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SubmitMutation) ResetEdge(name string) error {
+	switch name {
+	case submit.EdgeUser:
+		m.ResetUser()
+		return nil
+	case submit.EdgeLanguage:
+		m.ResetLanguage()
+		return nil
+	case submit.EdgeTestcaseResult:
+		m.ResetTestcaseResult()
+		return nil
+	case submit.EdgeSubmitContests:
+		m.ResetSubmitContests()
+		return nil
+	}
+	return fmt.Errorf("unknown Submit edge %s", name)
 }
 
 // TaskMutation represents an operation that mutates the Task nodes in the graph.
@@ -2939,6 +3964,270 @@ func (m *TestcaseMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Testcase edge %s", name)
+}
+
+// TestcaseResultMutation represents an operation that mutates the TestcaseResult nodes in the graph.
+type TestcaseResultMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*TestcaseResult, error)
+	predicates    []predicate.TestcaseResult
+}
+
+var _ ent.Mutation = (*TestcaseResultMutation)(nil)
+
+// testcaseresultOption allows management of the mutation configuration using functional options.
+type testcaseresultOption func(*TestcaseResultMutation)
+
+// newTestcaseResultMutation creates new mutation for the TestcaseResult entity.
+func newTestcaseResultMutation(c config, op Op, opts ...testcaseresultOption) *TestcaseResultMutation {
+	m := &TestcaseResultMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTestcaseResult,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTestcaseResultID sets the ID field of the mutation.
+func withTestcaseResultID(id int) testcaseresultOption {
+	return func(m *TestcaseResultMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TestcaseResult
+		)
+		m.oldValue = func(ctx context.Context) (*TestcaseResult, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TestcaseResult.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTestcaseResult sets the old TestcaseResult of the mutation.
+func withTestcaseResult(node *TestcaseResult) testcaseresultOption {
+	return func(m *TestcaseResultMutation) {
+		m.oldValue = func(context.Context) (*TestcaseResult, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TestcaseResultMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TestcaseResultMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TestcaseResultMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TestcaseResultMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TestcaseResult.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// Where appends a list predicates to the TestcaseResultMutation builder.
+func (m *TestcaseResultMutation) Where(ps ...predicate.TestcaseResult) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TestcaseResultMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TestcaseResultMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TestcaseResult, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TestcaseResultMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TestcaseResultMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (TestcaseResult).
+func (m *TestcaseResultMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TestcaseResultMutation) Fields() []string {
+	fields := make([]string, 0, 0)
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TestcaseResultMutation) Field(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TestcaseResultMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, fmt.Errorf("unknown TestcaseResult field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TestcaseResultMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown TestcaseResult field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TestcaseResultMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TestcaseResultMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TestcaseResultMutation) AddField(name string, value ent.Value) error {
+	return fmt.Errorf("unknown TestcaseResult numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TestcaseResultMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TestcaseResultMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TestcaseResultMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown TestcaseResult nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TestcaseResultMutation) ResetField(name string) error {
+	return fmt.Errorf("unknown TestcaseResult field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TestcaseResultMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TestcaseResultMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TestcaseResultMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TestcaseResultMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TestcaseResultMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TestcaseResultMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TestcaseResultMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown TestcaseResult unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TestcaseResultMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown TestcaseResult edge %s", name)
 }
 
 // TestcaseSetMutation represents an operation that mutates the TestcaseSet nodes in the graph.

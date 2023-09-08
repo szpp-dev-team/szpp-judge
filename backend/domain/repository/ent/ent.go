@@ -13,8 +13,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -77,11 +80,14 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			contest.Table:     contest.ValidColumn,
-			task.Table:        task.ValidColumn,
-			testcase.Table:    testcase.ValidColumn,
-			testcaseset.Table: testcaseset.ValidColumn,
-			user.Table:        user.ValidColumn,
+			contest.Table:        contest.ValidColumn,
+			language.Table:       language.ValidColumn,
+			submit.Table:         submit.ValidColumn,
+			task.Table:           task.ValidColumn,
+			testcase.Table:       testcase.ValidColumn,
+			testcaseresult.Table: testcaseresult.ValidColumn,
+			testcaseset.Table:    testcaseset.ValidColumn,
+			user.Table:           user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)
