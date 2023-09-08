@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
+import { JudgeType } from "../../judge/v1/judge_type_pb";
 import { JudgeStatus } from "../../judge/v1/resources_pb";
 
 /**
@@ -398,9 +399,9 @@ export class Task extends Message<Task> {
   /**
    * Judge の status(完全一致、誤差など)
    *
-   * @generated from field: judge.v1.JudgeStatus judge_status = 7;
+   * @generated from field: judge.v1.JudgeType judge_type = 7;
    */
-  judgeStatus = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
+  judgeType?: JudgeType;
 
   /**
    * @generated from field: backend.v1.Difficulty difficulty = 8;
@@ -431,7 +432,7 @@ export class Task extends Message<Task> {
     { no: 4, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 6, name: "contest_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
-    { no: 7, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
+    { no: 7, name: "judge_type", kind: "message", T: JudgeType },
     { no: 8, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
     { no: 9, name: "created_at", kind: "message", T: Timestamp },
     { no: 10, name: "updated_at", kind: "message", T: Timestamp, opt: true },
