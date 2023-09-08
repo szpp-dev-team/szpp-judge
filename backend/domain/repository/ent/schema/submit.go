@@ -14,7 +14,7 @@ func (Submit) Field() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.Int("user_id"),
-		field.Int("contest_id").Optional(),
+		field.Int("contest_id").Optional().Nillable(),
 		field.Int("task_id"),
 		field.Int("language_id"),
 		field.String("status"),
