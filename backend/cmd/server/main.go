@@ -28,13 +28,14 @@ func main() {
 		log.Fatal(err)
 	}
 	mysqlConfig := &mysql.Config{
-		DBName:    config.DBName,
-		User:      config.DBUser,
-		Passwd:    config.DBPass,
-		Addr:      config.DBAddr,
-		Net:       "tcp",
-		ParseTime: true,
-		Loc:       jst,
+		DBName:               config.DBName,
+		User:                 config.DBUser,
+		Passwd:               config.DBPass,
+		Addr:                 config.DBAddr,
+		Net:                  "tcp",
+		ParseTime:            true,
+		Loc:                  jst,
+		AllowNativePasswords: true,
 	}
 	entClient, err := ent.Open("mysql", mysqlConfig.FormatDSN())
 	if err != nil {

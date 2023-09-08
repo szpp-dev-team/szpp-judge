@@ -5,6 +5,7 @@ on:
       - develop
     paths:
       - frontend/**
+      - '!frontend/src/gen/**'
       - .github/workflows/frontend-deploy-preview.yml
 defaults:
   run:
@@ -16,15 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version-file: frontend/.node-version
-
       - uses: pnpm/action-setup@v2
         name: Install pnpm
         with:
           version: 8
           run_install: false
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: frontend/.node-version
 
       - name: Get pnpm store directory
         shell: bash
@@ -34,7 +35,9 @@ jobs:
       - name: Setup pnpm cache
         uses: actions/cache@v3
         with:
-          path: ${{ env.STORE_PATH }}
+          path: |
+            ${{ env.STORE_PATH }}
+            ${{ github.workspace }}/.next/cache
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -44,6 +47,8 @@ jobs:
 
       - name: Build with lint
         run: pnpm build
+        env:
+          NEXT_PUBLIC_ENVOY_BASE_URL: ${{ secrets.NEXT_PUBLIC_ENVOY_BASE_URL }}
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
