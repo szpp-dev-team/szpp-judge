@@ -64,3 +64,46 @@ func Test_GetUser(t *testing.T) {
 		})
 	}
 }
+
+func Test_CreateUser(t *testing.T) {
+	entClient := utils.NewTestClient(t)
+	defer entClient.Close()
+	interactor := NewInteractor(entClient)
+
+	tests := map[string]struct {
+		prepare func(t *testing.T, req *backendv1.CreateUserRequest)
+		wantErr bool
+		assert  func(ctx context.Context, t *testing.T, req *backendv1.CreateUserRequest, resp *backendv1.CreateUserResponse)
+	}{
+		"success": {
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.CreateUserRequest, resp *backendv1.CreateUserResponse) {
+				user, err := entClient.User.Query().Where(entuser.ID(int(resp.User.Id))).Only(ctx)
+				require.NoError(t, err)
+				assert.Equal(t, req.Username, user.Name)
+				err = VerifyPassword(user.EncryptedPassword, req.Password)
+				require.NoError(t, err)
+			},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			req := &backendv1.CreateUserRequest{
+				Username: "szppi",
+				Password: "szppi_tensai",
+				Email: "szppi@szpp.com",
+			}
+			resp, err := interactor.CreateUser(ctx, req)
+			if test.wantErr {
+				require.Error(t, err)
+				return
+			} else {
+				require.NoError(t, err)
+			}
+			if test.assert != nil {
+				test.assert(ctx, t, req, resp)
+			}
+		})
+	}
+}
