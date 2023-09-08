@@ -60,7 +60,7 @@ message MutationTask {
   string statement = 2; // 問題文
   int32 exec_time_limit = 3; // 実行時間制限[ms]
   int32 exec_memory_limit = 4; // 実行メモリ制限[MB]
-  judge.v1.JudgeStatus judge_status = 5; // Judge の status(完全一致、誤差など)
+  judge.v1.JudgeType judge_type = 5; // Judge の type(完全一致、誤差など)
   Difficulty difficulty = 6;
 }
 
