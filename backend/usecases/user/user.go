@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
@@ -33,6 +34,23 @@ func (i *Interactor) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.G
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &pb.GetUserResponse{
+		User: toPbUser(user),
+	}, nil
+}
+
+func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	now := timejst.Now()
+	q := i.entClient.User.Create().
+		SetName(req.Username).
+		SetEncryptedPassword(HashPassword(req.Password)).
+		SetRole("USER").
+		SetCreatedAt(now).
+		SetUpdatedAt(now)
+	user, err := q.Save(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &pb.CreateUserResponse{
 		User: toPbUser(user),
 	}, nil
 }
