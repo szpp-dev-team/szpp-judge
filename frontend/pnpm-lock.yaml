@@ -50,6 +50,9 @@ dependencies:
   framer-motion:
     specifier: 10.15.1
     version: 10.15.1(react-dom@18.2.0)(react@18.2.0)
+  jotai:
+    specifier: 2.4.2
+    version: 2.4.2(@types/react@18.2.20)(react@18.2.0)
   next:
     specifier: 13.4.13
     version: 13.4.13(@babel/core@7.22.11)(react-dom@18.2.0)(react@18.2.0)
@@ -9240,6 +9243,22 @@ packages:
     resolution: {integrity: sha512-5eEbBDQT/jF1xg6l36P+mWGGoH9Spuy0PCdSr2dtWRDGC6ph/w9ZCL4lmESW8f8F7MwT3XKescfP0wnZWAKL9w==}
     hasBin: true
     dev: true
+
+  /jotai@2.4.2(@types/react@18.2.20)(react@18.2.0):
+    resolution: {integrity: sha512-90jXVOd9h6gi5JXk558M+wnJfaaVN2WegcNOCfiFbWboNaDl6DkRgiY/K1oeqTfYJmq8yM7XPsL99LAvcOPqhw==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      '@types/react': 18.2.20
+      react: 18.2.0
+    dev: false
 
   /js-levenshtein@1.1.6:
     resolution: {integrity: sha512-X2BB11YZtrRqY4EnQcLX5Rh373zbK4alC1FW7D7MBhL2gtcC17cTnr6DmfHZeS0s2rTHjUTMMHfG7gO8SSdw+g==}
