@@ -20,6 +20,6 @@ func (Language) Field() []ent.Field {
 
 func (Language) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("submit", Submit.Type).Ref("language").Unique(),
+		edge.To("submit", Submit.Type),
 	}
 }
