@@ -13,7 +13,7 @@ export const WithHeaderFooter: FC<WithHeaderFooterProps> = ({ children }) => {
   return (
     <Flex flexDirection="column" minH="100vh" h="1px">
       <GlobalHeader />
-      <Box as="main" bg="gray.200">{children}</Box>
+      <Box as="main" flexGrow={1} bg="gray.200">{children}</Box>
       <GlobalFooter mt="auto" />
     </Flex>
   );
