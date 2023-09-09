@@ -28,9 +28,9 @@ func (Submit) Field() []ent.Field {
 
 func (Submit) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", User.Type),
+		edge.From("users", User.Type),
 		// edge.To("task", Task.Type),
-		edge.To("language", Language.Type),
+		edge.From("language", Language.Type),
 		edge.To("testcase_result", TestcaseResult.Type),
 	}
 }
