@@ -168,6 +168,80 @@ export class CreateUserResponse extends Message<CreateUserResponse> {
 }
 
 /**
+ * @generated from message backend.v1.ExistsUserIDRequest
+ */
+export class ExistsUserIDRequest extends Message<ExistsUserIDRequest> {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId = "";
+
+  constructor(data?: PartialMessage<ExistsUserIDRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.ExistsUserIDRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExistsUserIDRequest {
+    return new ExistsUserIDRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExistsUserIDRequest {
+    return new ExistsUserIDRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExistsUserIDRequest {
+    return new ExistsUserIDRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExistsUserIDRequest | PlainMessage<ExistsUserIDRequest> | undefined, b: ExistsUserIDRequest | PlainMessage<ExistsUserIDRequest> | undefined): boolean {
+    return proto3.util.equals(ExistsUserIDRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.ExistsUserIDResponse
+ */
+export class ExistsUserIDResponse extends Message<ExistsUserIDResponse> {
+  /**
+   * @generated from field: bool exists = 1;
+   */
+  exists = false;
+
+  constructor(data?: PartialMessage<ExistsUserIDResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.ExistsUserIDResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "exists", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExistsUserIDResponse {
+    return new ExistsUserIDResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExistsUserIDResponse {
+    return new ExistsUserIDResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExistsUserIDResponse {
+    return new ExistsUserIDResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExistsUserIDResponse | PlainMessage<ExistsUserIDResponse> | undefined, b: ExistsUserIDResponse | PlainMessage<ExistsUserIDResponse> | undefined): boolean {
+    return proto3.util.equals(ExistsUserIDResponse, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.LoginRequest
  */
 export class LoginRequest extends Message<LoginRequest> {
