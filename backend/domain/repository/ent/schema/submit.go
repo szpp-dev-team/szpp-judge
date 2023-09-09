@@ -13,10 +13,7 @@ type Submit struct {
 func (Submit) Field() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
-		field.Int("user_id"),
 		field.Int("contest_id").Optional().Nillable(),
-		field.Int("task_id"),
-		field.Int("language_id"),
 		field.String("status"),
 		field.Int("exec_time"),   // ms
 		field.Int("exec_memory"), // kib
