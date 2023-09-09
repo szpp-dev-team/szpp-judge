@@ -23,6 +23,14 @@ message CreateUserResponse {
   User user = 1;
 }
 
+message ExistsUserIDRequest {
+  string user_id = 1;
+}
+
+message ExistsUserIDResponse {
+  bool exists = 1;
+}
+
 message LoginRequest {
   string username = 1;
   string password = 2;
