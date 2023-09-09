@@ -38,14 +38,10 @@ message LogoutResponse {}
 
 message CreateTaskRequest {
   MutationTask task = 1;
-  repeated MutationTestcaseSet testcase_sets = 2;
-  repeated MutationTestcase testcases = 3;
 }
 
 message CreateTaskResponse {
   Task task = 1;
-  repeated TestcaseSet testcase_sets = 2;
-  repeated Testcase testcases = 3;
 }
 
 message GetTaskRequest {
@@ -54,20 +50,15 @@ message GetTaskRequest {
 
 message GetTaskResponse {
   Task task = 1;
-  repeated Testcase testcases = 2;
 }
 
 message UpdateTaskRequest {
   int32 id = 1;
   MutationTask task = 2;
-  repeated MutationTestcaseSet testcase_sets = 3;
-  repeated MutationTestcase testcases = 4;
 }
 
 message UpdateTaskResponse {
   Task task = 1;
-  repeated TestcaseSet testcase_sets = 2;
-  repeated Testcase testcases = 3;
 }
 
 message GetTestcaseSetsRequest {
