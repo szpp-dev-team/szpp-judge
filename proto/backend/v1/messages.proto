@@ -70,6 +70,26 @@ message UpdateTaskResponse {
   repeated Testcase testcases = 3;
 }
 
+message GetTestcaseSetsRequest {
+  int32 task_id = 1;
+}
+
+message GetTestcaseSetsResponse {
+  repeated TestcaseSet testcase_sets = 1;
+  repeated Testcase testcases = 2;
+}
+
+message SyncTestcaseSetsRequest {
+  int32 task_id = 1;
+  repeated MutationTestcaseSet testcase_sets = 2;
+  repeated MutationTestcase testcases = 3;
+}
+
+message SyncTestcaseSetsResponse {
+  repeated TestcaseSet testcase_sets = 1;
+  repeated Testcase testcases = 2;
+}
+
 message PingRequest {
   string name = 1;
 }

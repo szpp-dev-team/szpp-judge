@@ -25,6 +25,12 @@ service TaskService {
   rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
   // Task を更新する
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+
+  // TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+  rpc GetTestcaseSets(GetTestcaseSetsRequest) returns (GetTestcaseSetsResponse);
+  // TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+  rpc SyncTestcaseSets(SyncTestcaseSetsRequest) returns (SyncTestcaseSetsResponse);
+
   // 提出する
   rpc Submit(SubmitRequest) returns (SubmitResponse);
   // 提出の詳細を取得
