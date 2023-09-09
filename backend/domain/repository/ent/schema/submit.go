@@ -22,7 +22,7 @@ func (Submit) Field() []ent.Field {
 		field.Int("exec_memory"), // kib
 		field.Time("submitted_at"),
 		field.Time("created_at"),
-		field.Time("updated_at"),
+		field.Time("updated_at").Optional().Nillable(),
 	}
 }
 
