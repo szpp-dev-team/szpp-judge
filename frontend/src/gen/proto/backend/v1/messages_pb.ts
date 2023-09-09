@@ -318,16 +318,6 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
    */
   task?: MutationTask;
 
-  /**
-   * @generated from field: repeated backend.v1.MutationTestcaseSet testcase_sets = 2;
-   */
-  testcaseSets: MutationTestcaseSet[] = [];
-
-  /**
-   * @generated from field: repeated backend.v1.MutationTestcase testcases = 3;
-   */
-  testcases: MutationTestcase[] = [];
-
   constructor(data?: PartialMessage<CreateTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -337,8 +327,6 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
   static readonly typeName = "backend.v1.CreateTaskRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: MutationTask },
-    { no: 2, name: "testcase_sets", kind: "message", T: MutationTestcaseSet, repeated: true },
-    { no: 3, name: "testcases", kind: "message", T: MutationTestcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateTaskRequest {
@@ -367,16 +355,6 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
    */
   task?: Task;
 
-  /**
-   * @generated from field: repeated backend.v1.TestcaseSet testcase_sets = 2;
-   */
-  testcaseSets: TestcaseSet[] = [];
-
-  /**
-   * @generated from field: repeated backend.v1.Testcase testcases = 3;
-   */
-  testcases: Testcase[] = [];
-
   constructor(data?: PartialMessage<CreateTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -386,8 +364,6 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
   static readonly typeName = "backend.v1.CreateTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
-    { no: 2, name: "testcase_sets", kind: "message", T: TestcaseSet, repeated: true },
-    { no: 3, name: "testcases", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateTaskResponse {
@@ -453,11 +429,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
    */
   task?: Task;
 
-  /**
-   * @generated from field: repeated backend.v1.Testcase testcases = 2;
-   */
-  testcases: Testcase[] = [];
-
   constructor(data?: PartialMessage<GetTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -467,7 +438,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
   static readonly typeName = "backend.v1.GetTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
-    { no: 2, name: "testcases", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskResponse {
@@ -501,16 +471,6 @@ export class UpdateTaskRequest extends Message<UpdateTaskRequest> {
    */
   task?: MutationTask;
 
-  /**
-   * @generated from field: repeated backend.v1.MutationTestcaseSet testcase_sets = 3;
-   */
-  testcaseSets: MutationTestcaseSet[] = [];
-
-  /**
-   * @generated from field: repeated backend.v1.MutationTestcase testcases = 4;
-   */
-  testcases: MutationTestcase[] = [];
-
   constructor(data?: PartialMessage<UpdateTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -521,8 +481,6 @@ export class UpdateTaskRequest extends Message<UpdateTaskRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "task", kind: "message", T: MutationTask },
-    { no: 3, name: "testcase_sets", kind: "message", T: MutationTestcaseSet, repeated: true },
-    { no: 4, name: "testcases", kind: "message", T: MutationTestcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateTaskRequest {
@@ -551,16 +509,6 @@ export class UpdateTaskResponse extends Message<UpdateTaskResponse> {
    */
   task?: Task;
 
-  /**
-   * @generated from field: repeated backend.v1.TestcaseSet testcase_sets = 2;
-   */
-  testcaseSets: TestcaseSet[] = [];
-
-  /**
-   * @generated from field: repeated backend.v1.Testcase testcases = 3;
-   */
-  testcases: Testcase[] = [];
-
   constructor(data?: PartialMessage<UpdateTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -570,8 +518,6 @@ export class UpdateTaskResponse extends Message<UpdateTaskResponse> {
   static readonly typeName = "backend.v1.UpdateTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
-    { no: 2, name: "testcase_sets", kind: "message", T: TestcaseSet, repeated: true },
-    { no: 3, name: "testcases", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateTaskResponse {
