@@ -3,7 +3,7 @@ import type { LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 export type GlobalHeaderProps = {
-  contestID?: number;
+  contestSlug?: string;
   contestTitle?: string;
 };
 
@@ -24,13 +24,13 @@ const NavItemLink = ({ children, ...props }: LinkProps) => {
   );
 };
 
-export const GlobalHeader = ({ contestId, contestTitle }: GlobalHeaderProps) => {
+export const GlobalHeader = ({ contestSlug, contestTitle }: GlobalHeaderProps) => {
   return (
     <Box as="header" position="sticky" width="100%" top="0" left="0" zIndex={50}>
       <Flex as="nav" justifyContent="space-between" bg="teal.500" color="white">
         <Flex>
           <NavItemLink href="/" px="1.25rem">SZPP Judge</NavItemLink>
-          {contestId ? <NavItemLink href={`/contests/${contestId}`}>{contestTitle}</NavItemLink> : (
+          {contestSlug ? <NavItemLink href={`/contests/${contestSlug}`}>{contestTitle}</NavItemLink> : (
             <>
               <NavItemLink href="/contests">コンテスト</NavItemLink>
               <NavItemLink href="/tasks">問題</NavItemLink>
