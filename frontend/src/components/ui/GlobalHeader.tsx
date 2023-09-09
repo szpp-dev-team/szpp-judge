@@ -9,18 +9,20 @@ export type GlobalHeaderProps = {
 
 const NavItemLink = ({ children, ...props }: LinkProps) => {
   return (
-    <Link
-      as={NextLink}
-      display="block"
-      py="1rem"
-      px="0.75rem"
-      fontSize="sm"
-      fontWeight="semibold"
-      _hover={{ background: "teal.600" }}
-      {...props}
-    >
-      {children}
-    </Link>
+    <Box as="li" display="block">
+      <Link
+        as={NextLink}
+        display="block"
+        py="1rem"
+        px="0.75rem"
+        fontSize="sm"
+        fontWeight="semibold"
+        _hover={{ background: "teal.600" }}
+        {...props}
+      >
+        {children}
+      </Link>
+    </Box>
   );
 };
 
@@ -28,7 +30,7 @@ export const GlobalHeader = ({ contestSlug, contestTitle }: GlobalHeaderProps) =
   return (
     <Box as="header" position="sticky" width="100%" top="0" left="0" zIndex={50}>
       <Flex as="nav" justifyContent="space-between" bg="teal.500" color="white">
-        <Flex>
+        <Flex as="ul" listStyleType="none">
           <NavItemLink href="/" px="1.25rem">SZPP Judge</NavItemLink>
           {contestSlug ? <NavItemLink href={`/contests/${contestSlug}`}>{contestTitle}</NavItemLink> : (
             <>
@@ -37,7 +39,7 @@ export const GlobalHeader = ({ contestSlug, contestTitle }: GlobalHeaderProps) =
             </>
           )}
         </Flex>
-        <Flex>
+        <Flex as="ul" listStyleType="none">
           <NavItemLink href="/register" px="1.25rem">登録</NavItemLink>
           <NavItemLink href="/login" px="1.25rem">ログイン</NavItemLink>
         </Flex>
