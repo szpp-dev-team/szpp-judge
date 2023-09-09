@@ -12,9 +12,9 @@ const NavItemLink = ({ children, ...props }: LinkProps) => {
     <Link
       as={NextLink}
       display="block"
-      py="1.25rem"
+      py="1rem"
       px="0.75rem"
-      fontSize="md"
+      fontSize="sm"
       fontWeight="semibold"
       _hover={{ background: "teal.600" }}
       {...props}
