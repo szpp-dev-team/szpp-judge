@@ -1,9 +1,13 @@
 import { Duration, fmtDatetime } from "@/src/util/time";
-import { Box, BoxProps, FormControl, FormLabel, Icon, Link, LinkProps, Switch, Text } from "@chakra-ui/react";
+import { Box, FormControl, FormLabel, Icon, Link, Switch, Text } from "@chakra-ui/react";
+import type { BoxProps, LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { type ReactNode, useMemo, useState } from "react";
 import type { IconType } from "react-icons";
 import { IoBarChart, IoChatboxEllipses, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
+import { RoundedCheckIcon } from "../../icon/RoundedCheckIcon";
+import { RoundedCrossIcon } from "../../icon/RoundedCrossIcon";
+import { RoundedTriangleIcon } from "../../icon/RoundedTriangleIcon";
 import { SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
 
 export type ContestSidebarProps = {
@@ -66,7 +70,7 @@ export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) =
   );
 };
 
-const SidebarHoverShowArea = ({ ...props }: BoxProps) => {
+const SidebarHoverShowArea = (props: BoxProps) => {
   return (
     <Box
       position="absolute"
@@ -153,6 +157,23 @@ const SidebarMainPane = ({
               <Box as="ul" listStyleType="none" overflowY="auto" overscrollBehavior="contain">
                 {tasks.map((t, i) => (
                   <SidebarLinkItem
+                    leftElem={(() => {
+                      if (t.status == null) {
+                        return <Box h="1em" w="1em" minW="1em" />;
+                      }
+                      switch (t.status) {
+                        case "accepted":
+                          return <RoundedCheckIcon />;
+                        case "partialAccepted":
+                          return <RoundedTriangleIcon />;
+                        case "rejected":
+                          return <RoundedCrossIcon />;
+                        default: {
+                          const exhaustivecheck: never = t.status;
+                          throw new Error(`Invalid status: ${exhaustivecheck}`);
+                        }
+                      }
+                    })()}
                     key={t.id}
                     text={String.fromCharCode("A".charCodeAt(0) + i) + " - " + t.title}
                     href={`${contestRootPath}/tasks/${i + 1}`}
@@ -189,8 +210,9 @@ const SidebarMainPane = ({
   );
 };
 
-const SidebarLinkItem = ({ icon, text, href, ...props }: {
+const SidebarLinkItem = ({ icon, leftElem, text, href, ...props }: {
   icon?: IconType;
+  leftElem?: ReactNode;
   href: string;
   text: string;
 } & Omit<LinkProps, "children">) => {
@@ -203,10 +225,12 @@ const SidebarLinkItem = ({ icon, text, href, ...props }: {
         href={href}
         display="flex"
         alignItems="center"
+        gap={2}
         _hover={{ bg: "gray.200" }}
         {...props}
       >
-        {icon && <Icon as={icon} mr={2} />}
+        {icon && <Icon as={icon} />}
+        {leftElem}
         <Text as="span" overflow="hidden" textOverflow="ellipsis">{text}</Text>
       </Link>
     </Box>
