@@ -1,9 +1,10 @@
 import { Duration, fmtDatetime } from "@/src/util/time";
-import { Box, BoxProps, Icon, Link, LinkProps, Text } from "@chakra-ui/react";
+import { Box, BoxProps, FormControl, FormLabel, Icon, Link, LinkProps, Switch, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import type { IconType } from "react-icons";
 import { IoBarChart, IoChatboxEllipses, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
+import { SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
 
 export type ContestSidebarProps = {
   /** 画面上部から下へずらす量。GlobalHeaderの高さを期待する。"0px"など単位も必要。 */
@@ -24,19 +25,15 @@ export type ContestSidebarProps = {
   }>;
 } & Omit<BoxProps, "top" | "children">;
 
-export const ContestSidebar = ({
-  top = "0px",
-  startAt,
-  endAt,
-  now,
-  slug,
-  tasks,
-  ...props
-}: ContestSidebarProps) => {
-  const contestRootPath = `/contests/${slug}`;
-  const contestStarted = now >= startAt;
-  const contestFinished = now >= endAt;
-  const width = "17rem";
+type Color = BoxProps["color"];
+const FILL_COLOR: Color = "gray.100";
+const FONT_COLOR: Color = "teal.900";
+const DIVIDER_COLOR: Color = "gray.300";
+const BORDER_COLOR: Color = "gray.400";
+
+export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) => {
+  const [fixedShow, setFixedShow] = useState(true);
+  const [temporaryShow, setTemporaryShow] = useState(false);
 
   return (
     <Box
@@ -47,20 +44,97 @@ export const ContestSidebar = ({
       left={0}
       h={`calc(100vh - ${top})`}
       maxH={`calc(100vh - ${top})`}
+      w={fixedShow ? "fit-content" : 1}
+    >
+      <SidebarMainPane
+        zIndex={47}
+        {...props}
+        temporaryShow={temporaryShow}
+        fixedShow={fixedShow}
+        onToggleKnobClick={() => setFixedShow(!fixedShow)}
+        onFixSwitchChange={() => {
+          setTemporaryShow(true);
+          setFixedShow(!fixedShow);
+        }}
+        onMouseLeave={() => setTemporaryShow(false)}
+      />
+      <SidebarHoverShowArea
+        zIndex={46}
+        onMouseEnter={() => setTemporaryShow(true)}
+      />
+    </Box>
+  );
+};
+
+const SidebarHoverShowArea = ({ ...props }: BoxProps) => {
+  return (
+    <Box
+      position="absolute"
+      left={0}
+      top={0}
+      h="100%"
+      w="40px"
+      {...props}
+    >
+    </Box>
+  );
+};
+
+type SidebarMainPaneProps = {
+  temporaryShow: boolean;
+  fixedShow: boolean;
+  onToggleKnobClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onFixSwitchChange?: React.ChangeEventHandler<HTMLInputElement>;
+} & Omit<ContestSidebarProps, "top" | "hidden">;
+
+const SidebarMainPane = ({
+  temporaryShow,
+  fixedShow,
+  onToggleKnobClick,
+  onFixSwitchChange,
+  startAt,
+  endAt,
+  now,
+  slug,
+  tasks,
+  ...props
+}: SidebarMainPaneProps) => {
+  const contestRootPath = `/contests/${slug}`;
+  const contestStarted = now >= startAt;
+  const contestFinished = now >= endAt;
+  const width = "17rem";
+
+  return (
+    <Box
+      position="relative"
+      h="100%"
       w={width}
       minW={width}
       py={2}
+      transform={`translateX(${fixedShow || temporaryShow ? 0 : `-${width}`})`}
+      transition="transform"
+      transitionDuration="200ms"
       display="flex"
       flexDirection="column"
-      justifyContent="space-between"
-      bg="gray.100"
-      color="teal.900"
+      bg={FILL_COLOR}
+      color={FONT_COLOR}
       borderRight="1px"
-      borderColor="gray.400"
+      borderColor={BORDER_COLOR}
       shadow="lg"
       fontSize="sm"
       {...props}
     >
+      <FormControl display="flex" justifyContent="center" alignItems="center" my={1}>
+        <FormLabel fontSize="xs" mb={0} cursor="pointer">サイドバーを常に表示する</FormLabel>
+        <Switch isChecked={fixedShow} size="sm" onChange={onFixSwitchChange} />
+      </FormControl>
+      <SidebarToggleKnob
+        bg={FILL_COLOR}
+        color="teal.700"
+        borderColor={BORDER_COLOR}
+        iconDirection={fixedShow ? "hide" : "show"}
+        onClick={onToggleKnobClick}
+      />
       <Box as="ul" listStyleType="none" whiteSpace="nowrap" overflowY="auto" display="flex" flexDirection="column">
         <SidebarLinkItem text="コンテストトップ" icon={IoHome} href={`${contestRootPath}`} />
         {contestStarted && (
@@ -72,7 +146,7 @@ export const ContestSidebar = ({
               overflowY="auto"
               borderTop="1px"
               borderBottom="1px"
-              borderColor="gray.300"
+              borderColor={DIVIDER_COLOR}
               py={2}
               my={1}
             >
@@ -97,7 +171,16 @@ export const ContestSidebar = ({
         <SidebarLinkItem text="順位表" icon={IoBarChart} href={`${contestRootPath}/standings`} />
         {contestFinished && <SidebarLinkItem text="解説" icon={IoSchool} href={`${contestRootPath}/editorial`} />}
       </Box>
-      <Box as="ul" listStyleType="none" mx={4} py={2} textAlign="center" borderTop="1px" borderColor="gray.300">
+      <Box
+        as="ul"
+        listStyleType="none"
+        mt="auto"
+        mx={4}
+        py={2}
+        textAlign="center"
+        borderTop="1px"
+        borderColor={DIVIDER_COLOR}
+      >
         <SidebarRemainingTime startAt={startAt} endAt={endAt} now={now} />
         <SidebarDatetime label="開始" datetime={startAt} />
         <SidebarDatetime label="終了" datetime={endAt} />
