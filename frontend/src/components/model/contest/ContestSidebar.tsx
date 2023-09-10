@@ -71,13 +71,13 @@ export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) =
 };
 
 const SidebarHoverShowArea = (props: BoxProps) => {
-  const w = "56px";
+  const w = "60px";
   return (
     <Box
       position="absolute"
       left={0}
-      top={`calc(${SIDEBAR_TOGGLE_KNOB_TOP} + ${SIDEBAR_TOGGLE_KNOB_H} + 8px)`}
-      h={`calc(100% - ${SIDEBAR_TOGGLE_KNOB_TOP} - ${SIDEBAR_TOGGLE_KNOB_H} - 8px)`}
+      top={`calc(${SIDEBAR_TOGGLE_KNOB_TOP} + ${SIDEBAR_TOGGLE_KNOB_H})`}
+      h={`calc(100% - ${SIDEBAR_TOGGLE_KNOB_TOP} - ${SIDEBAR_TOGGLE_KNOB_H})`}
       w={w}
       {...props}
     >
