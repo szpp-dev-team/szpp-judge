@@ -25,6 +25,21 @@ service TaskService {
   rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
   // Task を更新する
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+
+  // TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+  // contestant によるリクエストの場合は sample のみ取得する。
+  rpc GetTestcaseSets(GetTestcaseSetsRequest) returns (GetTestcaseSetsResponse);
+  // TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+  rpc SyncTestcaseSets(SyncTestcaseSetsRequest) returns (SyncTestcaseSetsResponse);
+
+  // 提出する
+  rpc Submit(SubmitRequest) returns (SubmitResponse);
+  // 提出の詳細を取得
+  rpc GetSubmissionDetail(GetSubmissionDetailRequest) returns (GetSubmissionDetailResponse);
+  // 提出一覧を取得
+  rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse);
+  // ジャッジの進捗を取得
+  rpc GetJudgeProgress(GetJudgeProgressRequest) returns (GetJudgeProgressResponse);
   // Clarification を作成する
   rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
   // 指定された Clarification を取得する
@@ -54,4 +69,6 @@ service ContestService {
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
   rpc GetContest(GetContestRequest) returns (GetContestResponse);
   rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
+  // 順位表取得
+  rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
 }
