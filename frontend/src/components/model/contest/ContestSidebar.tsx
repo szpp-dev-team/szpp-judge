@@ -1,3 +1,4 @@
+import type { ScoreStatus } from "@/src/model/task";
 import { Duration, fmtDatetime } from "@/src/util/time";
 import { Box, FormControl, FormLabel, Icon, Link, Switch, Text } from "@chakra-ui/react";
 import type { BoxProps, LinkProps } from "@chakra-ui/react";
@@ -5,10 +6,8 @@ import NextLink from "next/link";
 import React, { type ReactNode, useMemo, useState } from "react";
 import type { IconType } from "react-icons";
 import { IoBarChart, IoChatboxEllipses, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
-import { RoundedCheckIcon } from "../../icon/RoundedCheckIcon";
-import { RoundedCrossIcon } from "../../icon/RoundedCrossIcon";
-import { RoundedTriangleIcon } from "../../icon/RoundedTriangleIcon";
 import { SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
+import { ScoreStatusIcon } from "../task/ScoreStatusIcon";
 
 export type ContestSidebarProps = {
   /** 画面上部から下へずらす量。GlobalHeaderの高さを期待する。"0px"など単位も必要。 */
@@ -25,7 +24,7 @@ export type ContestSidebarProps = {
   tasks: ReadonlyArray<{
     id: number;
     title: string;
-    status?: "accepted" | "partialAccepted" | "rejected";
+    scoreStatus?: ScoreStatus;
   }>;
 } & Omit<BoxProps, "top" | "children">;
 
@@ -157,23 +156,7 @@ const SidebarMainPane = ({
               <Box as="ul" listStyleType="none" overflowY="auto" overscrollBehavior="contain">
                 {tasks.map((t, i) => (
                   <SidebarLinkItem
-                    leftElem={(() => {
-                      if (t.status == null) {
-                        return <Box h="1em" w="1em" minW="1em" />;
-                      }
-                      switch (t.status) {
-                        case "accepted":
-                          return <RoundedCheckIcon />;
-                        case "partialAccepted":
-                          return <RoundedTriangleIcon />;
-                        case "rejected":
-                          return <RoundedCrossIcon />;
-                        default: {
-                          const exhaustivecheck: never = t.status;
-                          throw new Error(`Invalid status: ${exhaustivecheck}`);
-                        }
-                      }
-                    })()}
+                    leftElem={<ScoreStatusIcon status={t.scoreStatus} />}
                     key={t.id}
                     text={String.fromCharCode("A".charCodeAt(0) + i) + " - " + t.title}
                     href={`${contestRootPath}/tasks/${i + 1}`}
