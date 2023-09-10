@@ -1,7 +1,7 @@
 import { TaskWithMySubmissionSummary } from "@/src/model/task";
 import { pageTitle } from "@/src/util/pagemeta";
 import Head from "next/head";
-import { WithHeaderFooter } from "../../layout/WithHeaderFooter";
+import { ContestLayout } from "../../layout/ContestLayout";
 import { TaskCollection } from "./TaskCollection";
 
 const tasks: TaskWithMySubmissionSummary[] = [
@@ -81,11 +81,11 @@ const tasks: TaskWithMySubmissionSummary[] = [
 
 export const TaskCollectionPage = () => {
   return (
-    <WithHeaderFooter>
+    <ContestLayout>
       <Head>
         <title>{pageTitle("問題")}</title>
       </Head>
       <TaskCollection tasks={tasks} />
-    </WithHeaderFooter>
+    </ContestLayout>
   );
 };
