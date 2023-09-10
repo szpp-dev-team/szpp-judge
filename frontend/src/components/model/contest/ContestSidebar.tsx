@@ -1,4 +1,5 @@
 import type { ScoreStatus } from "@/src/model/task";
+import { genNthTaskSeq } from "@/src/usecase/contest";
 import { Duration, fmtDatetime } from "@/src/util/time";
 import { Box, FormControl, FormLabel, Icon, Link, Switch, Text } from "@chakra-ui/react";
 import type { BoxProps, LinkProps } from "@chakra-ui/react";
@@ -156,9 +157,14 @@ const SidebarMainPane = ({
               <Box as="ul" listStyleType="none" overflowY="auto" overscrollBehavior="contain">
                 {tasks.map((t, i) => (
                   <SidebarLinkItem
-                    leftElem={<ScoreStatusIcon status={t.scoreStatus} />}
+                    leftElem={
+                      <>
+                        <ScoreStatusIcon status={t.scoreStatus} mr={1} />
+                        <TaskSeqBadge seq={genNthTaskSeq(i, tasks.length)} />
+                      </>
+                    }
                     key={t.id}
-                    text={String.fromCharCode("A".charCodeAt(0) + i) + " - " + t.title}
+                    text={t.title}
                     href={`${contestRootPath}/tasks/${i + 1}`}
                     overflow="hidden"
                     textOverflow="ellipsis"
@@ -193,6 +199,23 @@ const SidebarMainPane = ({
   );
 };
 
+const TaskSeqBadge = ({ seq }: { seq: string }) => {
+  return (
+    <Text
+      as="span"
+      display="block"
+      minW="1.75em"
+      textAlign="center"
+      mx={1}
+      px={1}
+      bg="blackAlpha.100"
+      borderRadius={4}
+    >
+      {seq}
+    </Text>
+  );
+};
+
 const SidebarLinkItem = ({ icon, leftElem, text, href, ...props }: {
   icon?: IconType;
   leftElem?: ReactNode;
@@ -208,11 +231,10 @@ const SidebarLinkItem = ({ icon, leftElem, text, href, ...props }: {
         href={href}
         display="flex"
         alignItems="center"
-        gap={2}
         _hover={{ bg: "gray.200" }}
         {...props}
       >
-        {icon && <Icon as={icon} />}
+        {icon && <Icon as={icon} mr={2} />}
         {leftElem}
         <Text as="span" overflow="hidden" textOverflow="ellipsis">{text}</Text>
       </Link>
