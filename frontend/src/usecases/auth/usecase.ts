@@ -11,12 +11,13 @@ const createAuthUsecase = ({ repository, setCredential, setUser }: {
   return {
     // rest parameter を使うとこの関数で使いたい repository.<method> が1つなら
     // いいけどそれ以上のことをやらせたいときに引数が自由に使えなくて不便かも
-    async login(...args: Parameters<typeof repository.login>): Promise<AuthUser> {
-      const resp = await repository.login(...args);
+    // ただできればこのレイヤーは protobuf のことを知らなくていいようにしておきたい
+    async login(...params: Parameters<typeof repository.login>): Promise<AuthUser> {
+      const resp = await repository.login(...params);
 
       // globalState 更新
-      setCredential({ refreshToken: "tooooooooooooooooken" }) // TODO: ちゃんとトークンをセットする
-      setUser(resp)
+      setCredential({ refreshToken: "tooooooooooooooooken" }); // TODO: ちゃんとトークンをセットする
+      setUser(resp);
 
       return resp;
     },
