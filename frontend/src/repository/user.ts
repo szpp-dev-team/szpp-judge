@@ -5,14 +5,14 @@ import { backendGrpcTransport } from "../config/grpc";
 import type { AuthUser } from "../model/user";
 
 export class UserRepository {
-  readonly cli: PromiseClient<typeof UserService>;
+  readonly #cli: PromiseClient<typeof UserService>;
 
   constructor(t: Transport) {
-    this.cli = createPromiseClient(UserService, t);
+    this.#cli = createPromiseClient(UserService, t);
   }
 
   async register(req: CreateUserRequest): Promise<AuthUser> {
-    const { user } = await this.cli.createUser(req);
+    const { user } = await this.#cli.createUser(req);
     return {
       ...user!,
     };

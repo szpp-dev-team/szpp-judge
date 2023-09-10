@@ -5,21 +5,21 @@ import { backendGrpcTransport } from "../config/grpc";
 import type { AuthUser } from "../model/user";
 
 export class AuthRepository {
-  readonly cli: PromiseClient<typeof AuthService>;
+  readonly #cli: PromiseClient<typeof AuthService>;
 
   constructor(t: Transport) {
-    this.cli = createPromiseClient(AuthService, t);
+    this.#cli = createPromiseClient(AuthService, t);
   }
 
   async login(req: LoginRequest): Promise<AuthUser> {
-    const { user } = await this.cli.login(req);
+    const { user } = await this.#cli.login(req);
     return {
       ...user!,
     };
   }
 
   async logout(req: LogoutRequest): Promise<void> {
-    await this.cli.logout(req);
+    await this.#cli.logout(req);
   }
 }
 
