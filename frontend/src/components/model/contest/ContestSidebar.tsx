@@ -21,7 +21,7 @@ export type ContestSidebarProps = {
   now: Date;
   /** コンテストの slug */
   slug: string;
-  /** コンテストの問題と提出結果 */
+  /** コンテストの問題と得点状況 */
   tasks: ReadonlyArray<{
     id: number;
     title: string;
@@ -107,7 +107,7 @@ const SidebarMainPane = ({
   const contestRootPath = `/contests/${slug}`;
   const contestStarted = now >= startAt;
   const contestFinished = now >= endAt;
-  const width = "17rem";
+  const width = "14rem";
 
   return (
     <Box
@@ -167,6 +167,8 @@ const SidebarMainPane = ({
                     key={t.id}
                     text={t.title}
                     href={`${contestRootPath}/tasks/${i + 1}`}
+                    fontSize="xs"
+                    pl={2}
                     overflow="hidden"
                     textOverflow="ellipsis"
                   />
@@ -209,6 +211,7 @@ const TaskSeqBadge = ({ seq }: { seq: string }) => {
       textAlign="center"
       mx={1}
       px={1}
+      fontWeight="semibold"
       bg="blackAlpha.100"
       borderRadius={4}
     >
@@ -250,8 +253,8 @@ const SidebarRemainingTime = ({ startAt, endAt, now }: {
 }): JSX.Element | undefined => {
   const render = (label: string, remainTime: string) => (
     <Box as="li">
-      <Text as="span" fontSize="xs">{label}</Text>
-      <Text as="time" dateTime={remainTime} display="block" fontSize="lg" fontWeight="medium">{remainTime}</Text>
+      <Text as="span" fontSize="2xs">{label}</Text>
+      <Text as="time" dateTime={remainTime} display="block" fontSize="md" fontWeight="medium">{remainTime}</Text>
     </Box>
   );
   if (now < startAt) {
@@ -278,8 +281,8 @@ const SidebarDatetime = ({ label, datetime }: {
     [datetime],
   );
   return (
-    <Box as="li">
-      <Text as="span" fontSize="xs" mr={2}>{label}</Text>
+    <Box as="li" fontSize="xs">
+      <Text as="span" mr={2}>{label}</Text>
       <Text as="time" dateTime={machineFmt}>{humanFmt}</Text>
     </Box>
   );
