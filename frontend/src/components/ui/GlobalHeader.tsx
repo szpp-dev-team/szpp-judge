@@ -7,15 +7,18 @@ export type GlobalHeaderProps = {
   contestTitle?: string;
 };
 
+export const GLOBAL_HEADER_H = "52px";
+
 const NavItemLink = ({ children, ...props }: LinkProps) => {
   return (
     <Box as="li" display="block">
       <Link
         as={NextLink}
-        display="block"
-        py="1rem"
+        display="flex"
+        alignItems="center"
         px="0.75rem"
-        fontSize="sm"
+        h="100%"
+        fontSize="16px"
         fontWeight="semibold"
         _hover={{ background: "teal.600" }}
         {...props}
@@ -28,8 +31,19 @@ const NavItemLink = ({ children, ...props }: LinkProps) => {
 
 export const GlobalHeader = ({ contestSlug, contestTitle }: GlobalHeaderProps) => {
   return (
-    <Box as="header" position="sticky" width="100%" top="0" left="0" zIndex={50}>
-      <Flex as="nav" justifyContent="space-between" bg="teal.500" color="white">
+    <Box as="header" width="100%" mb={GLOBAL_HEADER_H}>
+      <Flex
+        as="nav"
+        justifyContent="space-between"
+        position="fixed"
+        top="0"
+        left="0"
+        zIndex={50}
+        h={GLOBAL_HEADER_H}
+        w="100%"
+        bg="teal.500"
+        color="white"
+      >
         <Flex as="ul" listStyleType="none">
           <NavItemLink href="/" px="1.25rem">SZPP Judge</NavItemLink>
           {contestSlug ? <NavItemLink href={`/contests/${contestSlug}`}>{contestTitle}</NavItemLink> : (

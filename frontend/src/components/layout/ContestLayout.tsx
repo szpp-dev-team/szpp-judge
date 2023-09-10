@@ -1,6 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { ContestSidebar } from "../model/contest/ContestSidebar";
+import { GLOBAL_HEADER_H } from "../ui/GlobalHeader";
 import { WithHeaderFooter } from "./WithHeaderFooter";
 
 export type ContestLayoutProps = {
@@ -8,14 +9,13 @@ export type ContestLayoutProps = {
 };
 
 export const ContestLayout = ({ children }: ContestLayoutProps) => {
-  const headerH = "3.25rem";
   return (
     <WithHeaderFooter
       headerProps={{ contestSlug: "sbc001", contestTitle: "SZPP Beginners Contest 001" }}
-      bodyProps={{ as: "div", display: "flex" }}
+      bodyProps={{ as: "div", display: "flex", w: "fit-content" }}
     >
       <ContestSidebar
-        top={headerH}
+        top={GLOBAL_HEADER_H}
         startAt={new Date("2023-09-02 21:00")}
         endAt={new Date("2023-09-04 01:00")}
         now={new Date("2023-09-02 21:00:01")}
