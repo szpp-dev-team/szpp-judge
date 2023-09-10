@@ -21,19 +21,19 @@ const fewTasks: ContestSidebarProps["tasks"] = [
 ];
 
 const manyTasks: ContestSidebarProps["tasks"] = [
-  { id: 1000, title: "すずっぴー君のおつかい" },
-  { id: 1001, title: "すずっぴー" },
-  { id: 1002, title: "ぴっぴー" },
+  { id: 1000, title: "すずっぴー君のおつかい", scoreStatus: "perfect" },
+  { id: 1001, title: "すずっぴー", scoreStatus: "partial" },
+  { id: 1002, title: "ぴっぴー", scoreStatus: "zero" },
   { id: 1003, title: "ぴー" },
-  { id: 1004, title: "XOR Sum" },
+  { id: 1004, title: "XOR Sum", scoreStatus: "perfect" },
   { id: 1005, title: "longlonglonglonglonglonglonglonglonglonglonglonglonglong" },
-  { id: 1006, title: "長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル" },
-  { id: 1007, title: "はい" },
+  { id: 1006, title: "長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル", scoreStatus: "zero" },
+  { id: 1007, title: "はい", scoreStatus: "perfect" },
   { id: 1008, title: "うん" },
   { id: 1009, title: "んんん...？" },
   { id: 1010, title: "そ、そんな..." },
   { id: 1011, title: "何も分からん" },
-  { id: 1011, title: "椅子を温める" },
+  { id: 1012, title: "椅子を温める" },
 ];
 
 export const BeforeStart: Story = {
