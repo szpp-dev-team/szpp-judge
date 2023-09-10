@@ -10,9 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
-	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
-	ent_testcaseset "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
+	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases/mock"
 	"github.com/szpp-dev-team/szpp-judge/backend/test/utils"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
@@ -22,9 +20,7 @@ import (
 func Test_CreateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	testcasesRepo := mock.NewMock()
-	interactor := NewInteractor(entClient, testcasesRepo)
-	now := timejst.Now()
+	interactor := NewInteractor(entClient, nil)
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.CreateTaskRequest)
@@ -34,67 +30,15 @@ func Test_CreateTask(t *testing.T) {
 	}{
 		"success": {
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.CreateTaskRequest, resp *backendv1.CreateTaskResponse) {
-				task, err := entClient.Task.Query().
-					WithTestcases().
-					WithTestcaseSets().
-					Where(ent_task.ID(int(resp.Task.Id))).Only(ctx)
-				require.NoError(t, err)
-
+				task := entClient.Task.GetX(context.Background(), int(resp.Task.Id))
 				assert.Equal(t, req.Task.Title, task.Title)
-
-				assert.Equal(t, len(req.Testcases), len(task.Edges.Testcases))
-				for _, testcase := range resp.Testcases {
-					testcase2, err := testcasesRepo.DownloadTestcase(ctx, task.ID, testcase.Slug)
-					require.NoError(t, err)
-					assert.Equal(t, testcase.Input, string(testcase2.In))
-					assert.Equal(t, testcase.Output, string(testcase2.Out))
-					testcase3, err := entClient.Testcase.Query().Where(ent_testcase.HasTaskWith(ent_task.ID(int(resp.Task.Id))), ent_testcase.Name(testcase.Slug)).Only(ctx)
-					require.NoError(t, err)
-					assert.Equal(t, testcase.Slug, testcase3.Name)
-				}
-
-				assert.Equal(t, len(req.TestcaseSets), len(task.Edges.TestcaseSets))
-				for _, testcaseSet := range req.TestcaseSets {
-					testcaseSet2, err := entClient.TestcaseSet.Query().Where(ent_testcaseset.HasTaskWith(ent_task.ID(int(resp.Task.Id))), ent_testcaseset.Name(testcaseSet.Slug)).Only(ctx)
-					require.NoError(t, err)
-					assert.Equal(t, testcaseSet.Slug, testcaseSet2.Name)
-				}
-			},
-		},
-		"DB constraints": {
-			prepare: func(t *testing.T, req *backendv1.CreateTaskRequest) {
-				task1, err := entClient.Task.Create().SetTitle("hoge").SetStatement("fuga").SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
-					SetExecTimeLimit(2000).SetExecMemoryLimit(1024).SetJudgeType(ent_task.JudgeTypeNormal).SetCaseInsensitive(false).
-					SetCreatedAt(now).Save(context.Background())
-				require.NoError(t, err)
-				task2, err := entClient.Task.Create().SetTitle("hoge").SetStatement("fuga").SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
-					SetExecTimeLimit(2000).SetExecMemoryLimit(1024).SetJudgeType(ent_task.JudgeTypeNormal).SetCaseInsensitive(false).
-					SetCreatedAt(now).Save(context.Background())
-				require.NoError(t, err)
-
-				_, err = entClient.Testcase.Create().SetName("foo").SetTask(task1).SetCreatedAt(now).Save(context.Background())
-				assert.NoError(t, err)
-				_, err = entClient.Testcase.Create().SetName("foo").SetTask(task1).SetCreatedAt(now).Save(context.Background())
-				assert.Error(t, err) // 同じ問題の中に同じ Testcase は作れない
-				_, err = entClient.Testcase.Create().SetName("foo").SetTask(task2).SetCreatedAt(now).Save(context.Background())
-				assert.NoError(t, err)
-
-				_, err = entClient.TestcaseSet.Create().SetName("foo").SetScore(100).SetIsSample(false).SetTask(task1).SetCreatedAt(now).Save(context.Background())
-				assert.NoError(t, err)
-				_, err = entClient.TestcaseSet.Create().SetName("foo").SetScore(100).SetIsSample(false).SetTask(task1).SetCreatedAt(now).Save(context.Background())
-				assert.Error(t, err) // 同じ問題の中に同じ TestcaseSet は作れない
-				_, err = entClient.TestcaseSet.Create().SetName("foo").SetScore(100).SetIsSample(false).SetTask(task2).SetCreatedAt(now).Save(context.Background())
-				assert.NoError(t, err)
 			},
 		},
 	}
 
 	for name, test := range tests {
-		testcaseSets, testcases := seedMutationTestcasePairs()
 		req := &backendv1.CreateTaskRequest{
-			Task:         seedMutationTask(),
-			TestcaseSets: testcaseSets,
-			Testcases:    testcases,
+			Task: seedMutationTask(),
 		}
 
 		t.Run(name, func(t *testing.T) {
@@ -125,8 +69,7 @@ func Test_CreateTask(t *testing.T) {
 
 func Test_UpdateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
-	testcasesRepo := mock.NewMock()
-	interactor := NewInteractor(entClient, testcasesRepo)
+	interactor := NewInteractor(entClient, nil)
 	now := timejst.Now()
 
 	tests := map[string]struct {
@@ -137,7 +80,7 @@ func Test_UpdateTask(t *testing.T) {
 	}{
 		"success": {
 			prepare: func(t *testing.T, req *backendv1.UpdateTaskRequest) {
-				q := entClient.Task.Create().
+				task := entClient.Task.Create().
 					SetTitle("hoge").
 					SetStatement("fuga").
 					SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
@@ -145,77 +88,23 @@ func Test_UpdateTask(t *testing.T) {
 					SetExecMemoryLimit(1024).
 					SetJudgeType(ent_task.JudgeTypeNormal).
 					SetCaseInsensitive(false).
-					SetCreatedAt(now)
-				testcaseIDs := []int{}
-				for i := range make([]struct{}, 4) {
-					name := fmt.Sprintf("%02d", i)
-					testcase, err := entClient.Testcase.Create().
-						SetName(name).
-						SetCreatedAt(now).
-						Save(context.Background())
-					require.NoError(t, err)
-					q.AddTestcaseIDs(testcase.ID)
-					testcaseIDs = append(testcaseIDs, testcase.ID)
-				}
-				ts1, err := entClient.TestcaseSet.Create().SetName("all").SetScore(100).SetIsSample(false).SetCreatedAt(now).AddTestcaseIDs(testcaseIDs...).Save(context.Background())
-				require.NoError(t, err)
-				ts2, err := entClient.TestcaseSet.Create().SetName("sample").SetScore(0).SetIsSample(true).SetCreatedAt(now).AddTestcaseIDs(testcaseIDs[:2]...).Save(context.Background())
-				require.NoError(t, err)
-				q.AddTestcaseSetIDs(ts1.ID, ts2.ID)
-				task, err := q.Save(context.Background())
-				require.NoError(t, err)
+					SetCreatedAt(now).
+					SaveX(context.Background())
 				req.Id = int32(task.ID)
-
-				for i := range testcaseIDs {
-					err := testcasesRepo.UploadTestcase(context.Background(), task.ID, &testcases.Testcase{
-						Name: fmt.Sprintf("%02d", i),
-						In:   []byte("a"),
-						Out:  []byte("b"),
-					})
-					require.NoError(t, err)
-				}
 			},
 			modify: func(req *backendv1.UpdateTaskRequest) {
 				req.Task.Title = "foo"
-				req.Testcases[0].Input = "!!!"
-				req.TestcaseSets = req.TestcaseSets[1:]
 			},
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.UpdateTaskRequest, resp *backendv1.UpdateTaskResponse) {
-				task, err := entClient.Task.Query().
-					WithTestcases().
-					WithTestcaseSets().
-					Where(ent_task.ID(int(resp.Task.Id))).Only(ctx)
-				require.NoError(t, err)
-
+				task := entClient.Task.GetX(context.Background(), int(resp.Task.Id))
 				assert.Equal(t, req.Task.Title, task.Title)
-
-				assert.Equal(t, len(req.Testcases), len(task.Edges.Testcases))
-				for _, testcase := range resp.Testcases {
-					testcase2, err := testcasesRepo.DownloadTestcase(ctx, task.ID, testcase.Slug)
-					require.NoError(t, err)
-					assert.Equal(t, testcase.Input, string(testcase2.In))
-					assert.Equal(t, testcase.Output, string(testcase2.Out))
-					testcase3, err := entClient.Testcase.Query().Where(ent_testcase.HasTaskWith(ent_task.ID(int(resp.Task.Id))), ent_testcase.Name(testcase.Slug)).Only(ctx)
-					require.NoError(t, err)
-					assert.Equal(t, testcase.Slug, testcase3.Name)
-				}
-
-				assert.Equal(t, len(req.TestcaseSets), len(task.Edges.TestcaseSets))
-				for _, testcaseSet := range req.TestcaseSets {
-					testcaseSet2, err := entClient.TestcaseSet.Query().Where(ent_testcaseset.HasTaskWith(ent_task.ID(int(resp.Task.Id))), ent_testcaseset.Name(testcaseSet.Slug)).Only(ctx)
-					require.NoError(t, err)
-					assert.Equal(t, testcaseSet.Slug, testcaseSet2.Name)
-				}
 			},
 		},
 	}
 
 	for name, test := range tests {
-		testcaseSets, testcases := seedMutationTestcasePairs()
 		req := &backendv1.UpdateTaskRequest{
-			Task:         seedMutationTask(),
-			TestcaseSets: testcaseSets,
-			Testcases:    testcases,
+			Task: seedMutationTask(),
 		}
 
 		t.Run(name, func(t *testing.T) {
@@ -247,8 +136,7 @@ func Test_UpdateTask(t *testing.T) {
 func Test_GetTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	testcasesRepo := mock.NewMock()
-	interactor := NewInteractor(entClient, testcasesRepo)
+	interactor := NewInteractor(entClient, nil)
 
 	now := timejst.Now()
 
@@ -259,7 +147,7 @@ func Test_GetTask(t *testing.T) {
 	}{
 		"success": {
 			prepare: func(t *testing.T, req *backendv1.GetTaskRequest) {
-				q := entClient.Task.Create().
+				task := entClient.Task.Create().
 					SetTitle("hoge").
 					SetStatement("fuga").
 					SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
@@ -267,42 +155,13 @@ func Test_GetTask(t *testing.T) {
 					SetExecMemoryLimit(1024).
 					SetJudgeType(ent_task.JudgeTypeNormal).
 					SetCaseInsensitive(false).
-					SetCreatedAt(now)
-				testcaseIDs := []int{}
-				for i := range make([]struct{}, 4) {
-					name := fmt.Sprintf("%02d", i)
-					testcase, err := entClient.Testcase.Create().
-						SetName(name).
-						SetCreatedAt(now).
-						Save(context.Background())
-					require.NoError(t, err)
-					q.AddTestcaseIDs(testcase.ID)
-					testcaseIDs = append(testcaseIDs, testcase.ID)
-				}
-				ts1, err := entClient.TestcaseSet.Create().SetName("all").SetScore(100).SetIsSample(false).SetCreatedAt(now).AddTestcaseIDs(testcaseIDs...).Save(context.Background())
-				require.NoError(t, err)
-				ts2, err := entClient.TestcaseSet.Create().SetName("sample").SetScore(0).SetIsSample(true).SetCreatedAt(now).AddTestcaseIDs(testcaseIDs[:2]...).Save(context.Background())
-				require.NoError(t, err)
-				q.AddTestcaseSetIDs(ts1.ID, ts2.ID)
-				task, err := q.Save(context.Background())
-				require.NoError(t, err)
+					SetCreatedAt(now).
+					SaveX(context.Background())
 				req.Id = int32(task.ID)
 
-				for i := range testcaseIDs {
-					err := testcasesRepo.UploadTestcase(context.Background(), task.ID, &testcases.Testcase{
-						Name: fmt.Sprintf("%02d", i),
-						In:   []byte("a"),
-						Out:  []byte("b"),
-					})
-					require.NoError(t, err)
-				}
 			},
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.GetTaskRequest, resp *backendv1.GetTaskResponse) {
-				task, err := entClient.Task.Query().
-					WithTestcases().
-					WithTestcaseSets().
-					Where(ent_task.ID(int(resp.Task.Id))).Only(ctx)
-				require.NoError(t, err)
+				task := entClient.Task.GetX(context.Background(), int(resp.Task.Id))
 				assert.Equal(t, "hoge", task.Title)
 			},
 		},
@@ -311,11 +170,157 @@ func Test_GetTask(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			req := &backendv1.GetTaskRequest{Id: 1}
+			req := &backendv1.GetTaskRequest{}
 			if test.prepare != nil {
 				test.prepare(t, req)
 			}
 			resp, err := interactor.GetTask(ctx, req)
+			if test.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			if test.assert != nil {
+				test.assert(ctx, t, req, resp)
+			}
+
+			utils.TruncateDB(t, entClient)
+		})
+	}
+}
+
+func Test_GetTestcaseSets(t *testing.T) {
+	entClient := utils.NewTestClient(t)
+	defer entClient.Close()
+	testcasesRepo := mock.NewMock()
+	interactor := NewInteractor(entClient, testcasesRepo)
+	now := timejst.Now()
+
+	task := entClient.Task.Create().
+		SetTitle("hoge").
+		SetStatement("fuga").
+		SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
+		SetExecTimeLimit(2000).
+		SetExecMemoryLimit(1024).
+		SetJudgeType(ent_task.JudgeTypeNormal).
+		SetCreatedAt(now).
+		SaveX(context.Background())
+
+	tests := map[string]struct {
+		prepare func(t *testing.T, req *backendv1.GetTestcaseSetsRequest)
+		wantErr bool
+		assert  func(ctx context.Context, t *testing.T, req *backendv1.GetTestcaseSetsRequest, resp *backendv1.GetTestcaseSetsResponse)
+	}{
+		"success": {
+			prepare: func(t *testing.T, req *backendv1.GetTestcaseSetsRequest) {
+				testcaseSets, testcases := seedMutationTestcasePairs()
+				testcaseIDByName := map[string]int{}
+				for i, testcase := range testcases {
+					testcasesRepo.UploadTestcase(context.Background(), task.ID, &testcases_repo.Testcase{
+						Name: fmt.Sprintf("%02d", i),
+						In:   []byte("a"),
+						Out:  []byte("b"),
+					})
+					t := entClient.Testcase.Create().
+						SetName(testcase.Slug).
+						SetCreatedAt(now).
+						SaveX(context.Background())
+					testcaseIDByName[testcase.Slug] = t.ID
+				}
+
+				for _, testcaseSet := range testcaseSets {
+					testcaseIDs := []int{}
+					for _, testcaseSlug := range testcaseSet.TestcaseSlugs {
+						testcaseIDs = append(testcaseIDs, testcaseIDByName[testcaseSlug])
+					}
+					entClient.TestcaseSet.Create().
+						SetName(testcaseSet.Slug).
+						SetScore(int(testcaseSet.Score)).
+						SetIsSample(testcaseSet.IsSample).
+						AddTestcaseIDs(testcaseIDs...).
+						SetCreatedAt(now).
+						SaveX(context.Background())
+				}
+			},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			req := &backendv1.GetTestcaseSetsRequest{TaskId: int32(task.ID)}
+			if test.prepare != nil {
+				test.prepare(t, req)
+			}
+			resp, err := interactor.GetTestcaseSets(ctx, req)
+			if test.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			if test.assert != nil {
+				test.assert(ctx, t, req, resp)
+			}
+
+			utils.TruncateDB(t, entClient)
+		})
+	}
+}
+
+func Test_SyncTestcaseSets(t *testing.T) {
+	entClient := utils.NewTestClient(t)
+	defer entClient.Close()
+	testcasesRepo := mock.NewMock()
+	interactor := NewInteractor(entClient, testcasesRepo)
+
+	task := entClient.Task.Create().
+		SetTitle("hoge").
+		SetStatement("fuga").
+		SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
+		SetExecTimeLimit(2000).
+		SetExecMemoryLimit(1024).
+		SetJudgeType(ent_task.JudgeTypeNormal).
+		SetCreatedAt(timejst.Now()).
+		SaveX(context.Background())
+
+	tests := map[string]struct {
+		prepare func(t *testing.T, req *backendv1.SyncTestcaseSetsRequest)
+		modify  func(req *backendv1.SyncTestcaseSetsRequest)
+		wantErr bool
+		assert  func(ctx context.Context, t *testing.T, req *backendv1.SyncTestcaseSetsRequest, resp *backendv1.SyncTestcaseSetsResponse)
+	}{
+		"create": {
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.SyncTestcaseSetsRequest, resp *backendv1.SyncTestcaseSetsResponse) {
+				testcaseSets := entClient.TestcaseSet.Query().WithTestcases().AllX(context.Background())
+				assert.Equal(t, 2, len(testcaseSets))
+				testcases := entClient.Testcase.Query().AllX(context.Background())
+				assert.Equal(t, 8, len(testcases))
+				assert.Equal(t, 3, len(testcaseSets[0].Edges.Testcases))
+				assert.Equal(t, 8, len(testcaseSets[1].Edges.Testcases))
+				for _, testcase := range testcases {
+					_, err := testcasesRepo.DownloadTestcase(context.Background(), task.ID, testcase.Name)
+					require.NoError(t, err)
+				}
+			},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			testcaseSets, testcases := seedMutationTestcasePairs()
+			req := &backendv1.SyncTestcaseSetsRequest{
+				TaskId:       int32(task.ID),
+				TestcaseSets: testcaseSets,
+				Testcases:    testcases,
+			}
+			if test.prepare != nil {
+				test.prepare(t, req)
+			}
+			if test.modify != nil {
+				test.modify(req)
+			}
+			resp, err := interactor.SyncTestcaseSets(ctx, req)
 			if test.wantErr {
 				require.Error(t, err)
 			} else {
