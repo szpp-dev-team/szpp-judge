@@ -7,7 +7,7 @@ import NextLink from "next/link";
 import React, { type ReactNode, useMemo, useState } from "react";
 import type { IconType } from "react-icons";
 import { IoBarChart, IoChatboxEllipses, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
-import { SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
+import { SIDEBAR_TOGGLE_KNOB_H, SIDEBAR_TOGGLE_KNOB_TOP, SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
 import { ScoreStatusIcon } from "../task/ScoreStatusIcon";
 
 export type ContestSidebarProps = {
@@ -71,13 +71,14 @@ export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) =
 };
 
 const SidebarHoverShowArea = (props: BoxProps) => {
+  const w = "56px";
   return (
     <Box
       position="absolute"
       left={0}
-      top={0}
-      h="100%"
-      w="40px"
+      top={`calc(${SIDEBAR_TOGGLE_KNOB_TOP} + ${SIDEBAR_TOGGLE_KNOB_H} + 8px)`}
+      h={`calc(100% - ${SIDEBAR_TOGGLE_KNOB_TOP} - ${SIDEBAR_TOGGLE_KNOB_H} - 8px)`}
+      w={w}
       {...props}
     >
     </Box>

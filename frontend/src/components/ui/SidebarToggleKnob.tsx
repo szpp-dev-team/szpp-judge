@@ -4,18 +4,21 @@ import { Box, HTMLChakraProps, IconProps } from "@chakra-ui/react";
 export type SidebarToggleKnobProps = {
   iconDirection?: "hide" | "show";
   iconProps?: IconProps;
-} & Omit<HTMLChakraProps<"button">, "children">;
+} & Omit<HTMLChakraProps<"button">, "children" | "top" | "bottom" | "left" | "right" | "height" | "width" | "h" | "w">;
+
+export const SIDEBAR_TOGGLE_KNOB_TOP = "40px";
+export const SIDEBAR_TOGGLE_KNOB_H = "48px";
+export const SIDEBAR_TOGGLE_KNOB_W = "28px";
 
 export const SidebarToggleKnob = ({ iconDirection = "hide", iconProps, ...props }: SidebarToggleKnobProps) => {
-  const w = "28px";
   return (
     <Box
       as="button"
       position="absolute"
-      top="40px"
-      right={`-${w}`}
-      h="48px"
-      w={w}
+      top={SIDEBAR_TOGGLE_KNOB_TOP}
+      right={`-${SIDEBAR_TOGGLE_KNOB_W}`}
+      h={SIDEBAR_TOGGLE_KNOB_H}
+      w={SIDEBAR_TOGGLE_KNOB_W}
       bg="gray.100"
       color="teal.700"
       border="1px"
