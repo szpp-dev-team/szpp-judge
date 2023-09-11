@@ -689,17 +689,12 @@ export class ContestTask extends Message<ContestTask> {
   title = "";
 
   /**
-   * @generated from field: string slug = 3;
-   */
-  slug = "";
-
-  /**
-   * @generated from field: int32 exec_time_limit = 4;
+   * @generated from field: int32 exec_time_limit = 3;
    */
   execTimeLimit = 0;
 
   /**
-   * @generated from field: int32 exec_memory_limit = 5;
+   * @generated from field: int32 exec_memory_limit = 4;
    */
   execMemoryLimit = 0;
 
@@ -713,9 +708,8 @@ export class ContestTask extends Message<ContestTask> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContestTask {

@@ -2741,7 +2741,7 @@ type ListContestTasksResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Tasks []*ContestTask `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	Tasks []*ContestTask `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"` // 問題の並び順
 }
 
 func (x *ListContestTasksResponse) Reset() {

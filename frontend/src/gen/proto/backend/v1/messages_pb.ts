@@ -2149,6 +2149,8 @@ export class ListContestTasksRequest extends Message<ListContestTasksRequest> {
  */
 export class ListContestTasksResponse extends Message<ListContestTasksResponse> {
   /**
+   * 問題の並び順
+   *
    * @generated from field: repeated backend.v1.ContestTask tasks = 1;
    */
   tasks: ContestTask[] = [];
