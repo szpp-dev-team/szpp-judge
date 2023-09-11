@@ -4,7 +4,7 @@ import "context"
 
 type Repository interface {
 	DownloadTestcase(ctx context.Context, taskID int, name string) (*Testcase, error)
-	UploadTestcase(ctx context.Context, taskID int, testcase *Testcase) error
+	UpsertTestcase(ctx context.Context, taskID int, testcase *Testcase) error
 }
 
 type Testcase struct {

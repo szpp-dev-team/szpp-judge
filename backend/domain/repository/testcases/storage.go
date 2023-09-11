@@ -36,7 +36,7 @@ func (i *gcsImpl) DownloadTestcase(ctx context.Context, taskID int, name string)
 	}, nil
 }
 
-func (i *gcsImpl) UploadTestcase(ctx context.Context, taskID int, testcase *Testcase) error {
+func (i *gcsImpl) UpsertTestcase(ctx context.Context, taskID int, testcase *Testcase) error {
 	bucket := i.client.Bucket("szpp-judge")
 	if err := upload(ctx, bucket, fmt.Sprintf("/testcases/%d/in/%s", taskID, testcase.Name), testcase.In); err != nil {
 		return err
