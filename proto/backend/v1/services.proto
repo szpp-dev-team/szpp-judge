@@ -69,6 +69,7 @@ service ContestService {
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
   rpc GetContest(GetContestRequest) returns (GetContestResponse);
   rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
+  rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
   // 順位表取得
   rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
 }

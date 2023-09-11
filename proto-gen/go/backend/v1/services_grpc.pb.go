@@ -1120,10 +1120,11 @@ var HealthcheckService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	ContestService_CreateContest_FullMethodName = "/backend.v1.ContestService/CreateContest"
-	ContestService_GetContest_FullMethodName    = "/backend.v1.ContestService/GetContest"
-	ContestService_ListContests_FullMethodName  = "/backend.v1.ContestService/ListContests"
-	ContestService_GetStandings_FullMethodName  = "/backend.v1.ContestService/GetStandings"
+	ContestService_CreateContest_FullMethodName    = "/backend.v1.ContestService/CreateContest"
+	ContestService_GetContest_FullMethodName       = "/backend.v1.ContestService/GetContest"
+	ContestService_ListContests_FullMethodName     = "/backend.v1.ContestService/ListContests"
+	ContestService_ListContestTasks_FullMethodName = "/backend.v1.ContestService/ListContestTasks"
+	ContestService_GetStandings_FullMethodName     = "/backend.v1.ContestService/GetStandings"
 )
 
 // ContestServiceClient is the client API for ContestService service.
@@ -1133,6 +1134,7 @@ type ContestServiceClient interface {
 	CreateContest(ctx context.Context, in *CreateContestRequest, opts ...grpc.CallOption) (*CreateContestResponse, error)
 	GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error)
 	ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error)
+	ListContestTasks(ctx context.Context, in *ListContestTasksRequest, opts ...grpc.CallOption) (*ListContestTasksResponse, error)
 	// 順位表取得
 	GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error)
 }
@@ -1172,6 +1174,15 @@ func (c *contestServiceClient) ListContests(ctx context.Context, in *ListContest
 	return out, nil
 }
 
+func (c *contestServiceClient) ListContestTasks(ctx context.Context, in *ListContestTasksRequest, opts ...grpc.CallOption) (*ListContestTasksResponse, error) {
+	out := new(ListContestTasksResponse)
+	err := c.cc.Invoke(ctx, ContestService_ListContestTasks_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contestServiceClient) GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error) {
 	out := new(GetStandingsResponse)
 	err := c.cc.Invoke(ctx, ContestService_GetStandings_FullMethodName, in, out, opts...)
@@ -1188,6 +1199,7 @@ type ContestServiceServer interface {
 	CreateContest(context.Context, *CreateContestRequest) (*CreateContestResponse, error)
 	GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error)
 	ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error)
+	ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error)
 	// 順位表取得
 	GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error)
 }
@@ -1204,6 +1216,9 @@ func (UnimplementedContestServiceServer) GetContest(context.Context, *GetContest
 }
 func (UnimplementedContestServiceServer) ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListContests not implemented")
+}
+func (UnimplementedContestServiceServer) ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListContestTasks not implemented")
 }
 func (UnimplementedContestServiceServer) GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStandings not implemented")
@@ -1274,6 +1289,24 @@ func _ContestService_ListContests_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContestService_ListContestTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContestTasksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).ListContestTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_ListContestTasks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).ListContestTasks(ctx, req.(*ListContestTasksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContestService_GetStandings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetStandingsRequest)
 	if err := dec(in); err != nil {
@@ -1310,6 +1343,10 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListContests",
 			Handler:    _ContestService_ListContests_Handler,
+		},
+		{
+			MethodName: "ListContestTasks",
+			Handler:    _ContestService_ListContestTasks_Handler,
 		},
 		{
 			MethodName: "GetStandings",

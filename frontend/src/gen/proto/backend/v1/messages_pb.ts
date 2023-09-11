@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Clarification, Clarification_Answer, Contest, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, StandingsElement, SubmissionDetail, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
+import { Clarification, Clarification_Answer, Contest, ContestTask, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, StandingsElement, SubmissionDetail, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
 
 /**
  * @generated from message backend.v1.GetUserRequest
@@ -388,25 +388,9 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
  */
 export class GetTaskRequest extends Message<GetTaskRequest> {
   /**
-   * @generated from oneof backend.v1.GetTaskRequest.task_oneof
+   * @generated from field: int32 task_id = 1;
    */
-  taskOneof: {
-    /**
-     * Task の ID
-     *
-     * @generated from field: int32 id = 1;
-     */
-    value: number;
-    case: "id";
-  } | {
-    /**
-     * Task のContest に Task が紐づいている場合に利用可能(例: abc001_a)
-     *
-     * @generated from field: string slug = 2;
-     */
-    value: string;
-    case: "slug";
-  } | { case: undefined; value?: undefined } = { case: undefined };
+  taskId = 0;
 
   constructor(data?: PartialMessage<GetTaskRequest>) {
     super();
@@ -416,8 +400,7 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.GetTaskRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */, oneof: "task_oneof" },
-    { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "task_oneof" },
+    { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskRequest {
@@ -479,9 +462,9 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
  */
 export class UpdateTaskRequest extends Message<UpdateTaskRequest> {
   /**
-   * @generated from field: int32 id = 1;
+   * @generated from field: int32 task_id = 1;
    */
-  id = 0;
+  taskId = 0;
 
   /**
    * @generated from field: backend.v1.MutationTask task = 2;
@@ -496,7 +479,7 @@ export class UpdateTaskRequest extends Message<UpdateTaskRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.UpdateTaskRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "task", kind: "message", T: MutationTask },
   ]);
 
@@ -2121,6 +2104,82 @@ export class DeleteAnswerResponse extends Message<DeleteAnswerResponse> {
 
   static equals(a: DeleteAnswerResponse | PlainMessage<DeleteAnswerResponse> | undefined, b: DeleteAnswerResponse | PlainMessage<DeleteAnswerResponse> | undefined): boolean {
     return proto3.util.equals(DeleteAnswerResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.ListContestTasksRequest
+ */
+export class ListContestTasksRequest extends Message<ListContestTasksRequest> {
+  /**
+   * @generated from field: string contest_slug = 1;
+   */
+  contestSlug = "";
+
+  constructor(data?: PartialMessage<ListContestTasksRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.ListContestTasksRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListContestTasksRequest {
+    return new ListContestTasksRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListContestTasksRequest {
+    return new ListContestTasksRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListContestTasksRequest {
+    return new ListContestTasksRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListContestTasksRequest | PlainMessage<ListContestTasksRequest> | undefined, b: ListContestTasksRequest | PlainMessage<ListContestTasksRequest> | undefined): boolean {
+    return proto3.util.equals(ListContestTasksRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.ListContestTasksResponse
+ */
+export class ListContestTasksResponse extends Message<ListContestTasksResponse> {
+  /**
+   * 問題の並び順
+   *
+   * @generated from field: repeated backend.v1.ContestTask tasks = 1;
+   */
+  tasks: ContestTask[] = [];
+
+  constructor(data?: PartialMessage<ListContestTasksResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.ListContestTasksResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "tasks", kind: "message", T: ContestTask, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListContestTasksResponse {
+    return new ListContestTasksResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListContestTasksResponse {
+    return new ListContestTasksResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListContestTasksResponse {
+    return new ListContestTasksResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListContestTasksResponse | PlainMessage<ListContestTasksResponse> | undefined, b: ListContestTasksResponse | PlainMessage<ListContestTasksResponse> | undefined): boolean {
+    return proto3.util.equals(ListContestTasksResponse, a, b);
   }
 }
 
