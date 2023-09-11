@@ -32,7 +32,7 @@ CREATE TABLE `tasks` (
 
 | Name | Type | Default | Nullable | Extra Definition | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | ---------------- | -------- | ------- | ------- |
-| id | bigint(20) |  | false | auto_increment | [testcases](testcases.md) [testcase_sets](testcase_sets.md) |  |  |
+| id | bigint(20) |  | false | auto_increment | [submits](submits.md) [testcases](testcases.md) [testcase_sets](testcase_sets.md) |  |  |
 | title | varchar(255) |  | false |  |  |  |  |
 | statement | varchar(255) |  | false |  |  |  |  |
 | difficulty | varchar(255) |  | false |  |  |  |  |

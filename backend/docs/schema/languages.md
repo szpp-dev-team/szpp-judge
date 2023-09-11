@@ -1,4 +1,4 @@
-# users
+# languages
 
 ## Description
 
@@ -6,13 +6,8 @@
 <summary><strong>Table Definition</strong></summary>
 
 ```sql
-CREATE TABLE `users` (
+CREATE TABLE `languages` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `role` varchar(255) NOT NULL,
-  `encrypted_password` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
@@ -23,12 +18,7 @@ CREATE TABLE `users` (
 
 | Name | Type | Default | Nullable | Extra Definition | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | ---------------- | -------- | ------- | ------- |
-| id | bigint(20) |  | false | auto_increment | [tasks](tasks.md) [user_submits](user_submits.md) |  |  |
-| name | varchar(255) |  | false |  |  |  |  |
-| role | varchar(255) |  | false |  |  |  |  |
-| encrypted_password | varchar(255) |  | false |  |  |  |  |
-| created_at | timestamp | NULL | true |  |  |  |  |
-| updated_at | timestamp | NULL | true |  |  |  |  |
+| id | bigint(20) |  | false | auto_increment | [submits](submits.md) |  |  |
 
 ## Constraints
 
@@ -44,7 +34,7 @@ CREATE TABLE `users` (
 
 ## Relations
 
-![er](users.svg)
+![er](languages.svg)
 
 ---
 

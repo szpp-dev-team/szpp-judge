@@ -4,11 +4,15 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
+| [languages](languages.md) | 1 |  | BASE TABLE |
+| [submits](submits.md) | 3 |  | BASE TABLE |
 | [tasks](tasks.md) | 13 |  | BASE TABLE |
 | [testcases](testcases.md) | 6 |  | BASE TABLE |
+| [testcase_results](testcase_results.md) | 2 |  | BASE TABLE |
 | [testcase_sets](testcase_sets.md) | 7 |  | BASE TABLE |
 | [testcase_set_testcases](testcase_set_testcases.md) | 2 |  | BASE TABLE |
 | [users](users.md) | 6 |  | BASE TABLE |
+| [user_submits](user_submits.md) | 2 |  | BASE TABLE |
 
 ## Relations
 
