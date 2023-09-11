@@ -588,42 +588,49 @@ export class Task extends Message<Task> {
  */
 export class MutationTask extends Message<MutationTask> {
   /**
+   * update の時のみ
+   *
+   * @generated from field: optional int32 id = 1;
+   */
+  id?: number;
+
+  /**
    * 問題名
    *
-   * @generated from field: string title = 1;
+   * @generated from field: string title = 2;
    */
   title = "";
 
   /**
    * 問題文
    *
-   * @generated from field: string statement = 2;
+   * @generated from field: string statement = 3;
    */
   statement = "";
 
   /**
    * 実行時間制限[ms]
    *
-   * @generated from field: int32 exec_time_limit = 3;
+   * @generated from field: int32 exec_time_limit = 4;
    */
   execTimeLimit = 0;
 
   /**
    * 実行メモリ制限[MB]
    *
-   * @generated from field: int32 exec_memory_limit = 4;
+   * @generated from field: int32 exec_memory_limit = 5;
    */
   execMemoryLimit = 0;
 
   /**
    * Judge の type(完全一致、誤差など)
    *
-   * @generated from field: judge.v1.JudgeType judge_type = 5;
+   * @generated from field: judge.v1.JudgeType judge_type = 6;
    */
   judgeType?: JudgeType;
 
   /**
-   * @generated from field: backend.v1.Difficulty difficulty = 6;
+   * @generated from field: backend.v1.Difficulty difficulty = 7;
    */
   difficulty = Difficulty.DIFFICULTY_UNSPECIFIED;
 
@@ -635,12 +642,13 @@ export class MutationTask extends Message<MutationTask> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.MutationTask";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "judge_type", kind: "message", T: JudgeType },
-    { no: 6, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "judge_type", kind: "message", T: JudgeType },
+    { no: 7, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationTask {
