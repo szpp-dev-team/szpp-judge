@@ -68,8 +68,9 @@ message Task {
   repeated int32 contest_ids = 6; // 属するコンテストの ID
   judge.v1.JudgeType judge_type = 7; // Judge の type(完全一致、誤差など)
   Difficulty difficulty = 8;
-  google.protobuf.Timestamp created_at = 9;
-  optional google.protobuf.Timestamp updated_at = 10;
+  int32 score = 9;
+  google.protobuf.Timestamp created_at = 10;
+  optional google.protobuf.Timestamp updated_at = 11;
 }
 
 message MutationTask {
@@ -80,6 +81,14 @@ message MutationTask {
   int32 exec_memory_limit = 5; // 実行メモリ制限[MB]
   judge.v1.JudgeType judge_type = 6; // Judge の type(完全一致、誤差など)
   Difficulty difficulty = 7;
+}
+
+message ContestTask {
+  int32 id = 1;
+  string title = 2;
+  string slug = 3;
+  int32 exec_time_limit = 4;
+  int32 exec_memory_limit = 5;
 }
 
 enum Visibility {
