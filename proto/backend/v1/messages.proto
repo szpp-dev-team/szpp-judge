@@ -45,7 +45,10 @@ message CreateTaskResponse {
 }
 
 message GetTaskRequest {
-  int32 id = 1;
+  oneof task_oneof {
+    int32 id = 1;
+    string slug = 2;
+  }
 }
 
 message GetTaskResponse {
