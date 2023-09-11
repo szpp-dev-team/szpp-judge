@@ -23,6 +23,23 @@ message Contest {
   google.protobuf.Timestamp start_at = 6;
   google.protobuf.Timestamp end_at = 7;
 }
+
+message StandingsElement {
+  message TaskDetail {
+    int32 task_id = 1;
+    int32 penalty_count = 2;
+    int32 ac_submit_id = 3;
+    google.protobuf.Timestamp ac_elapsed = 4;
+  }
+
+  int32 rank = 1;
+  int32 user_id = 2;
+  string user_name = 3;
+  int32 total_score = 4;
+  int32 total_penalty_count = 5;
+  google.protobuf.Timestamp latest_ac_at = 6;
+  repeated TaskDetail task_detail_list = 7;
+}
 message Clarification {
   int32 id = 1;
   int32 user_id = 2;
@@ -56,12 +73,13 @@ message Task {
 }
 
 message MutationTask {
-  string title = 1; // 問題名
-  string statement = 2; // 問題文
-  int32 exec_time_limit = 3; // 実行時間制限[ms]
-  int32 exec_memory_limit = 4; // 実行メモリ制限[MB]
-  judge.v1.JudgeType judge_type = 5; // Judge の type(完全一致、誤差など)
-  Difficulty difficulty = 6;
+  optional int32 id = 1; // Update 時のみ set
+  string title = 2; // 問題名
+  string statement = 3; // 問題文
+  int32 exec_time_limit = 4; // 実行時間制限[ms]
+  int32 exec_memory_limit = 5; // 実行メモリ制限[MB]
+  judge.v1.JudgeType judge_type = 6; // Judge の type(完全一致、誤差など)
+  Difficulty difficulty = 7;
 }
 
 enum Visibility {
@@ -84,16 +102,18 @@ message TestcaseSet {
   int32 id = 1;
   string slug = 2; // means name
   int32 score = 3;
-  repeated string testcase_slugs = 4;
-  google.protobuf.Timestamp created_at = 5;
-  optional google.protobuf.Timestamp updated_at = 6;
-  int32 task_id = 7;
+  bool is_sample = 4;
+  repeated string testcase_slugs = 5;
+  google.protobuf.Timestamp created_at = 6;
+  optional google.protobuf.Timestamp updated_at = 7;
+  int32 task_id = 8;
 }
 
 message MutationTestcaseSet {
   string slug = 1; // means name
   int32 score = 2;
-  repeated string testcase_slugs = 3;
+  bool is_sample = 3;
+  repeated string testcase_slugs = 4;
 }
 
 // (slug, task_id) は複合 unique

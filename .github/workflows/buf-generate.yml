@@ -3,7 +3,7 @@ on:
   push:
     # 原則として main と develop では generate を行わない
     # 生成済みのコードを PR を通して merge するという運用にする
-    branchs-ignore:
+    branches-ignore:
       - main
       - develop
     paths:

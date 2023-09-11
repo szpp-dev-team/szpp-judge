@@ -4,6 +4,10 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
+| [tasks](tasks.md) | 13 |  | BASE TABLE |
+| [testcases](testcases.md) | 6 |  | BASE TABLE |
+| [testcase_sets](testcase_sets.md) | 7 |  | BASE TABLE |
+| [testcase_set_testcases](testcase_set_testcases.md) | 2 |  | BASE TABLE |
 | [users](users.md) | 6 |  | BASE TABLE |
 
 ## Relations

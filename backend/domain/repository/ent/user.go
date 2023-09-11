@@ -26,9 +26,40 @@ type User struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt    time.Time `json:"updated_at,omitempty"`
-	submit_user  *int
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Tasks holds the value of the tasks edge.
+	Tasks []*Task `json:"tasks,omitempty"`
+	// Submits holds the value of the submits edge.
+	Submits []*Submit `json:"submits,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// TasksOrErr returns the Tasks value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) TasksOrErr() ([]*Task, error) {
+	if e.loadedTypes[0] {
+		return e.Tasks, nil
+	}
+	return nil, &NotLoadedError{edge: "tasks"}
+}
+
+// SubmitsOrErr returns the Submits value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) SubmitsOrErr() ([]*Submit, error) {
+	if e.loadedTypes[1] {
+		return e.Submits, nil
+	}
+	return nil, &NotLoadedError{edge: "submits"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -42,8 +73,6 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case user.ForeignKeys[0]: // submit_user
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -95,13 +124,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.UpdatedAt = value.Time
 			}
-		case user.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field submit_user", value)
-			} else if value.Valid {
-				u.submit_user = new(int)
-				*u.submit_user = int(value.Int64)
-			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -113,6 +135,16 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryTasks queries the "tasks" edge of the User entity.
+func (u *User) QueryTasks() *TaskQuery {
+	return NewUserClient(u.config).QueryTasks(u)
+}
+
+// QuerySubmits queries the "submits" edge of the User entity.
+func (u *User) QuerySubmits() *SubmitQuery {
+	return NewUserClient(u.config).QuerySubmits(u)
 }
 
 // Update returns a builder for updating this User.

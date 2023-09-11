@@ -14,7 +14,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
@@ -78,7 +81,10 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			language.Table:       language.ValidColumn,
 			submit.Table:         submit.ValidColumn,
+			task.Table:           task.ValidColumn,
+			testcase.Table:       testcase.ValidColumn,
 			testcaseresult.Table: testcaseresult.ValidColumn,
+			testcaseset.Table:    testcaseset.ValidColumn,
 			user.Table:           user.ValidColumn,
 		})
 	})

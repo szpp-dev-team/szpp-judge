@@ -12,8 +12,17 @@ type Language func(*sql.Selector)
 // Submit is the predicate function for submit builders.
 type Submit func(*sql.Selector)
 
+// Task is the predicate function for task builders.
+type Task func(*sql.Selector)
+
+// Testcase is the predicate function for testcase builders.
+type Testcase func(*sql.Selector)
+
 // TestcaseResult is the predicate function for testcaseresult builders.
 type TestcaseResult func(*sql.Selector)
+
+// TestcaseSet is the predicate function for testcaseset builders.
+type TestcaseSet func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

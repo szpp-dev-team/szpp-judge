@@ -33,6 +33,30 @@ func (f SubmitFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubmitMutation", m)
 }
 
+// The TaskFunc type is an adapter to allow the use of ordinary
+// function as Task mutator.
+type TaskFunc func(context.Context, *ent.TaskMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TaskFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TaskMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TaskMutation", m)
+}
+
+// The TestcaseFunc type is an adapter to allow the use of ordinary
+// function as Testcase mutator.
+type TestcaseFunc func(context.Context, *ent.TestcaseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestcaseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestcaseMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestcaseMutation", m)
+}
+
 // The TestcaseResultFunc type is an adapter to allow the use of ordinary
 // function as TestcaseResult mutator.
 type TestcaseResultFunc func(context.Context, *ent.TestcaseResultMutation) (ent.Value, error)
@@ -43,6 +67,18 @@ func (f TestcaseResultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestcaseResultMutation", m)
+}
+
+// The TestcaseSetFunc type is an adapter to allow the use of ordinary
+// function as TestcaseSet mutator.
+type TestcaseSetFunc func(context.Context, *ent.TestcaseSetMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestcaseSetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestcaseSetMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestcaseSetMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary

@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Clarification, Clarification_Answer, Contest, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, SubmissionDetail, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
+import { Clarification, Clarification_Answer, Contest, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, StandingsElement, SubmissionDetail, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
 
 /**
  * @generated from message backend.v1.GetUserRequest
@@ -318,16 +318,6 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
    */
   task?: MutationTask;
 
-  /**
-   * @generated from field: repeated backend.v1.MutationTestcaseSet testcase_sets = 2;
-   */
-  testcaseSets: MutationTestcaseSet[] = [];
-
-  /**
-   * @generated from field: repeated backend.v1.MutationTestcase testcases = 3;
-   */
-  testcases: MutationTestcase[] = [];
-
   constructor(data?: PartialMessage<CreateTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -337,8 +327,6 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
   static readonly typeName = "backend.v1.CreateTaskRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: MutationTask },
-    { no: 2, name: "testcase_sets", kind: "message", T: MutationTestcaseSet, repeated: true },
-    { no: 3, name: "testcases", kind: "message", T: MutationTestcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateTaskRequest {
@@ -367,16 +355,6 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
    */
   task?: Task;
 
-  /**
-   * @generated from field: repeated backend.v1.TestcaseSet testcase_sets = 2;
-   */
-  testcaseSets: TestcaseSet[] = [];
-
-  /**
-   * @generated from field: repeated backend.v1.Testcase testcases = 3;
-   */
-  testcases: Testcase[] = [];
-
   constructor(data?: PartialMessage<CreateTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -386,8 +364,6 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
   static readonly typeName = "backend.v1.CreateTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
-    { no: 2, name: "testcase_sets", kind: "message", T: TestcaseSet, repeated: true },
-    { no: 3, name: "testcases", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateTaskResponse {
@@ -453,11 +429,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
    */
   task?: Task;
 
-  /**
-   * @generated from field: repeated backend.v1.Testcase testcases = 2;
-   */
-  testcases: Testcase[] = [];
-
   constructor(data?: PartialMessage<GetTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -467,7 +438,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
   static readonly typeName = "backend.v1.GetTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
-    { no: 2, name: "testcases", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskResponse {
@@ -501,16 +471,6 @@ export class UpdateTaskRequest extends Message<UpdateTaskRequest> {
    */
   task?: MutationTask;
 
-  /**
-   * @generated from field: repeated backend.v1.MutationTestcaseSet testcase_sets = 3;
-   */
-  testcaseSets: MutationTestcaseSet[] = [];
-
-  /**
-   * @generated from field: repeated backend.v1.MutationTestcase testcases = 4;
-   */
-  testcases: MutationTestcase[] = [];
-
   constructor(data?: PartialMessage<UpdateTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -521,8 +481,6 @@ export class UpdateTaskRequest extends Message<UpdateTaskRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "task", kind: "message", T: MutationTask },
-    { no: 3, name: "testcase_sets", kind: "message", T: MutationTestcaseSet, repeated: true },
-    { no: 4, name: "testcases", kind: "message", T: MutationTestcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateTaskRequest {
@@ -551,16 +509,6 @@ export class UpdateTaskResponse extends Message<UpdateTaskResponse> {
    */
   task?: Task;
 
-  /**
-   * @generated from field: repeated backend.v1.TestcaseSet testcase_sets = 2;
-   */
-  testcaseSets: TestcaseSet[] = [];
-
-  /**
-   * @generated from field: repeated backend.v1.Testcase testcases = 3;
-   */
-  testcases: Testcase[] = [];
-
   constructor(data?: PartialMessage<UpdateTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -570,8 +518,6 @@ export class UpdateTaskResponse extends Message<UpdateTaskResponse> {
   static readonly typeName = "backend.v1.UpdateTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
-    { no: 2, name: "testcase_sets", kind: "message", T: TestcaseSet, repeated: true },
-    { no: 3, name: "testcases", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateTaskResponse {
@@ -588,6 +534,178 @@ export class UpdateTaskResponse extends Message<UpdateTaskResponse> {
 
   static equals(a: UpdateTaskResponse | PlainMessage<UpdateTaskResponse> | undefined, b: UpdateTaskResponse | PlainMessage<UpdateTaskResponse> | undefined): boolean {
     return proto3.util.equals(UpdateTaskResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetTestcaseSetsRequest
+ */
+export class GetTestcaseSetsRequest extends Message<GetTestcaseSetsRequest> {
+  /**
+   * @generated from field: int32 task_id = 1;
+   */
+  taskId = 0;
+
+  constructor(data?: PartialMessage<GetTestcaseSetsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetTestcaseSetsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTestcaseSetsRequest {
+    return new GetTestcaseSetsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetTestcaseSetsRequest {
+    return new GetTestcaseSetsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetTestcaseSetsRequest {
+    return new GetTestcaseSetsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetTestcaseSetsRequest | PlainMessage<GetTestcaseSetsRequest> | undefined, b: GetTestcaseSetsRequest | PlainMessage<GetTestcaseSetsRequest> | undefined): boolean {
+    return proto3.util.equals(GetTestcaseSetsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetTestcaseSetsResponse
+ */
+export class GetTestcaseSetsResponse extends Message<GetTestcaseSetsResponse> {
+  /**
+   * @generated from field: repeated backend.v1.TestcaseSet testcase_sets = 1;
+   */
+  testcaseSets: TestcaseSet[] = [];
+
+  /**
+   * @generated from field: repeated backend.v1.Testcase testcases = 2;
+   */
+  testcases: Testcase[] = [];
+
+  constructor(data?: PartialMessage<GetTestcaseSetsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetTestcaseSetsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "testcase_sets", kind: "message", T: TestcaseSet, repeated: true },
+    { no: 2, name: "testcases", kind: "message", T: Testcase, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTestcaseSetsResponse {
+    return new GetTestcaseSetsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetTestcaseSetsResponse {
+    return new GetTestcaseSetsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetTestcaseSetsResponse {
+    return new GetTestcaseSetsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetTestcaseSetsResponse | PlainMessage<GetTestcaseSetsResponse> | undefined, b: GetTestcaseSetsResponse | PlainMessage<GetTestcaseSetsResponse> | undefined): boolean {
+    return proto3.util.equals(GetTestcaseSetsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.SyncTestcaseSetsRequest
+ */
+export class SyncTestcaseSetsRequest extends Message<SyncTestcaseSetsRequest> {
+  /**
+   * @generated from field: int32 task_id = 1;
+   */
+  taskId = 0;
+
+  /**
+   * @generated from field: repeated backend.v1.MutationTestcaseSet testcase_sets = 2;
+   */
+  testcaseSets: MutationTestcaseSet[] = [];
+
+  /**
+   * @generated from field: repeated backend.v1.MutationTestcase testcases = 3;
+   */
+  testcases: MutationTestcase[] = [];
+
+  constructor(data?: PartialMessage<SyncTestcaseSetsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.SyncTestcaseSetsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "testcase_sets", kind: "message", T: MutationTestcaseSet, repeated: true },
+    { no: 3, name: "testcases", kind: "message", T: MutationTestcase, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SyncTestcaseSetsRequest {
+    return new SyncTestcaseSetsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SyncTestcaseSetsRequest {
+    return new SyncTestcaseSetsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SyncTestcaseSetsRequest {
+    return new SyncTestcaseSetsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SyncTestcaseSetsRequest | PlainMessage<SyncTestcaseSetsRequest> | undefined, b: SyncTestcaseSetsRequest | PlainMessage<SyncTestcaseSetsRequest> | undefined): boolean {
+    return proto3.util.equals(SyncTestcaseSetsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.SyncTestcaseSetsResponse
+ */
+export class SyncTestcaseSetsResponse extends Message<SyncTestcaseSetsResponse> {
+  /**
+   * @generated from field: repeated backend.v1.TestcaseSet testcase_sets = 1;
+   */
+  testcaseSets: TestcaseSet[] = [];
+
+  /**
+   * @generated from field: repeated backend.v1.Testcase testcases = 2;
+   */
+  testcases: Testcase[] = [];
+
+  constructor(data?: PartialMessage<SyncTestcaseSetsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.SyncTestcaseSetsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "testcase_sets", kind: "message", T: TestcaseSet, repeated: true },
+    { no: 2, name: "testcases", kind: "message", T: Testcase, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SyncTestcaseSetsResponse {
+    return new SyncTestcaseSetsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SyncTestcaseSetsResponse {
+    return new SyncTestcaseSetsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SyncTestcaseSetsResponse {
+    return new SyncTestcaseSetsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SyncTestcaseSetsResponse | PlainMessage<SyncTestcaseSetsResponse> | undefined, b: SyncTestcaseSetsResponse | PlainMessage<SyncTestcaseSetsResponse> | undefined): boolean {
+    return proto3.util.equals(SyncTestcaseSetsResponse, a, b);
   }
 }
 
@@ -1222,6 +1340,80 @@ export class ListContestsResponse extends Message<ListContestsResponse> {
 
   static equals(a: ListContestsResponse | PlainMessage<ListContestsResponse> | undefined, b: ListContestsResponse | PlainMessage<ListContestsResponse> | undefined): boolean {
     return proto3.util.equals(ListContestsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetStandingsRequest
+ */
+export class GetStandingsRequest extends Message<GetStandingsRequest> {
+  /**
+   * @generated from field: int32 contest_id = 1;
+   */
+  contestId = 0;
+
+  constructor(data?: PartialMessage<GetStandingsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetStandingsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetStandingsRequest {
+    return new GetStandingsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetStandingsRequest {
+    return new GetStandingsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetStandingsRequest {
+    return new GetStandingsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetStandingsRequest | PlainMessage<GetStandingsRequest> | undefined, b: GetStandingsRequest | PlainMessage<GetStandingsRequest> | undefined): boolean {
+    return proto3.util.equals(GetStandingsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetStandingsResponse
+ */
+export class GetStandingsResponse extends Message<GetStandingsResponse> {
+  /**
+   * @generated from field: repeated backend.v1.StandingsElement standings_list = 1;
+   */
+  standingsList: StandingsElement[] = [];
+
+  constructor(data?: PartialMessage<GetStandingsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetStandingsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "standings_list", kind: "message", T: StandingsElement, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetStandingsResponse {
+    return new GetStandingsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetStandingsResponse {
+    return new GetStandingsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetStandingsResponse {
+    return new GetStandingsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetStandingsResponse | PlainMessage<GetStandingsResponse> | undefined, b: GetStandingsResponse | PlainMessage<GetStandingsResponse> | undefined): boolean {
+    return proto3.util.equals(GetStandingsResponse, a, b);
   }
 }
 

@@ -213,6 +213,134 @@ export class Contest extends Message<Contest> {
 }
 
 /**
+ * @generated from message backend.v1.StandingsElement
+ */
+export class StandingsElement extends Message<StandingsElement> {
+  /**
+   * @generated from field: int32 rank = 1;
+   */
+  rank = 0;
+
+  /**
+   * @generated from field: int32 user_id = 2;
+   */
+  userId = 0;
+
+  /**
+   * @generated from field: string user_name = 3;
+   */
+  userName = "";
+
+  /**
+   * @generated from field: int32 total_score = 4;
+   */
+  totalScore = 0;
+
+  /**
+   * @generated from field: int32 total_penalty_count = 5;
+   */
+  totalPenaltyCount = 0;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp latest_ac_at = 6;
+   */
+  latestAcAt?: Timestamp;
+
+  /**
+   * @generated from field: repeated backend.v1.StandingsElement.TaskDetail task_detail_list = 7;
+   */
+  taskDetailList: StandingsElement_TaskDetail[] = [];
+
+  constructor(data?: PartialMessage<StandingsElement>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.StandingsElement";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "rank", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "user_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "total_score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "total_penalty_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "latest_ac_at", kind: "message", T: Timestamp },
+    { no: 7, name: "task_detail_list", kind: "message", T: StandingsElement_TaskDetail, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StandingsElement {
+    return new StandingsElement().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StandingsElement {
+    return new StandingsElement().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StandingsElement {
+    return new StandingsElement().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StandingsElement | PlainMessage<StandingsElement> | undefined, b: StandingsElement | PlainMessage<StandingsElement> | undefined): boolean {
+    return proto3.util.equals(StandingsElement, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.StandingsElement.TaskDetail
+ */
+export class StandingsElement_TaskDetail extends Message<StandingsElement_TaskDetail> {
+  /**
+   * @generated from field: int32 task_id = 1;
+   */
+  taskId = 0;
+
+  /**
+   * @generated from field: int32 penalty_count = 2;
+   */
+  penaltyCount = 0;
+
+  /**
+   * @generated from field: int32 ac_submit_id = 3;
+   */
+  acSubmitId = 0;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp ac_elapsed = 4;
+   */
+  acElapsed?: Timestamp;
+
+  constructor(data?: PartialMessage<StandingsElement_TaskDetail>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.StandingsElement.TaskDetail";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "penalty_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "ac_submit_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "ac_elapsed", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StandingsElement_TaskDetail {
+    return new StandingsElement_TaskDetail().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StandingsElement_TaskDetail {
+    return new StandingsElement_TaskDetail().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StandingsElement_TaskDetail {
+    return new StandingsElement_TaskDetail().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StandingsElement_TaskDetail | PlainMessage<StandingsElement_TaskDetail> | undefined, b: StandingsElement_TaskDetail | PlainMessage<StandingsElement_TaskDetail> | undefined): boolean {
+    return proto3.util.equals(StandingsElement_TaskDetail, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.Clarification
  */
 export class Clarification extends Message<Clarification> {
@@ -460,42 +588,49 @@ export class Task extends Message<Task> {
  */
 export class MutationTask extends Message<MutationTask> {
   /**
+   * Update 時のみ set
+   *
+   * @generated from field: optional int32 id = 1;
+   */
+  id?: number;
+
+  /**
    * 問題名
    *
-   * @generated from field: string title = 1;
+   * @generated from field: string title = 2;
    */
   title = "";
 
   /**
    * 問題文
    *
-   * @generated from field: string statement = 2;
+   * @generated from field: string statement = 3;
    */
   statement = "";
 
   /**
    * 実行時間制限[ms]
    *
-   * @generated from field: int32 exec_time_limit = 3;
+   * @generated from field: int32 exec_time_limit = 4;
    */
   execTimeLimit = 0;
 
   /**
    * 実行メモリ制限[MB]
    *
-   * @generated from field: int32 exec_memory_limit = 4;
+   * @generated from field: int32 exec_memory_limit = 5;
    */
   execMemoryLimit = 0;
 
   /**
    * Judge の type(完全一致、誤差など)
    *
-   * @generated from field: judge.v1.JudgeType judge_type = 5;
+   * @generated from field: judge.v1.JudgeType judge_type = 6;
    */
   judgeType?: JudgeType;
 
   /**
-   * @generated from field: backend.v1.Difficulty difficulty = 6;
+   * @generated from field: backend.v1.Difficulty difficulty = 7;
    */
   difficulty = Difficulty.DIFFICULTY_UNSPECIFIED;
 
@@ -507,12 +642,13 @@ export class MutationTask extends Message<MutationTask> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.MutationTask";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "judge_type", kind: "message", T: JudgeType },
-    { no: 6, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "judge_type", kind: "message", T: JudgeType },
+    { no: 7, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationTask {
@@ -556,22 +692,27 @@ export class TestcaseSet extends Message<TestcaseSet> {
   score = 0;
 
   /**
-   * @generated from field: repeated string testcase_slugs = 4;
+   * @generated from field: bool is_sample = 4;
+   */
+  isSample = false;
+
+  /**
+   * @generated from field: repeated string testcase_slugs = 5;
    */
   testcaseSlugs: string[] = [];
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 5;
+   * @generated from field: google.protobuf.Timestamp created_at = 6;
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp updated_at = 6;
+   * @generated from field: optional google.protobuf.Timestamp updated_at = 7;
    */
   updatedAt?: Timestamp;
 
   /**
-   * @generated from field: int32 task_id = 7;
+   * @generated from field: int32 task_id = 8;
    */
   taskId = 0;
 
@@ -586,10 +727,11 @@ export class TestcaseSet extends Message<TestcaseSet> {
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: "testcase_slugs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "created_at", kind: "message", T: Timestamp },
-    { no: 6, name: "updated_at", kind: "message", T: Timestamp, opt: true },
-    { no: 7, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "is_sample", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "testcase_slugs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "created_at", kind: "message", T: Timestamp },
+    { no: 7, name: "updated_at", kind: "message", T: Timestamp, opt: true },
+    { no: 8, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TestcaseSet {
@@ -626,7 +768,12 @@ export class MutationTestcaseSet extends Message<MutationTestcaseSet> {
   score = 0;
 
   /**
-   * @generated from field: repeated string testcase_slugs = 3;
+   * @generated from field: bool is_sample = 3;
+   */
+  isSample = false;
+
+  /**
+   * @generated from field: repeated string testcase_slugs = 4;
    */
   testcaseSlugs: string[] = [];
 
@@ -640,7 +787,8 @@ export class MutationTestcaseSet extends Message<MutationTestcaseSet> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "testcase_slugs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "is_sample", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "testcase_slugs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationTestcaseSet {

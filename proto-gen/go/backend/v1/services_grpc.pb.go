@@ -280,6 +280,8 @@ const (
 	TaskService_CreateTask_FullMethodName          = "/backend.v1.TaskService/CreateTask"
 	TaskService_GetTask_FullMethodName             = "/backend.v1.TaskService/GetTask"
 	TaskService_UpdateTask_FullMethodName          = "/backend.v1.TaskService/UpdateTask"
+	TaskService_GetTestcaseSets_FullMethodName     = "/backend.v1.TaskService/GetTestcaseSets"
+	TaskService_SyncTestcaseSets_FullMethodName    = "/backend.v1.TaskService/SyncTestcaseSets"
 	TaskService_Submit_FullMethodName              = "/backend.v1.TaskService/Submit"
 	TaskService_GetSubmissionDetail_FullMethodName = "/backend.v1.TaskService/GetSubmissionDetail"
 	TaskService_ListSubmissions_FullMethodName     = "/backend.v1.TaskService/ListSubmissions"
@@ -305,6 +307,11 @@ type TaskServiceClient interface {
 	GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*GetTaskResponse, error)
 	// Task を更新する
 	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error)
+	// TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+	// contestant によるリクエストの場合は sample のみ取得する。
+	GetTestcaseSets(ctx context.Context, in *GetTestcaseSetsRequest, opts ...grpc.CallOption) (*GetTestcaseSetsResponse, error)
+	// TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+	SyncTestcaseSets(ctx context.Context, in *SyncTestcaseSetsRequest, opts ...grpc.CallOption) (*SyncTestcaseSetsResponse, error)
 	// 提出する
 	Submit(ctx context.Context, in *SubmitRequest, opts ...grpc.CallOption) (*SubmitResponse, error)
 	// 提出の詳細を取得
@@ -362,6 +369,24 @@ func (c *taskServiceClient) GetTask(ctx context.Context, in *GetTaskRequest, opt
 func (c *taskServiceClient) UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error) {
 	out := new(UpdateTaskResponse)
 	err := c.cc.Invoke(ctx, TaskService_UpdateTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) GetTestcaseSets(ctx context.Context, in *GetTestcaseSetsRequest, opts ...grpc.CallOption) (*GetTestcaseSetsResponse, error) {
+	out := new(GetTestcaseSetsResponse)
+	err := c.cc.Invoke(ctx, TaskService_GetTestcaseSets_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) SyncTestcaseSets(ctx context.Context, in *SyncTestcaseSetsRequest, opts ...grpc.CallOption) (*SyncTestcaseSetsResponse, error) {
+	out := new(SyncTestcaseSetsResponse)
+	err := c.cc.Invoke(ctx, TaskService_SyncTestcaseSets_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -495,6 +520,11 @@ type TaskServiceServer interface {
 	GetTask(context.Context, *GetTaskRequest) (*GetTaskResponse, error)
 	// Task を更新する
 	UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error)
+	// TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+	// contestant によるリクエストの場合は sample のみ取得する。
+	GetTestcaseSets(context.Context, *GetTestcaseSetsRequest) (*GetTestcaseSetsResponse, error)
+	// TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+	SyncTestcaseSets(context.Context, *SyncTestcaseSetsRequest) (*SyncTestcaseSetsResponse, error)
 	// 提出する
 	Submit(context.Context, *SubmitRequest) (*SubmitResponse, error)
 	// 提出の詳細を取得
@@ -535,6 +565,12 @@ func (UnimplementedTaskServiceServer) GetTask(context.Context, *GetTaskRequest) 
 }
 func (UnimplementedTaskServiceServer) UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTask not implemented")
+}
+func (UnimplementedTaskServiceServer) GetTestcaseSets(context.Context, *GetTestcaseSetsRequest) (*GetTestcaseSetsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTestcaseSets not implemented")
+}
+func (UnimplementedTaskServiceServer) SyncTestcaseSets(context.Context, *SyncTestcaseSetsRequest) (*SyncTestcaseSetsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncTestcaseSets not implemented")
 }
 func (UnimplementedTaskServiceServer) Submit(context.Context, *SubmitRequest) (*SubmitResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Submit not implemented")
@@ -637,6 +673,42 @@ func _TaskService_UpdateTask_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TaskServiceServer).UpdateTask(ctx, req.(*UpdateTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_GetTestcaseSets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTestcaseSetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).GetTestcaseSets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_GetTestcaseSets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).GetTestcaseSets(ctx, req.(*GetTestcaseSetsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_SyncTestcaseSets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncTestcaseSetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).SyncTestcaseSets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_SyncTestcaseSets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).SyncTestcaseSets(ctx, req.(*SyncTestcaseSetsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -895,6 +967,14 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TaskService_UpdateTask_Handler,
 		},
 		{
+			MethodName: "GetTestcaseSets",
+			Handler:    _TaskService_GetTestcaseSets_Handler,
+		},
+		{
+			MethodName: "SyncTestcaseSets",
+			Handler:    _TaskService_SyncTestcaseSets_Handler,
+		},
+		{
 			MethodName: "Submit",
 			Handler:    _TaskService_Submit_Handler,
 		},
@@ -1043,6 +1123,7 @@ const (
 	ContestService_CreateContest_FullMethodName = "/backend.v1.ContestService/CreateContest"
 	ContestService_GetContest_FullMethodName    = "/backend.v1.ContestService/GetContest"
 	ContestService_ListContests_FullMethodName  = "/backend.v1.ContestService/ListContests"
+	ContestService_GetStandings_FullMethodName  = "/backend.v1.ContestService/GetStandings"
 )
 
 // ContestServiceClient is the client API for ContestService service.
@@ -1052,6 +1133,8 @@ type ContestServiceClient interface {
 	CreateContest(ctx context.Context, in *CreateContestRequest, opts ...grpc.CallOption) (*CreateContestResponse, error)
 	GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error)
 	ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error)
+	// 順位表取得
+	GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error)
 }
 
 type contestServiceClient struct {
@@ -1089,6 +1172,15 @@ func (c *contestServiceClient) ListContests(ctx context.Context, in *ListContest
 	return out, nil
 }
 
+func (c *contestServiceClient) GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error) {
+	out := new(GetStandingsResponse)
+	err := c.cc.Invoke(ctx, ContestService_GetStandings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ContestServiceServer is the server API for ContestService service.
 // All implementations should embed UnimplementedContestServiceServer
 // for forward compatibility
@@ -1096,6 +1188,8 @@ type ContestServiceServer interface {
 	CreateContest(context.Context, *CreateContestRequest) (*CreateContestResponse, error)
 	GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error)
 	ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error)
+	// 順位表取得
+	GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error)
 }
 
 // UnimplementedContestServiceServer should be embedded to have forward compatible implementations.
@@ -1110,6 +1204,9 @@ func (UnimplementedContestServiceServer) GetContest(context.Context, *GetContest
 }
 func (UnimplementedContestServiceServer) ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListContests not implemented")
+}
+func (UnimplementedContestServiceServer) GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStandings not implemented")
 }
 
 // UnsafeContestServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -1177,6 +1274,24 @@ func _ContestService_ListContests_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContestService_GetStandings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStandingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).GetStandings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_GetStandings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).GetStandings(ctx, req.(*GetStandingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ContestService_ServiceDesc is the grpc.ServiceDesc for ContestService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1195,6 +1310,10 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListContests",
 			Handler:    _ContestService_ListContests_Handler,
+		},
+		{
+			MethodName: "GetStandings",
+			Handler:    _ContestService_GetStandings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
