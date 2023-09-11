@@ -9,8 +9,6 @@ import (
 	"cloud.google.com/go/storage"
 )
 
-const tasksFolderID = "1d4TxRKqttep964mM-k60lsNjxhVVY8HI"
-
 type gcsImpl struct {
 	client *storage.Client
 }
