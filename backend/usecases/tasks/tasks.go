@@ -197,7 +197,7 @@ func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTe
 	}
 
 	for _, testcase := range req.Testcases {
-		if err := i.repository.UploadTestcase(ctx, int(req.TaskId), &testcases_repo.Testcase{
+		if err := i.repository.UpsertTestcase(ctx, int(req.TaskId), &testcases_repo.Testcase{
 			Name: testcase.Slug,
 			In:   []byte(testcase.Input),
 			Out:  []byte(testcase.Output),
@@ -233,6 +233,7 @@ func syncTestcases(ctx context.Context, tx *ent.Tx, taskID int, list []*backendv
 		testcaseID, err := tx.Testcase.Create().
 			SetName(mt.Slug).
 			SetNillableDescription(mt.Description).
+			SetTaskID(taskID).
 			SetCreatedAt(now).
 			OnConflict().
 			UpdateNewValues().
@@ -279,6 +280,7 @@ func syncTestcaseSets(ctx context.Context, tx *ent.Tx, taskID int, testcaseSetLi
 			SetName(testcaseSet.Slug).
 			SetScore(int(testcaseSet.Score)).
 			SetIsSample(testcaseSet.IsSample).
+			SetTaskID(taskID).
 			AddTestcaseIDs(newTestcaseIDs...).
 			SetCreatedAt(now).
 			OnConflict().
