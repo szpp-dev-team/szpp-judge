@@ -45,7 +45,10 @@ message CreateTaskResponse {
 }
 
 message GetTaskRequest {
-  int32 id = 1;
+  oneof task_oneof {
+    int32 id = 1; // Task の ID
+    string slug = 2; // Task のContest に Task が紐づいている場合に利用可能(例: abc001_a)
+  }
 }
 
 message GetTaskResponse {
