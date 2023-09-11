@@ -388,9 +388,21 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
  */
 export class GetTaskRequest extends Message<GetTaskRequest> {
   /**
-   * @generated from field: int32 id = 1;
+   * @generated from oneof backend.v1.GetTaskRequest.task_oneof
    */
-  id = 0;
+  taskOneof: {
+    /**
+     * @generated from field: int32 id = 1;
+     */
+    value: number;
+    case: "id";
+  } | {
+    /**
+     * @generated from field: string slug = 2;
+     */
+    value: string;
+    case: "slug";
+  } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<GetTaskRequest>) {
     super();
@@ -400,7 +412,8 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.GetTaskRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */, oneof: "task_oneof" },
+    { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "task_oneof" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskRequest {
