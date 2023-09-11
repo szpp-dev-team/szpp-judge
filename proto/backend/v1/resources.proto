@@ -86,9 +86,8 @@ message MutationTask {
 message ContestTask {
   int32 id = 1;
   string title = 2;
-  string slug = 3;
-  int32 exec_time_limit = 4;
-  int32 exec_memory_limit = 5;
+  int32 exec_time_limit = 3;
+  int32 exec_memory_limit = 4;
 }
 
 enum Visibility {
