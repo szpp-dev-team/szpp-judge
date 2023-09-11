@@ -21,9 +21,8 @@ var (
 	// SubmitsColumns holds the columns for the "submits" table.
 	SubmitsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "language_submit", Type: field.TypeInt, Nullable: true},
-		{Name: "submit_task", Type: field.TypeInt, Nullable: true},
-		{Name: "submit_language", Type: field.TypeInt, Nullable: true},
+		{Name: "language_submits", Type: field.TypeInt, Nullable: true},
+		{Name: "task_submits", Type: field.TypeInt, Nullable: true},
 	}
 	// SubmitsTable holds the schema information for the "submits" table.
 	SubmitsTable = &schema.Table{
@@ -32,21 +31,15 @@ var (
 		PrimaryKey: []*schema.Column{SubmitsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "submits_languages_submit",
+				Symbol:     "submits_languages_submits",
 				Columns:    []*schema.Column{SubmitsColumns[1]},
 				RefColumns: []*schema.Column{LanguagesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "submits_tasks_task",
+				Symbol:     "submits_tasks_submits",
 				Columns:    []*schema.Column{SubmitsColumns[2]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "submits_languages_language",
-				Columns:    []*schema.Column{SubmitsColumns[3]},
-				RefColumns: []*schema.Column{LanguagesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -243,7 +236,6 @@ var (
 func init() {
 	SubmitsTable.ForeignKeys[0].RefTable = LanguagesTable
 	SubmitsTable.ForeignKeys[1].RefTable = TasksTable
-	SubmitsTable.ForeignKeys[2].RefTable = LanguagesTable
 	TasksTable.ForeignKeys[0].RefTable = UsersTable
 	TestcasesTable.ForeignKeys[0].RefTable = TasksTable
 	TestcaseResultsTable.ForeignKeys[0].RefTable = SubmitsTable

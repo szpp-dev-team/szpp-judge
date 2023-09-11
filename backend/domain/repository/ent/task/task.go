@@ -40,6 +40,8 @@ const (
 	EdgeTestcaseSets = "testcase_sets"
 	// EdgeTestcases holds the string denoting the testcases edge name in mutations.
 	EdgeTestcases = "testcases"
+	// EdgeSubmits holds the string denoting the submits edge name in mutations.
+	EdgeSubmits = "submits"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the task in the database.
@@ -58,6 +60,13 @@ const (
 	TestcasesInverseTable = "testcases"
 	// TestcasesColumn is the table column denoting the testcases relation/edge.
 	TestcasesColumn = "task_testcases"
+	// SubmitsTable is the table that holds the submits relation/edge.
+	SubmitsTable = "submits"
+	// SubmitsInverseTable is the table name for the Submit entity.
+	// It exists in this package in order to avoid circular dependency with the "submit" package.
+	SubmitsInverseTable = "submits"
+	// SubmitsColumn is the table column denoting the submits relation/edge.
+	SubmitsColumn = "task_submits"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "tasks"
 	// UserInverseTable is the table name for the User entity.
@@ -220,6 +229,20 @@ func ByTestcases(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// BySubmitsCount orders the results by submits count.
+func BySubmitsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubmitsStep(), opts...)
+	}
+}
+
+// BySubmits orders the results by submits terms.
+func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubmitsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByUserField orders the results by user field.
 func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -238,6 +261,13 @@ func newTestcasesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TestcasesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, TestcasesTable, TestcasesColumn),
+	)
+}
+func newSubmitsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubmitsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
 	)
 }
 func newUserStep() *sqlgraph.Step {

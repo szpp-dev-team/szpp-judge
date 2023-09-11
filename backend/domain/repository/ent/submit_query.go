@@ -103,7 +103,7 @@ func (sq *SubmitQuery) QueryTask() *TaskQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(submit.Table, submit.FieldID, selector),
 			sqlgraph.To(task.Table, task.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, submit.TaskTable, submit.TaskColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.TaskTable, submit.TaskColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -125,7 +125,7 @@ func (sq *SubmitQuery) QueryLanguage() *LanguageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(submit.Table, submit.FieldID, selector),
 			sqlgraph.To(language.Table, language.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, submit.LanguageTable, submit.LanguageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.LanguageTable, submit.LanguageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -583,10 +583,10 @@ func (sq *SubmitQuery) loadTask(ctx context.Context, query *TaskQuery, nodes []*
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Submit)
 	for i := range nodes {
-		if nodes[i].submit_task == nil {
+		if nodes[i].task_submits == nil {
 			continue
 		}
-		fk := *nodes[i].submit_task
+		fk := *nodes[i].task_submits
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -603,7 +603,7 @@ func (sq *SubmitQuery) loadTask(ctx context.Context, query *TaskQuery, nodes []*
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "submit_task" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "task_submits" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -615,10 +615,10 @@ func (sq *SubmitQuery) loadLanguage(ctx context.Context, query *LanguageQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Submit)
 	for i := range nodes {
-		if nodes[i].submit_language == nil {
+		if nodes[i].language_submits == nil {
 			continue
 		}
-		fk := *nodes[i].submit_language
+		fk := *nodes[i].language_submits
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -635,7 +635,7 @@ func (sq *SubmitQuery) loadLanguage(ctx context.Context, query *LanguageQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "submit_language" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "language_submits" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

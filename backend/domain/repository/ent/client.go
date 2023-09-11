@@ -341,15 +341,15 @@ func (c *LanguageClient) GetX(ctx context.Context, id int) *Language {
 	return obj
 }
 
-// QuerySubmit queries the submit edge of a Language.
-func (c *LanguageClient) QuerySubmit(l *Language) *SubmitQuery {
+// QuerySubmits queries the submits edge of a Language.
+func (c *LanguageClient) QuerySubmits(l *Language) *SubmitQuery {
 	query := (&SubmitClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := l.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(language.Table, language.FieldID, id),
 			sqlgraph.To(submit.Table, submit.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, language.SubmitTable, language.SubmitColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, language.SubmitsTable, language.SubmitsColumn),
 		)
 		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
 		return fromV, nil
@@ -499,7 +499,7 @@ func (c *SubmitClient) QueryTask(s *Submit) *TaskQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(submit.Table, submit.FieldID, id),
 			sqlgraph.To(task.Table, task.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, submit.TaskTable, submit.TaskColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.TaskTable, submit.TaskColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -515,7 +515,7 @@ func (c *SubmitClient) QueryLanguage(s *Submit) *LanguageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(submit.Table, submit.FieldID, id),
 			sqlgraph.To(language.Table, language.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, submit.LanguageTable, submit.LanguageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.LanguageTable, submit.LanguageColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -682,6 +682,22 @@ func (c *TaskClient) QueryTestcases(t *Task) *TestcaseQuery {
 			sqlgraph.From(task.Table, task.FieldID, id),
 			sqlgraph.To(testcase.Table, testcase.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, task.TestcasesTable, task.TestcasesColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubmits queries the submits edge of a Task.
+func (c *TaskClient) QuerySubmits(t *Task) *SubmitQuery {
+	query := (&SubmitClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, id),
+			sqlgraph.To(submit.Table, submit.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, task.SubmitsTable, task.SubmitsColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil

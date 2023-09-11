@@ -53,21 +53,21 @@ func IDLTE(id int) predicate.Language {
 	return predicate.Language(sql.FieldLTE(FieldID, id))
 }
 
-// HasSubmit applies the HasEdge predicate on the "submit" edge.
-func HasSubmit() predicate.Language {
+// HasSubmits applies the HasEdge predicate on the "submits" edge.
+func HasSubmits() predicate.Language {
 	return predicate.Language(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SubmitTable, SubmitColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSubmitWith applies the HasEdge predicate on the "submit" edge with a given conditions (other predicates).
-func HasSubmitWith(preds ...predicate.Submit) predicate.Language {
+// HasSubmitsWith applies the HasEdge predicate on the "submits" edge with a given conditions (other predicates).
+func HasSubmitsWith(preds ...predicate.Submit) predicate.Language {
 	return predicate.Language(func(s *sql.Selector) {
-		step := newSubmitStep()
+		step := newSubmitsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

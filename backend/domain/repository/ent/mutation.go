@@ -41,16 +41,16 @@ const (
 // LanguageMutation represents an operation that mutates the Language nodes in the graph.
 type LanguageMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	clearedFields map[string]struct{}
-	submit        map[int]struct{}
-	removedsubmit map[int]struct{}
-	clearedsubmit bool
-	done          bool
-	oldValue      func(context.Context) (*Language, error)
-	predicates    []predicate.Language
+	op             Op
+	typ            string
+	id             *int
+	clearedFields  map[string]struct{}
+	submits        map[int]struct{}
+	removedsubmits map[int]struct{}
+	clearedsubmits bool
+	done           bool
+	oldValue       func(context.Context) (*Language, error)
+	predicates     []predicate.Language
 }
 
 var _ ent.Mutation = (*LanguageMutation)(nil)
@@ -151,58 +151,58 @@ func (m *LanguageMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// AddSubmitIDs adds the "submit" edge to the Submit entity by ids.
+// AddSubmitIDs adds the "submits" edge to the Submit entity by ids.
 func (m *LanguageMutation) AddSubmitIDs(ids ...int) {
-	if m.submit == nil {
-		m.submit = make(map[int]struct{})
+	if m.submits == nil {
+		m.submits = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.submit[ids[i]] = struct{}{}
+		m.submits[ids[i]] = struct{}{}
 	}
 }
 
-// ClearSubmit clears the "submit" edge to the Submit entity.
-func (m *LanguageMutation) ClearSubmit() {
-	m.clearedsubmit = true
+// ClearSubmits clears the "submits" edge to the Submit entity.
+func (m *LanguageMutation) ClearSubmits() {
+	m.clearedsubmits = true
 }
 
-// SubmitCleared reports if the "submit" edge to the Submit entity was cleared.
-func (m *LanguageMutation) SubmitCleared() bool {
-	return m.clearedsubmit
+// SubmitsCleared reports if the "submits" edge to the Submit entity was cleared.
+func (m *LanguageMutation) SubmitsCleared() bool {
+	return m.clearedsubmits
 }
 
-// RemoveSubmitIDs removes the "submit" edge to the Submit entity by IDs.
+// RemoveSubmitIDs removes the "submits" edge to the Submit entity by IDs.
 func (m *LanguageMutation) RemoveSubmitIDs(ids ...int) {
-	if m.removedsubmit == nil {
-		m.removedsubmit = make(map[int]struct{})
+	if m.removedsubmits == nil {
+		m.removedsubmits = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.submit, ids[i])
-		m.removedsubmit[ids[i]] = struct{}{}
+		delete(m.submits, ids[i])
+		m.removedsubmits[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedSubmit returns the removed IDs of the "submit" edge to the Submit entity.
-func (m *LanguageMutation) RemovedSubmitIDs() (ids []int) {
-	for id := range m.removedsubmit {
+// RemovedSubmits returns the removed IDs of the "submits" edge to the Submit entity.
+func (m *LanguageMutation) RemovedSubmitsIDs() (ids []int) {
+	for id := range m.removedsubmits {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// SubmitIDs returns the "submit" edge IDs in the mutation.
-func (m *LanguageMutation) SubmitIDs() (ids []int) {
-	for id := range m.submit {
+// SubmitsIDs returns the "submits" edge IDs in the mutation.
+func (m *LanguageMutation) SubmitsIDs() (ids []int) {
+	for id := range m.submits {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetSubmit resets all changes to the "submit" edge.
-func (m *LanguageMutation) ResetSubmit() {
-	m.submit = nil
-	m.clearedsubmit = false
-	m.removedsubmit = nil
+// ResetSubmits resets all changes to the "submits" edge.
+func (m *LanguageMutation) ResetSubmits() {
+	m.submits = nil
+	m.clearedsubmits = false
+	m.removedsubmits = nil
 }
 
 // Where appends a list predicates to the LanguageMutation builder.
@@ -314,8 +314,8 @@ func (m *LanguageMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *LanguageMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.submit != nil {
-		edges = append(edges, language.EdgeSubmit)
+	if m.submits != nil {
+		edges = append(edges, language.EdgeSubmits)
 	}
 	return edges
 }
@@ -324,9 +324,9 @@ func (m *LanguageMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case language.EdgeSubmit:
-		ids := make([]ent.Value, 0, len(m.submit))
-		for id := range m.submit {
+	case language.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.submits))
+		for id := range m.submits {
 			ids = append(ids, id)
 		}
 		return ids
@@ -337,8 +337,8 @@ func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *LanguageMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedsubmit != nil {
-		edges = append(edges, language.EdgeSubmit)
+	if m.removedsubmits != nil {
+		edges = append(edges, language.EdgeSubmits)
 	}
 	return edges
 }
@@ -347,9 +347,9 @@ func (m *LanguageMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *LanguageMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case language.EdgeSubmit:
-		ids := make([]ent.Value, 0, len(m.removedsubmit))
-		for id := range m.removedsubmit {
+	case language.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.removedsubmits))
+		for id := range m.removedsubmits {
 			ids = append(ids, id)
 		}
 		return ids
@@ -360,8 +360,8 @@ func (m *LanguageMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *LanguageMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedsubmit {
-		edges = append(edges, language.EdgeSubmit)
+	if m.clearedsubmits {
+		edges = append(edges, language.EdgeSubmits)
 	}
 	return edges
 }
@@ -370,8 +370,8 @@ func (m *LanguageMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *LanguageMutation) EdgeCleared(name string) bool {
 	switch name {
-	case language.EdgeSubmit:
-		return m.clearedsubmit
+	case language.EdgeSubmits:
+		return m.clearedsubmits
 	}
 	return false
 }
@@ -388,8 +388,8 @@ func (m *LanguageMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *LanguageMutation) ResetEdge(name string) error {
 	switch name {
-	case language.EdgeSubmit:
-		m.ResetSubmit()
+	case language.EdgeSubmits:
+		m.ResetSubmits()
 		return nil
 	}
 	return fmt.Errorf("unknown Language edge %s", name)
@@ -980,6 +980,9 @@ type TaskMutation struct {
 	testcases            map[int]struct{}
 	removedtestcases     map[int]struct{}
 	clearedtestcases     bool
+	submits              map[int]struct{}
+	removedsubmits       map[int]struct{}
+	clearedsubmits       bool
 	user                 *int
 	cleareduser          bool
 	done                 bool
@@ -1708,6 +1711,60 @@ func (m *TaskMutation) ResetTestcases() {
 	m.removedtestcases = nil
 }
 
+// AddSubmitIDs adds the "submits" edge to the Submit entity by ids.
+func (m *TaskMutation) AddSubmitIDs(ids ...int) {
+	if m.submits == nil {
+		m.submits = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.submits[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubmits clears the "submits" edge to the Submit entity.
+func (m *TaskMutation) ClearSubmits() {
+	m.clearedsubmits = true
+}
+
+// SubmitsCleared reports if the "submits" edge to the Submit entity was cleared.
+func (m *TaskMutation) SubmitsCleared() bool {
+	return m.clearedsubmits
+}
+
+// RemoveSubmitIDs removes the "submits" edge to the Submit entity by IDs.
+func (m *TaskMutation) RemoveSubmitIDs(ids ...int) {
+	if m.removedsubmits == nil {
+		m.removedsubmits = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.submits, ids[i])
+		m.removedsubmits[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubmits returns the removed IDs of the "submits" edge to the Submit entity.
+func (m *TaskMutation) RemovedSubmitsIDs() (ids []int) {
+	for id := range m.removedsubmits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubmitsIDs returns the "submits" edge IDs in the mutation.
+func (m *TaskMutation) SubmitsIDs() (ids []int) {
+	for id := range m.submits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubmits resets all changes to the "submits" edge.
+func (m *TaskMutation) ResetSubmits() {
+	m.submits = nil
+	m.clearedsubmits = false
+	m.removedsubmits = nil
+}
+
 // SetUserID sets the "user" edge to the User entity by id.
 func (m *TaskMutation) SetUserID(id int) {
 	m.user = &id
@@ -2116,12 +2173,15 @@ func (m *TaskMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TaskMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.testcase_sets != nil {
 		edges = append(edges, task.EdgeTestcaseSets)
 	}
 	if m.testcases != nil {
 		edges = append(edges, task.EdgeTestcases)
+	}
+	if m.submits != nil {
+		edges = append(edges, task.EdgeSubmits)
 	}
 	if m.user != nil {
 		edges = append(edges, task.EdgeUser)
@@ -2145,6 +2205,12 @@ func (m *TaskMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case task.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.submits))
+		for id := range m.submits {
+			ids = append(ids, id)
+		}
+		return ids
 	case task.EdgeUser:
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
@@ -2155,12 +2221,15 @@ func (m *TaskMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TaskMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedtestcase_sets != nil {
 		edges = append(edges, task.EdgeTestcaseSets)
 	}
 	if m.removedtestcases != nil {
 		edges = append(edges, task.EdgeTestcases)
+	}
+	if m.removedsubmits != nil {
+		edges = append(edges, task.EdgeSubmits)
 	}
 	return edges
 }
@@ -2181,18 +2250,27 @@ func (m *TaskMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case task.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.removedsubmits))
+		for id := range m.removedsubmits {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TaskMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedtestcase_sets {
 		edges = append(edges, task.EdgeTestcaseSets)
 	}
 	if m.clearedtestcases {
 		edges = append(edges, task.EdgeTestcases)
+	}
+	if m.clearedsubmits {
+		edges = append(edges, task.EdgeSubmits)
 	}
 	if m.cleareduser {
 		edges = append(edges, task.EdgeUser)
@@ -2208,6 +2286,8 @@ func (m *TaskMutation) EdgeCleared(name string) bool {
 		return m.clearedtestcase_sets
 	case task.EdgeTestcases:
 		return m.clearedtestcases
+	case task.EdgeSubmits:
+		return m.clearedsubmits
 	case task.EdgeUser:
 		return m.cleareduser
 	}
@@ -2234,6 +2314,9 @@ func (m *TaskMutation) ResetEdge(name string) error {
 		return nil
 	case task.EdgeTestcases:
 		m.ResetTestcases()
+		return nil
+	case task.EdgeSubmits:
+		m.ResetSubmits()
 		return nil
 	case task.EdgeUser:
 		m.ResetUser()

@@ -13,7 +13,7 @@ type Submit struct {
 func (Submit) Field() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
-		field.String("status"),
+		field.String("status").Optional(),
 		field.Int("exec_time").Optional(),   // ms
 		field.Int("exec_memory").Optional(), // kib
 		field.Time("submitted_at"),
@@ -25,8 +25,8 @@ func (Submit) Field() []ent.Field {
 func (Submit) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("users", User.Type).Ref("submits"),
-		edge.To("task", Task.Type).Unique(),
-		edge.To("language", Language.Type).Unique(),
+		edge.From("task", Task.Type).Ref("submits").Unique(),
+		edge.From("language", Language.Type).Ref("submits").Unique(),
 		edge.To("testcase_results", TestcaseResult.Type),
 	}
 }

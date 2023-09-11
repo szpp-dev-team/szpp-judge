@@ -33,14 +33,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "task" package.
 	TaskInverseTable = "tasks"
 	// TaskColumn is the table column denoting the task relation/edge.
-	TaskColumn = "submit_task"
+	TaskColumn = "task_submits"
 	// LanguageTable is the table that holds the language relation/edge.
 	LanguageTable = "submits"
 	// LanguageInverseTable is the table name for the Language entity.
 	// It exists in this package in order to avoid circular dependency with the "language" package.
 	LanguageInverseTable = "languages"
 	// LanguageColumn is the table column denoting the language relation/edge.
-	LanguageColumn = "submit_language"
+	LanguageColumn = "language_submits"
 	// TestcaseResultsTable is the table that holds the testcase_results relation/edge.
 	TestcaseResultsTable = "testcase_results"
 	// TestcaseResultsInverseTable is the table name for the TestcaseResult entity.
@@ -58,9 +58,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "submits"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"language_submit",
-	"submit_task",
-	"submit_language",
+	"language_submits",
+	"task_submits",
 }
 
 var (
@@ -144,14 +143,14 @@ func newTaskStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TaskInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, TaskTable, TaskColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, TaskTable, TaskColumn),
 	)
 }
 func newLanguageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LanguageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, LanguageTable, LanguageColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, LanguageTable, LanguageColumn),
 	)
 }
 func newTestcaseResultsStep() *sqlgraph.Step {

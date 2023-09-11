@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
@@ -157,6 +158,21 @@ func (tc *TaskCreate) AddTestcases(t ...*Testcase) *TaskCreate {
 		ids[i] = t[i].ID
 	}
 	return tc.AddTestcaseIDs(ids...)
+}
+
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
+func (tc *TaskCreate) AddSubmitIDs(ids ...int) *TaskCreate {
+	tc.mutation.AddSubmitIDs(ids...)
+	return tc
+}
+
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (tc *TaskCreate) AddSubmits(s ...*Submit) *TaskCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return tc.AddSubmitIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -340,6 +356,22 @@ func (tc *TaskCreate) createSpec() (*Task, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.SubmitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.SubmitsTable,
+			Columns: []string{task.SubmitsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

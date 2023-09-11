@@ -242,7 +242,7 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.TaskCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   submit.TaskTable,
 			Columns: []string{submit.TaskColumn},
 			Bidi:    false,
@@ -255,7 +255,7 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := su.mutation.TaskIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   submit.TaskTable,
 			Columns: []string{submit.TaskColumn},
 			Bidi:    false,
@@ -271,7 +271,7 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.LanguageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
 			Bidi:    false,
@@ -284,7 +284,7 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := su.mutation.LanguageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
 			Bidi:    false,
@@ -603,7 +603,7 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 	if suo.mutation.TaskCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   submit.TaskTable,
 			Columns: []string{submit.TaskColumn},
 			Bidi:    false,
@@ -616,7 +616,7 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 	if nodes := suo.mutation.TaskIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   submit.TaskTable,
 			Columns: []string{submit.TaskColumn},
 			Bidi:    false,
@@ -632,7 +632,7 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 	if suo.mutation.LanguageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
 			Bidi:    false,
@@ -645,7 +645,7 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 	if nodes := suo.mutation.LanguageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
 			Bidi:    false,

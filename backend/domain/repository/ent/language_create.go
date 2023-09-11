@@ -22,14 +22,14 @@ type LanguageCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// AddSubmitIDs adds the "submit" edge to the Submit entity by IDs.
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
 func (lc *LanguageCreate) AddSubmitIDs(ids ...int) *LanguageCreate {
 	lc.mutation.AddSubmitIDs(ids...)
 	return lc
 }
 
-// AddSubmit adds the "submit" edges to the Submit entity.
-func (lc *LanguageCreate) AddSubmit(s ...*Submit) *LanguageCreate {
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (lc *LanguageCreate) AddSubmits(s ...*Submit) *LanguageCreate {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -98,12 +98,12 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 		_spec = sqlgraph.NewCreateSpec(language.Table, sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt))
 	)
 	_spec.OnConflict = lc.conflict
-	if nodes := lc.mutation.SubmitIDs(); len(nodes) > 0 {
+	if nodes := lc.mutation.SubmitsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   language.SubmitTable,
-			Columns: []string{language.SubmitColumn},
+			Table:   language.SubmitsTable,
+			Columns: []string{language.SubmitsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),

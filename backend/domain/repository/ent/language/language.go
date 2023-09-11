@@ -12,17 +12,17 @@ const (
 	Label = "language"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// EdgeSubmit holds the string denoting the submit edge name in mutations.
-	EdgeSubmit = "submit"
+	// EdgeSubmits holds the string denoting the submits edge name in mutations.
+	EdgeSubmits = "submits"
 	// Table holds the table name of the language in the database.
 	Table = "languages"
-	// SubmitTable is the table that holds the submit relation/edge.
-	SubmitTable = "submits"
-	// SubmitInverseTable is the table name for the Submit entity.
+	// SubmitsTable is the table that holds the submits relation/edge.
+	SubmitsTable = "submits"
+	// SubmitsInverseTable is the table name for the Submit entity.
 	// It exists in this package in order to avoid circular dependency with the "submit" package.
-	SubmitInverseTable = "submits"
-	// SubmitColumn is the table column denoting the submit relation/edge.
-	SubmitColumn = "language_submit"
+	SubmitsInverseTable = "submits"
+	// SubmitsColumn is the table column denoting the submits relation/edge.
+	SubmitsColumn = "language_submits"
 )
 
 // Columns holds all SQL columns for language fields.
@@ -48,23 +48,23 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// BySubmitCount orders the results by submit count.
-func BySubmitCount(opts ...sql.OrderTermOption) OrderOption {
+// BySubmitsCount orders the results by submits count.
+func BySubmitsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubmitStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newSubmitsStep(), opts...)
 	}
 }
 
-// BySubmit orders the results by submit terms.
-func BySubmit(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// BySubmits orders the results by submits terms.
+func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubmitStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newSubmitsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newSubmitStep() *sqlgraph.Step {
+func newSubmitsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubmitInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SubmitTable, SubmitColumn),
+		sqlgraph.To(SubmitsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
 	)
 }

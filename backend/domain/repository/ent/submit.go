@@ -20,11 +20,10 @@ type Submit struct {
 	ID int `json:"id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubmitQuery when eager-loading is set.
-	Edges           SubmitEdges `json:"edges"`
-	language_submit *int
-	submit_task     *int
-	submit_language *int
-	selectValues    sql.SelectValues
+	Edges            SubmitEdges `json:"edges"`
+	language_submits *int
+	task_submits     *int
+	selectValues     sql.SelectValues
 }
 
 // SubmitEdges holds the relations/edges for other nodes in the graph.
@@ -93,11 +92,9 @@ func (*Submit) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case submit.FieldID:
 			values[i] = new(sql.NullInt64)
-		case submit.ForeignKeys[0]: // language_submit
+		case submit.ForeignKeys[0]: // language_submits
 			values[i] = new(sql.NullInt64)
-		case submit.ForeignKeys[1]: // submit_task
-			values[i] = new(sql.NullInt64)
-		case submit.ForeignKeys[2]: // submit_language
+		case submit.ForeignKeys[1]: // task_submits
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -122,24 +119,17 @@ func (s *Submit) assignValues(columns []string, values []any) error {
 			s.ID = int(value.Int64)
 		case submit.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field language_submit", value)
+				return fmt.Errorf("unexpected type %T for edge-field language_submits", value)
 			} else if value.Valid {
-				s.language_submit = new(int)
-				*s.language_submit = int(value.Int64)
+				s.language_submits = new(int)
+				*s.language_submits = int(value.Int64)
 			}
 		case submit.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field submit_task", value)
+				return fmt.Errorf("unexpected type %T for edge-field task_submits", value)
 			} else if value.Valid {
-				s.submit_task = new(int)
-				*s.submit_task = int(value.Int64)
-			}
-		case submit.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field submit_language", value)
-			} else if value.Valid {
-				s.submit_language = new(int)
-				*s.submit_language = int(value.Int64)
+				s.task_submits = new(int)
+				*s.task_submits = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])

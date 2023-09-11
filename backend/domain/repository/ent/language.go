@@ -24,20 +24,20 @@ type Language struct {
 
 // LanguageEdges holds the relations/edges for other nodes in the graph.
 type LanguageEdges struct {
-	// Submit holds the value of the submit edge.
-	Submit []*Submit `json:"submit,omitempty"`
+	// Submits holds the value of the submits edge.
+	Submits []*Submit `json:"submits,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// SubmitOrErr returns the Submit value or an error if the edge
+// SubmitsOrErr returns the Submits value or an error if the edge
 // was not loaded in eager-loading.
-func (e LanguageEdges) SubmitOrErr() ([]*Submit, error) {
+func (e LanguageEdges) SubmitsOrErr() ([]*Submit, error) {
 	if e.loadedTypes[0] {
-		return e.Submit, nil
+		return e.Submits, nil
 	}
-	return nil, &NotLoadedError{edge: "submit"}
+	return nil, &NotLoadedError{edge: "submits"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -81,9 +81,9 @@ func (l *Language) Value(name string) (ent.Value, error) {
 	return l.selectValues.Get(name)
 }
 
-// QuerySubmit queries the "submit" edge of the Language entity.
-func (l *Language) QuerySubmit() *SubmitQuery {
-	return NewLanguageClient(l.config).QuerySubmit(l)
+// QuerySubmits queries the "submits" edge of the Language entity.
+func (l *Language) QuerySubmits() *SubmitQuery {
+	return NewLanguageClient(l.config).QuerySubmits(l)
 }
 
 // Update returns a builder for updating this Language.

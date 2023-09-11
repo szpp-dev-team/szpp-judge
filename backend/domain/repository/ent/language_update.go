@@ -28,14 +28,14 @@ func (lu *LanguageUpdate) Where(ps ...predicate.Language) *LanguageUpdate {
 	return lu
 }
 
-// AddSubmitIDs adds the "submit" edge to the Submit entity by IDs.
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
 func (lu *LanguageUpdate) AddSubmitIDs(ids ...int) *LanguageUpdate {
 	lu.mutation.AddSubmitIDs(ids...)
 	return lu
 }
 
-// AddSubmit adds the "submit" edges to the Submit entity.
-func (lu *LanguageUpdate) AddSubmit(s ...*Submit) *LanguageUpdate {
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (lu *LanguageUpdate) AddSubmits(s ...*Submit) *LanguageUpdate {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -48,20 +48,20 @@ func (lu *LanguageUpdate) Mutation() *LanguageMutation {
 	return lu.mutation
 }
 
-// ClearSubmit clears all "submit" edges to the Submit entity.
-func (lu *LanguageUpdate) ClearSubmit() *LanguageUpdate {
-	lu.mutation.ClearSubmit()
+// ClearSubmits clears all "submits" edges to the Submit entity.
+func (lu *LanguageUpdate) ClearSubmits() *LanguageUpdate {
+	lu.mutation.ClearSubmits()
 	return lu
 }
 
-// RemoveSubmitIDs removes the "submit" edge to Submit entities by IDs.
+// RemoveSubmitIDs removes the "submits" edge to Submit entities by IDs.
 func (lu *LanguageUpdate) RemoveSubmitIDs(ids ...int) *LanguageUpdate {
 	lu.mutation.RemoveSubmitIDs(ids...)
 	return lu
 }
 
-// RemoveSubmit removes "submit" edges to Submit entities.
-func (lu *LanguageUpdate) RemoveSubmit(s ...*Submit) *LanguageUpdate {
+// RemoveSubmits removes "submits" edges to Submit entities.
+func (lu *LanguageUpdate) RemoveSubmits(s ...*Submit) *LanguageUpdate {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -105,12 +105,12 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if lu.mutation.SubmitCleared() {
+	if lu.mutation.SubmitsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   language.SubmitTable,
-			Columns: []string{language.SubmitColumn},
+			Table:   language.SubmitsTable,
+			Columns: []string{language.SubmitsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
@@ -118,12 +118,12 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.RemovedSubmitIDs(); len(nodes) > 0 && !lu.mutation.SubmitCleared() {
+	if nodes := lu.mutation.RemovedSubmitsIDs(); len(nodes) > 0 && !lu.mutation.SubmitsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   language.SubmitTable,
-			Columns: []string{language.SubmitColumn},
+			Table:   language.SubmitsTable,
+			Columns: []string{language.SubmitsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
@@ -134,12 +134,12 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.SubmitIDs(); len(nodes) > 0 {
+	if nodes := lu.mutation.SubmitsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   language.SubmitTable,
-			Columns: []string{language.SubmitColumn},
+			Table:   language.SubmitsTable,
+			Columns: []string{language.SubmitsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
@@ -170,14 +170,14 @@ type LanguageUpdateOne struct {
 	mutation *LanguageMutation
 }
 
-// AddSubmitIDs adds the "submit" edge to the Submit entity by IDs.
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
 func (luo *LanguageUpdateOne) AddSubmitIDs(ids ...int) *LanguageUpdateOne {
 	luo.mutation.AddSubmitIDs(ids...)
 	return luo
 }
 
-// AddSubmit adds the "submit" edges to the Submit entity.
-func (luo *LanguageUpdateOne) AddSubmit(s ...*Submit) *LanguageUpdateOne {
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (luo *LanguageUpdateOne) AddSubmits(s ...*Submit) *LanguageUpdateOne {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -190,20 +190,20 @@ func (luo *LanguageUpdateOne) Mutation() *LanguageMutation {
 	return luo.mutation
 }
 
-// ClearSubmit clears all "submit" edges to the Submit entity.
-func (luo *LanguageUpdateOne) ClearSubmit() *LanguageUpdateOne {
-	luo.mutation.ClearSubmit()
+// ClearSubmits clears all "submits" edges to the Submit entity.
+func (luo *LanguageUpdateOne) ClearSubmits() *LanguageUpdateOne {
+	luo.mutation.ClearSubmits()
 	return luo
 }
 
-// RemoveSubmitIDs removes the "submit" edge to Submit entities by IDs.
+// RemoveSubmitIDs removes the "submits" edge to Submit entities by IDs.
 func (luo *LanguageUpdateOne) RemoveSubmitIDs(ids ...int) *LanguageUpdateOne {
 	luo.mutation.RemoveSubmitIDs(ids...)
 	return luo
 }
 
-// RemoveSubmit removes "submit" edges to Submit entities.
-func (luo *LanguageUpdateOne) RemoveSubmit(s ...*Submit) *LanguageUpdateOne {
+// RemoveSubmits removes "submits" edges to Submit entities.
+func (luo *LanguageUpdateOne) RemoveSubmits(s ...*Submit) *LanguageUpdateOne {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -277,12 +277,12 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 			}
 		}
 	}
-	if luo.mutation.SubmitCleared() {
+	if luo.mutation.SubmitsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   language.SubmitTable,
-			Columns: []string{language.SubmitColumn},
+			Table:   language.SubmitsTable,
+			Columns: []string{language.SubmitsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
@@ -290,12 +290,12 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.RemovedSubmitIDs(); len(nodes) > 0 && !luo.mutation.SubmitCleared() {
+	if nodes := luo.mutation.RemovedSubmitsIDs(); len(nodes) > 0 && !luo.mutation.SubmitsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   language.SubmitTable,
-			Columns: []string{language.SubmitColumn},
+			Table:   language.SubmitsTable,
+			Columns: []string{language.SubmitsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
@@ -306,12 +306,12 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.SubmitIDs(); len(nodes) > 0 {
+	if nodes := luo.mutation.SubmitsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   language.SubmitTable,
-			Columns: []string{language.SubmitColumn},
+			Table:   language.SubmitsTable,
+			Columns: []string{language.SubmitsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),

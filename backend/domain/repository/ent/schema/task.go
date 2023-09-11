@@ -33,6 +33,7 @@ func (Task) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("testcase_sets", TestcaseSet.Type),
 		edge.To("testcases", Testcase.Type),
+		edge.To("submits", Submit.Type),
 		edge.From("user", User.Type).Ref("tasks").Unique(),
 	}
 }

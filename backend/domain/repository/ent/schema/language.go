@@ -13,13 +13,13 @@ type Language struct {
 func (Language) Field() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
-		field.String("name"),
-		field.String("language_slug"),
+		field.String("name"), // display name
+		field.String("slug").Unique(),
 	}
 }
 
 func (Language) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("submit", Submit.Type),
+		edge.To("submits", Submit.Type),
 	}
 }

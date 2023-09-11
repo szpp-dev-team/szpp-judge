@@ -81,7 +81,7 @@ func HasTask() predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, TaskTable, TaskColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, TaskTable, TaskColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -104,7 +104,7 @@ func HasLanguage() predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, LanguageTable, LanguageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, LanguageTable, LanguageColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
@@ -204,6 +205,21 @@ func (tu *TaskUpdate) AddTestcases(t ...*Testcase) *TaskUpdate {
 	return tu.AddTestcaseIDs(ids...)
 }
 
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
+func (tu *TaskUpdate) AddSubmitIDs(ids ...int) *TaskUpdate {
+	tu.mutation.AddSubmitIDs(ids...)
+	return tu
+}
+
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (tu *TaskUpdate) AddSubmits(s ...*Submit) *TaskUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return tu.AddSubmitIDs(ids...)
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tu *TaskUpdate) SetUserID(id int) *TaskUpdate {
 	tu.mutation.SetUserID(id)
@@ -268,6 +284,27 @@ func (tu *TaskUpdate) RemoveTestcases(t ...*Testcase) *TaskUpdate {
 		ids[i] = t[i].ID
 	}
 	return tu.RemoveTestcaseIDs(ids...)
+}
+
+// ClearSubmits clears all "submits" edges to the Submit entity.
+func (tu *TaskUpdate) ClearSubmits() *TaskUpdate {
+	tu.mutation.ClearSubmits()
+	return tu
+}
+
+// RemoveSubmitIDs removes the "submits" edge to Submit entities by IDs.
+func (tu *TaskUpdate) RemoveSubmitIDs(ids ...int) *TaskUpdate {
+	tu.mutation.RemoveSubmitIDs(ids...)
+	return tu
+}
+
+// RemoveSubmits removes "submits" edges to Submit entities.
+func (tu *TaskUpdate) RemoveSubmits(s ...*Submit) *TaskUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return tu.RemoveSubmitIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -462,6 +499,51 @@ func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tu.mutation.SubmitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.SubmitsTable,
+			Columns: []string{task.SubmitsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedSubmitsIDs(); len(nodes) > 0 && !tu.mutation.SubmitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.SubmitsTable,
+			Columns: []string{task.SubmitsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.SubmitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.SubmitsTable,
+			Columns: []string{task.SubmitsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -691,6 +773,21 @@ func (tuo *TaskUpdateOne) AddTestcases(t ...*Testcase) *TaskUpdateOne {
 	return tuo.AddTestcaseIDs(ids...)
 }
 
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
+func (tuo *TaskUpdateOne) AddSubmitIDs(ids ...int) *TaskUpdateOne {
+	tuo.mutation.AddSubmitIDs(ids...)
+	return tuo
+}
+
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (tuo *TaskUpdateOne) AddSubmits(s ...*Submit) *TaskUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return tuo.AddSubmitIDs(ids...)
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tuo *TaskUpdateOne) SetUserID(id int) *TaskUpdateOne {
 	tuo.mutation.SetUserID(id)
@@ -755,6 +852,27 @@ func (tuo *TaskUpdateOne) RemoveTestcases(t ...*Testcase) *TaskUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return tuo.RemoveTestcaseIDs(ids...)
+}
+
+// ClearSubmits clears all "submits" edges to the Submit entity.
+func (tuo *TaskUpdateOne) ClearSubmits() *TaskUpdateOne {
+	tuo.mutation.ClearSubmits()
+	return tuo
+}
+
+// RemoveSubmitIDs removes the "submits" edge to Submit entities by IDs.
+func (tuo *TaskUpdateOne) RemoveSubmitIDs(ids ...int) *TaskUpdateOne {
+	tuo.mutation.RemoveSubmitIDs(ids...)
+	return tuo
+}
+
+// RemoveSubmits removes "submits" edges to Submit entities.
+func (tuo *TaskUpdateOne) RemoveSubmits(s ...*Submit) *TaskUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return tuo.RemoveSubmitIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -979,6 +1097,51 @@ func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.SubmitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.SubmitsTable,
+			Columns: []string{task.SubmitsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedSubmitsIDs(); len(nodes) > 0 && !tuo.mutation.SubmitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.SubmitsTable,
+			Columns: []string{task.SubmitsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.SubmitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   task.SubmitsTable,
+			Columns: []string{task.SubmitsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
