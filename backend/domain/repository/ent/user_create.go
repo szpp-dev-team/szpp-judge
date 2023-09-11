@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -80,6 +81,21 @@ func (uc *UserCreate) AddTasks(t ...*Task) *UserCreate {
 		ids[i] = t[i].ID
 	}
 	return uc.AddTaskIDs(ids...)
+}
+
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
+func (uc *UserCreate) AddSubmitIDs(ids ...int) *UserCreate {
+	uc.mutation.AddSubmitIDs(ids...)
+	return uc
+}
+
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (uc *UserCreate) AddSubmits(s ...*Submit) *UserCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uc.AddSubmitIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -190,6 +206,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.SubmitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.SubmitsTable,
+			Columns: user.SubmitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

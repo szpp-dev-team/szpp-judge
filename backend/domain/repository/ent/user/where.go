@@ -388,6 +388,29 @@ func HasTasksWith(preds ...predicate.Task) predicate.User {
 	})
 }
 
+// HasSubmits applies the HasEdge predicate on the "submits" edge.
+func HasSubmits() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, SubmitsTable, SubmitsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubmitsWith applies the HasEdge predicate on the "submits" edge with a given conditions (other predicates).
+func HasSubmitsWith(preds ...predicate.Submit) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newSubmitsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
 	return predicate.User(func(s *sql.Selector) {

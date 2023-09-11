@@ -9,7 +9,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 )
 
 // Language is the model entity for the Language schema.
@@ -19,28 +18,23 @@ type Language struct {
 	ID int `json:"id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the LanguageQuery when eager-loading is set.
-	Edges           LanguageEdges `json:"edges"`
-	submit_language *int
-	selectValues    sql.SelectValues
+	Edges        LanguageEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // LanguageEdges holds the relations/edges for other nodes in the graph.
 type LanguageEdges struct {
 	// Submit holds the value of the submit edge.
-	Submit *Submit `json:"submit,omitempty"`
+	Submit []*Submit `json:"submit,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // SubmitOrErr returns the Submit value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e LanguageEdges) SubmitOrErr() (*Submit, error) {
+// was not loaded in eager-loading.
+func (e LanguageEdges) SubmitOrErr() ([]*Submit, error) {
 	if e.loadedTypes[0] {
-		if e.Submit == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: submit.Label}
-		}
 		return e.Submit, nil
 	}
 	return nil, &NotLoadedError{edge: "submit"}
@@ -52,8 +46,6 @@ func (*Language) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case language.FieldID:
-			values[i] = new(sql.NullInt64)
-		case language.ForeignKeys[0]: // submit_language
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -76,13 +68,6 @@ func (l *Language) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			l.ID = int(value.Int64)
-		case language.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field submit_language", value)
-			} else if value.Valid {
-				l.submit_language = new(int)
-				*l.submit_language = int(value.Int64)
-			}
 		default:
 			l.selectValues.Set(columns[i], values[i])
 		}

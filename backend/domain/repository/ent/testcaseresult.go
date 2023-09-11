@@ -15,9 +15,9 @@ import (
 type TestcaseResult struct {
 	config
 	// ID of the ent.
-	ID                     int `json:"id,omitempty"`
-	submit_testcase_result *int
-	selectValues           sql.SelectValues
+	ID                      int `json:"id,omitempty"`
+	submit_testcase_results *int
+	selectValues            sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -27,7 +27,7 @@ func (*TestcaseResult) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case testcaseresult.FieldID:
 			values[i] = new(sql.NullInt64)
-		case testcaseresult.ForeignKeys[0]: // submit_testcase_result
+		case testcaseresult.ForeignKeys[0]: // submit_testcase_results
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -52,10 +52,10 @@ func (tr *TestcaseResult) assignValues(columns []string, values []any) error {
 			tr.ID = int(value.Int64)
 		case testcaseresult.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field submit_testcase_result", value)
+				return fmt.Errorf("unexpected type %T for edge-field submit_testcase_results", value)
 			} else if value.Valid {
-				tr.submit_testcase_result = new(int)
-				*tr.submit_testcase_result = int(value.Int64)
+				tr.submit_testcase_results = new(int)
+				*tr.submit_testcase_results = int(value.Int64)
 			}
 		default:
 			tr.selectValues.Set(columns[i], values[i])

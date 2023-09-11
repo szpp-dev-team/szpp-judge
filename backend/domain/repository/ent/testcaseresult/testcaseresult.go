@@ -23,7 +23,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "testcase_results"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"submit_testcase_result",
+	"submit_testcase_results",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

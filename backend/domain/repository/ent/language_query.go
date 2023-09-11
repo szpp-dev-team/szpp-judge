@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -23,7 +24,6 @@ type LanguageQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Language
 	withSubmit *SubmitQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -74,7 +74,7 @@ func (lq *LanguageQuery) QuerySubmit() *SubmitQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(language.Table, language.FieldID, selector),
 			sqlgraph.To(submit.Table, submit.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, language.SubmitTable, language.SubmitColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, language.SubmitTable, language.SubmitColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -347,18 +347,11 @@ func (lq *LanguageQuery) prepareQuery(ctx context.Context) error {
 func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Language, error) {
 	var (
 		nodes       = []*Language{}
-		withFKs     = lq.withFKs
 		_spec       = lq.querySpec()
 		loadedTypes = [1]bool{
 			lq.withSubmit != nil,
 		}
 	)
-	if lq.withSubmit != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, language.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Language).scanValues(nil, columns)
 	}
@@ -378,8 +371,9 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 		return nodes, nil
 	}
 	if query := lq.withSubmit; query != nil {
-		if err := lq.loadSubmit(ctx, query, nodes, nil,
-			func(n *Language, e *Submit) { n.Edges.Submit = e }); err != nil {
+		if err := lq.loadSubmit(ctx, query, nodes,
+			func(n *Language) { n.Edges.Submit = []*Submit{} },
+			func(n *Language, e *Submit) { n.Edges.Submit = append(n.Edges.Submit, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -387,34 +381,33 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 }
 
 func (lq *LanguageQuery) loadSubmit(ctx context.Context, query *SubmitQuery, nodes []*Language, init func(*Language), assign func(*Language, *Submit)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Language)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Language)
 	for i := range nodes {
-		if nodes[i].submit_language == nil {
-			continue
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
 		}
-		fk := *nodes[i].submit_language
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(submit.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Submit(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(language.SubmitColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.language_submit
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "language_submit" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "submit_language" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "language_submit" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }

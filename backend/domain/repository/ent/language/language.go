@@ -17,12 +17,12 @@ const (
 	// Table holds the table name of the language in the database.
 	Table = "languages"
 	// SubmitTable is the table that holds the submit relation/edge.
-	SubmitTable = "languages"
+	SubmitTable = "submits"
 	// SubmitInverseTable is the table name for the Submit entity.
 	// It exists in this package in order to avoid circular dependency with the "submit" package.
 	SubmitInverseTable = "submits"
 	// SubmitColumn is the table column denoting the submit relation/edge.
-	SubmitColumn = "submit_language"
+	SubmitColumn = "language_submit"
 )
 
 // Columns holds all SQL columns for language fields.
@@ -30,21 +30,10 @@ var Columns = []string{
 	FieldID,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "languages"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"submit_language",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -59,16 +48,23 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// BySubmitField orders the results by submit field.
-func BySubmitField(field string, opts ...sql.OrderTermOption) OrderOption {
+// BySubmitCount orders the results by submit count.
+func BySubmitCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubmitStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newSubmitStep(), opts...)
+	}
+}
+
+// BySubmit orders the results by submit terms.
+func BySubmit(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubmitStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newSubmitStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubmitInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, SubmitTable, SubmitColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubmitTable, SubmitColumn),
 	)
 }

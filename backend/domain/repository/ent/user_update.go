@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -88,6 +89,21 @@ func (uu *UserUpdate) AddTasks(t ...*Task) *UserUpdate {
 	return uu.AddTaskIDs(ids...)
 }
 
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
+func (uu *UserUpdate) AddSubmitIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddSubmitIDs(ids...)
+	return uu
+}
+
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (uu *UserUpdate) AddSubmits(s ...*Submit) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.AddSubmitIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -112,6 +128,27 @@ func (uu *UserUpdate) RemoveTasks(t ...*Task) *UserUpdate {
 		ids[i] = t[i].ID
 	}
 	return uu.RemoveTaskIDs(ids...)
+}
+
+// ClearSubmits clears all "submits" edges to the Submit entity.
+func (uu *UserUpdate) ClearSubmits() *UserUpdate {
+	uu.mutation.ClearSubmits()
+	return uu
+}
+
+// RemoveSubmitIDs removes the "submits" edge to Submit entities by IDs.
+func (uu *UserUpdate) RemoveSubmitIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveSubmitIDs(ids...)
+	return uu
+}
+
+// RemoveSubmits removes "submits" edges to Submit entities.
+func (uu *UserUpdate) RemoveSubmits(s ...*Submit) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.RemoveSubmitIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -213,6 +250,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.SubmitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.SubmitsTable,
+			Columns: user.SubmitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedSubmitsIDs(); len(nodes) > 0 && !uu.mutation.SubmitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.SubmitsTable,
+			Columns: user.SubmitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.SubmitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.SubmitsTable,
+			Columns: user.SubmitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -292,6 +374,21 @@ func (uuo *UserUpdateOne) AddTasks(t ...*Task) *UserUpdateOne {
 	return uuo.AddTaskIDs(ids...)
 }
 
+// AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
+func (uuo *UserUpdateOne) AddSubmitIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddSubmitIDs(ids...)
+	return uuo
+}
+
+// AddSubmits adds the "submits" edges to the Submit entity.
+func (uuo *UserUpdateOne) AddSubmits(s ...*Submit) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.AddSubmitIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -316,6 +413,27 @@ func (uuo *UserUpdateOne) RemoveTasks(t ...*Task) *UserUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return uuo.RemoveTaskIDs(ids...)
+}
+
+// ClearSubmits clears all "submits" edges to the Submit entity.
+func (uuo *UserUpdateOne) ClearSubmits() *UserUpdateOne {
+	uuo.mutation.ClearSubmits()
+	return uuo
+}
+
+// RemoveSubmitIDs removes the "submits" edge to Submit entities by IDs.
+func (uuo *UserUpdateOne) RemoveSubmitIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveSubmitIDs(ids...)
+	return uuo
+}
+
+// RemoveSubmits removes "submits" edges to Submit entities.
+func (uuo *UserUpdateOne) RemoveSubmits(s ...*Submit) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.RemoveSubmitIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -440,6 +558,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.SubmitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.SubmitsTable,
+			Columns: user.SubmitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedSubmitsIDs(); len(nodes) > 0 && !uuo.mutation.SubmitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.SubmitsTable,
+			Columns: user.SubmitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.SubmitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.SubmitsTable,
+			Columns: user.SubmitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

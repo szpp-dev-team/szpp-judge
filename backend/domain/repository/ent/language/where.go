@@ -58,7 +58,7 @@ func HasSubmit() predicate.Language {
 	return predicate.Language(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, SubmitTable, SubmitColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, SubmitTable, SubmitColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

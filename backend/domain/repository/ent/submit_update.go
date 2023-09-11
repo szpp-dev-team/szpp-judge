@@ -13,6 +13,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -30,14 +31,14 @@ func (su *SubmitUpdate) Where(ps ...predicate.Submit) *SubmitUpdate {
 	return su
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
+// AddUserIDs adds the "users" edge to the User entity by IDs.
 func (su *SubmitUpdate) AddUserIDs(ids ...int) *SubmitUpdate {
 	su.mutation.AddUserIDs(ids...)
 	return su
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (su *SubmitUpdate) AddUser(u ...*User) *SubmitUpdate {
+// AddUsers adds the "users" edges to the User entity.
+func (su *SubmitUpdate) AddUsers(u ...*User) *SubmitUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
@@ -45,29 +46,52 @@ func (su *SubmitUpdate) AddUser(u ...*User) *SubmitUpdate {
 	return su.AddUserIDs(ids...)
 }
 
-// AddLanguageIDs adds the "language" edge to the Language entity by IDs.
-func (su *SubmitUpdate) AddLanguageIDs(ids ...int) *SubmitUpdate {
-	su.mutation.AddLanguageIDs(ids...)
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (su *SubmitUpdate) SetTaskID(id int) *SubmitUpdate {
+	su.mutation.SetTaskID(id)
 	return su
 }
 
-// AddLanguage adds the "language" edges to the Language entity.
-func (su *SubmitUpdate) AddLanguage(l ...*Language) *SubmitUpdate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (su *SubmitUpdate) SetNillableTaskID(id *int) *SubmitUpdate {
+	if id != nil {
+		su = su.SetTaskID(*id)
 	}
-	return su.AddLanguageIDs(ids...)
+	return su
 }
 
-// AddTestcaseResultIDs adds the "testcase_result" edge to the TestcaseResult entity by IDs.
+// SetTask sets the "task" edge to the Task entity.
+func (su *SubmitUpdate) SetTask(t *Task) *SubmitUpdate {
+	return su.SetTaskID(t.ID)
+}
+
+// SetLanguageID sets the "language" edge to the Language entity by ID.
+func (su *SubmitUpdate) SetLanguageID(id int) *SubmitUpdate {
+	su.mutation.SetLanguageID(id)
+	return su
+}
+
+// SetNillableLanguageID sets the "language" edge to the Language entity by ID if the given value is not nil.
+func (su *SubmitUpdate) SetNillableLanguageID(id *int) *SubmitUpdate {
+	if id != nil {
+		su = su.SetLanguageID(*id)
+	}
+	return su
+}
+
+// SetLanguage sets the "language" edge to the Language entity.
+func (su *SubmitUpdate) SetLanguage(l *Language) *SubmitUpdate {
+	return su.SetLanguageID(l.ID)
+}
+
+// AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by IDs.
 func (su *SubmitUpdate) AddTestcaseResultIDs(ids ...int) *SubmitUpdate {
 	su.mutation.AddTestcaseResultIDs(ids...)
 	return su
 }
 
-// AddTestcaseResult adds the "testcase_result" edges to the TestcaseResult entity.
-func (su *SubmitUpdate) AddTestcaseResult(t ...*TestcaseResult) *SubmitUpdate {
+// AddTestcaseResults adds the "testcase_results" edges to the TestcaseResult entity.
+func (su *SubmitUpdate) AddTestcaseResults(t ...*TestcaseResult) *SubmitUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
@@ -80,20 +104,20 @@ func (su *SubmitUpdate) Mutation() *SubmitMutation {
 	return su.mutation
 }
 
-// ClearUser clears all "user" edges to the User entity.
-func (su *SubmitUpdate) ClearUser() *SubmitUpdate {
-	su.mutation.ClearUser()
+// ClearUsers clears all "users" edges to the User entity.
+func (su *SubmitUpdate) ClearUsers() *SubmitUpdate {
+	su.mutation.ClearUsers()
 	return su
 }
 
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
+// RemoveUserIDs removes the "users" edge to User entities by IDs.
 func (su *SubmitUpdate) RemoveUserIDs(ids ...int) *SubmitUpdate {
 	su.mutation.RemoveUserIDs(ids...)
 	return su
 }
 
-// RemoveUser removes "user" edges to User entities.
-func (su *SubmitUpdate) RemoveUser(u ...*User) *SubmitUpdate {
+// RemoveUsers removes "users" edges to User entities.
+func (su *SubmitUpdate) RemoveUsers(u ...*User) *SubmitUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
@@ -101,41 +125,32 @@ func (su *SubmitUpdate) RemoveUser(u ...*User) *SubmitUpdate {
 	return su.RemoveUserIDs(ids...)
 }
 
-// ClearLanguage clears all "language" edges to the Language entity.
+// ClearTask clears the "task" edge to the Task entity.
+func (su *SubmitUpdate) ClearTask() *SubmitUpdate {
+	su.mutation.ClearTask()
+	return su
+}
+
+// ClearLanguage clears the "language" edge to the Language entity.
 func (su *SubmitUpdate) ClearLanguage() *SubmitUpdate {
 	su.mutation.ClearLanguage()
 	return su
 }
 
-// RemoveLanguageIDs removes the "language" edge to Language entities by IDs.
-func (su *SubmitUpdate) RemoveLanguageIDs(ids ...int) *SubmitUpdate {
-	su.mutation.RemoveLanguageIDs(ids...)
+// ClearTestcaseResults clears all "testcase_results" edges to the TestcaseResult entity.
+func (su *SubmitUpdate) ClearTestcaseResults() *SubmitUpdate {
+	su.mutation.ClearTestcaseResults()
 	return su
 }
 
-// RemoveLanguage removes "language" edges to Language entities.
-func (su *SubmitUpdate) RemoveLanguage(l ...*Language) *SubmitUpdate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return su.RemoveLanguageIDs(ids...)
-}
-
-// ClearTestcaseResult clears all "testcase_result" edges to the TestcaseResult entity.
-func (su *SubmitUpdate) ClearTestcaseResult() *SubmitUpdate {
-	su.mutation.ClearTestcaseResult()
-	return su
-}
-
-// RemoveTestcaseResultIDs removes the "testcase_result" edge to TestcaseResult entities by IDs.
+// RemoveTestcaseResultIDs removes the "testcase_results" edge to TestcaseResult entities by IDs.
 func (su *SubmitUpdate) RemoveTestcaseResultIDs(ids ...int) *SubmitUpdate {
 	su.mutation.RemoveTestcaseResultIDs(ids...)
 	return su
 }
 
-// RemoveTestcaseResult removes "testcase_result" edges to TestcaseResult entities.
-func (su *SubmitUpdate) RemoveTestcaseResult(t ...*TestcaseResult) *SubmitUpdate {
+// RemoveTestcaseResults removes "testcase_results" edges to TestcaseResult entities.
+func (su *SubmitUpdate) RemoveTestcaseResults(t ...*TestcaseResult) *SubmitUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
@@ -179,12 +194,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if su.mutation.UserCleared() {
+	if su.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.UserTable,
-			Columns: []string{submit.UserColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   submit.UsersTable,
+			Columns: submit.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -192,12 +207,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedUserIDs(); len(nodes) > 0 && !su.mutation.UserCleared() {
+	if nodes := su.mutation.RemovedUsersIDs(); len(nodes) > 0 && !su.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.UserTable,
-			Columns: []string{submit.UserColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   submit.UsersTable,
+			Columns: submit.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -208,15 +223,44 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := su.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.UserTable,
-			Columns: []string{submit.UserColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   submit.UsersTable,
+			Columns: submit.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.TaskCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   submit.TaskTable,
+			Columns: []string{submit.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.TaskIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   submit.TaskTable,
+			Columns: []string{submit.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -226,7 +270,7 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.LanguageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
@@ -234,28 +278,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.RemovedLanguageIDs(); len(nodes) > 0 && !su.mutation.LanguageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.LanguageTable,
-			Columns: []string{submit.LanguageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := su.mutation.LanguageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
@@ -269,12 +297,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if su.mutation.TestcaseResultCleared() {
+	if su.mutation.TestcaseResultsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   submit.TestcaseResultTable,
-			Columns: []string{submit.TestcaseResultColumn},
+			Table:   submit.TestcaseResultsTable,
+			Columns: []string{submit.TestcaseResultsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt),
@@ -282,12 +310,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedTestcaseResultIDs(); len(nodes) > 0 && !su.mutation.TestcaseResultCleared() {
+	if nodes := su.mutation.RemovedTestcaseResultsIDs(); len(nodes) > 0 && !su.mutation.TestcaseResultsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   submit.TestcaseResultTable,
-			Columns: []string{submit.TestcaseResultColumn},
+			Table:   submit.TestcaseResultsTable,
+			Columns: []string{submit.TestcaseResultsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt),
@@ -298,12 +326,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.TestcaseResultIDs(); len(nodes) > 0 {
+	if nodes := su.mutation.TestcaseResultsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   submit.TestcaseResultTable,
-			Columns: []string{submit.TestcaseResultColumn},
+			Table:   submit.TestcaseResultsTable,
+			Columns: []string{submit.TestcaseResultsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt),
@@ -334,14 +362,14 @@ type SubmitUpdateOne struct {
 	mutation *SubmitMutation
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
+// AddUserIDs adds the "users" edge to the User entity by IDs.
 func (suo *SubmitUpdateOne) AddUserIDs(ids ...int) *SubmitUpdateOne {
 	suo.mutation.AddUserIDs(ids...)
 	return suo
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (suo *SubmitUpdateOne) AddUser(u ...*User) *SubmitUpdateOne {
+// AddUsers adds the "users" edges to the User entity.
+func (suo *SubmitUpdateOne) AddUsers(u ...*User) *SubmitUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
@@ -349,29 +377,52 @@ func (suo *SubmitUpdateOne) AddUser(u ...*User) *SubmitUpdateOne {
 	return suo.AddUserIDs(ids...)
 }
 
-// AddLanguageIDs adds the "language" edge to the Language entity by IDs.
-func (suo *SubmitUpdateOne) AddLanguageIDs(ids ...int) *SubmitUpdateOne {
-	suo.mutation.AddLanguageIDs(ids...)
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (suo *SubmitUpdateOne) SetTaskID(id int) *SubmitUpdateOne {
+	suo.mutation.SetTaskID(id)
 	return suo
 }
 
-// AddLanguage adds the "language" edges to the Language entity.
-func (suo *SubmitUpdateOne) AddLanguage(l ...*Language) *SubmitUpdateOne {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableTaskID(id *int) *SubmitUpdateOne {
+	if id != nil {
+		suo = suo.SetTaskID(*id)
 	}
-	return suo.AddLanguageIDs(ids...)
+	return suo
 }
 
-// AddTestcaseResultIDs adds the "testcase_result" edge to the TestcaseResult entity by IDs.
+// SetTask sets the "task" edge to the Task entity.
+func (suo *SubmitUpdateOne) SetTask(t *Task) *SubmitUpdateOne {
+	return suo.SetTaskID(t.ID)
+}
+
+// SetLanguageID sets the "language" edge to the Language entity by ID.
+func (suo *SubmitUpdateOne) SetLanguageID(id int) *SubmitUpdateOne {
+	suo.mutation.SetLanguageID(id)
+	return suo
+}
+
+// SetNillableLanguageID sets the "language" edge to the Language entity by ID if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableLanguageID(id *int) *SubmitUpdateOne {
+	if id != nil {
+		suo = suo.SetLanguageID(*id)
+	}
+	return suo
+}
+
+// SetLanguage sets the "language" edge to the Language entity.
+func (suo *SubmitUpdateOne) SetLanguage(l *Language) *SubmitUpdateOne {
+	return suo.SetLanguageID(l.ID)
+}
+
+// AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by IDs.
 func (suo *SubmitUpdateOne) AddTestcaseResultIDs(ids ...int) *SubmitUpdateOne {
 	suo.mutation.AddTestcaseResultIDs(ids...)
 	return suo
 }
 
-// AddTestcaseResult adds the "testcase_result" edges to the TestcaseResult entity.
-func (suo *SubmitUpdateOne) AddTestcaseResult(t ...*TestcaseResult) *SubmitUpdateOne {
+// AddTestcaseResults adds the "testcase_results" edges to the TestcaseResult entity.
+func (suo *SubmitUpdateOne) AddTestcaseResults(t ...*TestcaseResult) *SubmitUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
@@ -384,20 +435,20 @@ func (suo *SubmitUpdateOne) Mutation() *SubmitMutation {
 	return suo.mutation
 }
 
-// ClearUser clears all "user" edges to the User entity.
-func (suo *SubmitUpdateOne) ClearUser() *SubmitUpdateOne {
-	suo.mutation.ClearUser()
+// ClearUsers clears all "users" edges to the User entity.
+func (suo *SubmitUpdateOne) ClearUsers() *SubmitUpdateOne {
+	suo.mutation.ClearUsers()
 	return suo
 }
 
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
+// RemoveUserIDs removes the "users" edge to User entities by IDs.
 func (suo *SubmitUpdateOne) RemoveUserIDs(ids ...int) *SubmitUpdateOne {
 	suo.mutation.RemoveUserIDs(ids...)
 	return suo
 }
 
-// RemoveUser removes "user" edges to User entities.
-func (suo *SubmitUpdateOne) RemoveUser(u ...*User) *SubmitUpdateOne {
+// RemoveUsers removes "users" edges to User entities.
+func (suo *SubmitUpdateOne) RemoveUsers(u ...*User) *SubmitUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
@@ -405,41 +456,32 @@ func (suo *SubmitUpdateOne) RemoveUser(u ...*User) *SubmitUpdateOne {
 	return suo.RemoveUserIDs(ids...)
 }
 
-// ClearLanguage clears all "language" edges to the Language entity.
+// ClearTask clears the "task" edge to the Task entity.
+func (suo *SubmitUpdateOne) ClearTask() *SubmitUpdateOne {
+	suo.mutation.ClearTask()
+	return suo
+}
+
+// ClearLanguage clears the "language" edge to the Language entity.
 func (suo *SubmitUpdateOne) ClearLanguage() *SubmitUpdateOne {
 	suo.mutation.ClearLanguage()
 	return suo
 }
 
-// RemoveLanguageIDs removes the "language" edge to Language entities by IDs.
-func (suo *SubmitUpdateOne) RemoveLanguageIDs(ids ...int) *SubmitUpdateOne {
-	suo.mutation.RemoveLanguageIDs(ids...)
+// ClearTestcaseResults clears all "testcase_results" edges to the TestcaseResult entity.
+func (suo *SubmitUpdateOne) ClearTestcaseResults() *SubmitUpdateOne {
+	suo.mutation.ClearTestcaseResults()
 	return suo
 }
 
-// RemoveLanguage removes "language" edges to Language entities.
-func (suo *SubmitUpdateOne) RemoveLanguage(l ...*Language) *SubmitUpdateOne {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return suo.RemoveLanguageIDs(ids...)
-}
-
-// ClearTestcaseResult clears all "testcase_result" edges to the TestcaseResult entity.
-func (suo *SubmitUpdateOne) ClearTestcaseResult() *SubmitUpdateOne {
-	suo.mutation.ClearTestcaseResult()
-	return suo
-}
-
-// RemoveTestcaseResultIDs removes the "testcase_result" edge to TestcaseResult entities by IDs.
+// RemoveTestcaseResultIDs removes the "testcase_results" edge to TestcaseResult entities by IDs.
 func (suo *SubmitUpdateOne) RemoveTestcaseResultIDs(ids ...int) *SubmitUpdateOne {
 	suo.mutation.RemoveTestcaseResultIDs(ids...)
 	return suo
 }
 
-// RemoveTestcaseResult removes "testcase_result" edges to TestcaseResult entities.
-func (suo *SubmitUpdateOne) RemoveTestcaseResult(t ...*TestcaseResult) *SubmitUpdateOne {
+// RemoveTestcaseResults removes "testcase_results" edges to TestcaseResult entities.
+func (suo *SubmitUpdateOne) RemoveTestcaseResults(t ...*TestcaseResult) *SubmitUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
@@ -513,12 +555,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 			}
 		}
 	}
-	if suo.mutation.UserCleared() {
+	if suo.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.UserTable,
-			Columns: []string{submit.UserColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   submit.UsersTable,
+			Columns: submit.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -526,12 +568,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedUserIDs(); len(nodes) > 0 && !suo.mutation.UserCleared() {
+	if nodes := suo.mutation.RemovedUsersIDs(); len(nodes) > 0 && !suo.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.UserTable,
-			Columns: []string{submit.UserColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   submit.UsersTable,
+			Columns: submit.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -542,15 +584,44 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := suo.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.UserTable,
-			Columns: []string{submit.UserColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   submit.UsersTable,
+			Columns: submit.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.TaskCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   submit.TaskTable,
+			Columns: []string{submit.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.TaskIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   submit.TaskTable,
+			Columns: []string{submit.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -560,7 +631,7 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 	}
 	if suo.mutation.LanguageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
@@ -568,28 +639,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.RemovedLanguageIDs(); len(nodes) > 0 && !suo.mutation.LanguageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.LanguageTable,
-			Columns: []string{submit.LanguageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := suo.mutation.LanguageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
@@ -603,12 +658,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if suo.mutation.TestcaseResultCleared() {
+	if suo.mutation.TestcaseResultsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   submit.TestcaseResultTable,
-			Columns: []string{submit.TestcaseResultColumn},
+			Table:   submit.TestcaseResultsTable,
+			Columns: []string{submit.TestcaseResultsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt),
@@ -616,12 +671,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedTestcaseResultIDs(); len(nodes) > 0 && !suo.mutation.TestcaseResultCleared() {
+	if nodes := suo.mutation.RemovedTestcaseResultsIDs(); len(nodes) > 0 && !suo.mutation.TestcaseResultsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   submit.TestcaseResultTable,
-			Columns: []string{submit.TestcaseResultColumn},
+			Table:   submit.TestcaseResultsTable,
+			Columns: []string{submit.TestcaseResultsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt),
@@ -632,12 +687,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.TestcaseResultIDs(); len(nodes) > 0 {
+	if nodes := suo.mutation.TestcaseResultsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   submit.TestcaseResultTable,
-			Columns: []string{submit.TestcaseResultColumn},
+			Table:   submit.TestcaseResultsTable,
+			Columns: []string{submit.TestcaseResultsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt),

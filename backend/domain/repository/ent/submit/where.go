@@ -53,21 +53,44 @@ func IDLTE(id int) predicate.Submit {
 	return predicate.Submit(sql.FieldLTE(FieldID, id))
 }
 
-// HasUser applies the HasEdge predicate on the "user" edge.
-func HasUser() predicate.Submit {
+// HasUsers applies the HasEdge predicate on the "users" edge.
+func HasUsers() predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, UserTable, UserColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, UsersTable, UsersPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
-func HasUserWith(preds ...predicate.User) predicate.Submit {
+// HasUsersWith applies the HasEdge predicate on the "users" edge with a given conditions (other predicates).
+func HasUsersWith(preds ...predicate.User) predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
-		step := newUserStep()
+		step := newUsersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTask applies the HasEdge predicate on the "task" edge.
+func HasTask() predicate.Submit {
+	return predicate.Submit(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, TaskTable, TaskColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTaskWith applies the HasEdge predicate on the "task" edge with a given conditions (other predicates).
+func HasTaskWith(preds ...predicate.Task) predicate.Submit {
+	return predicate.Submit(func(s *sql.Selector) {
+		step := newTaskStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -81,7 +104,7 @@ func HasLanguage() predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, LanguageTable, LanguageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, LanguageTable, LanguageColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -99,21 +122,21 @@ func HasLanguageWith(preds ...predicate.Language) predicate.Submit {
 	})
 }
 
-// HasTestcaseResult applies the HasEdge predicate on the "testcase_result" edge.
-func HasTestcaseResult() predicate.Submit {
+// HasTestcaseResults applies the HasEdge predicate on the "testcase_results" edge.
+func HasTestcaseResults() predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, TestcaseResultTable, TestcaseResultColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, TestcaseResultsTable, TestcaseResultsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasTestcaseResultWith applies the HasEdge predicate on the "testcase_result" edge with a given conditions (other predicates).
-func HasTestcaseResultWith(preds ...predicate.TestcaseResult) predicate.Submit {
+// HasTestcaseResultsWith applies the HasEdge predicate on the "testcase_results" edge with a given conditions (other predicates).
+func HasTestcaseResultsWith(preds ...predicate.TestcaseResult) predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
-		step := newTestcaseResultStep()
+		step := newTestcaseResultsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

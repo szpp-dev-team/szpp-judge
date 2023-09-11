@@ -4,8 +4,10 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
@@ -16,6 +18,7 @@ type TestcaseResultCreate struct {
 	config
 	mutation *TestcaseResultMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // Mutation returns the TestcaseResultMutation object of the builder.
@@ -78,13 +81,131 @@ func (trc *TestcaseResultCreate) createSpec() (*TestcaseResult, *sqlgraph.Create
 		_node = &TestcaseResult{config: trc.config}
 		_spec = sqlgraph.NewCreateSpec(testcaseresult.Table, sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt))
 	)
+	_spec.OnConflict = trc.conflict
 	return _node, _spec
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TestcaseResult.Create().
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (trc *TestcaseResultCreate) OnConflict(opts ...sql.ConflictOption) *TestcaseResultUpsertOne {
+	trc.conflict = opts
+	return &TestcaseResultUpsertOne{
+		create: trc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TestcaseResult.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (trc *TestcaseResultCreate) OnConflictColumns(columns ...string) *TestcaseResultUpsertOne {
+	trc.conflict = append(trc.conflict, sql.ConflictColumns(columns...))
+	return &TestcaseResultUpsertOne{
+		create: trc,
+	}
+}
+
+type (
+	// TestcaseResultUpsertOne is the builder for "upsert"-ing
+	//  one TestcaseResult node.
+	TestcaseResultUpsertOne struct {
+		create *TestcaseResultCreate
+	}
+
+	// TestcaseResultUpsert is the "OnConflict" setter.
+	TestcaseResultUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.TestcaseResult.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *TestcaseResultUpsertOne) UpdateNewValues() *TestcaseResultUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TestcaseResult.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *TestcaseResultUpsertOne) Ignore() *TestcaseResultUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestcaseResultUpsertOne) DoNothing() *TestcaseResultUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestcaseResultCreate.OnConflict
+// documentation for more info.
+func (u *TestcaseResultUpsertOne) Update(set func(*TestcaseResultUpsert)) *TestcaseResultUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestcaseResultUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// Exec executes the query.
+func (u *TestcaseResultUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestcaseResultCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestcaseResultUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *TestcaseResultUpsertOne) ID(ctx context.Context) (id int, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *TestcaseResultUpsertOne) IDX(ctx context.Context) int {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
 }
 
 // TestcaseResultCreateBulk is the builder for creating many TestcaseResult entities in bulk.
 type TestcaseResultCreateBulk struct {
 	config
 	builders []*TestcaseResultCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the TestcaseResult entities in the database.
@@ -110,6 +231,7 @@ func (trcb *TestcaseResultCreateBulk) Save(ctx context.Context) ([]*TestcaseResu
 					_, err = mutators[i+1].Mutate(root, trcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = trcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, trcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -160,6 +282,102 @@ func (trcb *TestcaseResultCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (trcb *TestcaseResultCreateBulk) ExecX(ctx context.Context) {
 	if err := trcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TestcaseResult.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (trcb *TestcaseResultCreateBulk) OnConflict(opts ...sql.ConflictOption) *TestcaseResultUpsertBulk {
+	trcb.conflict = opts
+	return &TestcaseResultUpsertBulk{
+		create: trcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TestcaseResult.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (trcb *TestcaseResultCreateBulk) OnConflictColumns(columns ...string) *TestcaseResultUpsertBulk {
+	trcb.conflict = append(trcb.conflict, sql.ConflictColumns(columns...))
+	return &TestcaseResultUpsertBulk{
+		create: trcb,
+	}
+}
+
+// TestcaseResultUpsertBulk is the builder for "upsert"-ing
+// a bulk of TestcaseResult nodes.
+type TestcaseResultUpsertBulk struct {
+	create *TestcaseResultCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.TestcaseResult.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *TestcaseResultUpsertBulk) UpdateNewValues() *TestcaseResultUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TestcaseResult.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *TestcaseResultUpsertBulk) Ignore() *TestcaseResultUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestcaseResultUpsertBulk) DoNothing() *TestcaseResultUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestcaseResultCreateBulk.OnConflict
+// documentation for more info.
+func (u *TestcaseResultUpsertBulk) Update(set func(*TestcaseResultUpsert)) *TestcaseResultUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestcaseResultUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// Exec executes the query.
+func (u *TestcaseResultUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TestcaseResultCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestcaseResultCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestcaseResultUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

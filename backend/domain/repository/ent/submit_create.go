@@ -4,12 +4,15 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -19,16 +22,17 @@ type SubmitCreate struct {
 	config
 	mutation *SubmitMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
+// AddUserIDs adds the "users" edge to the User entity by IDs.
 func (sc *SubmitCreate) AddUserIDs(ids ...int) *SubmitCreate {
 	sc.mutation.AddUserIDs(ids...)
 	return sc
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (sc *SubmitCreate) AddUser(u ...*User) *SubmitCreate {
+// AddUsers adds the "users" edges to the User entity.
+func (sc *SubmitCreate) AddUsers(u ...*User) *SubmitCreate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
@@ -36,29 +40,52 @@ func (sc *SubmitCreate) AddUser(u ...*User) *SubmitCreate {
 	return sc.AddUserIDs(ids...)
 }
 
-// AddLanguageIDs adds the "language" edge to the Language entity by IDs.
-func (sc *SubmitCreate) AddLanguageIDs(ids ...int) *SubmitCreate {
-	sc.mutation.AddLanguageIDs(ids...)
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (sc *SubmitCreate) SetTaskID(id int) *SubmitCreate {
+	sc.mutation.SetTaskID(id)
 	return sc
 }
 
-// AddLanguage adds the "language" edges to the Language entity.
-func (sc *SubmitCreate) AddLanguage(l ...*Language) *SubmitCreate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (sc *SubmitCreate) SetNillableTaskID(id *int) *SubmitCreate {
+	if id != nil {
+		sc = sc.SetTaskID(*id)
 	}
-	return sc.AddLanguageIDs(ids...)
+	return sc
 }
 
-// AddTestcaseResultIDs adds the "testcase_result" edge to the TestcaseResult entity by IDs.
+// SetTask sets the "task" edge to the Task entity.
+func (sc *SubmitCreate) SetTask(t *Task) *SubmitCreate {
+	return sc.SetTaskID(t.ID)
+}
+
+// SetLanguageID sets the "language" edge to the Language entity by ID.
+func (sc *SubmitCreate) SetLanguageID(id int) *SubmitCreate {
+	sc.mutation.SetLanguageID(id)
+	return sc
+}
+
+// SetNillableLanguageID sets the "language" edge to the Language entity by ID if the given value is not nil.
+func (sc *SubmitCreate) SetNillableLanguageID(id *int) *SubmitCreate {
+	if id != nil {
+		sc = sc.SetLanguageID(*id)
+	}
+	return sc
+}
+
+// SetLanguage sets the "language" edge to the Language entity.
+func (sc *SubmitCreate) SetLanguage(l *Language) *SubmitCreate {
+	return sc.SetLanguageID(l.ID)
+}
+
+// AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by IDs.
 func (sc *SubmitCreate) AddTestcaseResultIDs(ids ...int) *SubmitCreate {
 	sc.mutation.AddTestcaseResultIDs(ids...)
 	return sc
 }
 
-// AddTestcaseResult adds the "testcase_result" edges to the TestcaseResult entity.
-func (sc *SubmitCreate) AddTestcaseResult(t ...*TestcaseResult) *SubmitCreate {
+// AddTestcaseResults adds the "testcase_results" edges to the TestcaseResult entity.
+func (sc *SubmitCreate) AddTestcaseResults(t ...*TestcaseResult) *SubmitCreate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
@@ -126,12 +153,13 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 		_node = &Submit{config: sc.config}
 		_spec = sqlgraph.NewCreateSpec(submit.Table, sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt))
 	)
-	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
+	_spec.OnConflict = sc.conflict
+	if nodes := sc.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   submit.UserTable,
-			Columns: []string{submit.UserColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   submit.UsersTable,
+			Columns: submit.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -142,9 +170,26 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := sc.mutation.TaskIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   submit.TaskTable,
+			Columns: []string{submit.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.submit_task = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := sc.mutation.LanguageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
@@ -156,14 +201,15 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.submit_language = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := sc.mutation.TestcaseResultIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.TestcaseResultsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   submit.TestcaseResultTable,
-			Columns: []string{submit.TestcaseResultColumn},
+			Table:   submit.TestcaseResultsTable,
+			Columns: []string{submit.TestcaseResultsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt),
@@ -177,10 +223,127 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Submit.Create().
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (sc *SubmitCreate) OnConflict(opts ...sql.ConflictOption) *SubmitUpsertOne {
+	sc.conflict = opts
+	return &SubmitUpsertOne{
+		create: sc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Submit.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (sc *SubmitCreate) OnConflictColumns(columns ...string) *SubmitUpsertOne {
+	sc.conflict = append(sc.conflict, sql.ConflictColumns(columns...))
+	return &SubmitUpsertOne{
+		create: sc,
+	}
+}
+
+type (
+	// SubmitUpsertOne is the builder for "upsert"-ing
+	//  one Submit node.
+	SubmitUpsertOne struct {
+		create *SubmitCreate
+	}
+
+	// SubmitUpsert is the "OnConflict" setter.
+	SubmitUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.Submit.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *SubmitUpsertOne) UpdateNewValues() *SubmitUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Submit.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *SubmitUpsertOne) Ignore() *SubmitUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *SubmitUpsertOne) DoNothing() *SubmitUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the SubmitCreate.OnConflict
+// documentation for more info.
+func (u *SubmitUpsertOne) Update(set func(*SubmitUpsert)) *SubmitUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&SubmitUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// Exec executes the query.
+func (u *SubmitUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for SubmitCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *SubmitUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *SubmitUpsertOne) ID(ctx context.Context) (id int, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *SubmitUpsertOne) IDX(ctx context.Context) int {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // SubmitCreateBulk is the builder for creating many Submit entities in bulk.
 type SubmitCreateBulk struct {
 	config
 	builders []*SubmitCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Submit entities in the database.
@@ -206,6 +369,7 @@ func (scb *SubmitCreateBulk) Save(ctx context.Context) ([]*Submit, error) {
 					_, err = mutators[i+1].Mutate(root, scb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = scb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, scb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -256,6 +420,102 @@ func (scb *SubmitCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (scb *SubmitCreateBulk) ExecX(ctx context.Context) {
 	if err := scb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Submit.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (scb *SubmitCreateBulk) OnConflict(opts ...sql.ConflictOption) *SubmitUpsertBulk {
+	scb.conflict = opts
+	return &SubmitUpsertBulk{
+		create: scb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Submit.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (scb *SubmitCreateBulk) OnConflictColumns(columns ...string) *SubmitUpsertBulk {
+	scb.conflict = append(scb.conflict, sql.ConflictColumns(columns...))
+	return &SubmitUpsertBulk{
+		create: scb,
+	}
+}
+
+// SubmitUpsertBulk is the builder for "upsert"-ing
+// a bulk of Submit nodes.
+type SubmitUpsertBulk struct {
+	create *SubmitCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Submit.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *SubmitUpsertBulk) UpdateNewValues() *SubmitUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Submit.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *SubmitUpsertBulk) Ignore() *SubmitUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *SubmitUpsertBulk) DoNothing() *SubmitUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the SubmitCreateBulk.OnConflict
+// documentation for more info.
+func (u *SubmitUpsertBulk) Update(set func(*SubmitUpsert)) *SubmitUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&SubmitUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// Exec executes the query.
+func (u *SubmitUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the SubmitCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for SubmitCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *SubmitUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

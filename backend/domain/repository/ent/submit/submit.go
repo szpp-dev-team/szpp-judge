@@ -12,35 +12,42 @@ const (
 	Label = "submit"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// EdgeUser holds the string denoting the user edge name in mutations.
-	EdgeUser = "user"
+	// EdgeUsers holds the string denoting the users edge name in mutations.
+	EdgeUsers = "users"
+	// EdgeTask holds the string denoting the task edge name in mutations.
+	EdgeTask = "task"
 	// EdgeLanguage holds the string denoting the language edge name in mutations.
 	EdgeLanguage = "language"
-	// EdgeTestcaseResult holds the string denoting the testcase_result edge name in mutations.
-	EdgeTestcaseResult = "testcase_result"
+	// EdgeTestcaseResults holds the string denoting the testcase_results edge name in mutations.
+	EdgeTestcaseResults = "testcase_results"
 	// Table holds the table name of the submit in the database.
 	Table = "submits"
-	// UserTable is the table that holds the user relation/edge.
-	UserTable = "users"
-	// UserInverseTable is the table name for the User entity.
+	// UsersTable is the table that holds the users relation/edge. The primary key declared below.
+	UsersTable = "user_submits"
+	// UsersInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UserInverseTable = "users"
-	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "submit_user"
+	UsersInverseTable = "users"
+	// TaskTable is the table that holds the task relation/edge.
+	TaskTable = "submits"
+	// TaskInverseTable is the table name for the Task entity.
+	// It exists in this package in order to avoid circular dependency with the "task" package.
+	TaskInverseTable = "tasks"
+	// TaskColumn is the table column denoting the task relation/edge.
+	TaskColumn = "submit_task"
 	// LanguageTable is the table that holds the language relation/edge.
-	LanguageTable = "languages"
+	LanguageTable = "submits"
 	// LanguageInverseTable is the table name for the Language entity.
 	// It exists in this package in order to avoid circular dependency with the "language" package.
 	LanguageInverseTable = "languages"
 	// LanguageColumn is the table column denoting the language relation/edge.
 	LanguageColumn = "submit_language"
-	// TestcaseResultTable is the table that holds the testcase_result relation/edge.
-	TestcaseResultTable = "testcase_results"
-	// TestcaseResultInverseTable is the table name for the TestcaseResult entity.
+	// TestcaseResultsTable is the table that holds the testcase_results relation/edge.
+	TestcaseResultsTable = "testcase_results"
+	// TestcaseResultsInverseTable is the table name for the TestcaseResult entity.
 	// It exists in this package in order to avoid circular dependency with the "testcaseresult" package.
-	TestcaseResultInverseTable = "testcase_results"
-	// TestcaseResultColumn is the table column denoting the testcase_result relation/edge.
-	TestcaseResultColumn = "submit_testcase_result"
+	TestcaseResultsInverseTable = "testcase_results"
+	// TestcaseResultsColumn is the table column denoting the testcase_results relation/edge.
+	TestcaseResultsColumn = "submit_testcase_results"
 )
 
 // Columns holds all SQL columns for submit fields.
@@ -48,10 +55,29 @@ var Columns = []string{
 	FieldID,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "submits"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"language_submit",
+	"submit_task",
+	"submit_language",
+}
+
+var (
+	// UsersPrimaryKey and UsersColumn2 are the table columns denoting the
+	// primary key for the users relation (M2M).
+	UsersPrimaryKey = []string{"user_id", "submit_id"}
+)
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -66,65 +92,72 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByUserCount orders the results by user count.
-func ByUserCount(opts ...sql.OrderTermOption) OrderOption {
+// ByUsersCount orders the results by users count.
+func ByUsersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newUsersStep(), opts...)
 	}
 }
 
-// ByUser orders the results by user terms.
-func ByUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByUsers orders the results by users terms.
+func ByUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByLanguageCount orders the results by language count.
-func ByLanguageCount(opts ...sql.OrderTermOption) OrderOption {
+// ByTaskField orders the results by task field.
+func ByTaskField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newLanguageStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newTaskStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByLanguage orders the results by language terms.
-func ByLanguage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByLanguageField orders the results by language field.
+func ByLanguageField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newLanguageStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newLanguageStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByTestcaseResultCount orders the results by testcase_result count.
-func ByTestcaseResultCount(opts ...sql.OrderTermOption) OrderOption {
+// ByTestcaseResultsCount orders the results by testcase_results count.
+func ByTestcaseResultsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newTestcaseResultStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newTestcaseResultsStep(), opts...)
 	}
 }
 
-// ByTestcaseResult orders the results by testcase_result terms.
-func ByTestcaseResult(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByTestcaseResults orders the results by testcase_results terms.
+func ByTestcaseResults(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTestcaseResultStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newTestcaseResultsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newUserStep() *sqlgraph.Step {
+func newUsersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, UserTable, UserColumn),
+		sqlgraph.To(UsersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, UsersTable, UsersPrimaryKey...),
+	)
+}
+func newTaskStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TaskInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, TaskTable, TaskColumn),
 	)
 }
 func newLanguageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LanguageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, LanguageTable, LanguageColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, LanguageTable, LanguageColumn),
 	)
 }
-func newTestcaseResultStep() *sqlgraph.Step {
+func newTestcaseResultsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TestcaseResultInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, TestcaseResultTable, TestcaseResultColumn),
+		sqlgraph.To(TestcaseResultsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TestcaseResultsTable, TestcaseResultsColumn),
 	)
 }

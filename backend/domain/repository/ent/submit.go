@@ -8,7 +8,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 )
 
 // Submit is the model entity for the Submit schema.
@@ -18,48 +20,70 @@ type Submit struct {
 	ID int `json:"id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubmitQuery when eager-loading is set.
-	Edges        SubmitEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges           SubmitEdges `json:"edges"`
+	language_submit *int
+	submit_task     *int
+	submit_language *int
+	selectValues    sql.SelectValues
 }
 
 // SubmitEdges holds the relations/edges for other nodes in the graph.
 type SubmitEdges struct {
-	// User holds the value of the user edge.
-	User []*User `json:"user,omitempty"`
+	// Users holds the value of the users edge.
+	Users []*User `json:"users,omitempty"`
+	// Task holds the value of the task edge.
+	Task *Task `json:"task,omitempty"`
 	// Language holds the value of the language edge.
-	Language []*Language `json:"language,omitempty"`
-	// TestcaseResult holds the value of the testcase_result edge.
-	TestcaseResult []*TestcaseResult `json:"testcase_result,omitempty"`
+	Language *Language `json:"language,omitempty"`
+	// TestcaseResults holds the value of the testcase_results edge.
+	TestcaseResults []*TestcaseResult `json:"testcase_results,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
-// UserOrErr returns the User value or an error if the edge
+// UsersOrErr returns the Users value or an error if the edge
 // was not loaded in eager-loading.
-func (e SubmitEdges) UserOrErr() ([]*User, error) {
+func (e SubmitEdges) UsersOrErr() ([]*User, error) {
 	if e.loadedTypes[0] {
-		return e.User, nil
+		return e.Users, nil
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "users"}
+}
+
+// TaskOrErr returns the Task value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SubmitEdges) TaskOrErr() (*Task, error) {
+	if e.loadedTypes[1] {
+		if e.Task == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: task.Label}
+		}
+		return e.Task, nil
+	}
+	return nil, &NotLoadedError{edge: "task"}
 }
 
 // LanguageOrErr returns the Language value or an error if the edge
-// was not loaded in eager-loading.
-func (e SubmitEdges) LanguageOrErr() ([]*Language, error) {
-	if e.loadedTypes[1] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SubmitEdges) LanguageOrErr() (*Language, error) {
+	if e.loadedTypes[2] {
+		if e.Language == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: language.Label}
+		}
 		return e.Language, nil
 	}
 	return nil, &NotLoadedError{edge: "language"}
 }
 
-// TestcaseResultOrErr returns the TestcaseResult value or an error if the edge
+// TestcaseResultsOrErr returns the TestcaseResults value or an error if the edge
 // was not loaded in eager-loading.
-func (e SubmitEdges) TestcaseResultOrErr() ([]*TestcaseResult, error) {
-	if e.loadedTypes[2] {
-		return e.TestcaseResult, nil
+func (e SubmitEdges) TestcaseResultsOrErr() ([]*TestcaseResult, error) {
+	if e.loadedTypes[3] {
+		return e.TestcaseResults, nil
 	}
-	return nil, &NotLoadedError{edge: "testcase_result"}
+	return nil, &NotLoadedError{edge: "testcase_results"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -68,6 +92,12 @@ func (*Submit) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case submit.FieldID:
+			values[i] = new(sql.NullInt64)
+		case submit.ForeignKeys[0]: // language_submit
+			values[i] = new(sql.NullInt64)
+		case submit.ForeignKeys[1]: // submit_task
+			values[i] = new(sql.NullInt64)
+		case submit.ForeignKeys[2]: // submit_language
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -90,6 +120,27 @@ func (s *Submit) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			s.ID = int(value.Int64)
+		case submit.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field language_submit", value)
+			} else if value.Valid {
+				s.language_submit = new(int)
+				*s.language_submit = int(value.Int64)
+			}
+		case submit.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field submit_task", value)
+			} else if value.Valid {
+				s.submit_task = new(int)
+				*s.submit_task = int(value.Int64)
+			}
+		case submit.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field submit_language", value)
+			} else if value.Valid {
+				s.submit_language = new(int)
+				*s.submit_language = int(value.Int64)
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -103,9 +154,14 @@ func (s *Submit) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
 }
 
-// QueryUser queries the "user" edge of the Submit entity.
-func (s *Submit) QueryUser() *UserQuery {
-	return NewSubmitClient(s.config).QueryUser(s)
+// QueryUsers queries the "users" edge of the Submit entity.
+func (s *Submit) QueryUsers() *UserQuery {
+	return NewSubmitClient(s.config).QueryUsers(s)
+}
+
+// QueryTask queries the "task" edge of the Submit entity.
+func (s *Submit) QueryTask() *TaskQuery {
+	return NewSubmitClient(s.config).QueryTask(s)
 }
 
 // QueryLanguage queries the "language" edge of the Submit entity.
@@ -113,9 +169,9 @@ func (s *Submit) QueryLanguage() *LanguageQuery {
 	return NewSubmitClient(s.config).QueryLanguage(s)
 }
 
-// QueryTestcaseResult queries the "testcase_result" edge of the Submit entity.
-func (s *Submit) QueryTestcaseResult() *TestcaseResultQuery {
-	return NewSubmitClient(s.config).QueryTestcaseResult(s)
+// QueryTestcaseResults queries the "testcase_results" edge of the Submit entity.
+func (s *Submit) QueryTestcaseResults() *TestcaseResultQuery {
+	return NewSubmitClient(s.config).QueryTestcaseResults(s)
 }
 
 // Update returns a builder for updating this Submit.
