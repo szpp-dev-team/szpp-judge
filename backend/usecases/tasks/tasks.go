@@ -76,10 +76,10 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 }
 
 func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest) (*backendv1.GetTaskResponse, error) {
-	task, err := i.entClient.Task.Get(ctx, int(req.Id))
+	task, err := i.entClient.Task.Get(ctx, int(req.TaskId))
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.Id)
+			return nil, status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -93,7 +93,7 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 	var task *ent.Task
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
 		// TODO: SetUser
-		q := tx.Task.UpdateOneID(int(req.Id)).
+		q := tx.Task.UpdateOneID(int(req.TaskId)).
 			SetTitle(req.Task.Title).
 			SetStatement(req.Task.Statement).
 			SetDifficulty(req.Task.Difficulty.String()).
@@ -119,7 +119,7 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 		task, err = q.Save(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
-				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.Id)
+				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
 			}
 			return status.Error(codes.Internal, err.Error())
 		}

@@ -90,7 +90,7 @@ func Test_UpdateTask(t *testing.T) {
 					SetCaseInsensitive(false).
 					SetCreatedAt(now).
 					SaveX(context.Background())
-				req.Id = int32(task.ID)
+				req.TaskId = int32(task.ID)
 			},
 			modify: func(req *backendv1.UpdateTaskRequest) {
 				req.Task.Title = "foo"
@@ -157,7 +157,7 @@ func Test_GetTask(t *testing.T) {
 					SetCaseInsensitive(false).
 					SetCreatedAt(now).
 					SaveX(context.Background())
-				req.Id = int32(task.ID)
+				req.TaskId = int32(task.ID)
 
 			},
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.GetTaskRequest, resp *backendv1.GetTaskResponse) {
