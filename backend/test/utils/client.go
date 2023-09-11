@@ -45,14 +45,28 @@ func NewTestClient(t *testing.T) *ent.Client {
 
 func TruncateDB(t *testing.T, client *ent.Client) {
 	t.Helper()
-
 	ctx := context.Background()
-	_, err := client.User.Delete().Exec(ctx)
+
+	rows, err := client.QueryContext(ctx, "SHOW TABLES")
 	require.NoError(t, err)
-	_, err = client.Task.Delete().Exec(ctx)
-	require.NoError(t, err)
-	_, err = client.Testcase.Delete().Exec(ctx)
-	require.NoError(t, err)
-	_, err = client.TestcaseSet.Delete().Exec(ctx)
-	require.NoError(t, err)
+	defer rows.Close()
+	for rows.Next() {
+		var table string
+		require.NoError(t, rows.Scan(&table))
+		_, err := client.ExecContext(ctx, "SET foreign_key_checks = 0")
+		require.NoError(t, err)
+		defer client.ExecContext(ctx, "SET foreign_key_checks = 1")
+		_, err = client.ExecContext(ctx, "TRUNCATE TABLE "+table)
+		require.NoError(t, err)
+	}
+
+	// ctx := context.Background()
+	// _, err := client.User.Delete().Exec(ctx)
+	// require.NoError(t, err)
+	// _, err = client.Task.Delete().Exec(ctx)
+	// require.NoError(t, err)
+	// _, err = client.Testcase.Delete().Exec(ctx)
+	// require.NoError(t, err)
+	// _, err = client.TestcaseSet.Delete().Exec(ctx)
+	// require.NoError(t, err)
 }
