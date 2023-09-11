@@ -232,3 +232,11 @@ message DeleteAnswerRequest {
 }
 
 message DeleteAnswerResponse {}
+
+message ListContestTasksRequest {
+  string contest_slug = 1;
+}
+
+message ListContestTasksResponse {
+  repeated ContestTask tasks = 1;
+}
