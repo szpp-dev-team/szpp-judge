@@ -235,5 +235,5 @@ message ListContestTasksRequest {
 }
 
 message ListContestTasksResponse {
-  repeated ContestTask tasks = 1;  // 問題の並び順
+  repeated ContestTask tasks = 1; // 問題の並び順
 }
