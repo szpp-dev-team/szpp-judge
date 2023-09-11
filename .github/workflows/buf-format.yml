@@ -1,4 +1,4 @@
-name: buf
+name: buf format
 on:
   pull_request:
     branches:
