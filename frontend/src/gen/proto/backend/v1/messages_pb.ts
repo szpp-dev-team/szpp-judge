@@ -219,6 +219,16 @@ export class LoginResponse extends Message<LoginResponse> {
    */
   user?: User;
 
+  /**
+   * @generated from field: string access_token = 2;
+   */
+  accessToken = "";
+
+  /**
+   * @generated from field: string refresh_token = 3;
+   */
+  refreshToken = "";
+
   constructor(data?: PartialMessage<LoginResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -228,6 +238,8 @@ export class LoginResponse extends Message<LoginResponse> {
   static readonly typeName = "backend.v1.LoginResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "user", kind: "message", T: User },
+    { no: 2, name: "access_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "refresh_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LoginResponse {
@@ -248,9 +260,88 @@ export class LoginResponse extends Message<LoginResponse> {
 }
 
 /**
+ * @generated from message backend.v1.RefreshAccessTokenRequest
+ */
+export class RefreshAccessTokenRequest extends Message<RefreshAccessTokenRequest> {
+  /**
+   * @generated from field: string refresh_token = 1;
+   */
+  refreshToken = "";
+
+  constructor(data?: PartialMessage<RefreshAccessTokenRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.RefreshAccessTokenRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "refresh_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RefreshAccessTokenRequest {
+    return new RefreshAccessTokenRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RefreshAccessTokenRequest {
+    return new RefreshAccessTokenRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RefreshAccessTokenRequest {
+    return new RefreshAccessTokenRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RefreshAccessTokenRequest | PlainMessage<RefreshAccessTokenRequest> | undefined, b: RefreshAccessTokenRequest | PlainMessage<RefreshAccessTokenRequest> | undefined): boolean {
+    return proto3.util.equals(RefreshAccessTokenRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.RefreshAccessTokenResponse
+ */
+export class RefreshAccessTokenResponse extends Message<RefreshAccessTokenResponse> {
+  /**
+   * @generated from field: string access_token = 1;
+   */
+  accessToken = "";
+
+  constructor(data?: PartialMessage<RefreshAccessTokenResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.RefreshAccessTokenResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "access_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RefreshAccessTokenResponse {
+    return new RefreshAccessTokenResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RefreshAccessTokenResponse {
+    return new RefreshAccessTokenResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RefreshAccessTokenResponse {
+    return new RefreshAccessTokenResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RefreshAccessTokenResponse | PlainMessage<RefreshAccessTokenResponse> | undefined, b: RefreshAccessTokenResponse | PlainMessage<RefreshAccessTokenResponse> | undefined): boolean {
+    return proto3.util.equals(RefreshAccessTokenResponse, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.LogoutRequest
  */
 export class LogoutRequest extends Message<LogoutRequest> {
+  /**
+   * @generated from field: string refresh_token = 1;
+   */
+  refreshToken = "";
+
   constructor(data?: PartialMessage<LogoutRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -259,6 +350,7 @@ export class LogoutRequest extends Message<LogoutRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.LogoutRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "refresh_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LogoutRequest {
