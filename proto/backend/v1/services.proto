@@ -70,6 +70,8 @@ service ContestService {
   rpc GetContest(GetContestRequest) returns (GetContestResponse);
   rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
   rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
+  // 自分の問題ごとの結果情報を返す
+  rpc GetMySubmissionStatuses(GetMySubmissionStatusesRequest) returns (GetMySubmissionStatusesResponse);
   // 順位表取得
   rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
 }
