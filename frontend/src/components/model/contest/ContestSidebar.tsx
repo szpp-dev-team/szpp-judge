@@ -55,7 +55,13 @@ export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) =
         {...props}
         temporaryShow={temporaryShow}
         fixedShow={fixedShow}
-        onToggleKnobClick={() => setFixedShow(!fixedShow)}
+        onToggleKnobClick={() => {
+          if (!fixedShow && temporaryShow) {
+            setTemporaryShow(false);
+          } else {
+            setFixedShow(!fixedShow);
+          }
+        }}
         onFixSwitchChange={() => {
           setTemporaryShow(true);
           setFixedShow(!fixedShow);
@@ -137,7 +143,7 @@ const SidebarMainPane = ({
         bg={FILL_COLOR}
         color="teal.700"
         borderColor={BORDER_COLOR}
-        iconDirection={fixedShow ? "hide" : "show"}
+        iconDirection={fixedShow || temporaryShow ? "hide" : "show"}
         onClick={onToggleKnobClick}
       />
       <Box as="ul" listStyleType="none" whiteSpace="nowrap" overflowY="auto" display="flex" flexDirection="column">
