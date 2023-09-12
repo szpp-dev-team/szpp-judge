@@ -1,28 +1,37 @@
 import { Box, type BoxProps, Flex } from "@chakra-ui/react";
 import { type ReactNode } from "react";
 import { GlobalFooter, type GlobalFooterProps } from "../ui/GlobalFooter";
-import { GlobalHeader, type GlobalHeaderProps } from "../ui/GlobalHeader";
+import { GLOBAL_HEADER_H, GlobalHeader, type GlobalHeaderProps } from "../ui/GlobalHeader";
 
 export type WithHeaderFooterProps = {
   children: ReactNode;
   headerProps?: GlobalHeaderProps;
-  bodyProps?: BoxProps;
   footerProps?: GlobalFooterProps;
+  leftChildren?: ReactNode;
+  rightChildren?: ReactNode;
 };
 
 export const WithHeaderFooter = ({
   children,
   headerProps,
-  bodyProps,
   footerProps,
+  leftChildren,
+  rightChildren,
 }: WithHeaderFooterProps) => {
   // 子要素で height=100% がうまく機能するためには、親要素で height が auto になってはならない
   // そこで、適当に height=1px を設定することで非 auto にするというトリックを施している
+  const bg: BoxProps["bg"] = "gray.200";
   return (
-    <Flex flexDirection="column" minH="100vh" h="1px" w="fit-content" minW="100%">
+    <>
       <GlobalHeader {...headerProps} />
-      <Box as="main" flexGrow={1} bg="gray.200" {...bodyProps}>{children}</Box>
-      <GlobalFooter {...footerProps} />
-    </Flex>
+      <Flex minW="100%" bg={bg}>
+        {leftChildren}
+        <Flex flexDirection="column" minH="100vh" h="1px" pt={GLOBAL_HEADER_H} flexGrow={1}>
+          <Box as="main" bg={bg} flexGrow={1}>{children}</Box>
+          <GlobalFooter {...footerProps} />
+        </Flex>
+        {rightChildren}
+      </Flex>
+    </>
   );
 };

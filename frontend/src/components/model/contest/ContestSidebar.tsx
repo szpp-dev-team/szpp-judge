@@ -35,6 +35,8 @@ const FONT_COLOR: Color = "teal.900";
 const DIVIDER_COLOR: Color = "gray.300";
 const BORDER_COLOR: Color = "gray.400";
 
+const SIDEBAR_MAIN_PANE_WIDTH = "14rem";
+
 export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) => {
   const [fixedShow, setFixedShow] = useState(true);
   const [temporaryShow, setTemporaryShow] = useState(false);
@@ -42,36 +44,40 @@ export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) =
   return (
     <Box
       as="aside"
-      position="sticky"
-      zIndex={45}
-      top={top}
-      left={0}
-      h={`calc(100vh - ${top})`}
-      maxH={`calc(100vh - ${top})`}
-      w={fixedShow ? "fit-content" : 1}
+      minW={fixedShow ? SIDEBAR_MAIN_PANE_WIDTH : 0}
     >
-      <SidebarMainPane
-        zIndex={47}
-        {...props}
-        temporaryShow={temporaryShow}
-        fixedShow={fixedShow}
-        onToggleKnobClick={() => {
-          if (!fixedShow && temporaryShow) {
-            setTemporaryShow(false);
-          } else {
+      <Box
+        as="nav"
+        position="fixed"
+        zIndex={45}
+        top={top}
+        left={0}
+        h={`calc(100vh - ${top})`}
+        maxH={`calc(100vh - ${top})`}
+      >
+        <SidebarMainPane
+          zIndex={47}
+          {...props}
+          temporaryShow={temporaryShow}
+          fixedShow={fixedShow}
+          onToggleKnobClick={() => {
+            if (!fixedShow && temporaryShow) {
+              setTemporaryShow(false);
+            } else {
+              setFixedShow(!fixedShow);
+            }
+          }}
+          onFixSwitchChange={() => {
+            setTemporaryShow(true);
             setFixedShow(!fixedShow);
-          }
-        }}
-        onFixSwitchChange={() => {
-          setTemporaryShow(true);
-          setFixedShow(!fixedShow);
-        }}
-        onMouseLeave={() => setTemporaryShow(false)}
-      />
-      <SidebarHoverShowArea
-        zIndex={46}
-        onMouseEnter={() => setTemporaryShow(true)}
-      />
+          }}
+          onMouseLeave={() => setTemporaryShow(false)}
+        />
+        <SidebarHoverShowArea
+          zIndex={46}
+          onMouseEnter={() => setTemporaryShow(true)}
+        />
+      </Box>
     </Box>
   );
 };
@@ -113,16 +119,15 @@ const SidebarMainPane = ({
   const contestRootPath = `/contests/${slug}`;
   const contestStarted = now >= startAt;
   const contestFinished = now >= endAt;
-  const width = "14rem";
 
   return (
     <Box
       position="relative"
       h="100%"
-      w={width}
-      minW={width}
+      w={SIDEBAR_MAIN_PANE_WIDTH}
+      minW={SIDEBAR_MAIN_PANE_WIDTH}
       py={2}
-      transform={`translateX(${fixedShow || temporaryShow ? 0 : `-${width}`})`}
+      transform={`translateX(${fixedShow || temporaryShow ? 0 : `-${SIDEBAR_MAIN_PANE_WIDTH}`})`}
       transition="transform"
       transitionDuration="200ms"
       display="flex"

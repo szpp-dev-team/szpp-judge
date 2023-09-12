@@ -31,7 +31,7 @@ const NavItemLink = ({ children, ...props }: LinkProps) => {
 
 export const GlobalHeader = ({ contestSlug, contestTitle }: GlobalHeaderProps) => {
   return (
-    <Box as="header" width="100%" mb={GLOBAL_HEADER_H}>
+    <Box as="header" width="100%">
       <Flex
         as="nav"
         justifyContent="space-between"
