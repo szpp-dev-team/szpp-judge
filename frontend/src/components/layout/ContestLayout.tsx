@@ -12,7 +12,7 @@ export const ContestLayout = ({ children }: ContestLayoutProps) => {
   return (
     <WithHeaderFooter
       headerProps={{ contestSlug: "sbc001", contestTitle: "SZPP Beginners Contest 001" }}
-      bodyProps={{ as: "div", display: "flex", w: "fit-content" }}
+      bodyProps={{ as: "div", display: "flex" }}
     >
       <ContestSidebar
         top={GLOBAL_HEADER_H}
@@ -33,7 +33,7 @@ export const ContestLayout = ({ children }: ContestLayoutProps) => {
           { id: 1009, title: "すずっぴー君のおつかい" },
         ]}
       />
-      <Box as="main">{children}</Box>
+      <Box as="main" flexGrow={1}>{children}</Box>
     </WithHeaderFooter>
   );
 };
