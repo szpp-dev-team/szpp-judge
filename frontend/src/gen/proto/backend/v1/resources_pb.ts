@@ -698,6 +698,16 @@ export class ContestTask extends Message<ContestTask> {
    */
   execMemoryLimit = 0;
 
+  /**
+   * @generated from field: backend.v1.Difficulty difficulty = 5;
+   */
+  difficulty = Difficulty.DIFFICULTY_UNSPECIFIED;
+
+  /**
+   * @generated from field: int32 score = 6;
+   */
+  score = 0;
+
   constructor(data?: PartialMessage<ContestTask>) {
     super();
     proto3.util.initPartial(data, this);
@@ -710,6 +720,8 @@ export class ContestTask extends Message<ContestTask> {
     { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
+    { no: 6, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContestTask {
@@ -1390,6 +1402,49 @@ export class JudgeProgress extends Message<JudgeProgress> {
 
   static equals(a: JudgeProgress | PlainMessage<JudgeProgress> | undefined, b: JudgeProgress | PlainMessage<JudgeProgress> | undefined): boolean {
     return proto3.util.equals(JudgeProgress, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.SubmissionStatus
+ */
+export class SubmissionStatus extends Message<SubmissionStatus> {
+  /**
+   * @generated from field: int32 task_id = 1;
+   */
+  taskId = 0;
+
+  /**
+   * @generated from field: optional int32 score = 2;
+   */
+  score?: number;
+
+  constructor(data?: PartialMessage<SubmissionStatus>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.SubmissionStatus";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmissionStatus {
+    return new SubmissionStatus().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmissionStatus {
+    return new SubmissionStatus().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmissionStatus {
+    return new SubmissionStatus().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SubmissionStatus | PlainMessage<SubmissionStatus> | undefined, b: SubmissionStatus | PlainMessage<SubmissionStatus> | undefined): boolean {
+    return proto3.util.equals(SubmissionStatus, a, b);
   }
 }
 

@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Clarification, Clarification_Answer, Contest, ContestTask, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, StandingsElement, SubmissionDetail, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
+import { Clarification, Clarification_Answer, Contest, ContestTask, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, StandingsElement, SubmissionDetail, SubmissionStatus, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
 
 /**
  * @generated from message backend.v1.GetUserRequest
@@ -2180,6 +2180,80 @@ export class ListContestTasksResponse extends Message<ListContestTasksResponse> 
 
   static equals(a: ListContestTasksResponse | PlainMessage<ListContestTasksResponse> | undefined, b: ListContestTasksResponse | PlainMessage<ListContestTasksResponse> | undefined): boolean {
     return proto3.util.equals(ListContestTasksResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetMySubmissionStatusesRequest
+ */
+export class GetMySubmissionStatusesRequest extends Message<GetMySubmissionStatusesRequest> {
+  /**
+   * @generated from field: string contest_slug = 1;
+   */
+  contestSlug = "";
+
+  constructor(data?: PartialMessage<GetMySubmissionStatusesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetMySubmissionStatusesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetMySubmissionStatusesRequest {
+    return new GetMySubmissionStatusesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetMySubmissionStatusesRequest {
+    return new GetMySubmissionStatusesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetMySubmissionStatusesRequest {
+    return new GetMySubmissionStatusesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetMySubmissionStatusesRequest | PlainMessage<GetMySubmissionStatusesRequest> | undefined, b: GetMySubmissionStatusesRequest | PlainMessage<GetMySubmissionStatusesRequest> | undefined): boolean {
+    return proto3.util.equals(GetMySubmissionStatusesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetMySubmissionStatusesResponse
+ */
+export class GetMySubmissionStatusesResponse extends Message<GetMySubmissionStatusesResponse> {
+  /**
+   * @generated from field: repeated backend.v1.SubmissionStatus submission_statuses = 1;
+   */
+  submissionStatuses: SubmissionStatus[] = [];
+
+  constructor(data?: PartialMessage<GetMySubmissionStatusesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetMySubmissionStatusesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "submission_statuses", kind: "message", T: SubmissionStatus, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetMySubmissionStatusesResponse {
+    return new GetMySubmissionStatusesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetMySubmissionStatusesResponse {
+    return new GetMySubmissionStatusesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetMySubmissionStatusesResponse {
+    return new GetMySubmissionStatusesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetMySubmissionStatusesResponse | PlainMessage<GetMySubmissionStatusesResponse> | undefined, b: GetMySubmissionStatusesResponse | PlainMessage<GetMySubmissionStatusesResponse> | undefined): boolean {
+    return proto3.util.equals(GetMySubmissionStatusesResponse, a, b);
   }
 }
 
