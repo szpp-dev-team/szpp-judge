@@ -30,9 +30,21 @@ message LoginRequest {
 
 message LoginResponse {
   User user = 1;
+  string access_token = 2;
+  string refresh_token = 3;
 }
 
-message LogoutRequest {}
+message RefreshAccessTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshAccessTokenResponse {
+  string access_token = 1;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
 
 message LogoutResponse {}
 

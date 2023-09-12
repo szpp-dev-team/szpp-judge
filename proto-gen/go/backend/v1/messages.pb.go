@@ -285,7 +285,9 @@ type LoginResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	User *User `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	User         *User  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	AccessToken  string `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	RefreshToken string `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
 }
 
 func (x *LoginResponse) Reset() {
@@ -327,16 +329,126 @@ func (x *LoginResponse) GetUser() *User {
 	return nil
 }
 
+func (x *LoginResponse) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+type RefreshAccessTokenRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	RefreshToken string `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+}
+
+func (x *RefreshAccessTokenRequest) Reset() {
+	*x = RefreshAccessTokenRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RefreshAccessTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefreshAccessTokenRequest) ProtoMessage() {}
+
+func (x *RefreshAccessTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefreshAccessTokenRequest.ProtoReflect.Descriptor instead.
+func (*RefreshAccessTokenRequest) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *RefreshAccessTokenRequest) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+type RefreshAccessTokenResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	AccessToken string `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+}
+
+func (x *RefreshAccessTokenResponse) Reset() {
+	*x = RefreshAccessTokenResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RefreshAccessTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefreshAccessTokenResponse) ProtoMessage() {}
+
+func (x *RefreshAccessTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefreshAccessTokenResponse.ProtoReflect.Descriptor instead.
+func (*RefreshAccessTokenResponse) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *RefreshAccessTokenResponse) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
 type LogoutRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	RefreshToken string `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
 }
 
 func (x *LogoutRequest) Reset() {
 	*x = LogoutRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[6]
+		mi := &file_backend_v1_messages_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -349,7 +461,7 @@ func (x *LogoutRequest) String() string {
 func (*LogoutRequest) ProtoMessage() {}
 
 func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[6]
+	mi := &file_backend_v1_messages_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -362,7 +474,14 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{6}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *LogoutRequest) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
 }
 
 type LogoutResponse struct {
@@ -374,7 +493,7 @@ type LogoutResponse struct {
 func (x *LogoutResponse) Reset() {
 	*x = LogoutResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[7]
+		mi := &file_backend_v1_messages_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -387,7 +506,7 @@ func (x *LogoutResponse) String() string {
 func (*LogoutResponse) ProtoMessage() {}
 
 func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[7]
+	mi := &file_backend_v1_messages_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -400,7 +519,7 @@ func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutResponse.ProtoReflect.Descriptor instead.
 func (*LogoutResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{7}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{9}
 }
 
 type CreateTaskRequest struct {
@@ -414,7 +533,7 @@ type CreateTaskRequest struct {
 func (x *CreateTaskRequest) Reset() {
 	*x = CreateTaskRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[8]
+		mi := &file_backend_v1_messages_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -427,7 +546,7 @@ func (x *CreateTaskRequest) String() string {
 func (*CreateTaskRequest) ProtoMessage() {}
 
 func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[8]
+	mi := &file_backend_v1_messages_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -440,7 +559,7 @@ func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTaskRequest.ProtoReflect.Descriptor instead.
 func (*CreateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{8}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CreateTaskRequest) GetTask() *MutationTask {
@@ -461,7 +580,7 @@ type CreateTaskResponse struct {
 func (x *CreateTaskResponse) Reset() {
 	*x = CreateTaskResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[9]
+		mi := &file_backend_v1_messages_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -474,7 +593,7 @@ func (x *CreateTaskResponse) String() string {
 func (*CreateTaskResponse) ProtoMessage() {}
 
 func (x *CreateTaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[9]
+	mi := &file_backend_v1_messages_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -487,7 +606,7 @@ func (x *CreateTaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTaskResponse.ProtoReflect.Descriptor instead.
 func (*CreateTaskResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{9}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *CreateTaskResponse) GetTask() *Task {
@@ -508,7 +627,7 @@ type GetTaskRequest struct {
 func (x *GetTaskRequest) Reset() {
 	*x = GetTaskRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[10]
+		mi := &file_backend_v1_messages_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -521,7 +640,7 @@ func (x *GetTaskRequest) String() string {
 func (*GetTaskRequest) ProtoMessage() {}
 
 func (x *GetTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[10]
+	mi := &file_backend_v1_messages_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -534,7 +653,7 @@ func (x *GetTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskRequest.ProtoReflect.Descriptor instead.
 func (*GetTaskRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{10}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetTaskRequest) GetTaskId() int32 {
@@ -555,7 +674,7 @@ type GetTaskResponse struct {
 func (x *GetTaskResponse) Reset() {
 	*x = GetTaskResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[11]
+		mi := &file_backend_v1_messages_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -568,7 +687,7 @@ func (x *GetTaskResponse) String() string {
 func (*GetTaskResponse) ProtoMessage() {}
 
 func (x *GetTaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[11]
+	mi := &file_backend_v1_messages_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -581,7 +700,7 @@ func (x *GetTaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskResponse.ProtoReflect.Descriptor instead.
 func (*GetTaskResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{11}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetTaskResponse) GetTask() *Task {
@@ -603,7 +722,7 @@ type UpdateTaskRequest struct {
 func (x *UpdateTaskRequest) Reset() {
 	*x = UpdateTaskRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[12]
+		mi := &file_backend_v1_messages_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -616,7 +735,7 @@ func (x *UpdateTaskRequest) String() string {
 func (*UpdateTaskRequest) ProtoMessage() {}
 
 func (x *UpdateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[12]
+	mi := &file_backend_v1_messages_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -629,7 +748,7 @@ func (x *UpdateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTaskRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{12}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UpdateTaskRequest) GetTaskId() int32 {
@@ -657,7 +776,7 @@ type UpdateTaskResponse struct {
 func (x *UpdateTaskResponse) Reset() {
 	*x = UpdateTaskResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[13]
+		mi := &file_backend_v1_messages_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -670,7 +789,7 @@ func (x *UpdateTaskResponse) String() string {
 func (*UpdateTaskResponse) ProtoMessage() {}
 
 func (x *UpdateTaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[13]
+	mi := &file_backend_v1_messages_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -683,7 +802,7 @@ func (x *UpdateTaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTaskResponse.ProtoReflect.Descriptor instead.
 func (*UpdateTaskResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{13}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *UpdateTaskResponse) GetTask() *Task {
@@ -704,7 +823,7 @@ type GetTestcaseSetsRequest struct {
 func (x *GetTestcaseSetsRequest) Reset() {
 	*x = GetTestcaseSetsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[14]
+		mi := &file_backend_v1_messages_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -717,7 +836,7 @@ func (x *GetTestcaseSetsRequest) String() string {
 func (*GetTestcaseSetsRequest) ProtoMessage() {}
 
 func (x *GetTestcaseSetsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[14]
+	mi := &file_backend_v1_messages_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -730,7 +849,7 @@ func (x *GetTestcaseSetsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTestcaseSetsRequest.ProtoReflect.Descriptor instead.
 func (*GetTestcaseSetsRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{14}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GetTestcaseSetsRequest) GetTaskId() int32 {
@@ -752,7 +871,7 @@ type GetTestcaseSetsResponse struct {
 func (x *GetTestcaseSetsResponse) Reset() {
 	*x = GetTestcaseSetsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[15]
+		mi := &file_backend_v1_messages_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -765,7 +884,7 @@ func (x *GetTestcaseSetsResponse) String() string {
 func (*GetTestcaseSetsResponse) ProtoMessage() {}
 
 func (x *GetTestcaseSetsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[15]
+	mi := &file_backend_v1_messages_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -778,7 +897,7 @@ func (x *GetTestcaseSetsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTestcaseSetsResponse.ProtoReflect.Descriptor instead.
 func (*GetTestcaseSetsResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{15}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetTestcaseSetsResponse) GetTestcaseSets() []*TestcaseSet {
@@ -808,7 +927,7 @@ type SyncTestcaseSetsRequest struct {
 func (x *SyncTestcaseSetsRequest) Reset() {
 	*x = SyncTestcaseSetsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[16]
+		mi := &file_backend_v1_messages_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -821,7 +940,7 @@ func (x *SyncTestcaseSetsRequest) String() string {
 func (*SyncTestcaseSetsRequest) ProtoMessage() {}
 
 func (x *SyncTestcaseSetsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[16]
+	mi := &file_backend_v1_messages_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -834,7 +953,7 @@ func (x *SyncTestcaseSetsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncTestcaseSetsRequest.ProtoReflect.Descriptor instead.
 func (*SyncTestcaseSetsRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{16}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *SyncTestcaseSetsRequest) GetTaskId() int32 {
@@ -870,7 +989,7 @@ type SyncTestcaseSetsResponse struct {
 func (x *SyncTestcaseSetsResponse) Reset() {
 	*x = SyncTestcaseSetsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[17]
+		mi := &file_backend_v1_messages_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -883,7 +1002,7 @@ func (x *SyncTestcaseSetsResponse) String() string {
 func (*SyncTestcaseSetsResponse) ProtoMessage() {}
 
 func (x *SyncTestcaseSetsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[17]
+	mi := &file_backend_v1_messages_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -896,7 +1015,7 @@ func (x *SyncTestcaseSetsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncTestcaseSetsResponse.ProtoReflect.Descriptor instead.
 func (*SyncTestcaseSetsResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{17}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *SyncTestcaseSetsResponse) GetTestcaseSets() []*TestcaseSet {
@@ -924,7 +1043,7 @@ type PingRequest struct {
 func (x *PingRequest) Reset() {
 	*x = PingRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[18]
+		mi := &file_backend_v1_messages_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -937,7 +1056,7 @@ func (x *PingRequest) String() string {
 func (*PingRequest) ProtoMessage() {}
 
 func (x *PingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[18]
+	mi := &file_backend_v1_messages_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -950,7 +1069,7 @@ func (x *PingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PingRequest.ProtoReflect.Descriptor instead.
 func (*PingRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{18}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *PingRequest) GetName() string {
@@ -971,7 +1090,7 @@ type PingResponse struct {
 func (x *PingResponse) Reset() {
 	*x = PingResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[19]
+		mi := &file_backend_v1_messages_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -984,7 +1103,7 @@ func (x *PingResponse) String() string {
 func (*PingResponse) ProtoMessage() {}
 
 func (x *PingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[19]
+	mi := &file_backend_v1_messages_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -997,7 +1116,7 @@ func (x *PingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PingResponse.ProtoReflect.Descriptor instead.
 func (*PingResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{19}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *PingResponse) GetMessage() string {
@@ -1021,7 +1140,7 @@ type SubmitRequest struct {
 func (x *SubmitRequest) Reset() {
 	*x = SubmitRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[20]
+		mi := &file_backend_v1_messages_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1034,7 +1153,7 @@ func (x *SubmitRequest) String() string {
 func (*SubmitRequest) ProtoMessage() {}
 
 func (x *SubmitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[20]
+	mi := &file_backend_v1_messages_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1047,7 +1166,7 @@ func (x *SubmitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitRequest.ProtoReflect.Descriptor instead.
 func (*SubmitRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{20}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *SubmitRequest) GetContestId() int32 {
@@ -1089,7 +1208,7 @@ type SubmitResponse struct {
 func (x *SubmitResponse) Reset() {
 	*x = SubmitResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[21]
+		mi := &file_backend_v1_messages_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1102,7 +1221,7 @@ func (x *SubmitResponse) String() string {
 func (*SubmitResponse) ProtoMessage() {}
 
 func (x *SubmitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[21]
+	mi := &file_backend_v1_messages_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1115,7 +1234,7 @@ func (x *SubmitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitResponse.ProtoReflect.Descriptor instead.
 func (*SubmitResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{21}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *SubmitResponse) GetSubmissionId() int32 {
@@ -1136,7 +1255,7 @@ type GetSubmissionDetailRequest struct {
 func (x *GetSubmissionDetailRequest) Reset() {
 	*x = GetSubmissionDetailRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[22]
+		mi := &file_backend_v1_messages_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1149,7 +1268,7 @@ func (x *GetSubmissionDetailRequest) String() string {
 func (*GetSubmissionDetailRequest) ProtoMessage() {}
 
 func (x *GetSubmissionDetailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[22]
+	mi := &file_backend_v1_messages_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1162,7 +1281,7 @@ func (x *GetSubmissionDetailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSubmissionDetailRequest.ProtoReflect.Descriptor instead.
 func (*GetSubmissionDetailRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{22}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GetSubmissionDetailRequest) GetId() int32 {
@@ -1183,7 +1302,7 @@ type GetSubmissionDetailResponse struct {
 func (x *GetSubmissionDetailResponse) Reset() {
 	*x = GetSubmissionDetailResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[23]
+		mi := &file_backend_v1_messages_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1196,7 +1315,7 @@ func (x *GetSubmissionDetailResponse) String() string {
 func (*GetSubmissionDetailResponse) ProtoMessage() {}
 
 func (x *GetSubmissionDetailResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[23]
+	mi := &file_backend_v1_messages_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1209,7 +1328,7 @@ func (x *GetSubmissionDetailResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSubmissionDetailResponse.ProtoReflect.Descriptor instead.
 func (*GetSubmissionDetailResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{23}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GetSubmissionDetailResponse) GetSubmissionDetail() *SubmissionDetail {
@@ -1231,7 +1350,7 @@ type ListSubmissionsRequest struct {
 func (x *ListSubmissionsRequest) Reset() {
 	*x = ListSubmissionsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[24]
+		mi := &file_backend_v1_messages_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1244,7 +1363,7 @@ func (x *ListSubmissionsRequest) String() string {
 func (*ListSubmissionsRequest) ProtoMessage() {}
 
 func (x *ListSubmissionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[24]
+	mi := &file_backend_v1_messages_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1257,7 +1376,7 @@ func (x *ListSubmissionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSubmissionsRequest.ProtoReflect.Descriptor instead.
 func (*ListSubmissionsRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{24}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ListSubmissionsRequest) GetContestId() int32 {
@@ -1285,7 +1404,7 @@ type ListSubmissionsResponse struct {
 func (x *ListSubmissionsResponse) Reset() {
 	*x = ListSubmissionsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[25]
+		mi := &file_backend_v1_messages_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1298,7 +1417,7 @@ func (x *ListSubmissionsResponse) String() string {
 func (*ListSubmissionsResponse) ProtoMessage() {}
 
 func (x *ListSubmissionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[25]
+	mi := &file_backend_v1_messages_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1311,7 +1430,7 @@ func (x *ListSubmissionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSubmissionsResponse.ProtoReflect.Descriptor instead.
 func (*ListSubmissionsResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{25}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ListSubmissionsResponse) GetSubmissions() []*SubmissionSummary {
@@ -1332,7 +1451,7 @@ type GetJudgeProgressRequest struct {
 func (x *GetJudgeProgressRequest) Reset() {
 	*x = GetJudgeProgressRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[26]
+		mi := &file_backend_v1_messages_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1345,7 +1464,7 @@ func (x *GetJudgeProgressRequest) String() string {
 func (*GetJudgeProgressRequest) ProtoMessage() {}
 
 func (x *GetJudgeProgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[26]
+	mi := &file_backend_v1_messages_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1358,7 +1477,7 @@ func (x *GetJudgeProgressRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetJudgeProgressRequest.ProtoReflect.Descriptor instead.
 func (*GetJudgeProgressRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{26}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GetJudgeProgressRequest) GetSubmissionId() int32 {
@@ -1379,7 +1498,7 @@ type GetJudgeProgressResponse struct {
 func (x *GetJudgeProgressResponse) Reset() {
 	*x = GetJudgeProgressResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[27]
+		mi := &file_backend_v1_messages_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1392,7 +1511,7 @@ func (x *GetJudgeProgressResponse) String() string {
 func (*GetJudgeProgressResponse) ProtoMessage() {}
 
 func (x *GetJudgeProgressResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[27]
+	mi := &file_backend_v1_messages_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1405,7 +1524,7 @@ func (x *GetJudgeProgressResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetJudgeProgressResponse.ProtoReflect.Descriptor instead.
 func (*GetJudgeProgressResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{27}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GetJudgeProgressResponse) GetJudgeProgress() *JudgeProgress {
@@ -1430,7 +1549,7 @@ type CreateContestRequest struct {
 func (x *CreateContestRequest) Reset() {
 	*x = CreateContestRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[28]
+		mi := &file_backend_v1_messages_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1443,7 +1562,7 @@ func (x *CreateContestRequest) String() string {
 func (*CreateContestRequest) ProtoMessage() {}
 
 func (x *CreateContestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[28]
+	mi := &file_backend_v1_messages_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1456,7 +1575,7 @@ func (x *CreateContestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateContestRequest.ProtoReflect.Descriptor instead.
 func (*CreateContestRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{28}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *CreateContestRequest) GetName() string {
@@ -1505,7 +1624,7 @@ type CreateContestResponse struct {
 func (x *CreateContestResponse) Reset() {
 	*x = CreateContestResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[29]
+		mi := &file_backend_v1_messages_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1518,7 +1637,7 @@ func (x *CreateContestResponse) String() string {
 func (*CreateContestResponse) ProtoMessage() {}
 
 func (x *CreateContestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[29]
+	mi := &file_backend_v1_messages_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1531,7 +1650,7 @@ func (x *CreateContestResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateContestResponse.ProtoReflect.Descriptor instead.
 func (*CreateContestResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{29}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *CreateContestResponse) GetContest() *Contest {
@@ -1552,7 +1671,7 @@ type GetContestRequest struct {
 func (x *GetContestRequest) Reset() {
 	*x = GetContestRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[30]
+		mi := &file_backend_v1_messages_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1565,7 +1684,7 @@ func (x *GetContestRequest) String() string {
 func (*GetContestRequest) ProtoMessage() {}
 
 func (x *GetContestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[30]
+	mi := &file_backend_v1_messages_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1578,7 +1697,7 @@ func (x *GetContestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetContestRequest.ProtoReflect.Descriptor instead.
 func (*GetContestRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{30}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *GetContestRequest) GetSlug() string {
@@ -1599,7 +1718,7 @@ type GetContestResponse struct {
 func (x *GetContestResponse) Reset() {
 	*x = GetContestResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[31]
+		mi := &file_backend_v1_messages_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1612,7 +1731,7 @@ func (x *GetContestResponse) String() string {
 func (*GetContestResponse) ProtoMessage() {}
 
 func (x *GetContestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[31]
+	mi := &file_backend_v1_messages_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1625,7 +1744,7 @@ func (x *GetContestResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetContestResponse.ProtoReflect.Descriptor instead.
 func (*GetContestResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{31}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *GetContestResponse) GetContest() *Contest {
@@ -1644,7 +1763,7 @@ type ListContestsRequest struct {
 func (x *ListContestsRequest) Reset() {
 	*x = ListContestsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[32]
+		mi := &file_backend_v1_messages_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1657,7 +1776,7 @@ func (x *ListContestsRequest) String() string {
 func (*ListContestsRequest) ProtoMessage() {}
 
 func (x *ListContestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[32]
+	mi := &file_backend_v1_messages_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1670,7 +1789,7 @@ func (x *ListContestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListContestsRequest.ProtoReflect.Descriptor instead.
 func (*ListContestsRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{32}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{34}
 }
 
 type ListContestsResponse struct {
@@ -1684,7 +1803,7 @@ type ListContestsResponse struct {
 func (x *ListContestsResponse) Reset() {
 	*x = ListContestsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[33]
+		mi := &file_backend_v1_messages_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1697,7 +1816,7 @@ func (x *ListContestsResponse) String() string {
 func (*ListContestsResponse) ProtoMessage() {}
 
 func (x *ListContestsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[33]
+	mi := &file_backend_v1_messages_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1710,7 +1829,7 @@ func (x *ListContestsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListContestsResponse.ProtoReflect.Descriptor instead.
 func (*ListContestsResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{33}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *ListContestsResponse) GetContests() []*Contest {
@@ -1731,7 +1850,7 @@ type GetStandingsRequest struct {
 func (x *GetStandingsRequest) Reset() {
 	*x = GetStandingsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[34]
+		mi := &file_backend_v1_messages_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1744,7 +1863,7 @@ func (x *GetStandingsRequest) String() string {
 func (*GetStandingsRequest) ProtoMessage() {}
 
 func (x *GetStandingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[34]
+	mi := &file_backend_v1_messages_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1757,7 +1876,7 @@ func (x *GetStandingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStandingsRequest.ProtoReflect.Descriptor instead.
 func (*GetStandingsRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{34}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetStandingsRequest) GetContestId() int32 {
@@ -1778,7 +1897,7 @@ type GetStandingsResponse struct {
 func (x *GetStandingsResponse) Reset() {
 	*x = GetStandingsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[35]
+		mi := &file_backend_v1_messages_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1791,7 +1910,7 @@ func (x *GetStandingsResponse) String() string {
 func (*GetStandingsResponse) ProtoMessage() {}
 
 func (x *GetStandingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[35]
+	mi := &file_backend_v1_messages_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1804,7 +1923,7 @@ func (x *GetStandingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStandingsResponse.ProtoReflect.Descriptor instead.
 func (*GetStandingsResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{35}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *GetStandingsResponse) GetStandingsList() []*StandingsElement {
@@ -1827,7 +1946,7 @@ type CreateClarificationRequest struct {
 func (x *CreateClarificationRequest) Reset() {
 	*x = CreateClarificationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[36]
+		mi := &file_backend_v1_messages_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1840,7 +1959,7 @@ func (x *CreateClarificationRequest) String() string {
 func (*CreateClarificationRequest) ProtoMessage() {}
 
 func (x *CreateClarificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[36]
+	mi := &file_backend_v1_messages_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1853,7 +1972,7 @@ func (x *CreateClarificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateClarificationRequest.ProtoReflect.Descriptor instead.
 func (*CreateClarificationRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{36}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *CreateClarificationRequest) GetUserId() int32 {
@@ -1888,7 +2007,7 @@ type CreateClarificationResponse struct {
 func (x *CreateClarificationResponse) Reset() {
 	*x = CreateClarificationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[37]
+		mi := &file_backend_v1_messages_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1901,7 +2020,7 @@ func (x *CreateClarificationResponse) String() string {
 func (*CreateClarificationResponse) ProtoMessage() {}
 
 func (x *CreateClarificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[37]
+	mi := &file_backend_v1_messages_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1914,7 +2033,7 @@ func (x *CreateClarificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateClarificationResponse.ProtoReflect.Descriptor instead.
 func (*CreateClarificationResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{37}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *CreateClarificationResponse) GetClarification() *Clarification {
@@ -1935,7 +2054,7 @@ type GetClarificationRequest struct {
 func (x *GetClarificationRequest) Reset() {
 	*x = GetClarificationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[38]
+		mi := &file_backend_v1_messages_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1948,7 +2067,7 @@ func (x *GetClarificationRequest) String() string {
 func (*GetClarificationRequest) ProtoMessage() {}
 
 func (x *GetClarificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[38]
+	mi := &file_backend_v1_messages_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1961,7 +2080,7 @@ func (x *GetClarificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetClarificationRequest.ProtoReflect.Descriptor instead.
 func (*GetClarificationRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{38}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *GetClarificationRequest) GetId() int32 {
@@ -1982,7 +2101,7 @@ type GetClarificationResponse struct {
 func (x *GetClarificationResponse) Reset() {
 	*x = GetClarificationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[39]
+		mi := &file_backend_v1_messages_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1995,7 +2114,7 @@ func (x *GetClarificationResponse) String() string {
 func (*GetClarificationResponse) ProtoMessage() {}
 
 func (x *GetClarificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[39]
+	mi := &file_backend_v1_messages_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2008,7 +2127,7 @@ func (x *GetClarificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetClarificationResponse.ProtoReflect.Descriptor instead.
 func (*GetClarificationResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{39}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *GetClarificationResponse) GetClarification() *Clarification {
@@ -2027,7 +2146,7 @@ type ListClarificationsRequest struct {
 func (x *ListClarificationsRequest) Reset() {
 	*x = ListClarificationsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[40]
+		mi := &file_backend_v1_messages_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2040,7 +2159,7 @@ func (x *ListClarificationsRequest) String() string {
 func (*ListClarificationsRequest) ProtoMessage() {}
 
 func (x *ListClarificationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[40]
+	mi := &file_backend_v1_messages_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2053,7 +2172,7 @@ func (x *ListClarificationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListClarificationsRequest.ProtoReflect.Descriptor instead.
 func (*ListClarificationsRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{40}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{42}
 }
 
 type ListClarificationsResponse struct {
@@ -2067,7 +2186,7 @@ type ListClarificationsResponse struct {
 func (x *ListClarificationsResponse) Reset() {
 	*x = ListClarificationsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[41]
+		mi := &file_backend_v1_messages_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2080,7 +2199,7 @@ func (x *ListClarificationsResponse) String() string {
 func (*ListClarificationsResponse) ProtoMessage() {}
 
 func (x *ListClarificationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[41]
+	mi := &file_backend_v1_messages_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2093,7 +2212,7 @@ func (x *ListClarificationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListClarificationsResponse.ProtoReflect.Descriptor instead.
 func (*ListClarificationsResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{41}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ListClarificationsResponse) GetClarifications() []*Clarification {
@@ -2116,7 +2235,7 @@ type UpdateClarificationRequest struct {
 func (x *UpdateClarificationRequest) Reset() {
 	*x = UpdateClarificationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[42]
+		mi := &file_backend_v1_messages_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2129,7 +2248,7 @@ func (x *UpdateClarificationRequest) String() string {
 func (*UpdateClarificationRequest) ProtoMessage() {}
 
 func (x *UpdateClarificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[42]
+	mi := &file_backend_v1_messages_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2142,7 +2261,7 @@ func (x *UpdateClarificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateClarificationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateClarificationRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{42}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *UpdateClarificationRequest) GetId() int32 {
@@ -2177,7 +2296,7 @@ type UpdateClarificationResponse struct {
 func (x *UpdateClarificationResponse) Reset() {
 	*x = UpdateClarificationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[43]
+		mi := &file_backend_v1_messages_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2190,7 +2309,7 @@ func (x *UpdateClarificationResponse) String() string {
 func (*UpdateClarificationResponse) ProtoMessage() {}
 
 func (x *UpdateClarificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[43]
+	mi := &file_backend_v1_messages_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2203,7 +2322,7 @@ func (x *UpdateClarificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateClarificationResponse.ProtoReflect.Descriptor instead.
 func (*UpdateClarificationResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{43}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *UpdateClarificationResponse) GetClarification() *Clarification {
@@ -2224,7 +2343,7 @@ type DeleteClarificationRequest struct {
 func (x *DeleteClarificationRequest) Reset() {
 	*x = DeleteClarificationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[44]
+		mi := &file_backend_v1_messages_proto_msgTypes[46]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2237,7 +2356,7 @@ func (x *DeleteClarificationRequest) String() string {
 func (*DeleteClarificationRequest) ProtoMessage() {}
 
 func (x *DeleteClarificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[44]
+	mi := &file_backend_v1_messages_proto_msgTypes[46]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2250,7 +2369,7 @@ func (x *DeleteClarificationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteClarificationRequest.ProtoReflect.Descriptor instead.
 func (*DeleteClarificationRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{44}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *DeleteClarificationRequest) GetId() int32 {
@@ -2269,7 +2388,7 @@ type DeleteClarificationResponse struct {
 func (x *DeleteClarificationResponse) Reset() {
 	*x = DeleteClarificationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[45]
+		mi := &file_backend_v1_messages_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2282,7 +2401,7 @@ func (x *DeleteClarificationResponse) String() string {
 func (*DeleteClarificationResponse) ProtoMessage() {}
 
 func (x *DeleteClarificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[45]
+	mi := &file_backend_v1_messages_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2295,7 +2414,7 @@ func (x *DeleteClarificationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteClarificationResponse.ProtoReflect.Descriptor instead.
 func (*DeleteClarificationResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{45}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{47}
 }
 
 type CreateAnswerRequest struct {
@@ -2311,7 +2430,7 @@ type CreateAnswerRequest struct {
 func (x *CreateAnswerRequest) Reset() {
 	*x = CreateAnswerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[46]
+		mi := &file_backend_v1_messages_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2324,7 +2443,7 @@ func (x *CreateAnswerRequest) String() string {
 func (*CreateAnswerRequest) ProtoMessage() {}
 
 func (x *CreateAnswerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[46]
+	mi := &file_backend_v1_messages_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2337,7 +2456,7 @@ func (x *CreateAnswerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAnswerRequest.ProtoReflect.Descriptor instead.
 func (*CreateAnswerRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{46}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *CreateAnswerRequest) GetClarificationId() int32 {
@@ -2372,7 +2491,7 @@ type CreateAnswerResponse struct {
 func (x *CreateAnswerResponse) Reset() {
 	*x = CreateAnswerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[47]
+		mi := &file_backend_v1_messages_proto_msgTypes[49]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2385,7 +2504,7 @@ func (x *CreateAnswerResponse) String() string {
 func (*CreateAnswerResponse) ProtoMessage() {}
 
 func (x *CreateAnswerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[47]
+	mi := &file_backend_v1_messages_proto_msgTypes[49]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2398,7 +2517,7 @@ func (x *CreateAnswerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAnswerResponse.ProtoReflect.Descriptor instead.
 func (*CreateAnswerResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{47}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *CreateAnswerResponse) GetAnswer() *Clarification_Answer {
@@ -2419,7 +2538,7 @@ type GetAnswerRequest struct {
 func (x *GetAnswerRequest) Reset() {
 	*x = GetAnswerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[48]
+		mi := &file_backend_v1_messages_proto_msgTypes[50]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2432,7 +2551,7 @@ func (x *GetAnswerRequest) String() string {
 func (*GetAnswerRequest) ProtoMessage() {}
 
 func (x *GetAnswerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[48]
+	mi := &file_backend_v1_messages_proto_msgTypes[50]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2445,7 +2564,7 @@ func (x *GetAnswerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAnswerRequest.ProtoReflect.Descriptor instead.
 func (*GetAnswerRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{48}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *GetAnswerRequest) GetAnswerId() int32 {
@@ -2466,7 +2585,7 @@ type GetAnswerResponse struct {
 func (x *GetAnswerResponse) Reset() {
 	*x = GetAnswerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[49]
+		mi := &file_backend_v1_messages_proto_msgTypes[51]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2479,7 +2598,7 @@ func (x *GetAnswerResponse) String() string {
 func (*GetAnswerResponse) ProtoMessage() {}
 
 func (x *GetAnswerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[49]
+	mi := &file_backend_v1_messages_proto_msgTypes[51]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2492,7 +2611,7 @@ func (x *GetAnswerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAnswerResponse.ProtoReflect.Descriptor instead.
 func (*GetAnswerResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{49}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *GetAnswerResponse) GetAnswer() *Clarification_Answer {
@@ -2514,7 +2633,7 @@ type UpdateAnswerRequest struct {
 func (x *UpdateAnswerRequest) Reset() {
 	*x = UpdateAnswerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[50]
+		mi := &file_backend_v1_messages_proto_msgTypes[52]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2527,7 +2646,7 @@ func (x *UpdateAnswerRequest) String() string {
 func (*UpdateAnswerRequest) ProtoMessage() {}
 
 func (x *UpdateAnswerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[50]
+	mi := &file_backend_v1_messages_proto_msgTypes[52]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2540,7 +2659,7 @@ func (x *UpdateAnswerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAnswerRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAnswerRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{50}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *UpdateAnswerRequest) GetAnswerId() int32 {
@@ -2568,7 +2687,7 @@ type UpdateAnswerResponse struct {
 func (x *UpdateAnswerResponse) Reset() {
 	*x = UpdateAnswerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[51]
+		mi := &file_backend_v1_messages_proto_msgTypes[53]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2581,7 +2700,7 @@ func (x *UpdateAnswerResponse) String() string {
 func (*UpdateAnswerResponse) ProtoMessage() {}
 
 func (x *UpdateAnswerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[51]
+	mi := &file_backend_v1_messages_proto_msgTypes[53]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2594,7 +2713,7 @@ func (x *UpdateAnswerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAnswerResponse.ProtoReflect.Descriptor instead.
 func (*UpdateAnswerResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{51}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *UpdateAnswerResponse) GetAnswer() *Clarification_Answer {
@@ -2615,7 +2734,7 @@ type DeleteAnswerRequest struct {
 func (x *DeleteAnswerRequest) Reset() {
 	*x = DeleteAnswerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[52]
+		mi := &file_backend_v1_messages_proto_msgTypes[54]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2628,7 +2747,7 @@ func (x *DeleteAnswerRequest) String() string {
 func (*DeleteAnswerRequest) ProtoMessage() {}
 
 func (x *DeleteAnswerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[52]
+	mi := &file_backend_v1_messages_proto_msgTypes[54]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2641,7 +2760,7 @@ func (x *DeleteAnswerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAnswerRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAnswerRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{52}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *DeleteAnswerRequest) GetAnswerId() int32 {
@@ -2660,7 +2779,7 @@ type DeleteAnswerResponse struct {
 func (x *DeleteAnswerResponse) Reset() {
 	*x = DeleteAnswerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[53]
+		mi := &file_backend_v1_messages_proto_msgTypes[55]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2673,7 +2792,7 @@ func (x *DeleteAnswerResponse) String() string {
 func (*DeleteAnswerResponse) ProtoMessage() {}
 
 func (x *DeleteAnswerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[53]
+	mi := &file_backend_v1_messages_proto_msgTypes[55]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2686,7 +2805,7 @@ func (x *DeleteAnswerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAnswerResponse.ProtoReflect.Descriptor instead.
 func (*DeleteAnswerResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{53}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{55}
 }
 
 type ListContestTasksRequest struct {
@@ -2700,7 +2819,7 @@ type ListContestTasksRequest struct {
 func (x *ListContestTasksRequest) Reset() {
 	*x = ListContestTasksRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[54]
+		mi := &file_backend_v1_messages_proto_msgTypes[56]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2713,7 +2832,7 @@ func (x *ListContestTasksRequest) String() string {
 func (*ListContestTasksRequest) ProtoMessage() {}
 
 func (x *ListContestTasksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[54]
+	mi := &file_backend_v1_messages_proto_msgTypes[56]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2726,7 +2845,7 @@ func (x *ListContestTasksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListContestTasksRequest.ProtoReflect.Descriptor instead.
 func (*ListContestTasksRequest) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{54}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *ListContestTasksRequest) GetContestSlug() string {
@@ -2747,7 +2866,7 @@ type ListContestTasksResponse struct {
 func (x *ListContestTasksResponse) Reset() {
 	*x = ListContestTasksResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_backend_v1_messages_proto_msgTypes[55]
+		mi := &file_backend_v1_messages_proto_msgTypes[57]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2760,7 +2879,7 @@ func (x *ListContestTasksResponse) String() string {
 func (*ListContestTasksResponse) ProtoMessage() {}
 
 func (x *ListContestTasksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_v1_messages_proto_msgTypes[55]
+	mi := &file_backend_v1_messages_proto_msgTypes[57]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2773,7 +2892,7 @@ func (x *ListContestTasksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListContestTasksResponse.ProtoReflect.Descriptor instead.
 func (*ListContestTasksResponse) Descriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{55}
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *ListContestTasksResponse) GetTasks() []*ContestTask {
@@ -2813,11 +2932,26 @@ var file_backend_v1_messages_proto_rawDesc = []byte{
 	0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73,
 	0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f,
 	0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f,
-	0x72, 0x64, 0x22, 0x35, 0x0a, 0x0d, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x72, 0x64, 0x22, 0x7d, 0x0a, 0x0d, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x10, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x55,
-	0x73, 0x65, 0x72, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x22, 0x0f, 0x0a, 0x0d, 0x4c, 0x6f, 0x67,
-	0x6f, 0x75, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x10, 0x0a, 0x0e, 0x4c, 0x6f,
+	0x73, 0x65, 0x72, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x12, 0x21, 0x0a, 0x0c, 0x61, 0x63, 0x63,
+	0x65, 0x73, 0x73, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0b, 0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x23, 0x0a, 0x0d,
+	0x72, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0c, 0x72, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x54, 0x6f, 0x6b, 0x65,
+	0x6e, 0x22, 0x40, 0x0a, 0x19, 0x52, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x41, 0x63, 0x63, 0x65,
+	0x73, 0x73, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x23,
+	0x0a, 0x0d, 0x72, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x72, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x54, 0x6f,
+	0x6b, 0x65, 0x6e, 0x22, 0x3f, 0x0a, 0x1a, 0x52, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x41, 0x63,
+	0x63, 0x65, 0x73, 0x73, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x21, 0x0a, 0x0c, 0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x5f, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x54,
+	0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x34, 0x0a, 0x0d, 0x4c, 0x6f, 0x67, 0x6f, 0x75, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x23, 0x0a, 0x0d, 0x72, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68,
+	0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x72, 0x65,
+	0x66, 0x72, 0x65, 0x73, 0x68, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x10, 0x0a, 0x0e, 0x4c, 0x6f,
 	0x67, 0x6f, 0x75, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x41, 0x0a, 0x11,
 	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x12, 0x2c, 0x0a, 0x04, 0x74, 0x61, 0x73, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
@@ -3081,7 +3215,7 @@ func file_backend_v1_messages_proto_rawDescGZIP() []byte {
 	return file_backend_v1_messages_proto_rawDescData
 }
 
-var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 56)
+var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 58)
 var file_backend_v1_messages_proto_goTypes = []interface{}{
 	(*GetUserRequest)(nil),              // 0: backend.v1.GetUserRequest
 	(*GetUserResponse)(nil),             // 1: backend.v1.GetUserResponse
@@ -3089,105 +3223,107 @@ var file_backend_v1_messages_proto_goTypes = []interface{}{
 	(*CreateUserResponse)(nil),          // 3: backend.v1.CreateUserResponse
 	(*LoginRequest)(nil),                // 4: backend.v1.LoginRequest
 	(*LoginResponse)(nil),               // 5: backend.v1.LoginResponse
-	(*LogoutRequest)(nil),               // 6: backend.v1.LogoutRequest
-	(*LogoutResponse)(nil),              // 7: backend.v1.LogoutResponse
-	(*CreateTaskRequest)(nil),           // 8: backend.v1.CreateTaskRequest
-	(*CreateTaskResponse)(nil),          // 9: backend.v1.CreateTaskResponse
-	(*GetTaskRequest)(nil),              // 10: backend.v1.GetTaskRequest
-	(*GetTaskResponse)(nil),             // 11: backend.v1.GetTaskResponse
-	(*UpdateTaskRequest)(nil),           // 12: backend.v1.UpdateTaskRequest
-	(*UpdateTaskResponse)(nil),          // 13: backend.v1.UpdateTaskResponse
-	(*GetTestcaseSetsRequest)(nil),      // 14: backend.v1.GetTestcaseSetsRequest
-	(*GetTestcaseSetsResponse)(nil),     // 15: backend.v1.GetTestcaseSetsResponse
-	(*SyncTestcaseSetsRequest)(nil),     // 16: backend.v1.SyncTestcaseSetsRequest
-	(*SyncTestcaseSetsResponse)(nil),    // 17: backend.v1.SyncTestcaseSetsResponse
-	(*PingRequest)(nil),                 // 18: backend.v1.PingRequest
-	(*PingResponse)(nil),                // 19: backend.v1.PingResponse
-	(*SubmitRequest)(nil),               // 20: backend.v1.SubmitRequest
-	(*SubmitResponse)(nil),              // 21: backend.v1.SubmitResponse
-	(*GetSubmissionDetailRequest)(nil),  // 22: backend.v1.GetSubmissionDetailRequest
-	(*GetSubmissionDetailResponse)(nil), // 23: backend.v1.GetSubmissionDetailResponse
-	(*ListSubmissionsRequest)(nil),      // 24: backend.v1.ListSubmissionsRequest
-	(*ListSubmissionsResponse)(nil),     // 25: backend.v1.ListSubmissionsResponse
-	(*GetJudgeProgressRequest)(nil),     // 26: backend.v1.GetJudgeProgressRequest
-	(*GetJudgeProgressResponse)(nil),    // 27: backend.v1.GetJudgeProgressResponse
-	(*CreateContestRequest)(nil),        // 28: backend.v1.CreateContestRequest
-	(*CreateContestResponse)(nil),       // 29: backend.v1.CreateContestResponse
-	(*GetContestRequest)(nil),           // 30: backend.v1.GetContestRequest
-	(*GetContestResponse)(nil),          // 31: backend.v1.GetContestResponse
-	(*ListContestsRequest)(nil),         // 32: backend.v1.ListContestsRequest
-	(*ListContestsResponse)(nil),        // 33: backend.v1.ListContestsResponse
-	(*GetStandingsRequest)(nil),         // 34: backend.v1.GetStandingsRequest
-	(*GetStandingsResponse)(nil),        // 35: backend.v1.GetStandingsResponse
-	(*CreateClarificationRequest)(nil),  // 36: backend.v1.CreateClarificationRequest
-	(*CreateClarificationResponse)(nil), // 37: backend.v1.CreateClarificationResponse
-	(*GetClarificationRequest)(nil),     // 38: backend.v1.GetClarificationRequest
-	(*GetClarificationResponse)(nil),    // 39: backend.v1.GetClarificationResponse
-	(*ListClarificationsRequest)(nil),   // 40: backend.v1.ListClarificationsRequest
-	(*ListClarificationsResponse)(nil),  // 41: backend.v1.ListClarificationsResponse
-	(*UpdateClarificationRequest)(nil),  // 42: backend.v1.UpdateClarificationRequest
-	(*UpdateClarificationResponse)(nil), // 43: backend.v1.UpdateClarificationResponse
-	(*DeleteClarificationRequest)(nil),  // 44: backend.v1.DeleteClarificationRequest
-	(*DeleteClarificationResponse)(nil), // 45: backend.v1.DeleteClarificationResponse
-	(*CreateAnswerRequest)(nil),         // 46: backend.v1.CreateAnswerRequest
-	(*CreateAnswerResponse)(nil),        // 47: backend.v1.CreateAnswerResponse
-	(*GetAnswerRequest)(nil),            // 48: backend.v1.GetAnswerRequest
-	(*GetAnswerResponse)(nil),           // 49: backend.v1.GetAnswerResponse
-	(*UpdateAnswerRequest)(nil),         // 50: backend.v1.UpdateAnswerRequest
-	(*UpdateAnswerResponse)(nil),        // 51: backend.v1.UpdateAnswerResponse
-	(*DeleteAnswerRequest)(nil),         // 52: backend.v1.DeleteAnswerRequest
-	(*DeleteAnswerResponse)(nil),        // 53: backend.v1.DeleteAnswerResponse
-	(*ListContestTasksRequest)(nil),     // 54: backend.v1.ListContestTasksRequest
-	(*ListContestTasksResponse)(nil),    // 55: backend.v1.ListContestTasksResponse
-	(*User)(nil),                        // 56: backend.v1.User
-	(*MutationTask)(nil),                // 57: backend.v1.MutationTask
-	(*Task)(nil),                        // 58: backend.v1.Task
-	(*TestcaseSet)(nil),                 // 59: backend.v1.TestcaseSet
-	(*Testcase)(nil),                    // 60: backend.v1.Testcase
-	(*MutationTestcaseSet)(nil),         // 61: backend.v1.MutationTestcaseSet
-	(*MutationTestcase)(nil),            // 62: backend.v1.MutationTestcase
-	(*SubmissionDetail)(nil),            // 63: backend.v1.SubmissionDetail
-	(*SubmissionSummary)(nil),           // 64: backend.v1.SubmissionSummary
-	(*JudgeProgress)(nil),               // 65: backend.v1.JudgeProgress
-	(*timestamppb.Timestamp)(nil),       // 66: google.protobuf.Timestamp
-	(*Contest)(nil),                     // 67: backend.v1.Contest
-	(*StandingsElement)(nil),            // 68: backend.v1.StandingsElement
-	(*Clarification)(nil),               // 69: backend.v1.Clarification
-	(*Clarification_Answer)(nil),        // 70: backend.v1.Clarification.Answer
-	(*ContestTask)(nil),                 // 71: backend.v1.ContestTask
+	(*RefreshAccessTokenRequest)(nil),   // 6: backend.v1.RefreshAccessTokenRequest
+	(*RefreshAccessTokenResponse)(nil),  // 7: backend.v1.RefreshAccessTokenResponse
+	(*LogoutRequest)(nil),               // 8: backend.v1.LogoutRequest
+	(*LogoutResponse)(nil),              // 9: backend.v1.LogoutResponse
+	(*CreateTaskRequest)(nil),           // 10: backend.v1.CreateTaskRequest
+	(*CreateTaskResponse)(nil),          // 11: backend.v1.CreateTaskResponse
+	(*GetTaskRequest)(nil),              // 12: backend.v1.GetTaskRequest
+	(*GetTaskResponse)(nil),             // 13: backend.v1.GetTaskResponse
+	(*UpdateTaskRequest)(nil),           // 14: backend.v1.UpdateTaskRequest
+	(*UpdateTaskResponse)(nil),          // 15: backend.v1.UpdateTaskResponse
+	(*GetTestcaseSetsRequest)(nil),      // 16: backend.v1.GetTestcaseSetsRequest
+	(*GetTestcaseSetsResponse)(nil),     // 17: backend.v1.GetTestcaseSetsResponse
+	(*SyncTestcaseSetsRequest)(nil),     // 18: backend.v1.SyncTestcaseSetsRequest
+	(*SyncTestcaseSetsResponse)(nil),    // 19: backend.v1.SyncTestcaseSetsResponse
+	(*PingRequest)(nil),                 // 20: backend.v1.PingRequest
+	(*PingResponse)(nil),                // 21: backend.v1.PingResponse
+	(*SubmitRequest)(nil),               // 22: backend.v1.SubmitRequest
+	(*SubmitResponse)(nil),              // 23: backend.v1.SubmitResponse
+	(*GetSubmissionDetailRequest)(nil),  // 24: backend.v1.GetSubmissionDetailRequest
+	(*GetSubmissionDetailResponse)(nil), // 25: backend.v1.GetSubmissionDetailResponse
+	(*ListSubmissionsRequest)(nil),      // 26: backend.v1.ListSubmissionsRequest
+	(*ListSubmissionsResponse)(nil),     // 27: backend.v1.ListSubmissionsResponse
+	(*GetJudgeProgressRequest)(nil),     // 28: backend.v1.GetJudgeProgressRequest
+	(*GetJudgeProgressResponse)(nil),    // 29: backend.v1.GetJudgeProgressResponse
+	(*CreateContestRequest)(nil),        // 30: backend.v1.CreateContestRequest
+	(*CreateContestResponse)(nil),       // 31: backend.v1.CreateContestResponse
+	(*GetContestRequest)(nil),           // 32: backend.v1.GetContestRequest
+	(*GetContestResponse)(nil),          // 33: backend.v1.GetContestResponse
+	(*ListContestsRequest)(nil),         // 34: backend.v1.ListContestsRequest
+	(*ListContestsResponse)(nil),        // 35: backend.v1.ListContestsResponse
+	(*GetStandingsRequest)(nil),         // 36: backend.v1.GetStandingsRequest
+	(*GetStandingsResponse)(nil),        // 37: backend.v1.GetStandingsResponse
+	(*CreateClarificationRequest)(nil),  // 38: backend.v1.CreateClarificationRequest
+	(*CreateClarificationResponse)(nil), // 39: backend.v1.CreateClarificationResponse
+	(*GetClarificationRequest)(nil),     // 40: backend.v1.GetClarificationRequest
+	(*GetClarificationResponse)(nil),    // 41: backend.v1.GetClarificationResponse
+	(*ListClarificationsRequest)(nil),   // 42: backend.v1.ListClarificationsRequest
+	(*ListClarificationsResponse)(nil),  // 43: backend.v1.ListClarificationsResponse
+	(*UpdateClarificationRequest)(nil),  // 44: backend.v1.UpdateClarificationRequest
+	(*UpdateClarificationResponse)(nil), // 45: backend.v1.UpdateClarificationResponse
+	(*DeleteClarificationRequest)(nil),  // 46: backend.v1.DeleteClarificationRequest
+	(*DeleteClarificationResponse)(nil), // 47: backend.v1.DeleteClarificationResponse
+	(*CreateAnswerRequest)(nil),         // 48: backend.v1.CreateAnswerRequest
+	(*CreateAnswerResponse)(nil),        // 49: backend.v1.CreateAnswerResponse
+	(*GetAnswerRequest)(nil),            // 50: backend.v1.GetAnswerRequest
+	(*GetAnswerResponse)(nil),           // 51: backend.v1.GetAnswerResponse
+	(*UpdateAnswerRequest)(nil),         // 52: backend.v1.UpdateAnswerRequest
+	(*UpdateAnswerResponse)(nil),        // 53: backend.v1.UpdateAnswerResponse
+	(*DeleteAnswerRequest)(nil),         // 54: backend.v1.DeleteAnswerRequest
+	(*DeleteAnswerResponse)(nil),        // 55: backend.v1.DeleteAnswerResponse
+	(*ListContestTasksRequest)(nil),     // 56: backend.v1.ListContestTasksRequest
+	(*ListContestTasksResponse)(nil),    // 57: backend.v1.ListContestTasksResponse
+	(*User)(nil),                        // 58: backend.v1.User
+	(*MutationTask)(nil),                // 59: backend.v1.MutationTask
+	(*Task)(nil),                        // 60: backend.v1.Task
+	(*TestcaseSet)(nil),                 // 61: backend.v1.TestcaseSet
+	(*Testcase)(nil),                    // 62: backend.v1.Testcase
+	(*MutationTestcaseSet)(nil),         // 63: backend.v1.MutationTestcaseSet
+	(*MutationTestcase)(nil),            // 64: backend.v1.MutationTestcase
+	(*SubmissionDetail)(nil),            // 65: backend.v1.SubmissionDetail
+	(*SubmissionSummary)(nil),           // 66: backend.v1.SubmissionSummary
+	(*JudgeProgress)(nil),               // 67: backend.v1.JudgeProgress
+	(*timestamppb.Timestamp)(nil),       // 68: google.protobuf.Timestamp
+	(*Contest)(nil),                     // 69: backend.v1.Contest
+	(*StandingsElement)(nil),            // 70: backend.v1.StandingsElement
+	(*Clarification)(nil),               // 71: backend.v1.Clarification
+	(*Clarification_Answer)(nil),        // 72: backend.v1.Clarification.Answer
+	(*ContestTask)(nil),                 // 73: backend.v1.ContestTask
 }
 var file_backend_v1_messages_proto_depIdxs = []int32{
-	56, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
-	56, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
-	56, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
-	57, // 3: backend.v1.CreateTaskRequest.task:type_name -> backend.v1.MutationTask
-	58, // 4: backend.v1.CreateTaskResponse.task:type_name -> backend.v1.Task
-	58, // 5: backend.v1.GetTaskResponse.task:type_name -> backend.v1.Task
-	57, // 6: backend.v1.UpdateTaskRequest.task:type_name -> backend.v1.MutationTask
-	58, // 7: backend.v1.UpdateTaskResponse.task:type_name -> backend.v1.Task
-	59, // 8: backend.v1.GetTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
-	60, // 9: backend.v1.GetTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
-	61, // 10: backend.v1.SyncTestcaseSetsRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
-	62, // 11: backend.v1.SyncTestcaseSetsRequest.testcases:type_name -> backend.v1.MutationTestcase
-	59, // 12: backend.v1.SyncTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
-	60, // 13: backend.v1.SyncTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
-	63, // 14: backend.v1.GetSubmissionDetailResponse.submission_detail:type_name -> backend.v1.SubmissionDetail
-	64, // 15: backend.v1.ListSubmissionsResponse.submissions:type_name -> backend.v1.SubmissionSummary
-	65, // 16: backend.v1.GetJudgeProgressResponse.judge_progress:type_name -> backend.v1.JudgeProgress
-	66, // 17: backend.v1.CreateContestRequest.start_at:type_name -> google.protobuf.Timestamp
-	66, // 18: backend.v1.CreateContestRequest.end_at:type_name -> google.protobuf.Timestamp
-	67, // 19: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
-	67, // 20: backend.v1.GetContestResponse.contest:type_name -> backend.v1.Contest
-	67, // 21: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
-	68, // 22: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsElement
-	69, // 23: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	69, // 24: backend.v1.GetClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	69, // 25: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
-	69, // 26: backend.v1.UpdateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	70, // 27: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	70, // 28: backend.v1.GetAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	70, // 29: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	71, // 30: backend.v1.ListContestTasksResponse.tasks:type_name -> backend.v1.ContestTask
+	58, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
+	58, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
+	58, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
+	59, // 3: backend.v1.CreateTaskRequest.task:type_name -> backend.v1.MutationTask
+	60, // 4: backend.v1.CreateTaskResponse.task:type_name -> backend.v1.Task
+	60, // 5: backend.v1.GetTaskResponse.task:type_name -> backend.v1.Task
+	59, // 6: backend.v1.UpdateTaskRequest.task:type_name -> backend.v1.MutationTask
+	60, // 7: backend.v1.UpdateTaskResponse.task:type_name -> backend.v1.Task
+	61, // 8: backend.v1.GetTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
+	62, // 9: backend.v1.GetTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
+	63, // 10: backend.v1.SyncTestcaseSetsRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
+	64, // 11: backend.v1.SyncTestcaseSetsRequest.testcases:type_name -> backend.v1.MutationTestcase
+	61, // 12: backend.v1.SyncTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
+	62, // 13: backend.v1.SyncTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
+	65, // 14: backend.v1.GetSubmissionDetailResponse.submission_detail:type_name -> backend.v1.SubmissionDetail
+	66, // 15: backend.v1.ListSubmissionsResponse.submissions:type_name -> backend.v1.SubmissionSummary
+	67, // 16: backend.v1.GetJudgeProgressResponse.judge_progress:type_name -> backend.v1.JudgeProgress
+	68, // 17: backend.v1.CreateContestRequest.start_at:type_name -> google.protobuf.Timestamp
+	68, // 18: backend.v1.CreateContestRequest.end_at:type_name -> google.protobuf.Timestamp
+	69, // 19: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
+	69, // 20: backend.v1.GetContestResponse.contest:type_name -> backend.v1.Contest
+	69, // 21: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
+	70, // 22: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsElement
+	71, // 23: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	71, // 24: backend.v1.GetClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	71, // 25: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
+	71, // 26: backend.v1.UpdateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	72, // 27: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	72, // 28: backend.v1.GetAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	72, // 29: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	73, // 30: backend.v1.ListContestTasksResponse.tasks:type_name -> backend.v1.ContestTask
 	31, // [31:31] is the sub-list for method output_type
 	31, // [31:31] is the sub-list for method input_type
 	31, // [31:31] is the sub-list for extension type_name
@@ -3275,7 +3411,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogoutRequest); i {
+			switch v := v.(*RefreshAccessTokenRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3287,7 +3423,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogoutResponse); i {
+			switch v := v.(*RefreshAccessTokenResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3299,7 +3435,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateTaskRequest); i {
+			switch v := v.(*LogoutRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3311,7 +3447,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateTaskResponse); i {
+			switch v := v.(*LogoutResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3323,7 +3459,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTaskRequest); i {
+			switch v := v.(*CreateTaskRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3335,7 +3471,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTaskResponse); i {
+			switch v := v.(*CreateTaskResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3347,7 +3483,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateTaskRequest); i {
+			switch v := v.(*GetTaskRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3359,7 +3495,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateTaskResponse); i {
+			switch v := v.(*GetTaskResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3371,7 +3507,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTestcaseSetsRequest); i {
+			switch v := v.(*UpdateTaskRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3383,7 +3519,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTestcaseSetsResponse); i {
+			switch v := v.(*UpdateTaskResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3395,7 +3531,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SyncTestcaseSetsRequest); i {
+			switch v := v.(*GetTestcaseSetsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3407,7 +3543,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SyncTestcaseSetsResponse); i {
+			switch v := v.(*GetTestcaseSetsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3419,7 +3555,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PingRequest); i {
+			switch v := v.(*SyncTestcaseSetsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3431,7 +3567,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PingResponse); i {
+			switch v := v.(*SyncTestcaseSetsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3443,7 +3579,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SubmitRequest); i {
+			switch v := v.(*PingRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3455,7 +3591,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SubmitResponse); i {
+			switch v := v.(*PingResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3467,7 +3603,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetSubmissionDetailRequest); i {
+			switch v := v.(*SubmitRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3479,7 +3615,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetSubmissionDetailResponse); i {
+			switch v := v.(*SubmitResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3491,7 +3627,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListSubmissionsRequest); i {
+			switch v := v.(*GetSubmissionDetailRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3503,7 +3639,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListSubmissionsResponse); i {
+			switch v := v.(*GetSubmissionDetailResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3515,7 +3651,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetJudgeProgressRequest); i {
+			switch v := v.(*ListSubmissionsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3527,7 +3663,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetJudgeProgressResponse); i {
+			switch v := v.(*ListSubmissionsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3539,7 +3675,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateContestRequest); i {
+			switch v := v.(*GetJudgeProgressRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3551,7 +3687,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateContestResponse); i {
+			switch v := v.(*GetJudgeProgressResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3563,7 +3699,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetContestRequest); i {
+			switch v := v.(*CreateContestRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3575,7 +3711,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetContestResponse); i {
+			switch v := v.(*CreateContestResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3587,7 +3723,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListContestsRequest); i {
+			switch v := v.(*GetContestRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3599,7 +3735,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListContestsResponse); i {
+			switch v := v.(*GetContestResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3611,7 +3747,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetStandingsRequest); i {
+			switch v := v.(*ListContestsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3623,7 +3759,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetStandingsResponse); i {
+			switch v := v.(*ListContestsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3635,7 +3771,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateClarificationRequest); i {
+			switch v := v.(*GetStandingsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3647,7 +3783,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateClarificationResponse); i {
+			switch v := v.(*GetStandingsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3659,7 +3795,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetClarificationRequest); i {
+			switch v := v.(*CreateClarificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3671,7 +3807,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetClarificationResponse); i {
+			switch v := v.(*CreateClarificationResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3683,7 +3819,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListClarificationsRequest); i {
+			switch v := v.(*GetClarificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3695,7 +3831,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListClarificationsResponse); i {
+			switch v := v.(*GetClarificationResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3707,7 +3843,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateClarificationRequest); i {
+			switch v := v.(*ListClarificationsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3719,7 +3855,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateClarificationResponse); i {
+			switch v := v.(*ListClarificationsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3731,7 +3867,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteClarificationRequest); i {
+			switch v := v.(*UpdateClarificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3743,7 +3879,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteClarificationResponse); i {
+			switch v := v.(*UpdateClarificationResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3755,7 +3891,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateAnswerRequest); i {
+			switch v := v.(*DeleteClarificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3767,7 +3903,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateAnswerResponse); i {
+			switch v := v.(*DeleteClarificationResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3779,7 +3915,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAnswerRequest); i {
+			switch v := v.(*CreateAnswerRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3791,7 +3927,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAnswerResponse); i {
+			switch v := v.(*CreateAnswerResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3803,7 +3939,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[50].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateAnswerRequest); i {
+			switch v := v.(*GetAnswerRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3815,7 +3951,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateAnswerResponse); i {
+			switch v := v.(*GetAnswerResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3827,7 +3963,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[52].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteAnswerRequest); i {
+			switch v := v.(*UpdateAnswerRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3839,7 +3975,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[53].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteAnswerResponse); i {
+			switch v := v.(*UpdateAnswerResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3851,7 +3987,7 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[54].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListContestTasksRequest); i {
+			switch v := v.(*DeleteAnswerRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3863,6 +3999,30 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 		file_backend_v1_messages_proto_msgTypes[55].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteAnswerResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_v1_messages_proto_msgTypes[56].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListContestTasksRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_v1_messages_proto_msgTypes[57].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListContestTasksResponse); i {
 			case 0:
 				return &v.state
@@ -3875,15 +4035,15 @@ func file_backend_v1_messages_proto_init() {
 			}
 		}
 	}
-	file_backend_v1_messages_proto_msgTypes[20].OneofWrappers = []interface{}{}
-	file_backend_v1_messages_proto_msgTypes[24].OneofWrappers = []interface{}{}
+	file_backend_v1_messages_proto_msgTypes[22].OneofWrappers = []interface{}{}
+	file_backend_v1_messages_proto_msgTypes[26].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_v1_messages_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   56,
+			NumMessages:   58,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
