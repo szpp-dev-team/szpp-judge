@@ -4,6 +4,7 @@ package backend.v1;
 
 import "google/protobuf/timestamp.proto";
 import "judge/v1/judge_type.proto";
+import "judge/v1/resources.proto";
 
 message User {
   int32 id = 1;
@@ -21,6 +22,23 @@ message Contest {
   repeated int32 task_ids = 5;
   google.protobuf.Timestamp start_at = 6;
   google.protobuf.Timestamp end_at = 7;
+}
+
+message StandingsElement {
+  message TaskDetail {
+    int32 task_id = 1;
+    int32 penalty_count = 2;
+    int32 ac_submit_id = 3;
+    google.protobuf.Timestamp ac_elapsed = 4;
+  }
+
+  int32 rank = 1;
+  int32 user_id = 2;
+  string user_name = 3;
+  int32 total_score = 4;
+  int32 total_penalty_count = 5;
+  google.protobuf.Timestamp latest_ac_at = 6;
+  repeated TaskDetail task_detail_list = 7;
 }
 message Clarification {
   int32 id = 1;
@@ -112,4 +130,67 @@ message MutationTestcase {
   optional string description = 2;
   string input = 3;
   string output = 4;
+}
+
+// 提出の詳細
+message SubmissionDetail {
+  int32 id = 1;
+  // user
+  int32 user_id = 2;
+  string username = 3;
+  // contest
+  optional int32 contest_id = 4; // コンテスト中の提出でなければ null
+  // task
+  int32 task_id = 5;
+  string task_title = 6;
+  int32 score = 7;
+  // submission
+  string lang_id = 8;
+  string source_code = 9;
+  // judge
+  optional judge.v1.JudgeStatus status = 10; // ジャッジ中はnull
+  optional uint32 exec_time_ms = 11; // ジャッジ中はnull
+  optional uint32 exec_memory_kib = 12; // ジャッジ中はnull
+  repeated TestcaseResult testcase_results = 13; // ジャッジ完了したテストケースの実行情報
+  // timestamp
+  google.protobuf.Timestamp submitted_at = 14;
+  google.protobuf.Timestamp created_at = 15;
+  optional google.protobuf.Timestamp updated_at = 16;
+}
+
+// 提出一覧用
+message SubmissionSummary {
+  int32 id = 1;
+  // user
+  int32 user_id = 2;
+  string username = 3;
+  // contest
+  optional int32 contest_id = 4;
+  // task
+  int32 task_id = 5;
+  string task_title = 6;
+  int32 score = 7;
+  // submission
+  string lang_id = 8;
+  // judge
+  optional judge.v1.JudgeStatus judge_status = 9; // ジャッジ中はnull
+  optional uint32 exec_time_ms = 10; // ジャッジ中はnull
+  optional uint32 exec_memory_kib = 11; // ジャッジ中はnull
+  // timestamp
+  google.protobuf.Timestamp submitted_at = 12;
+}
+
+// テストケース一つあたりの結果
+message TestcaseResult {
+  string testcase_name = 1;
+  judge.v1.JudgeStatus judge_status = 2;
+  uint32 exec_time_ms = 3;
+  uint32 exec_memory_kib = 4;
+}
+
+// ジャッジの途中経過　WA(2/10) など。
+message JudgeProgress {
+  judge.v1.JudgeStatus status = 1; // ジャッジ済みのケースが全てACであれば UNSPECIFIED そうでなければ最初に出た非ACの結果
+  int32 total_testcases = 2; // テストケースの総数
+  int32 completed_testcases = 3; // ジャッジ済みのテストケース数
 }
