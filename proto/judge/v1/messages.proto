@@ -23,6 +23,7 @@ message JudgeRequest {
   optional bool want_result_detail = 8;
   optional uint32 stdout_limit_kib = 9;
   optional uint32 stderr_limit_kib = 10;
+  int32 submit_id = 11;
 }
 
 message JudgeResponse {
