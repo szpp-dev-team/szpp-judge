@@ -22,3 +22,7 @@ func (s *userServiceServer) GetUser(ctx context.Context, req *backendv1.GetUserR
 func (s *userServiceServer) CreateUser(ctx context.Context, req *backendv1.CreateUserRequest) (*backendv1.CreateUserResponse, error) {
 	return s.interactor.CreateUser(ctx, req)
 }
+
+func (s *userServiceServer) CheckUser(ctx context.Context, req *backendv1.CheckUserRequest) (*backendv1.CheckUserResponse, error) {
+	return s.interactor.CheckUser(ctx, req)
+}
