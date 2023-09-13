@@ -92,9 +92,62 @@ func Test_CreateUser(t *testing.T) {
 			req := &backendv1.CreateUserRequest{
 				Username: "szppi",
 				Password: "szppi_tensai",
-				Email: "szppi@szpp.com",
+				Email:    "szppi@szpp.com",
 			}
 			resp, err := interactor.CreateUser(ctx, req)
+			if test.wantErr {
+				require.Error(t, err)
+				return
+			} else {
+				require.NoError(t, err)
+			}
+			if test.assert != nil {
+				test.assert(ctx, t, req, resp)
+			}
+		})
+	}
+}
+
+func Test_CheckUser(t *testing.T) {
+	entClient := utils.NewTestClient(t)
+	defer entClient.Close()
+	interactor := NewInteractor(entClient)
+
+	tests := map[string]struct {
+		prepare func(t *testing.T, req *backendv1.CheckUserRequest)
+		wantErr bool
+		assert  func(ctx context.Context, t *testing.T, req *backendv1.CheckUserRequest, resp *backendv1.CheckUserResponse)
+	}{
+		"success": {
+			prepare: func(t *testing.T, req *backendv1.CheckUserRequest) {
+				q := entClient.User.Create().
+					SetName(req.Username).
+					SetEncryptedPassword(HashPassword("fugafuga")).
+					SetRole("ADMIN").
+					SetCreatedAt(timejst.Now()).
+					SetUpdatedAt(timejst.Now())
+				_, err := q.Save(context.Background())
+				require.NoError(t, err)
+			},
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.CheckUserRequest, resp *backendv1.CheckUserResponse) {
+				assert.True(t, resp.Exists)
+			},
+		},
+		"not found": {
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.CheckUserRequest, resp *backendv1.CheckUserResponse) {
+				assert.False(t, resp.Exists)
+			},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			req := &backendv1.CheckUserRequest{Username: "hogegege"}
+			if test.prepare != nil {
+				test.prepare(t, req)
+			}
+			resp, err := interactor.CheckUser(ctx, req)
 			if test.wantErr {
 				require.Error(t, err)
 				return
