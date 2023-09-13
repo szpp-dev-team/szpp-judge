@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
+import { CheckUserRequest, CheckUserResponse, CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -32,6 +32,17 @@ export const UserService = {
       name: "CreateUser",
       I: CreateUserRequest,
       O: CreateUserResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * User が存在するかどうかを確認する
+     *
+     * @generated from rpc backend.v1.UserService.CheckUser
+     */
+    checkUser: {
+      name: "CheckUser",
+      I: CheckUserRequest,
+      O: CheckUserResponse,
       kind: MethodKind.Unary,
     },
   }

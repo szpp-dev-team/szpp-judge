@@ -194,6 +194,80 @@ export class CreateUserResponse extends Message<CreateUserResponse> {
 }
 
 /**
+ * @generated from message backend.v1.CheckUserRequest
+ */
+export class CheckUserRequest extends Message<CheckUserRequest> {
+  /**
+   * @generated from field: string username = 1;
+   */
+  username = "";
+
+  constructor(data?: PartialMessage<CheckUserRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.CheckUserRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckUserRequest {
+    return new CheckUserRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckUserRequest {
+    return new CheckUserRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckUserRequest {
+    return new CheckUserRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CheckUserRequest | PlainMessage<CheckUserRequest> | undefined, b: CheckUserRequest | PlainMessage<CheckUserRequest> | undefined): boolean {
+    return proto3.util.equals(CheckUserRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.CheckUserResponse
+ */
+export class CheckUserResponse extends Message<CheckUserResponse> {
+  /**
+   * @generated from field: bool exists = 1;
+   */
+  exists = false;
+
+  constructor(data?: PartialMessage<CheckUserResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.CheckUserResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "exists", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckUserResponse {
+    return new CheckUserResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckUserResponse {
+    return new CheckUserResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckUserResponse {
+    return new CheckUserResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CheckUserResponse | PlainMessage<CheckUserResponse> | undefined, b: CheckUserResponse | PlainMessage<CheckUserResponse> | undefined): boolean {
+    return proto3.util.equals(CheckUserResponse, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.LoginRequest
  */
 export class LoginRequest extends Message<LoginRequest> {
