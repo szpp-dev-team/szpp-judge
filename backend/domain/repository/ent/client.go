@@ -989,6 +989,38 @@ func (c *TestcaseResultClient) GetX(ctx context.Context, id int) *TestcaseResult
 	return obj
 }
 
+// QuerySubmit queries the submit edge of a TestcaseResult.
+func (c *TestcaseResultClient) QuerySubmit(tr *TestcaseResult) *SubmitQuery {
+	query := (&SubmitClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(testcaseresult.Table, testcaseresult.FieldID, id),
+			sqlgraph.To(submit.Table, submit.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, testcaseresult.SubmitTable, testcaseresult.SubmitColumn),
+		)
+		fromV = sqlgraph.Neighbors(tr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTestcase queries the testcase edge of a TestcaseResult.
+func (c *TestcaseResultClient) QueryTestcase(tr *TestcaseResult) *TestcaseQuery {
+	query := (&TestcaseClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(testcaseresult.Table, testcaseresult.FieldID, id),
+			sqlgraph.To(testcase.Table, testcase.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, testcaseresult.TestcaseTable, testcaseresult.TestcaseColumn),
+		)
+		fromV = sqlgraph.Neighbors(tr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *TestcaseResultClient) Hooks() []Hook {
 	return c.hooks.TestcaseResult

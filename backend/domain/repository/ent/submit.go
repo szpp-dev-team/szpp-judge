@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -15,9 +16,21 @@ import (
 
 // Submit is the model entity for the Submit schema.
 type Submit struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Status holds the value of the "status" field.
+	Status string `json:"status,omitempty"`
+	// ExecTime holds the value of the "exec_time" field.
+	ExecTime int `json:"exec_time,omitempty"`
+	// ExecMemory holds the value of the "exec_memory" field.
+	ExecMemory int `json:"exec_memory,omitempty"`
+	// SubmittedAt holds the value of the "submitted_at" field.
+	SubmittedAt time.Time `json:"submitted_at,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubmitQuery when eager-loading is set.
 	Edges            SubmitEdges `json:"edges"`
@@ -90,8 +103,12 @@ func (*Submit) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case submit.FieldID:
+		case submit.FieldID, submit.FieldExecTime, submit.FieldExecMemory:
 			values[i] = new(sql.NullInt64)
+		case submit.FieldStatus:
+			values[i] = new(sql.NullString)
+		case submit.FieldSubmittedAt, submit.FieldCreatedAt, submit.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case submit.ForeignKeys[0]: // language_submits
 			values[i] = new(sql.NullInt64)
 		case submit.ForeignKeys[1]: // task_submits
@@ -117,6 +134,43 @@ func (s *Submit) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			s.ID = int(value.Int64)
+		case submit.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				s.Status = value.String
+			}
+		case submit.FieldExecTime:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field exec_time", values[i])
+			} else if value.Valid {
+				s.ExecTime = int(value.Int64)
+			}
+		case submit.FieldExecMemory:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field exec_memory", values[i])
+			} else if value.Valid {
+				s.ExecMemory = int(value.Int64)
+			}
+		case submit.FieldSubmittedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field submitted_at", values[i])
+			} else if value.Valid {
+				s.SubmittedAt = value.Time
+			}
+		case submit.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				s.CreatedAt = value.Time
+			}
+		case submit.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				s.UpdatedAt = new(time.Time)
+				*s.UpdatedAt = value.Time
+			}
 		case submit.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field language_submits", value)
@@ -186,7 +240,26 @@ func (s *Submit) Unwrap() *Submit {
 func (s *Submit) String() string {
 	var builder strings.Builder
 	builder.WriteString("Submit(")
-	builder.WriteString(fmt.Sprintf("id=%v", s.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	builder.WriteString("status=")
+	builder.WriteString(s.Status)
+	builder.WriteString(", ")
+	builder.WriteString("exec_time=")
+	builder.WriteString(fmt.Sprintf("%v", s.ExecTime))
+	builder.WriteString(", ")
+	builder.WriteString("exec_memory=")
+	builder.WriteString(fmt.Sprintf("%v", s.ExecMemory))
+	builder.WriteString(", ")
+	builder.WriteString("submitted_at=")
+	builder.WriteString(s.SubmittedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := s.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

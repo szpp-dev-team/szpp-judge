@@ -22,6 +22,24 @@ type LanguageCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetName sets the "name" field.
+func (lc *LanguageCreate) SetName(s string) *LanguageCreate {
+	lc.mutation.SetName(s)
+	return lc
+}
+
+// SetSlug sets the "slug" field.
+func (lc *LanguageCreate) SetSlug(s string) *LanguageCreate {
+	lc.mutation.SetSlug(s)
+	return lc
+}
+
+// SetID sets the "id" field.
+func (lc *LanguageCreate) SetID(i int) *LanguageCreate {
+	lc.mutation.SetID(i)
+	return lc
+}
+
 // AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
 func (lc *LanguageCreate) AddSubmitIDs(ids ...int) *LanguageCreate {
 	lc.mutation.AddSubmitIDs(ids...)
@@ -71,6 +89,12 @@ func (lc *LanguageCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (lc *LanguageCreate) check() error {
+	if _, ok := lc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Language.name"`)}
+	}
+	if _, ok := lc.mutation.Slug(); !ok {
+		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Language.slug"`)}
+	}
 	return nil
 }
 
@@ -85,8 +109,10 @@ func (lc *LanguageCreate) sqlSave(ctx context.Context) (*Language, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	lc.mutation.id = &_node.ID
 	lc.mutation.done = true
 	return _node, nil
@@ -98,6 +124,18 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 		_spec = sqlgraph.NewCreateSpec(language.Table, sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt))
 	)
 	_spec.OnConflict = lc.conflict
+	if id, ok := lc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
+	if value, ok := lc.mutation.Name(); ok {
+		_spec.SetField(language.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := lc.mutation.Slug(); ok {
+		_spec.SetField(language.FieldSlug, field.TypeString, value)
+		_node.Slug = value
+	}
 	if nodes := lc.mutation.SubmitsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -121,11 +159,17 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Language.Create().
+//		SetName(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.LanguageUpsert) {
+//			SetName(v+v).
+//		}).
 //		Exec(ctx)
 func (lc *LanguageCreate) OnConflict(opts ...sql.ConflictOption) *LanguageUpsertOne {
 	lc.conflict = opts
@@ -160,16 +204,48 @@ type (
 	}
 )
 
-// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// SetName sets the "name" field.
+func (u *LanguageUpsert) SetName(v string) *LanguageUpsert {
+	u.Set(language.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *LanguageUpsert) UpdateName() *LanguageUpsert {
+	u.SetExcluded(language.FieldName)
+	return u
+}
+
+// SetSlug sets the "slug" field.
+func (u *LanguageUpsert) SetSlug(v string) *LanguageUpsert {
+	u.Set(language.FieldSlug, v)
+	return u
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *LanguageUpsert) UpdateSlug() *LanguageUpsert {
+	u.SetExcluded(language.FieldSlug)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
 //	client.Language.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(language.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 func (u *LanguageUpsertOne) UpdateNewValues() *LanguageUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(language.FieldID)
+		}
+	}))
 	return u
 }
 
@@ -198,6 +274,34 @@ func (u *LanguageUpsertOne) Update(set func(*LanguageUpsert)) *LanguageUpsertOne
 		set(&LanguageUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetName sets the "name" field.
+func (u *LanguageUpsertOne) SetName(v string) *LanguageUpsertOne {
+	return u.Update(func(s *LanguageUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *LanguageUpsertOne) UpdateName() *LanguageUpsertOne {
+	return u.Update(func(s *LanguageUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetSlug sets the "slug" field.
+func (u *LanguageUpsertOne) SetSlug(v string) *LanguageUpsertOne {
+	return u.Update(func(s *LanguageUpsert) {
+		s.SetSlug(v)
+	})
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *LanguageUpsertOne) UpdateSlug() *LanguageUpsertOne {
+	return u.Update(func(s *LanguageUpsert) {
+		s.UpdateSlug()
+	})
 }
 
 // Exec executes the query.
@@ -275,7 +379,7 @@ func (lcb *LanguageCreateBulk) Save(ctx context.Context) ([]*Language, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}
@@ -327,6 +431,11 @@ func (lcb *LanguageCreateBulk) ExecX(ctx context.Context) {
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.LanguageUpsert) {
+//			SetName(v+v).
+//		}).
 //		Exec(ctx)
 func (lcb *LanguageCreateBulk) OnConflict(opts ...sql.ConflictOption) *LanguageUpsertBulk {
 	lcb.conflict = opts
@@ -360,10 +469,20 @@ type LanguageUpsertBulk struct {
 //	client.Language.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(language.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 func (u *LanguageUpsertBulk) UpdateNewValues() *LanguageUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(language.FieldID)
+			}
+		}
+	}))
 	return u
 }
 
@@ -392,6 +511,34 @@ func (u *LanguageUpsertBulk) Update(set func(*LanguageUpsert)) *LanguageUpsertBu
 		set(&LanguageUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetName sets the "name" field.
+func (u *LanguageUpsertBulk) SetName(v string) *LanguageUpsertBulk {
+	return u.Update(func(s *LanguageUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *LanguageUpsertBulk) UpdateName() *LanguageUpsertBulk {
+	return u.Update(func(s *LanguageUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetSlug sets the "slug" field.
+func (u *LanguageUpsertBulk) SetSlug(v string) *LanguageUpsertBulk {
+	return u.Update(func(s *LanguageUpsert) {
+		s.SetSlug(v)
+	})
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *LanguageUpsertBulk) UpdateSlug() *LanguageUpsertBulk {
+	return u.Update(func(s *LanguageUpsert) {
+		s.UpdateSlug()
+	})
 }
 
 // Exec executes the query.

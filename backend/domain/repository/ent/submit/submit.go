@@ -12,6 +12,18 @@ const (
 	Label = "submit"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// FieldExecTime holds the string denoting the exec_time field in the database.
+	FieldExecTime = "exec_time"
+	// FieldExecMemory holds the string denoting the exec_memory field in the database.
+	FieldExecMemory = "exec_memory"
+	// FieldSubmittedAt holds the string denoting the submitted_at field in the database.
+	FieldSubmittedAt = "submitted_at"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// EdgeUsers holds the string denoting the users edge name in mutations.
 	EdgeUsers = "users"
 	// EdgeTask holds the string denoting the task edge name in mutations.
@@ -53,6 +65,12 @@ const (
 // Columns holds all SQL columns for submit fields.
 var Columns = []string{
 	FieldID,
+	FieldStatus,
+	FieldExecTime,
+	FieldExecMemory,
+	FieldSubmittedAt,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "submits"
@@ -89,6 +107,36 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByExecTime orders the results by the exec_time field.
+func ByExecTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecTime, opts...).ToFunc()
+}
+
+// ByExecMemory orders the results by the exec_memory field.
+func ByExecMemory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecMemory, opts...).ToFunc()
+}
+
+// BySubmittedAt orders the results by the submitted_at field.
+func BySubmittedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSubmittedAt, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
 // ByUsersCount orders the results by users count.

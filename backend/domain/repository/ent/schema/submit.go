@@ -10,7 +10,7 @@ type Submit struct {
 	ent.Schema
 }
 
-func (Submit) Field() []ent.Field {
+func (Submit) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.String("status").Optional(),

@@ -13,9 +13,13 @@ import (
 
 // Language is the model entity for the Language schema.
 type Language struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Slug holds the value of the "slug" field.
+	Slug string `json:"slug,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the LanguageQuery when eager-loading is set.
 	Edges        LanguageEdges `json:"edges"`
@@ -47,6 +51,8 @@ func (*Language) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case language.FieldID:
 			values[i] = new(sql.NullInt64)
+		case language.FieldName, language.FieldSlug:
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -68,6 +74,18 @@ func (l *Language) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			l.ID = int(value.Int64)
+		case language.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				l.Name = value.String
+			}
+		case language.FieldSlug:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field slug", values[i])
+			} else if value.Valid {
+				l.Slug = value.String
+			}
 		default:
 			l.selectValues.Set(columns[i], values[i])
 		}
@@ -108,7 +126,12 @@ func (l *Language) Unwrap() *Language {
 func (l *Language) String() string {
 	var builder strings.Builder
 	builder.WriteString("Language(")
-	builder.WriteString(fmt.Sprintf("id=%v", l.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", l.ID))
+	builder.WriteString("name=")
+	builder.WriteString(l.Name)
+	builder.WriteString(", ")
+	builder.WriteString("slug=")
+	builder.WriteString(l.Slug)
 	builder.WriteByte(')')
 	return builder.String()
 }

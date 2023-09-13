@@ -4,6 +4,7 @@ package testcaseresult
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 )
 
@@ -50,6 +51,212 @@ func IDLT(id int) predicate.TestcaseResult {
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int) predicate.TestcaseResult {
 	return predicate.TestcaseResult(sql.FieldLTE(FieldID, id))
+}
+
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldEQ(FieldStatus, v))
+}
+
+// ExecTime applies equality check predicate on the "exec_time" field. It's identical to ExecTimeEQ.
+func ExecTime(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldEQ(FieldExecTime, v))
+}
+
+// ExecMemory applies equality check predicate on the "exec_memory" field. It's identical to ExecMemoryEQ.
+func ExecMemory(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldEQ(FieldExecMemory, v))
+}
+
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldLTE(FieldStatus, v))
+}
+
+// StatusContains applies the Contains predicate on the "status" field.
+func StatusContains(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldContains(FieldStatus, v))
+}
+
+// StatusHasPrefix applies the HasPrefix predicate on the "status" field.
+func StatusHasPrefix(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldHasPrefix(FieldStatus, v))
+}
+
+// StatusHasSuffix applies the HasSuffix predicate on the "status" field.
+func StatusHasSuffix(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldHasSuffix(FieldStatus, v))
+}
+
+// StatusEqualFold applies the EqualFold predicate on the "status" field.
+func StatusEqualFold(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldEqualFold(FieldStatus, v))
+}
+
+// StatusContainsFold applies the ContainsFold predicate on the "status" field.
+func StatusContainsFold(v string) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldContainsFold(FieldStatus, v))
+}
+
+// ExecTimeEQ applies the EQ predicate on the "exec_time" field.
+func ExecTimeEQ(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldEQ(FieldExecTime, v))
+}
+
+// ExecTimeNEQ applies the NEQ predicate on the "exec_time" field.
+func ExecTimeNEQ(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldNEQ(FieldExecTime, v))
+}
+
+// ExecTimeIn applies the In predicate on the "exec_time" field.
+func ExecTimeIn(vs ...int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldIn(FieldExecTime, vs...))
+}
+
+// ExecTimeNotIn applies the NotIn predicate on the "exec_time" field.
+func ExecTimeNotIn(vs ...int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldNotIn(FieldExecTime, vs...))
+}
+
+// ExecTimeGT applies the GT predicate on the "exec_time" field.
+func ExecTimeGT(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldGT(FieldExecTime, v))
+}
+
+// ExecTimeGTE applies the GTE predicate on the "exec_time" field.
+func ExecTimeGTE(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldGTE(FieldExecTime, v))
+}
+
+// ExecTimeLT applies the LT predicate on the "exec_time" field.
+func ExecTimeLT(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldLT(FieldExecTime, v))
+}
+
+// ExecTimeLTE applies the LTE predicate on the "exec_time" field.
+func ExecTimeLTE(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldLTE(FieldExecTime, v))
+}
+
+// ExecMemoryEQ applies the EQ predicate on the "exec_memory" field.
+func ExecMemoryEQ(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldEQ(FieldExecMemory, v))
+}
+
+// ExecMemoryNEQ applies the NEQ predicate on the "exec_memory" field.
+func ExecMemoryNEQ(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldNEQ(FieldExecMemory, v))
+}
+
+// ExecMemoryIn applies the In predicate on the "exec_memory" field.
+func ExecMemoryIn(vs ...int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldIn(FieldExecMemory, vs...))
+}
+
+// ExecMemoryNotIn applies the NotIn predicate on the "exec_memory" field.
+func ExecMemoryNotIn(vs ...int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldNotIn(FieldExecMemory, vs...))
+}
+
+// ExecMemoryGT applies the GT predicate on the "exec_memory" field.
+func ExecMemoryGT(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldGT(FieldExecMemory, v))
+}
+
+// ExecMemoryGTE applies the GTE predicate on the "exec_memory" field.
+func ExecMemoryGTE(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldGTE(FieldExecMemory, v))
+}
+
+// ExecMemoryLT applies the LT predicate on the "exec_memory" field.
+func ExecMemoryLT(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldLT(FieldExecMemory, v))
+}
+
+// ExecMemoryLTE applies the LTE predicate on the "exec_memory" field.
+func ExecMemoryLTE(v int) predicate.TestcaseResult {
+	return predicate.TestcaseResult(sql.FieldLTE(FieldExecMemory, v))
+}
+
+// HasSubmit applies the HasEdge predicate on the "submit" edge.
+func HasSubmit() predicate.TestcaseResult {
+	return predicate.TestcaseResult(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SubmitTable, SubmitColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubmitWith applies the HasEdge predicate on the "submit" edge with a given conditions (other predicates).
+func HasSubmitWith(preds ...predicate.Submit) predicate.TestcaseResult {
+	return predicate.TestcaseResult(func(s *sql.Selector) {
+		step := newSubmitStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTestcase applies the HasEdge predicate on the "testcase" edge.
+func HasTestcase() predicate.TestcaseResult {
+	return predicate.TestcaseResult(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, TestcaseTable, TestcaseColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTestcaseWith applies the HasEdge predicate on the "testcase" edge with a given conditions (other predicates).
+func HasTestcaseWith(preds ...predicate.Testcase) predicate.TestcaseResult {
+	return predicate.TestcaseResult(func(s *sql.Selector) {
+		step := newTestcaseStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

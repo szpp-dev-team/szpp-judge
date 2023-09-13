@@ -403,6 +403,18 @@ func (sq *SubmitQuery) WithTestcaseResults(opts ...func(*TestcaseResultQuery)) *
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Status string `json:"status,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Submit.Query().
+//		GroupBy(submit.FieldStatus).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (sq *SubmitQuery) GroupBy(field string, fields ...string) *SubmitGroupBy {
 	sq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &SubmitGroupBy{build: sq}
@@ -414,6 +426,16 @@ func (sq *SubmitQuery) GroupBy(field string, fields ...string) *SubmitGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Status string `json:"status,omitempty"`
+//	}
+//
+//	client.Submit.Query().
+//		Select(submit.FieldStatus).
+//		Scan(ctx, &v)
 func (sq *SubmitQuery) Select(fields ...string) *SubmitSelect {
 	sq.ctx.Fields = append(sq.ctx.Fields, fields...)
 	sbuild := &SubmitSelect{SubmitQuery: sq}

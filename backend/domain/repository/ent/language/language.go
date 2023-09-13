@@ -12,6 +12,10 @@ const (
 	Label = "language"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldSlug holds the string denoting the slug field in the database.
+	FieldSlug = "slug"
 	// EdgeSubmits holds the string denoting the submits edge name in mutations.
 	EdgeSubmits = "submits"
 	// Table holds the table name of the language in the database.
@@ -28,6 +32,8 @@ const (
 // Columns holds all SQL columns for language fields.
 var Columns = []string{
 	FieldID,
+	FieldName,
+	FieldSlug,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -46,6 +52,16 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// BySlug orders the results by the slug field.
+func BySlug(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSlug, opts...).ToFunc()
 }
 
 // BySubmitsCount orders the results by submits count.

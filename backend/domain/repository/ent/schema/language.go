@@ -10,7 +10,7 @@ type Language struct {
 	ent.Schema
 }
 
-func (Language) Field() []ent.Field {
+func (Language) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.String("name"), // display name

@@ -294,6 +294,18 @@ func (lq *LanguageQuery) WithSubmits(opts ...func(*SubmitQuery)) *LanguageQuery 
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Language.Query().
+//		GroupBy(language.FieldName).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (lq *LanguageQuery) GroupBy(field string, fields ...string) *LanguageGroupBy {
 	lq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &LanguageGroupBy{build: lq}
@@ -305,6 +317,16 @@ func (lq *LanguageQuery) GroupBy(field string, fields ...string) *LanguageGroupB
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//	}
+//
+//	client.Language.Query().
+//		Select(language.FieldName).
+//		Scan(ctx, &v)
 func (lq *LanguageQuery) Select(fields ...string) *LanguageSelect {
 	lq.ctx.Fields = append(lq.ctx.Fields, fields...)
 	sbuild := &LanguageSelect{LanguageQuery: lq}

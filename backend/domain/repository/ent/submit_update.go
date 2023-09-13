@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,6 +29,112 @@ type SubmitUpdate struct {
 // Where appends a list predicates to the SubmitUpdate builder.
 func (su *SubmitUpdate) Where(ps ...predicate.Submit) *SubmitUpdate {
 	su.mutation.Where(ps...)
+	return su
+}
+
+// SetStatus sets the "status" field.
+func (su *SubmitUpdate) SetStatus(s string) *SubmitUpdate {
+	su.mutation.SetStatus(s)
+	return su
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (su *SubmitUpdate) SetNillableStatus(s *string) *SubmitUpdate {
+	if s != nil {
+		su.SetStatus(*s)
+	}
+	return su
+}
+
+// ClearStatus clears the value of the "status" field.
+func (su *SubmitUpdate) ClearStatus() *SubmitUpdate {
+	su.mutation.ClearStatus()
+	return su
+}
+
+// SetExecTime sets the "exec_time" field.
+func (su *SubmitUpdate) SetExecTime(i int) *SubmitUpdate {
+	su.mutation.ResetExecTime()
+	su.mutation.SetExecTime(i)
+	return su
+}
+
+// SetNillableExecTime sets the "exec_time" field if the given value is not nil.
+func (su *SubmitUpdate) SetNillableExecTime(i *int) *SubmitUpdate {
+	if i != nil {
+		su.SetExecTime(*i)
+	}
+	return su
+}
+
+// AddExecTime adds i to the "exec_time" field.
+func (su *SubmitUpdate) AddExecTime(i int) *SubmitUpdate {
+	su.mutation.AddExecTime(i)
+	return su
+}
+
+// ClearExecTime clears the value of the "exec_time" field.
+func (su *SubmitUpdate) ClearExecTime() *SubmitUpdate {
+	su.mutation.ClearExecTime()
+	return su
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (su *SubmitUpdate) SetExecMemory(i int) *SubmitUpdate {
+	su.mutation.ResetExecMemory()
+	su.mutation.SetExecMemory(i)
+	return su
+}
+
+// SetNillableExecMemory sets the "exec_memory" field if the given value is not nil.
+func (su *SubmitUpdate) SetNillableExecMemory(i *int) *SubmitUpdate {
+	if i != nil {
+		su.SetExecMemory(*i)
+	}
+	return su
+}
+
+// AddExecMemory adds i to the "exec_memory" field.
+func (su *SubmitUpdate) AddExecMemory(i int) *SubmitUpdate {
+	su.mutation.AddExecMemory(i)
+	return su
+}
+
+// ClearExecMemory clears the value of the "exec_memory" field.
+func (su *SubmitUpdate) ClearExecMemory() *SubmitUpdate {
+	su.mutation.ClearExecMemory()
+	return su
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (su *SubmitUpdate) SetSubmittedAt(t time.Time) *SubmitUpdate {
+	su.mutation.SetSubmittedAt(t)
+	return su
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (su *SubmitUpdate) SetCreatedAt(t time.Time) *SubmitUpdate {
+	su.mutation.SetCreatedAt(t)
+	return su
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (su *SubmitUpdate) SetUpdatedAt(t time.Time) *SubmitUpdate {
+	su.mutation.SetUpdatedAt(t)
+	return su
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (su *SubmitUpdate) SetNillableUpdatedAt(t *time.Time) *SubmitUpdate {
+	if t != nil {
+		su.SetUpdatedAt(*t)
+	}
+	return su
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (su *SubmitUpdate) ClearUpdatedAt() *SubmitUpdate {
+	su.mutation.ClearUpdatedAt()
 	return su
 }
 
@@ -193,6 +300,42 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := su.mutation.Status(); ok {
+		_spec.SetField(submit.FieldStatus, field.TypeString, value)
+	}
+	if su.mutation.StatusCleared() {
+		_spec.ClearField(submit.FieldStatus, field.TypeString)
+	}
+	if value, ok := su.mutation.ExecTime(); ok {
+		_spec.SetField(submit.FieldExecTime, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.AddedExecTime(); ok {
+		_spec.AddField(submit.FieldExecTime, field.TypeInt, value)
+	}
+	if su.mutation.ExecTimeCleared() {
+		_spec.ClearField(submit.FieldExecTime, field.TypeInt)
+	}
+	if value, ok := su.mutation.ExecMemory(); ok {
+		_spec.SetField(submit.FieldExecMemory, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.AddedExecMemory(); ok {
+		_spec.AddField(submit.FieldExecMemory, field.TypeInt, value)
+	}
+	if su.mutation.ExecMemoryCleared() {
+		_spec.ClearField(submit.FieldExecMemory, field.TypeInt)
+	}
+	if value, ok := su.mutation.SubmittedAt(); ok {
+		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)
+	}
+	if value, ok := su.mutation.CreatedAt(); ok {
+		_spec.SetField(submit.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := su.mutation.UpdatedAt(); ok {
+		_spec.SetField(submit.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if su.mutation.UpdatedAtCleared() {
+		_spec.ClearField(submit.FieldUpdatedAt, field.TypeTime)
 	}
 	if su.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -360,6 +503,112 @@ type SubmitUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *SubmitMutation
+}
+
+// SetStatus sets the "status" field.
+func (suo *SubmitUpdateOne) SetStatus(s string) *SubmitUpdateOne {
+	suo.mutation.SetStatus(s)
+	return suo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableStatus(s *string) *SubmitUpdateOne {
+	if s != nil {
+		suo.SetStatus(*s)
+	}
+	return suo
+}
+
+// ClearStatus clears the value of the "status" field.
+func (suo *SubmitUpdateOne) ClearStatus() *SubmitUpdateOne {
+	suo.mutation.ClearStatus()
+	return suo
+}
+
+// SetExecTime sets the "exec_time" field.
+func (suo *SubmitUpdateOne) SetExecTime(i int) *SubmitUpdateOne {
+	suo.mutation.ResetExecTime()
+	suo.mutation.SetExecTime(i)
+	return suo
+}
+
+// SetNillableExecTime sets the "exec_time" field if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableExecTime(i *int) *SubmitUpdateOne {
+	if i != nil {
+		suo.SetExecTime(*i)
+	}
+	return suo
+}
+
+// AddExecTime adds i to the "exec_time" field.
+func (suo *SubmitUpdateOne) AddExecTime(i int) *SubmitUpdateOne {
+	suo.mutation.AddExecTime(i)
+	return suo
+}
+
+// ClearExecTime clears the value of the "exec_time" field.
+func (suo *SubmitUpdateOne) ClearExecTime() *SubmitUpdateOne {
+	suo.mutation.ClearExecTime()
+	return suo
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (suo *SubmitUpdateOne) SetExecMemory(i int) *SubmitUpdateOne {
+	suo.mutation.ResetExecMemory()
+	suo.mutation.SetExecMemory(i)
+	return suo
+}
+
+// SetNillableExecMemory sets the "exec_memory" field if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableExecMemory(i *int) *SubmitUpdateOne {
+	if i != nil {
+		suo.SetExecMemory(*i)
+	}
+	return suo
+}
+
+// AddExecMemory adds i to the "exec_memory" field.
+func (suo *SubmitUpdateOne) AddExecMemory(i int) *SubmitUpdateOne {
+	suo.mutation.AddExecMemory(i)
+	return suo
+}
+
+// ClearExecMemory clears the value of the "exec_memory" field.
+func (suo *SubmitUpdateOne) ClearExecMemory() *SubmitUpdateOne {
+	suo.mutation.ClearExecMemory()
+	return suo
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (suo *SubmitUpdateOne) SetSubmittedAt(t time.Time) *SubmitUpdateOne {
+	suo.mutation.SetSubmittedAt(t)
+	return suo
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (suo *SubmitUpdateOne) SetCreatedAt(t time.Time) *SubmitUpdateOne {
+	suo.mutation.SetCreatedAt(t)
+	return suo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (suo *SubmitUpdateOne) SetUpdatedAt(t time.Time) *SubmitUpdateOne {
+	suo.mutation.SetUpdatedAt(t)
+	return suo
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableUpdatedAt(t *time.Time) *SubmitUpdateOne {
+	if t != nil {
+		suo.SetUpdatedAt(*t)
+	}
+	return suo
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (suo *SubmitUpdateOne) ClearUpdatedAt() *SubmitUpdateOne {
+	suo.mutation.ClearUpdatedAt()
+	return suo
 }
 
 // AddUserIDs adds the "users" edge to the User entity by IDs.
@@ -554,6 +803,42 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := suo.mutation.Status(); ok {
+		_spec.SetField(submit.FieldStatus, field.TypeString, value)
+	}
+	if suo.mutation.StatusCleared() {
+		_spec.ClearField(submit.FieldStatus, field.TypeString)
+	}
+	if value, ok := suo.mutation.ExecTime(); ok {
+		_spec.SetField(submit.FieldExecTime, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.AddedExecTime(); ok {
+		_spec.AddField(submit.FieldExecTime, field.TypeInt, value)
+	}
+	if suo.mutation.ExecTimeCleared() {
+		_spec.ClearField(submit.FieldExecTime, field.TypeInt)
+	}
+	if value, ok := suo.mutation.ExecMemory(); ok {
+		_spec.SetField(submit.FieldExecMemory, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.AddedExecMemory(); ok {
+		_spec.AddField(submit.FieldExecMemory, field.TypeInt, value)
+	}
+	if suo.mutation.ExecMemoryCleared() {
+		_spec.ClearField(submit.FieldExecMemory, field.TypeInt)
+	}
+	if value, ok := suo.mutation.SubmittedAt(); ok {
+		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)
+	}
+	if value, ok := suo.mutation.CreatedAt(); ok {
+		_spec.SetField(submit.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := suo.mutation.UpdatedAt(); ok {
+		_spec.SetField(submit.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if suo.mutation.UpdatedAtCleared() {
+		_spec.ClearField(submit.FieldUpdatedAt, field.TypeTime)
 	}
 	if suo.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{

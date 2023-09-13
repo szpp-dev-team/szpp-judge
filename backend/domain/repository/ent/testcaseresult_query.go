@@ -11,17 +11,21 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 )
 
 // TestcaseResultQuery is the builder for querying TestcaseResult entities.
 type TestcaseResultQuery struct {
 	config
-	ctx        *QueryContext
-	order      []testcaseresult.OrderOption
-	inters     []Interceptor
-	predicates []predicate.TestcaseResult
-	withFKs    bool
+	ctx          *QueryContext
+	order        []testcaseresult.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.TestcaseResult
+	withSubmit   *SubmitQuery
+	withTestcase *TestcaseQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +60,50 @@ func (trq *TestcaseResultQuery) Unique(unique bool) *TestcaseResultQuery {
 func (trq *TestcaseResultQuery) Order(o ...testcaseresult.OrderOption) *TestcaseResultQuery {
 	trq.order = append(trq.order, o...)
 	return trq
+}
+
+// QuerySubmit chains the current query on the "submit" edge.
+func (trq *TestcaseResultQuery) QuerySubmit() *SubmitQuery {
+	query := (&SubmitClient{config: trq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := trq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := trq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(testcaseresult.Table, testcaseresult.FieldID, selector),
+			sqlgraph.To(submit.Table, submit.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, testcaseresult.SubmitTable, testcaseresult.SubmitColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(trq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTestcase chains the current query on the "testcase" edge.
+func (trq *TestcaseResultQuery) QueryTestcase() *TestcaseQuery {
+	query := (&TestcaseClient{config: trq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := trq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := trq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(testcaseresult.Table, testcaseresult.FieldID, selector),
+			sqlgraph.To(testcase.Table, testcase.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, testcaseresult.TestcaseTable, testcaseresult.TestcaseColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(trq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first TestcaseResult entity from the query.
@@ -245,19 +293,55 @@ func (trq *TestcaseResultQuery) Clone() *TestcaseResultQuery {
 		return nil
 	}
 	return &TestcaseResultQuery{
-		config:     trq.config,
-		ctx:        trq.ctx.Clone(),
-		order:      append([]testcaseresult.OrderOption{}, trq.order...),
-		inters:     append([]Interceptor{}, trq.inters...),
-		predicates: append([]predicate.TestcaseResult{}, trq.predicates...),
+		config:       trq.config,
+		ctx:          trq.ctx.Clone(),
+		order:        append([]testcaseresult.OrderOption{}, trq.order...),
+		inters:       append([]Interceptor{}, trq.inters...),
+		predicates:   append([]predicate.TestcaseResult{}, trq.predicates...),
+		withSubmit:   trq.withSubmit.Clone(),
+		withTestcase: trq.withTestcase.Clone(),
 		// clone intermediate query.
 		sql:  trq.sql.Clone(),
 		path: trq.path,
 	}
 }
 
+// WithSubmit tells the query-builder to eager-load the nodes that are connected to
+// the "submit" edge. The optional arguments are used to configure the query builder of the edge.
+func (trq *TestcaseResultQuery) WithSubmit(opts ...func(*SubmitQuery)) *TestcaseResultQuery {
+	query := (&SubmitClient{config: trq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	trq.withSubmit = query
+	return trq
+}
+
+// WithTestcase tells the query-builder to eager-load the nodes that are connected to
+// the "testcase" edge. The optional arguments are used to configure the query builder of the edge.
+func (trq *TestcaseResultQuery) WithTestcase(opts ...func(*TestcaseQuery)) *TestcaseResultQuery {
+	query := (&TestcaseClient{config: trq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	trq.withTestcase = query
+	return trq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Status string `json:"status,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.TestcaseResult.Query().
+//		GroupBy(testcaseresult.FieldStatus).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (trq *TestcaseResultQuery) GroupBy(field string, fields ...string) *TestcaseResultGroupBy {
 	trq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &TestcaseResultGroupBy{build: trq}
@@ -269,6 +353,16 @@ func (trq *TestcaseResultQuery) GroupBy(field string, fields ...string) *Testcas
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Status string `json:"status,omitempty"`
+//	}
+//
+//	client.TestcaseResult.Query().
+//		Select(testcaseresult.FieldStatus).
+//		Scan(ctx, &v)
 func (trq *TestcaseResultQuery) Select(fields ...string) *TestcaseResultSelect {
 	trq.ctx.Fields = append(trq.ctx.Fields, fields...)
 	sbuild := &TestcaseResultSelect{TestcaseResultQuery: trq}
@@ -310,10 +404,17 @@ func (trq *TestcaseResultQuery) prepareQuery(ctx context.Context) error {
 
 func (trq *TestcaseResultQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*TestcaseResult, error) {
 	var (
-		nodes   = []*TestcaseResult{}
-		withFKs = trq.withFKs
-		_spec   = trq.querySpec()
+		nodes       = []*TestcaseResult{}
+		withFKs     = trq.withFKs
+		_spec       = trq.querySpec()
+		loadedTypes = [2]bool{
+			trq.withSubmit != nil,
+			trq.withTestcase != nil,
+		}
 	)
+	if trq.withSubmit != nil || trq.withTestcase != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, testcaseresult.ForeignKeys...)
 	}
@@ -323,6 +424,7 @@ func (trq *TestcaseResultQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &TestcaseResult{config: trq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -334,7 +436,84 @@ func (trq *TestcaseResultQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := trq.withSubmit; query != nil {
+		if err := trq.loadSubmit(ctx, query, nodes, nil,
+			func(n *TestcaseResult, e *Submit) { n.Edges.Submit = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := trq.withTestcase; query != nil {
+		if err := trq.loadTestcase(ctx, query, nodes, nil,
+			func(n *TestcaseResult, e *Testcase) { n.Edges.Testcase = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (trq *TestcaseResultQuery) loadSubmit(ctx context.Context, query *SubmitQuery, nodes []*TestcaseResult, init func(*TestcaseResult), assign func(*TestcaseResult, *Submit)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*TestcaseResult)
+	for i := range nodes {
+		if nodes[i].submit_testcase_results == nil {
+			continue
+		}
+		fk := *nodes[i].submit_testcase_results
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(submit.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "submit_testcase_results" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (trq *TestcaseResultQuery) loadTestcase(ctx context.Context, query *TestcaseQuery, nodes []*TestcaseResult, init func(*TestcaseResult), assign func(*TestcaseResult, *Testcase)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*TestcaseResult)
+	for i := range nodes {
+		if nodes[i].testcase_result_testcase == nil {
+			continue
+		}
+		fk := *nodes[i].testcase_result_testcase
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(testcase.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "testcase_result_testcase" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (trq *TestcaseResultQuery) sqlCount(ctx context.Context) (int, error) {

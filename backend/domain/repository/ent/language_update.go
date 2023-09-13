@@ -28,6 +28,18 @@ func (lu *LanguageUpdate) Where(ps ...predicate.Language) *LanguageUpdate {
 	return lu
 }
 
+// SetName sets the "name" field.
+func (lu *LanguageUpdate) SetName(s string) *LanguageUpdate {
+	lu.mutation.SetName(s)
+	return lu
+}
+
+// SetSlug sets the "slug" field.
+func (lu *LanguageUpdate) SetSlug(s string) *LanguageUpdate {
+	lu.mutation.SetSlug(s)
+	return lu
+}
+
 // AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
 func (lu *LanguageUpdate) AddSubmitIDs(ids ...int) *LanguageUpdate {
 	lu.mutation.AddSubmitIDs(ids...)
@@ -105,6 +117,12 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := lu.mutation.Name(); ok {
+		_spec.SetField(language.FieldName, field.TypeString, value)
+	}
+	if value, ok := lu.mutation.Slug(); ok {
+		_spec.SetField(language.FieldSlug, field.TypeString, value)
+	}
 	if lu.mutation.SubmitsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -168,6 +186,18 @@ type LanguageUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *LanguageMutation
+}
+
+// SetName sets the "name" field.
+func (luo *LanguageUpdateOne) SetName(s string) *LanguageUpdateOne {
+	luo.mutation.SetName(s)
+	return luo
+}
+
+// SetSlug sets the "slug" field.
+func (luo *LanguageUpdateOne) SetSlug(s string) *LanguageUpdateOne {
+	luo.mutation.SetSlug(s)
+	return luo
 }
 
 // AddSubmitIDs adds the "submits" edge to the Submit entity by IDs.
@@ -276,6 +306,12 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := luo.mutation.Name(); ok {
+		_spec.SetField(language.FieldName, field.TypeString, value)
+	}
+	if value, ok := luo.mutation.Slug(); ok {
+		_spec.SetField(language.FieldSlug, field.TypeString, value)
 	}
 	if luo.mutation.SubmitsCleared() {
 		edge := &sqlgraph.EdgeSpec{
