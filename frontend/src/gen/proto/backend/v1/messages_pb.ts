@@ -168,76 +168,150 @@ export class CreateUserResponse extends Message<CreateUserResponse> {
 }
 
 /**
- * @generated from message backend.v1.ExistsUserIDRequest
+ * @generated from message backend.v1.ExistsUsernameRequest
  */
-export class ExistsUserIDRequest extends Message<ExistsUserIDRequest> {
+export class ExistsUsernameRequest extends Message<ExistsUsernameRequest> {
   /**
-   * @generated from field: string user_id = 1;
+   * @generated from field: string username = 1;
    */
-  userId = "";
+  username = "";
 
-  constructor(data?: PartialMessage<ExistsUserIDRequest>) {
+  constructor(data?: PartialMessage<ExistsUsernameRequest>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.ExistsUserIDRequest";
+  static readonly typeName = "backend.v1.ExistsUsernameRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExistsUserIDRequest {
-    return new ExistsUserIDRequest().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExistsUsernameRequest {
+    return new ExistsUsernameRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExistsUserIDRequest {
-    return new ExistsUserIDRequest().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExistsUsernameRequest {
+    return new ExistsUsernameRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExistsUserIDRequest {
-    return new ExistsUserIDRequest().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExistsUsernameRequest {
+    return new ExistsUsernameRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: ExistsUserIDRequest | PlainMessage<ExistsUserIDRequest> | undefined, b: ExistsUserIDRequest | PlainMessage<ExistsUserIDRequest> | undefined): boolean {
-    return proto3.util.equals(ExistsUserIDRequest, a, b);
+  static equals(a: ExistsUsernameRequest | PlainMessage<ExistsUsernameRequest> | undefined, b: ExistsUsernameRequest | PlainMessage<ExistsUsernameRequest> | undefined): boolean {
+    return proto3.util.equals(ExistsUsernameRequest, a, b);
   }
 }
 
 /**
- * @generated from message backend.v1.ExistsUserIDResponse
+ * @generated from message backend.v1.ExistsUsernameResponse
  */
-export class ExistsUserIDResponse extends Message<ExistsUserIDResponse> {
+export class ExistsUsernameResponse extends Message<ExistsUsernameResponse> {
   /**
    * @generated from field: bool exists = 1;
    */
   exists = false;
 
-  constructor(data?: PartialMessage<ExistsUserIDResponse>) {
+  constructor(data?: PartialMessage<ExistsUsernameResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.ExistsUserIDResponse";
+  static readonly typeName = "backend.v1.ExistsUsernameResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "exists", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExistsUserIDResponse {
-    return new ExistsUserIDResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExistsUsernameResponse {
+    return new ExistsUsernameResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExistsUserIDResponse {
-    return new ExistsUserIDResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExistsUsernameResponse {
+    return new ExistsUsernameResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExistsUserIDResponse {
-    return new ExistsUserIDResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExistsUsernameResponse {
+    return new ExistsUsernameResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: ExistsUserIDResponse | PlainMessage<ExistsUserIDResponse> | undefined, b: ExistsUserIDResponse | PlainMessage<ExistsUserIDResponse> | undefined): boolean {
-    return proto3.util.equals(ExistsUserIDResponse, a, b);
+  static equals(a: ExistsUsernameResponse | PlainMessage<ExistsUsernameResponse> | undefined, b: ExistsUsernameResponse | PlainMessage<ExistsUsernameResponse> | undefined): boolean {
+    return proto3.util.equals(ExistsUsernameResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.ExistsEmailRequest
+ */
+export class ExistsEmailRequest extends Message<ExistsEmailRequest> {
+  /**
+   * @generated from field: string email = 1;
+   */
+  email = "";
+
+  constructor(data?: PartialMessage<ExistsEmailRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.ExistsEmailRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "email", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExistsEmailRequest {
+    return new ExistsEmailRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExistsEmailRequest {
+    return new ExistsEmailRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExistsEmailRequest {
+    return new ExistsEmailRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExistsEmailRequest | PlainMessage<ExistsEmailRequest> | undefined, b: ExistsEmailRequest | PlainMessage<ExistsEmailRequest> | undefined): boolean {
+    return proto3.util.equals(ExistsEmailRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.ExistsEmailResponse
+ */
+export class ExistsEmailResponse extends Message<ExistsEmailResponse> {
+  /**
+   * @generated from field: bool exists = 1;
+   */
+  exists = false;
+
+  constructor(data?: PartialMessage<ExistsEmailResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.ExistsEmailResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "exists", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExistsEmailResponse {
+    return new ExistsEmailResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExistsEmailResponse {
+    return new ExistsEmailResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExistsEmailResponse {
+    return new ExistsEmailResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExistsEmailResponse | PlainMessage<ExistsEmailResponse> | undefined, b: ExistsEmailResponse | PlainMessage<ExistsEmailResponse> | undefined): boolean {
+    return proto3.util.equals(ExistsEmailResponse, a, b);
   }
 }
 
