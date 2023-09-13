@@ -9,8 +9,10 @@ service UserService {
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
   // User を新たに作成する
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-  // UserID が存在するかを確認する
-  rpc ExistsUserID(ExistsUserIDRequest) returns (ExistsUserIDResponse);
+  // Username が存在するかを確認する
+  rpc ExistsUsername(ExistsUsernameRequest) returns (ExistsUsernameResponse);
+  // Email が存在するかを確認する
+  rpc ExistsEmail(ExistsEmailRequest) returns (ExistsEmailResponse);
 }
 
 service AuthService {

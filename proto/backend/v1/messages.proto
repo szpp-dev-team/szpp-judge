@@ -23,11 +23,19 @@ message CreateUserResponse {
   User user = 1;
 }
 
-message ExistsUserIDRequest {
-  string user_id = 1;
+message ExistsUsernameRequest {
+  string username = 1;
 }
 
-message ExistsUserIDResponse {
+message ExistsUsernameResponse {
+  bool exists = 1;
+}
+
+message ExistsEmailRequest {
+  string email = 1;
+}
+
+message ExistsEmailResponse {
   bool exists = 1;
 }
 
