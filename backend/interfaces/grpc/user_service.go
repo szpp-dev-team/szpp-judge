@@ -11,6 +11,10 @@ type userServiceServer struct {
 	interactor *user.Interactor
 }
 
+func NewUserServiceServer(interactor *user.Interactor) backendv1.UserServiceServer {
+	return &userServiceServer{interactor}
+}
+
 func (s *userServiceServer) GetUser(ctx context.Context, req *backendv1.GetUserRequest) (*backendv1.GetUserResponse, error) {
 	return s.interactor.GetUser(ctx, req)
 }
