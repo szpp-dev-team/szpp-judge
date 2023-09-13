@@ -23,6 +23,14 @@ message CreateUserResponse {
   User user = 1;
 }
 
+message CheckUserRequest {
+  string username = 1;
+}
+
+message CheckUserResponse {
+  bool exists = 1;
+}
+
 enum Role {
   UNKNOWN = 0;
   ADMIN = 1;
