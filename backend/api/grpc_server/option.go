@@ -1,14 +1,16 @@
 package grpc_server
 
 import (
+	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	"golang.org/x/exp/slog"
 )
 
 type option struct {
-	logger        *slog.Logger
-	entClient     *ent.Client
-	useReflection bool
+	logger           *slog.Logger
+	entClient        *ent.Client
+	cloudtasksClient *cloudtasks.Client
+	useReflection    bool
 }
 
 func defaultOption() *option {
@@ -35,5 +37,11 @@ func WithReflection(b bool) optionFunc {
 func WithEntClient(c *ent.Client) optionFunc {
 	return func(o *option) {
 		o.entClient = c
+	}
+}
+
+func WithCloudtasksClient(c *cloudtasks.Client) optionFunc {
+	return func(o *option) {
+		o.cloudtasksClient = c
 	}
 }

@@ -68,6 +68,20 @@ func (sc *SubmitCreate) SetNillableExecMemory(i *int) *SubmitCreate {
 	return sc
 }
 
+// SetScore sets the "score" field.
+func (sc *SubmitCreate) SetScore(i int) *SubmitCreate {
+	sc.mutation.SetScore(i)
+	return sc
+}
+
+// SetNillableScore sets the "score" field if the given value is not nil.
+func (sc *SubmitCreate) SetNillableScore(i *int) *SubmitCreate {
+	if i != nil {
+		sc.SetScore(*i)
+	}
+	return sc
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (sc *SubmitCreate) SetSubmittedAt(t time.Time) *SubmitCreate {
 	sc.mutation.SetSubmittedAt(t)
@@ -100,19 +114,23 @@ func (sc *SubmitCreate) SetID(i int) *SubmitCreate {
 	return sc
 }
 
-// AddUserIDs adds the "users" edge to the User entity by IDs.
-func (sc *SubmitCreate) AddUserIDs(ids ...int) *SubmitCreate {
-	sc.mutation.AddUserIDs(ids...)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (sc *SubmitCreate) SetUserID(id int) *SubmitCreate {
+	sc.mutation.SetUserID(id)
 	return sc
 }
 
-// AddUsers adds the "users" edges to the User entity.
-func (sc *SubmitCreate) AddUsers(u ...*User) *SubmitCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (sc *SubmitCreate) SetNillableUserID(id *int) *SubmitCreate {
+	if id != nil {
+		sc = sc.SetUserID(*id)
 	}
-	return sc.AddUserIDs(ids...)
+	return sc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (sc *SubmitCreate) SetUser(u *User) *SubmitCreate {
+	return sc.SetUserID(u.ID)
 }
 
 // SetTaskID sets the "task" edge to the Task entity by ID.
@@ -243,7 +261,7 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.Status(); ok {
 		_spec.SetField(submit.FieldStatus, field.TypeString, value)
-		_node.Status = value
+		_node.Status = &value
 	}
 	if value, ok := sc.mutation.ExecTime(); ok {
 		_spec.SetField(submit.FieldExecTime, field.TypeInt, value)
@@ -252,6 +270,10 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.ExecMemory(); ok {
 		_spec.SetField(submit.FieldExecMemory, field.TypeInt, value)
 		_node.ExecMemory = value
+	}
+	if value, ok := sc.mutation.Score(); ok {
+		_spec.SetField(submit.FieldScore, field.TypeInt, value)
+		_node.Score = value
 	}
 	if value, ok := sc.mutation.SubmittedAt(); ok {
 		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)
@@ -265,12 +287,12 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 		_spec.SetField(submit.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = &value
 	}
-	if nodes := sc.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   submit.UsersTable,
-			Columns: submit.UsersPrimaryKey,
+			Table:   submit.UserTable,
+			Columns: []string{submit.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -279,6 +301,7 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.user_submits = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.TaskIDs(); len(nodes) > 0 {
@@ -449,6 +472,30 @@ func (u *SubmitUpsert) ClearExecMemory() *SubmitUpsert {
 	return u
 }
 
+// SetScore sets the "score" field.
+func (u *SubmitUpsert) SetScore(v int) *SubmitUpsert {
+	u.Set(submit.FieldScore, v)
+	return u
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateScore() *SubmitUpsert {
+	u.SetExcluded(submit.FieldScore)
+	return u
+}
+
+// AddScore adds v to the "score" field.
+func (u *SubmitUpsert) AddScore(v int) *SubmitUpsert {
+	u.Add(submit.FieldScore, v)
+	return u
+}
+
+// ClearScore clears the value of the "score" field.
+func (u *SubmitUpsert) ClearScore() *SubmitUpsert {
+	u.SetNull(submit.FieldScore)
+	return u
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (u *SubmitUpsert) SetSubmittedAt(v time.Time) *SubmitUpsert {
 	u.Set(submit.FieldSubmittedAt, v)
@@ -613,6 +660,34 @@ func (u *SubmitUpsertOne) UpdateExecMemory() *SubmitUpsertOne {
 func (u *SubmitUpsertOne) ClearExecMemory() *SubmitUpsertOne {
 	return u.Update(func(s *SubmitUpsert) {
 		s.ClearExecMemory()
+	})
+}
+
+// SetScore sets the "score" field.
+func (u *SubmitUpsertOne) SetScore(v int) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetScore(v)
+	})
+}
+
+// AddScore adds v to the "score" field.
+func (u *SubmitUpsertOne) AddScore(v int) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.AddScore(v)
+	})
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateScore() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateScore()
+	})
+}
+
+// ClearScore clears the value of the "score" field.
+func (u *SubmitUpsertOne) ClearScore() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearScore()
 	})
 }
 
@@ -948,6 +1023,34 @@ func (u *SubmitUpsertBulk) UpdateExecMemory() *SubmitUpsertBulk {
 func (u *SubmitUpsertBulk) ClearExecMemory() *SubmitUpsertBulk {
 	return u.Update(func(s *SubmitUpsert) {
 		s.ClearExecMemory()
+	})
+}
+
+// SetScore sets the "score" field.
+func (u *SubmitUpsertBulk) SetScore(v int) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetScore(v)
+	})
+}
+
+// AddScore adds v to the "score" field.
+func (u *SubmitUpsertBulk) AddScore(v int) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.AddScore(v)
+	})
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateScore() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateScore()
+	})
+}
+
+// ClearScore clears the value of the "score" field.
+func (u *SubmitUpsertBulk) ClearScore() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearScore()
 	})
 }
 

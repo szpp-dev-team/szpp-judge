@@ -106,6 +106,33 @@ func (su *SubmitUpdate) ClearExecMemory() *SubmitUpdate {
 	return su
 }
 
+// SetScore sets the "score" field.
+func (su *SubmitUpdate) SetScore(i int) *SubmitUpdate {
+	su.mutation.ResetScore()
+	su.mutation.SetScore(i)
+	return su
+}
+
+// SetNillableScore sets the "score" field if the given value is not nil.
+func (su *SubmitUpdate) SetNillableScore(i *int) *SubmitUpdate {
+	if i != nil {
+		su.SetScore(*i)
+	}
+	return su
+}
+
+// AddScore adds i to the "score" field.
+func (su *SubmitUpdate) AddScore(i int) *SubmitUpdate {
+	su.mutation.AddScore(i)
+	return su
+}
+
+// ClearScore clears the value of the "score" field.
+func (su *SubmitUpdate) ClearScore() *SubmitUpdate {
+	su.mutation.ClearScore()
+	return su
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (su *SubmitUpdate) SetSubmittedAt(t time.Time) *SubmitUpdate {
 	su.mutation.SetSubmittedAt(t)
@@ -138,19 +165,23 @@ func (su *SubmitUpdate) ClearUpdatedAt() *SubmitUpdate {
 	return su
 }
 
-// AddUserIDs adds the "users" edge to the User entity by IDs.
-func (su *SubmitUpdate) AddUserIDs(ids ...int) *SubmitUpdate {
-	su.mutation.AddUserIDs(ids...)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (su *SubmitUpdate) SetUserID(id int) *SubmitUpdate {
+	su.mutation.SetUserID(id)
 	return su
 }
 
-// AddUsers adds the "users" edges to the User entity.
-func (su *SubmitUpdate) AddUsers(u ...*User) *SubmitUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (su *SubmitUpdate) SetNillableUserID(id *int) *SubmitUpdate {
+	if id != nil {
+		su = su.SetUserID(*id)
 	}
-	return su.AddUserIDs(ids...)
+	return su
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (su *SubmitUpdate) SetUser(u *User) *SubmitUpdate {
+	return su.SetUserID(u.ID)
 }
 
 // SetTaskID sets the "task" edge to the Task entity by ID.
@@ -211,25 +242,10 @@ func (su *SubmitUpdate) Mutation() *SubmitMutation {
 	return su.mutation
 }
 
-// ClearUsers clears all "users" edges to the User entity.
-func (su *SubmitUpdate) ClearUsers() *SubmitUpdate {
-	su.mutation.ClearUsers()
+// ClearUser clears the "user" edge to the User entity.
+func (su *SubmitUpdate) ClearUser() *SubmitUpdate {
+	su.mutation.ClearUser()
 	return su
-}
-
-// RemoveUserIDs removes the "users" edge to User entities by IDs.
-func (su *SubmitUpdate) RemoveUserIDs(ids ...int) *SubmitUpdate {
-	su.mutation.RemoveUserIDs(ids...)
-	return su
-}
-
-// RemoveUsers removes "users" edges to User entities.
-func (su *SubmitUpdate) RemoveUsers(u ...*User) *SubmitUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return su.RemoveUserIDs(ids...)
 }
 
 // ClearTask clears the "task" edge to the Task entity.
@@ -325,6 +341,15 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.ExecMemoryCleared() {
 		_spec.ClearField(submit.FieldExecMemory, field.TypeInt)
 	}
+	if value, ok := su.mutation.Score(); ok {
+		_spec.SetField(submit.FieldScore, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.AddedScore(); ok {
+		_spec.AddField(submit.FieldScore, field.TypeInt, value)
+	}
+	if su.mutation.ScoreCleared() {
+		_spec.ClearField(submit.FieldScore, field.TypeInt)
+	}
 	if value, ok := su.mutation.SubmittedAt(); ok {
 		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)
 	}
@@ -337,12 +362,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.UpdatedAtCleared() {
 		_spec.ClearField(submit.FieldUpdatedAt, field.TypeTime)
 	}
-	if su.mutation.UsersCleared() {
+	if su.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   submit.UsersTable,
-			Columns: submit.UsersPrimaryKey,
+			Table:   submit.UserTable,
+			Columns: []string{submit.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -350,28 +375,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedUsersIDs(); len(nodes) > 0 && !su.mutation.UsersCleared() {
+	if nodes := su.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   submit.UsersTable,
-			Columns: submit.UsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.UsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   submit.UsersTable,
-			Columns: submit.UsersPrimaryKey,
+			Table:   submit.UserTable,
+			Columns: []string{submit.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -579,6 +588,33 @@ func (suo *SubmitUpdateOne) ClearExecMemory() *SubmitUpdateOne {
 	return suo
 }
 
+// SetScore sets the "score" field.
+func (suo *SubmitUpdateOne) SetScore(i int) *SubmitUpdateOne {
+	suo.mutation.ResetScore()
+	suo.mutation.SetScore(i)
+	return suo
+}
+
+// SetNillableScore sets the "score" field if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableScore(i *int) *SubmitUpdateOne {
+	if i != nil {
+		suo.SetScore(*i)
+	}
+	return suo
+}
+
+// AddScore adds i to the "score" field.
+func (suo *SubmitUpdateOne) AddScore(i int) *SubmitUpdateOne {
+	suo.mutation.AddScore(i)
+	return suo
+}
+
+// ClearScore clears the value of the "score" field.
+func (suo *SubmitUpdateOne) ClearScore() *SubmitUpdateOne {
+	suo.mutation.ClearScore()
+	return suo
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (suo *SubmitUpdateOne) SetSubmittedAt(t time.Time) *SubmitUpdateOne {
 	suo.mutation.SetSubmittedAt(t)
@@ -611,19 +647,23 @@ func (suo *SubmitUpdateOne) ClearUpdatedAt() *SubmitUpdateOne {
 	return suo
 }
 
-// AddUserIDs adds the "users" edge to the User entity by IDs.
-func (suo *SubmitUpdateOne) AddUserIDs(ids ...int) *SubmitUpdateOne {
-	suo.mutation.AddUserIDs(ids...)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (suo *SubmitUpdateOne) SetUserID(id int) *SubmitUpdateOne {
+	suo.mutation.SetUserID(id)
 	return suo
 }
 
-// AddUsers adds the "users" edges to the User entity.
-func (suo *SubmitUpdateOne) AddUsers(u ...*User) *SubmitUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableUserID(id *int) *SubmitUpdateOne {
+	if id != nil {
+		suo = suo.SetUserID(*id)
 	}
-	return suo.AddUserIDs(ids...)
+	return suo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (suo *SubmitUpdateOne) SetUser(u *User) *SubmitUpdateOne {
+	return suo.SetUserID(u.ID)
 }
 
 // SetTaskID sets the "task" edge to the Task entity by ID.
@@ -684,25 +724,10 @@ func (suo *SubmitUpdateOne) Mutation() *SubmitMutation {
 	return suo.mutation
 }
 
-// ClearUsers clears all "users" edges to the User entity.
-func (suo *SubmitUpdateOne) ClearUsers() *SubmitUpdateOne {
-	suo.mutation.ClearUsers()
+// ClearUser clears the "user" edge to the User entity.
+func (suo *SubmitUpdateOne) ClearUser() *SubmitUpdateOne {
+	suo.mutation.ClearUser()
 	return suo
-}
-
-// RemoveUserIDs removes the "users" edge to User entities by IDs.
-func (suo *SubmitUpdateOne) RemoveUserIDs(ids ...int) *SubmitUpdateOne {
-	suo.mutation.RemoveUserIDs(ids...)
-	return suo
-}
-
-// RemoveUsers removes "users" edges to User entities.
-func (suo *SubmitUpdateOne) RemoveUsers(u ...*User) *SubmitUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return suo.RemoveUserIDs(ids...)
 }
 
 // ClearTask clears the "task" edge to the Task entity.
@@ -828,6 +853,15 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 	if suo.mutation.ExecMemoryCleared() {
 		_spec.ClearField(submit.FieldExecMemory, field.TypeInt)
 	}
+	if value, ok := suo.mutation.Score(); ok {
+		_spec.SetField(submit.FieldScore, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.AddedScore(); ok {
+		_spec.AddField(submit.FieldScore, field.TypeInt, value)
+	}
+	if suo.mutation.ScoreCleared() {
+		_spec.ClearField(submit.FieldScore, field.TypeInt)
+	}
 	if value, ok := suo.mutation.SubmittedAt(); ok {
 		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)
 	}
@@ -840,12 +874,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 	if suo.mutation.UpdatedAtCleared() {
 		_spec.ClearField(submit.FieldUpdatedAt, field.TypeTime)
 	}
-	if suo.mutation.UsersCleared() {
+	if suo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   submit.UsersTable,
-			Columns: submit.UsersPrimaryKey,
+			Table:   submit.UserTable,
+			Columns: []string{submit.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -853,28 +887,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedUsersIDs(); len(nodes) > 0 && !suo.mutation.UsersCleared() {
+	if nodes := suo.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   submit.UsersTable,
-			Columns: submit.UsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.UsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   submit.UsersTable,
-			Columns: submit.UsersPrimaryKey,
+			Table:   submit.UserTable,
+			Columns: []string{submit.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),

@@ -12,6 +12,8 @@ import (
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	ent_testcaseset "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
+	sources_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
@@ -21,14 +23,21 @@ import (
 )
 
 type Interactor struct {
-	entClient  *ent.Client
-	repository testcases_repo.Repository
-	logger     *slog.Logger
+	entClient     *ent.Client
+	testcasesRepo testcases_repo.Repository
+	sourcesRepo   sources_repo.Repository
+	judgeQueue    judge_queue.JudgeQueue
+	logger        *slog.Logger
 }
 
-func NewInteractor(entClient *ent.Client, repository testcases_repo.Repository) *Interactor {
+func NewInteractor(
+	entClient *ent.Client,
+	testcasesRepo testcases_repo.Repository,
+	sourcesRepo sources_repo.Repository,
+	judgeQueue judge_queue.JudgeQueue,
+) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "tasks"))
-	return &Interactor{entClient, repository, logger}
+	return &Interactor{entClient, testcasesRepo, sourcesRepo, judgeQueue, logger}
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
@@ -151,7 +160,7 @@ func (i *Interactor) GetTestcaseSets(ctx context.Context, req *backendv1.GetTest
 			if _, ok := testcaseByName[t.Name]; ok {
 				continue
 			}
-			testcase, err := i.repository.DownloadTestcase(ctx, int(req.TaskId), t.Name)
+			testcase, err := i.testcasesRepo.DownloadTestcase(ctx, int(req.TaskId), t.Name)
 			if err != nil {
 				i.logger.Error("failed to download testcase", slog.Int("task_id", int(req.TaskId)), slog.String("testcase_name", t.Name))
 				return nil, status.Error(codes.Internal, err.Error())
@@ -197,7 +206,7 @@ func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTe
 	}
 
 	for _, testcase := range req.Testcases {
-		if err := i.repository.UpsertTestcase(ctx, int(req.TaskId), &testcases_repo.Testcase{
+		if err := i.testcasesRepo.UpsertTestcase(ctx, int(req.TaskId), &testcases_repo.Testcase{
 			Name: testcase.Slug,
 			In:   []byte(testcase.Input),
 			Out:  []byte(testcase.Output),

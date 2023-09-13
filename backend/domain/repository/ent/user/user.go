@@ -35,11 +35,13 @@ const (
 	TasksInverseTable = "tasks"
 	// TasksColumn is the table column denoting the tasks relation/edge.
 	TasksColumn = "user_tasks"
-	// SubmitsTable is the table that holds the submits relation/edge. The primary key declared below.
-	SubmitsTable = "user_submits"
+	// SubmitsTable is the table that holds the submits relation/edge.
+	SubmitsTable = "submits"
 	// SubmitsInverseTable is the table name for the Submit entity.
 	// It exists in this package in order to avoid circular dependency with the "submit" package.
 	SubmitsInverseTable = "submits"
+	// SubmitsColumn is the table column denoting the submits relation/edge.
+	SubmitsColumn = "user_submits"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -51,12 +53,6 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
-
-var (
-	// SubmitsPrimaryKey and SubmitsColumn2 are the table columns denoting the
-	// primary key for the submits relation (M2M).
-	SubmitsPrimaryKey = []string{"user_id", "submit_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -139,6 +135,6 @@ func newSubmitsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubmitsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, SubmitsTable, SubmitsPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
 	)
 }

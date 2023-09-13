@@ -529,13 +529,14 @@ type SubmitMutation struct {
 	addexec_time            *int
 	exec_memory             *int
 	addexec_memory          *int
+	score                   *int
+	addscore                *int
 	submitted_at            *time.Time
 	created_at              *time.Time
 	updated_at              *time.Time
 	clearedFields           map[string]struct{}
-	users                   map[int]struct{}
-	removedusers            map[int]struct{}
-	clearedusers            bool
+	user                    *int
+	cleareduser             bool
 	task                    *int
 	clearedtask             bool
 	language                *int
@@ -669,7 +670,7 @@ func (m *SubmitMutation) Status() (r string, exists bool) {
 // OldStatus returns the old "status" field's value of the Submit entity.
 // If the Submit object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubmitMutation) OldStatus(ctx context.Context) (v string, err error) {
+func (m *SubmitMutation) OldStatus(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -841,6 +842,76 @@ func (m *SubmitMutation) ResetExecMemory() {
 	delete(m.clearedFields, submit.FieldExecMemory)
 }
 
+// SetScore sets the "score" field.
+func (m *SubmitMutation) SetScore(i int) {
+	m.score = &i
+	m.addscore = nil
+}
+
+// Score returns the value of the "score" field in the mutation.
+func (m *SubmitMutation) Score() (r int, exists bool) {
+	v := m.score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScore returns the old "score" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldScore(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScore: %w", err)
+	}
+	return oldValue.Score, nil
+}
+
+// AddScore adds i to the "score" field.
+func (m *SubmitMutation) AddScore(i int) {
+	if m.addscore != nil {
+		*m.addscore += i
+	} else {
+		m.addscore = &i
+	}
+}
+
+// AddedScore returns the value that was added to the "score" field in this mutation.
+func (m *SubmitMutation) AddedScore() (r int, exists bool) {
+	v := m.addscore
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearScore clears the value of the "score" field.
+func (m *SubmitMutation) ClearScore() {
+	m.score = nil
+	m.addscore = nil
+	m.clearedFields[submit.FieldScore] = struct{}{}
+}
+
+// ScoreCleared returns if the "score" field was cleared in this mutation.
+func (m *SubmitMutation) ScoreCleared() bool {
+	_, ok := m.clearedFields[submit.FieldScore]
+	return ok
+}
+
+// ResetScore resets all changes to the "score" field.
+func (m *SubmitMutation) ResetScore() {
+	m.score = nil
+	m.addscore = nil
+	delete(m.clearedFields, submit.FieldScore)
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (m *SubmitMutation) SetSubmittedAt(t time.Time) {
 	m.submitted_at = &t
@@ -962,58 +1033,43 @@ func (m *SubmitMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, submit.FieldUpdatedAt)
 }
 
-// AddUserIDs adds the "users" edge to the User entity by ids.
-func (m *SubmitMutation) AddUserIDs(ids ...int) {
-	if m.users == nil {
-		m.users = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.users[ids[i]] = struct{}{}
-	}
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *SubmitMutation) SetUserID(id int) {
+	m.user = &id
 }
 
-// ClearUsers clears the "users" edge to the User entity.
-func (m *SubmitMutation) ClearUsers() {
-	m.clearedusers = true
+// ClearUser clears the "user" edge to the User entity.
+func (m *SubmitMutation) ClearUser() {
+	m.cleareduser = true
 }
 
-// UsersCleared reports if the "users" edge to the User entity was cleared.
-func (m *SubmitMutation) UsersCleared() bool {
-	return m.clearedusers
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *SubmitMutation) UserCleared() bool {
+	return m.cleareduser
 }
 
-// RemoveUserIDs removes the "users" edge to the User entity by IDs.
-func (m *SubmitMutation) RemoveUserIDs(ids ...int) {
-	if m.removedusers == nil {
-		m.removedusers = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.users, ids[i])
-		m.removedusers[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedUsers returns the removed IDs of the "users" edge to the User entity.
-func (m *SubmitMutation) RemovedUsersIDs() (ids []int) {
-	for id := range m.removedusers {
-		ids = append(ids, id)
+// UserID returns the "user" edge ID in the mutation.
+func (m *SubmitMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
 	}
 	return
 }
 
-// UsersIDs returns the "users" edge IDs in the mutation.
-func (m *SubmitMutation) UsersIDs() (ids []int) {
-	for id := range m.users {
-		ids = append(ids, id)
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *SubmitMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUsers resets all changes to the "users" edge.
-func (m *SubmitMutation) ResetUsers() {
-	m.users = nil
-	m.clearedusers = false
-	m.removedusers = nil
+// ResetUser resets all changes to the "user" edge.
+func (m *SubmitMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
 }
 
 // SetTaskID sets the "task" edge to the Task entity by id.
@@ -1182,7 +1238,7 @@ func (m *SubmitMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubmitMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.status != nil {
 		fields = append(fields, submit.FieldStatus)
 	}
@@ -1191,6 +1247,9 @@ func (m *SubmitMutation) Fields() []string {
 	}
 	if m.exec_memory != nil {
 		fields = append(fields, submit.FieldExecMemory)
+	}
+	if m.score != nil {
+		fields = append(fields, submit.FieldScore)
 	}
 	if m.submitted_at != nil {
 		fields = append(fields, submit.FieldSubmittedAt)
@@ -1215,6 +1274,8 @@ func (m *SubmitMutation) Field(name string) (ent.Value, bool) {
 		return m.ExecTime()
 	case submit.FieldExecMemory:
 		return m.ExecMemory()
+	case submit.FieldScore:
+		return m.Score()
 	case submit.FieldSubmittedAt:
 		return m.SubmittedAt()
 	case submit.FieldCreatedAt:
@@ -1236,6 +1297,8 @@ func (m *SubmitMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldExecTime(ctx)
 	case submit.FieldExecMemory:
 		return m.OldExecMemory(ctx)
+	case submit.FieldScore:
+		return m.OldScore(ctx)
 	case submit.FieldSubmittedAt:
 		return m.OldSubmittedAt(ctx)
 	case submit.FieldCreatedAt:
@@ -1272,6 +1335,13 @@ func (m *SubmitMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetExecMemory(v)
 		return nil
+	case submit.FieldScore:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScore(v)
+		return nil
 	case submit.FieldSubmittedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -1307,6 +1377,9 @@ func (m *SubmitMutation) AddedFields() []string {
 	if m.addexec_memory != nil {
 		fields = append(fields, submit.FieldExecMemory)
 	}
+	if m.addscore != nil {
+		fields = append(fields, submit.FieldScore)
+	}
 	return fields
 }
 
@@ -1319,6 +1392,8 @@ func (m *SubmitMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedExecTime()
 	case submit.FieldExecMemory:
 		return m.AddedExecMemory()
+	case submit.FieldScore:
+		return m.AddedScore()
 	}
 	return nil, false
 }
@@ -1342,6 +1417,13 @@ func (m *SubmitMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddExecMemory(v)
 		return nil
+	case submit.FieldScore:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddScore(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Submit numeric field %s", name)
 }
@@ -1358,6 +1440,9 @@ func (m *SubmitMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(submit.FieldExecMemory) {
 		fields = append(fields, submit.FieldExecMemory)
+	}
+	if m.FieldCleared(submit.FieldScore) {
+		fields = append(fields, submit.FieldScore)
 	}
 	if m.FieldCleared(submit.FieldUpdatedAt) {
 		fields = append(fields, submit.FieldUpdatedAt)
@@ -1385,6 +1470,9 @@ func (m *SubmitMutation) ClearField(name string) error {
 	case submit.FieldExecMemory:
 		m.ClearExecMemory()
 		return nil
+	case submit.FieldScore:
+		m.ClearScore()
+		return nil
 	case submit.FieldUpdatedAt:
 		m.ClearUpdatedAt()
 		return nil
@@ -1405,6 +1493,9 @@ func (m *SubmitMutation) ResetField(name string) error {
 	case submit.FieldExecMemory:
 		m.ResetExecMemory()
 		return nil
+	case submit.FieldScore:
+		m.ResetScore()
+		return nil
 	case submit.FieldSubmittedAt:
 		m.ResetSubmittedAt()
 		return nil
@@ -1421,8 +1512,8 @@ func (m *SubmitMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *SubmitMutation) AddedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.users != nil {
-		edges = append(edges, submit.EdgeUsers)
+	if m.user != nil {
+		edges = append(edges, submit.EdgeUser)
 	}
 	if m.task != nil {
 		edges = append(edges, submit.EdgeTask)
@@ -1440,12 +1531,10 @@ func (m *SubmitMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *SubmitMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case submit.EdgeUsers:
-		ids := make([]ent.Value, 0, len(m.users))
-		for id := range m.users {
-			ids = append(ids, id)
+	case submit.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case submit.EdgeTask:
 		if id := m.task; id != nil {
 			return []ent.Value{*id}
@@ -1467,9 +1556,6 @@ func (m *SubmitMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SubmitMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.removedusers != nil {
-		edges = append(edges, submit.EdgeUsers)
-	}
 	if m.removedtestcase_results != nil {
 		edges = append(edges, submit.EdgeTestcaseResults)
 	}
@@ -1480,12 +1566,6 @@ func (m *SubmitMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *SubmitMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case submit.EdgeUsers:
-		ids := make([]ent.Value, 0, len(m.removedusers))
-		for id := range m.removedusers {
-			ids = append(ids, id)
-		}
-		return ids
 	case submit.EdgeTestcaseResults:
 		ids := make([]ent.Value, 0, len(m.removedtestcase_results))
 		for id := range m.removedtestcase_results {
@@ -1499,8 +1579,8 @@ func (m *SubmitMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *SubmitMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.clearedusers {
-		edges = append(edges, submit.EdgeUsers)
+	if m.cleareduser {
+		edges = append(edges, submit.EdgeUser)
 	}
 	if m.clearedtask {
 		edges = append(edges, submit.EdgeTask)
@@ -1518,8 +1598,8 @@ func (m *SubmitMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *SubmitMutation) EdgeCleared(name string) bool {
 	switch name {
-	case submit.EdgeUsers:
-		return m.clearedusers
+	case submit.EdgeUser:
+		return m.cleareduser
 	case submit.EdgeTask:
 		return m.clearedtask
 	case submit.EdgeLanguage:
@@ -1534,6 +1614,9 @@ func (m *SubmitMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *SubmitMutation) ClearEdge(name string) error {
 	switch name {
+	case submit.EdgeUser:
+		m.ClearUser()
+		return nil
 	case submit.EdgeTask:
 		m.ClearTask()
 		return nil
@@ -1548,8 +1631,8 @@ func (m *SubmitMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *SubmitMutation) ResetEdge(name string) error {
 	switch name {
-	case submit.EdgeUsers:
-		m.ResetUsers()
+	case submit.EdgeUser:
+		m.ResetUser()
 		return nil
 	case submit.EdgeTask:
 		m.ResetTask()

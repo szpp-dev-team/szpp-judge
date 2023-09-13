@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"github.com/go-sql-driver/mysql"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
@@ -45,6 +46,13 @@ func main() {
 	if err := entClient.Schema.Create(context.Background()); err != nil {
 		log.Fatal(err)
 	}
+
+	// api clients
+	cloudtasksClient, err := cloudtasks.NewClient(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cloudtasksClient.Close()
 
 	// logger
 	logger := slog.Default()

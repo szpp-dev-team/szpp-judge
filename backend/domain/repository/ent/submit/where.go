@@ -70,6 +70,11 @@ func ExecMemory(v int) predicate.Submit {
 	return predicate.Submit(sql.FieldEQ(FieldExecMemory, v))
 }
 
+// Score applies equality check predicate on the "score" field. It's identical to ScoreEQ.
+func Score(v int) predicate.Submit {
+	return predicate.Submit(sql.FieldEQ(FieldScore, v))
+}
+
 // SubmittedAt applies equality check predicate on the "submitted_at" field. It's identical to SubmittedAtEQ.
 func SubmittedAt(v time.Time) predicate.Submit {
 	return predicate.Submit(sql.FieldEQ(FieldSubmittedAt, v))
@@ -260,6 +265,56 @@ func ExecMemoryNotNil() predicate.Submit {
 	return predicate.Submit(sql.FieldNotNull(FieldExecMemory))
 }
 
+// ScoreEQ applies the EQ predicate on the "score" field.
+func ScoreEQ(v int) predicate.Submit {
+	return predicate.Submit(sql.FieldEQ(FieldScore, v))
+}
+
+// ScoreNEQ applies the NEQ predicate on the "score" field.
+func ScoreNEQ(v int) predicate.Submit {
+	return predicate.Submit(sql.FieldNEQ(FieldScore, v))
+}
+
+// ScoreIn applies the In predicate on the "score" field.
+func ScoreIn(vs ...int) predicate.Submit {
+	return predicate.Submit(sql.FieldIn(FieldScore, vs...))
+}
+
+// ScoreNotIn applies the NotIn predicate on the "score" field.
+func ScoreNotIn(vs ...int) predicate.Submit {
+	return predicate.Submit(sql.FieldNotIn(FieldScore, vs...))
+}
+
+// ScoreGT applies the GT predicate on the "score" field.
+func ScoreGT(v int) predicate.Submit {
+	return predicate.Submit(sql.FieldGT(FieldScore, v))
+}
+
+// ScoreGTE applies the GTE predicate on the "score" field.
+func ScoreGTE(v int) predicate.Submit {
+	return predicate.Submit(sql.FieldGTE(FieldScore, v))
+}
+
+// ScoreLT applies the LT predicate on the "score" field.
+func ScoreLT(v int) predicate.Submit {
+	return predicate.Submit(sql.FieldLT(FieldScore, v))
+}
+
+// ScoreLTE applies the LTE predicate on the "score" field.
+func ScoreLTE(v int) predicate.Submit {
+	return predicate.Submit(sql.FieldLTE(FieldScore, v))
+}
+
+// ScoreIsNil applies the IsNil predicate on the "score" field.
+func ScoreIsNil() predicate.Submit {
+	return predicate.Submit(sql.FieldIsNull(FieldScore))
+}
+
+// ScoreNotNil applies the NotNil predicate on the "score" field.
+func ScoreNotNil() predicate.Submit {
+	return predicate.Submit(sql.FieldNotNull(FieldScore))
+}
+
 // SubmittedAtEQ applies the EQ predicate on the "submitted_at" field.
 func SubmittedAtEQ(v time.Time) predicate.Submit {
 	return predicate.Submit(sql.FieldEQ(FieldSubmittedAt, v))
@@ -390,21 +445,21 @@ func UpdatedAtNotNil() predicate.Submit {
 	return predicate.Submit(sql.FieldNotNull(FieldUpdatedAt))
 }
 
-// HasUsers applies the HasEdge predicate on the "users" edge.
-func HasUsers() predicate.Submit {
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, UsersTable, UsersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUsersWith applies the HasEdge predicate on the "users" edge with a given conditions (other predicates).
-func HasUsersWith(preds ...predicate.User) predicate.Submit {
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {
-		step := newUsersStep()
+		step := newUserStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

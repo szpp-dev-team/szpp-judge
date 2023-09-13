@@ -20,7 +20,7 @@ import (
 func Test_CreateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient, nil)
+	interactor := NewInteractor(entClient, nil, nil, nil)
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.CreateTaskRequest)
@@ -69,7 +69,7 @@ func Test_CreateTask(t *testing.T) {
 
 func Test_UpdateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
-	interactor := NewInteractor(entClient, nil)
+	interactor := NewInteractor(entClient, nil, nil, nil)
 	now := timejst.Now()
 
 	tests := map[string]struct {
@@ -136,7 +136,7 @@ func Test_UpdateTask(t *testing.T) {
 func Test_GetTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient, nil)
+	interactor := NewInteractor(entClient, nil, nil, nil)
 
 	now := timejst.Now()
 
@@ -193,7 +193,7 @@ func Test_GetTestcaseSets(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
 	testcasesRepo := mock.NewMock()
-	interactor := NewInteractor(entClient, testcasesRepo)
+	interactor := NewInteractor(entClient, testcasesRepo, nil, nil)
 	now := timejst.Now()
 
 	tests := map[string]struct {
@@ -274,7 +274,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
 	testcasesRepo := mock.NewMock()
-	interactor := NewInteractor(entClient, testcasesRepo)
+	interactor := NewInteractor(entClient, testcasesRepo, nil, nil)
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.SyncTestcaseSetsRequest)

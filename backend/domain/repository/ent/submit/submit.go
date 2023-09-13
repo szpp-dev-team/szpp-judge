@@ -18,14 +18,16 @@ const (
 	FieldExecTime = "exec_time"
 	// FieldExecMemory holds the string denoting the exec_memory field in the database.
 	FieldExecMemory = "exec_memory"
+	// FieldScore holds the string denoting the score field in the database.
+	FieldScore = "score"
 	// FieldSubmittedAt holds the string denoting the submitted_at field in the database.
 	FieldSubmittedAt = "submitted_at"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeUsers holds the string denoting the users edge name in mutations.
-	EdgeUsers = "users"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// EdgeTask holds the string denoting the task edge name in mutations.
 	EdgeTask = "task"
 	// EdgeLanguage holds the string denoting the language edge name in mutations.
@@ -34,11 +36,13 @@ const (
 	EdgeTestcaseResults = "testcase_results"
 	// Table holds the table name of the submit in the database.
 	Table = "submits"
-	// UsersTable is the table that holds the users relation/edge. The primary key declared below.
-	UsersTable = "user_submits"
-	// UsersInverseTable is the table name for the User entity.
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "submits"
+	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UsersInverseTable = "users"
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_submits"
 	// TaskTable is the table that holds the task relation/edge.
 	TaskTable = "submits"
 	// TaskInverseTable is the table name for the Task entity.
@@ -68,6 +72,7 @@ var Columns = []string{
 	FieldStatus,
 	FieldExecTime,
 	FieldExecMemory,
+	FieldScore,
 	FieldSubmittedAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -78,13 +83,8 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"language_submits",
 	"task_submits",
+	"user_submits",
 }
-
-var (
-	// UsersPrimaryKey and UsersColumn2 are the table columns denoting the
-	// primary key for the users relation (M2M).
-	UsersPrimaryKey = []string{"user_id", "submit_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -124,6 +124,11 @@ func ByExecMemory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExecMemory, opts...).ToFunc()
 }
 
+// ByScore orders the results by the score field.
+func ByScore(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScore, opts...).ToFunc()
+}
+
 // BySubmittedAt orders the results by the submitted_at field.
 func BySubmittedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSubmittedAt, opts...).ToFunc()
@@ -139,17 +144,10 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByUsersCount orders the results by users count.
-func ByUsersCount(opts ...sql.OrderTermOption) OrderOption {
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUsersStep(), opts...)
-	}
-}
-
-// ByUsers orders the results by users terms.
-func ByUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -180,11 +178,11 @@ func ByTestcaseResults(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTestcaseResultsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newUsersStep() *sqlgraph.Step {
+func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UsersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, UsersTable, UsersPrimaryKey...),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
 	)
 }
 func newTaskStep() *sqlgraph.Step {

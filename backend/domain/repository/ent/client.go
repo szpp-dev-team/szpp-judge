@@ -475,15 +475,15 @@ func (c *SubmitClient) GetX(ctx context.Context, id int) *Submit {
 	return obj
 }
 
-// QueryUsers queries the users edge of a Submit.
-func (c *SubmitClient) QueryUsers(s *Submit) *UserQuery {
+// QueryUser queries the user edge of a Submit.
+func (c *SubmitClient) QueryUser(s *Submit) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(submit.Table, submit.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, submit.UsersTable, submit.UsersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.UserTable, submit.UserColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1313,7 +1313,7 @@ func (c *UserClient) QuerySubmits(u *User) *SubmitQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(submit.Table, submit.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubmitsTable, user.SubmitsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.SubmitsTable, user.SubmitsColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
