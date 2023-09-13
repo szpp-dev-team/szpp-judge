@@ -249,3 +249,11 @@ message ListContestTasksRequest {
 message ListContestTasksResponse {
   repeated ContestTask tasks = 1; // 問題の並び順
 }
+
+message GetMySubmissionStatusesRequest {
+  string contest_slug = 1;
+}
+
+message GetMySubmissionStatusesResponse {
+  repeated SubmissionStatus submission_statuses = 1;
+}

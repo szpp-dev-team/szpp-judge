@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetStandingsRequest, GetStandingsResponse, GetSubmissionDetailRequest, GetSubmissionDetailResponse, GetTaskRequest, GetTaskResponse, GetTestcaseSetsRequest, GetTestcaseSetsResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, ListSubmissionsRequest, ListSubmissionsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, RefreshAccessTokenRequest, RefreshAccessTokenResponse, SubmitRequest, SubmitResponse, SyncTestcaseSetsRequest, SyncTestcaseSetsResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, GetSubmissionDetailRequest, GetSubmissionDetailResponse, GetTaskRequest, GetTaskResponse, GetTestcaseSetsRequest, GetTestcaseSetsResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, ListSubmissionsRequest, ListSubmissionsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, RefreshAccessTokenRequest, RefreshAccessTokenResponse, SubmitRequest, SubmitResponse, SyncTestcaseSetsRequest, SyncTestcaseSetsResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -345,6 +345,17 @@ export const ContestService = {
       name: "ListContestTasks",
       I: ListContestTasksRequest,
       O: ListContestTasksResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 自分の問題ごとの結果情報を返す
+     *
+     * @generated from rpc backend.v1.ContestService.GetMySubmissionStatuses
+     */
+    getMySubmissionStatuses: {
+      name: "GetMySubmissionStatuses",
+      I: GetMySubmissionStatusesRequest,
+      O: GetMySubmissionStatusesResponse,
       kind: MethodKind.Unary,
     },
     /**

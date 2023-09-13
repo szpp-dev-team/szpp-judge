@@ -1159,11 +1159,12 @@ var HealthcheckService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	ContestService_CreateContest_FullMethodName    = "/backend.v1.ContestService/CreateContest"
-	ContestService_GetContest_FullMethodName       = "/backend.v1.ContestService/GetContest"
-	ContestService_ListContests_FullMethodName     = "/backend.v1.ContestService/ListContests"
-	ContestService_ListContestTasks_FullMethodName = "/backend.v1.ContestService/ListContestTasks"
-	ContestService_GetStandings_FullMethodName     = "/backend.v1.ContestService/GetStandings"
+	ContestService_CreateContest_FullMethodName           = "/backend.v1.ContestService/CreateContest"
+	ContestService_GetContest_FullMethodName              = "/backend.v1.ContestService/GetContest"
+	ContestService_ListContests_FullMethodName            = "/backend.v1.ContestService/ListContests"
+	ContestService_ListContestTasks_FullMethodName        = "/backend.v1.ContestService/ListContestTasks"
+	ContestService_GetMySubmissionStatuses_FullMethodName = "/backend.v1.ContestService/GetMySubmissionStatuses"
+	ContestService_GetStandings_FullMethodName            = "/backend.v1.ContestService/GetStandings"
 )
 
 // ContestServiceClient is the client API for ContestService service.
@@ -1174,6 +1175,8 @@ type ContestServiceClient interface {
 	GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error)
 	ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error)
 	ListContestTasks(ctx context.Context, in *ListContestTasksRequest, opts ...grpc.CallOption) (*ListContestTasksResponse, error)
+	// 自分の問題ごとの結果情報を返す
+	GetMySubmissionStatuses(ctx context.Context, in *GetMySubmissionStatusesRequest, opts ...grpc.CallOption) (*GetMySubmissionStatusesResponse, error)
 	// 順位表取得
 	GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error)
 }
@@ -1222,6 +1225,15 @@ func (c *contestServiceClient) ListContestTasks(ctx context.Context, in *ListCon
 	return out, nil
 }
 
+func (c *contestServiceClient) GetMySubmissionStatuses(ctx context.Context, in *GetMySubmissionStatusesRequest, opts ...grpc.CallOption) (*GetMySubmissionStatusesResponse, error) {
+	out := new(GetMySubmissionStatusesResponse)
+	err := c.cc.Invoke(ctx, ContestService_GetMySubmissionStatuses_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contestServiceClient) GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error) {
 	out := new(GetStandingsResponse)
 	err := c.cc.Invoke(ctx, ContestService_GetStandings_FullMethodName, in, out, opts...)
@@ -1239,6 +1251,8 @@ type ContestServiceServer interface {
 	GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error)
 	ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error)
 	ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error)
+	// 自分の問題ごとの結果情報を返す
+	GetMySubmissionStatuses(context.Context, *GetMySubmissionStatusesRequest) (*GetMySubmissionStatusesResponse, error)
 	// 順位表取得
 	GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error)
 }
@@ -1258,6 +1272,9 @@ func (UnimplementedContestServiceServer) ListContests(context.Context, *ListCont
 }
 func (UnimplementedContestServiceServer) ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListContestTasks not implemented")
+}
+func (UnimplementedContestServiceServer) GetMySubmissionStatuses(context.Context, *GetMySubmissionStatusesRequest) (*GetMySubmissionStatusesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMySubmissionStatuses not implemented")
 }
 func (UnimplementedContestServiceServer) GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStandings not implemented")
@@ -1346,6 +1363,24 @@ func _ContestService_ListContestTasks_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContestService_GetMySubmissionStatuses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMySubmissionStatusesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).GetMySubmissionStatuses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_GetMySubmissionStatuses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).GetMySubmissionStatuses(ctx, req.(*GetMySubmissionStatusesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContestService_GetStandings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetStandingsRequest)
 	if err := dec(in); err != nil {
@@ -1386,6 +1421,10 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListContestTasks",
 			Handler:    _ContestService_ListContestTasks_Handler,
+		},
+		{
+			MethodName: "GetMySubmissionStatuses",
+			Handler:    _ContestService_GetMySubmissionStatuses_Handler,
 		},
 		{
 			MethodName: "GetStandings",
