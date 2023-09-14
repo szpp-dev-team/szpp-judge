@@ -50,6 +50,10 @@ func GetClaimsFromContext(ctx context.Context) *Claims {
 	return claims
 }
 
+func SetClaimsToContext(ctx context.Context, claims *Claims) context.Context {
+	return context.WithValue(ctx, claimsKey, claims)
+}
+
 func GetClaimsFromToken(accessToken string, secret []byte) (*Claims, error) {
 	jwtToken, err := jwt.ParseWithClaims(accessToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return secret, nil
