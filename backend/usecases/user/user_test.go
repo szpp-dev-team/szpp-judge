@@ -26,8 +26,8 @@ func Test_GetUser(t *testing.T) {
 		"success": {
 			prepare: func(t *testing.T, req *backendv1.GetUserRequest) {
 				q := entClient.User.Create().
-					SetName("hogege").
-					SetEncryptedPassword(HashPassword("fugafuga")).
+					SetUsername("hogege").
+					SetHashedPassword(HashPassword("fugafuga")).
 					SetRole("ADMIN").
 					SetCreatedAt(now).
 					SetUpdatedAt(now)
@@ -37,8 +37,8 @@ func Test_GetUser(t *testing.T) {
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.GetUserRequest, resp *backendv1.GetUserResponse) {
 				user, err := entClient.User.Query().Where(entuser.ID(int(resp.User.Id))).Only(ctx)
 				require.NoError(t, err)
-				assert.Equal(t, "hogege", user.Name)
-				err = VerifyPassword(user.EncryptedPassword, "fugafuga")
+				assert.Equal(t, "hogege", user.Username)
+				err = VerifyPassword(user.HashedPassword, "fugafuga")
 				require.NoError(t, err)
 			},
 		},
@@ -79,8 +79,8 @@ func Test_CreateUser(t *testing.T) {
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.CreateUserRequest, resp *backendv1.CreateUserResponse) {
 				user, err := entClient.User.Query().Where(entuser.ID(int(resp.User.Id))).Only(ctx)
 				require.NoError(t, err)
-				assert.Equal(t, req.Username, user.Name)
-				err = VerifyPassword(user.EncryptedPassword, req.Password)
+				assert.Equal(t, req.Username, user.Username)
+				err = VerifyPassword(user.HashedPassword, req.Password)
 				require.NoError(t, err)
 			},
 		},
@@ -121,8 +121,8 @@ func Test_ExistsUsername(t *testing.T) {
 		"success": {
 			prepare: func(t *testing.T, req *backendv1.ExistsUsernameRequest) {
 				q := entClient.User.Create().
-					SetName(req.Username).
-					SetEncryptedPassword(HashPassword("fugafuga")).
+					SetUsername(req.Username).
+					SetHashedPassword(HashPassword("fugafuga")).
 					SetRole("ADMIN").
 					SetCreatedAt(timejst.Now()).
 					SetUpdatedAt(timejst.Now())

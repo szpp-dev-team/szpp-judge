@@ -26,7 +26,7 @@ func NewInteractor(entClient *ent.Client) *Interactor {
 
 func (i *Interactor) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 	q := i.entClient.User.Query()
-	user, err := q.Where(entuser.Name(req.Username)).Only(ctx)
+	user, err := q.Where(entuser.Username(req.Username)).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -41,8 +41,8 @@ func (i *Interactor) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.G
 func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	now := timejst.Now()
 	q := i.entClient.User.Create().
-		SetName(req.Username).
-		SetEncryptedPassword(HashPassword(req.Password)).
+		SetUsername(req.Username).
+		SetHashedPassword(HashPassword(req.Password)).
 		SetRole("USER").
 		SetCreatedAt(now).
 		SetUpdatedAt(now)
@@ -57,7 +57,7 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 
 func (i *Interactor) ExistsUsername(ctx context.Context, req *pb.ExistsUsernameRequest) (*pb.ExistsUsernameResponse, error) {
 	q := i.entClient.User.Query()
-	_, err := q.Where(entuser.Name(req.Username)).Only(ctx)
+	_, err := q.Where(entuser.Username(req.Username)).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return &pb.ExistsUsernameResponse{
@@ -74,7 +74,7 @@ func (i *Interactor) ExistsUsername(ctx context.Context, req *pb.ExistsUsernameR
 func toPbUser(t *ent.User) *backendv1.User {
 	return &backendv1.User{
 		Id:        int32(t.ID),
-		Username:  t.Name,
+		Username:  t.Username,
 		IsAdmin:   backendv1.Role_value[t.Role] == backendv1.Role_value["ADMIN"],
 		CreatedAt: timestamppb.New(t.CreatedAt),
 		UpdatedAt: timestamppb.New(t.UpdatedAt),
