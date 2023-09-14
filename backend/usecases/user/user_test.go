@@ -108,18 +108,18 @@ func Test_CreateUser(t *testing.T) {
 	}
 }
 
-func Test_CheckUser(t *testing.T) {
+func Test_ExistsUsername(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
 	interactor := NewInteractor(entClient)
 
 	tests := map[string]struct {
-		prepare func(t *testing.T, req *backendv1.CheckUserRequest)
+		prepare func(t *testing.T, req *backendv1.ExistsUsernameRequest)
 		wantErr bool
-		assert  func(ctx context.Context, t *testing.T, req *backendv1.CheckUserRequest, resp *backendv1.CheckUserResponse)
+		assert  func(ctx context.Context, t *testing.T, req *backendv1.ExistsUsernameRequest, resp *backendv1.ExistsUsernameResponse)
 	}{
 		"success": {
-			prepare: func(t *testing.T, req *backendv1.CheckUserRequest) {
+			prepare: func(t *testing.T, req *backendv1.ExistsUsernameRequest) {
 				q := entClient.User.Create().
 					SetName(req.Username).
 					SetEncryptedPassword(HashPassword("fugafuga")).
@@ -129,12 +129,12 @@ func Test_CheckUser(t *testing.T) {
 				_, err := q.Save(context.Background())
 				require.NoError(t, err)
 			},
-			assert: func(ctx context.Context, t *testing.T, req *backendv1.CheckUserRequest, resp *backendv1.CheckUserResponse) {
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.ExistsUsernameRequest, resp *backendv1.ExistsUsernameResponse) {
 				assert.True(t, resp.Exists)
 			},
 		},
 		"not found": {
-			assert: func(ctx context.Context, t *testing.T, req *backendv1.CheckUserRequest, resp *backendv1.CheckUserResponse) {
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.ExistsUsernameRequest, resp *backendv1.ExistsUsernameResponse) {
 				assert.False(t, resp.Exists)
 			},
 		},
@@ -143,11 +143,11 @@ func Test_CheckUser(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			req := &backendv1.CheckUserRequest{Username: "hogegege"}
+			req := &backendv1.ExistsUsernameRequest{Username: "hogegege"}
 			if test.prepare != nil {
 				test.prepare(t, req)
 			}
-			resp, err := interactor.CheckUser(ctx, req)
+			resp, err := interactor.ExistsUsername(ctx, req)
 			if test.wantErr {
 				require.Error(t, err)
 				return

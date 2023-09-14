@@ -23,6 +23,6 @@ func (s *userServiceServer) CreateUser(ctx context.Context, req *backendv1.Creat
 	return s.interactor.CreateUser(ctx, req)
 }
 
-func (s *userServiceServer) CheckUser(ctx context.Context, req *backendv1.CheckUserRequest) (*backendv1.CheckUserResponse, error) {
-	return s.interactor.CheckUser(ctx, req)
+func (s *userServiceServer) ExistsUsername(ctx context.Context, req *backendv1.ExistsUsernameRequest) (*backendv1.ExistsUsernameResponse, error) {
+	return s.interactor.ExistsUsername(ctx, req)
 }

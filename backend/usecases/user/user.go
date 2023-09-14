@@ -55,18 +55,18 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 	}, nil
 }
 
-func (i *Interactor) CheckUser(ctx context.Context, req *pb.CheckUserRequest) (*pb.CheckUserResponse, error) {
+func (i *Interactor) ExistsUsername(ctx context.Context, req *pb.ExistsUsernameRequest) (*pb.ExistsUsernameResponse, error) {
 	q := i.entClient.User.Query()
 	_, err := q.Where(entuser.Name(req.Username)).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return &pb.CheckUserResponse{
+			return &pb.ExistsUsernameResponse{
 				Exists: false,
 			}, nil
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &pb.CheckUserResponse{
+	return &pb.ExistsUsernameResponse{
 		Exists: true,
 	}, nil
 }
