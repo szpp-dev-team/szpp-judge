@@ -43,6 +43,7 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 	q := i.entClient.User.Create().
 		SetUsername(req.Username).
 		SetHashedPassword(HashPassword(req.Password)).
+		SetEmail(req.Email).
 		SetRole("USER").
 		SetCreatedAt(now).
 		SetUpdatedAt(now)
