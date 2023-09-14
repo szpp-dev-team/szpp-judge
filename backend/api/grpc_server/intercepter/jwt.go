@@ -44,7 +44,8 @@ func Auth(secret []byte) grpc.UnaryServerInterceptor {
 }
 
 func GetClaimsFromContext(ctx context.Context) *Claims {
-	return ctx.Value(claimsKey).(*Claims)
+	claims, _ := ctx.Value(claimsKey).(*Claims)
+	return claims
 }
 
 func GetClaimsFromToken(accessToken string, secret []byte) (*Claims, error) {
