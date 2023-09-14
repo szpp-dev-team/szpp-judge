@@ -38,9 +38,9 @@ func (uc *UserCreate) SetRole(s string) *UserCreate {
 	return uc
 }
 
-// SetEncryptedPassword sets the "encrypted_password" field.
-func (uc *UserCreate) SetEncryptedPassword(s string) *UserCreate {
-	uc.mutation.SetEncryptedPassword(s)
+// SetHashedPassword sets the "hashed_password" field.
+func (uc *UserCreate) SetHashedPassword(b []byte) *UserCreate {
+	uc.mutation.SetHashedPassword(b)
 	return uc
 }
 
@@ -113,8 +113,8 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Role(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
 	}
-	if _, ok := uc.mutation.EncryptedPassword(); !ok {
-		return &ValidationError{Name: "encrypted_password", err: errors.New(`ent: missing required field "User.encrypted_password"`)}
+	if _, ok := uc.mutation.HashedPassword(); !ok {
+		return &ValidationError{Name: "hashed_password", err: errors.New(`ent: missing required field "User.hashed_password"`)}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
@@ -163,9 +163,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
 		_node.Role = value
 	}
-	if value, ok := uc.mutation.EncryptedPassword(); ok {
-		_spec.SetField(user.FieldEncryptedPassword, field.TypeString, value)
-		_node.EncryptedPassword = value
+	if value, ok := uc.mutation.HashedPassword(); ok {
+		_spec.SetField(user.FieldHashedPassword, field.TypeBytes, value)
+		_node.HashedPassword = value
 	}
 	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)

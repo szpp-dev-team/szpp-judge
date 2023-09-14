@@ -30,19 +30,19 @@ const (
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *int
-	username           *string
-	email              *string
-	role               *string
-	encrypted_password *string
-	created_at         *time.Time
-	updated_at         *time.Time
-	clearedFields      map[string]struct{}
-	done               bool
-	oldValue           func(context.Context) (*User, error)
-	predicates         []predicate.User
+	op              Op
+	typ             string
+	id              *int
+	username        *string
+	email           *string
+	role            *string
+	hashed_password *[]byte
+	created_at      *time.Time
+	updated_at      *time.Time
+	clearedFields   map[string]struct{}
+	done            bool
+	oldValue        func(context.Context) (*User, error)
+	predicates      []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -257,40 +257,40 @@ func (m *UserMutation) ResetRole() {
 	m.role = nil
 }
 
-// SetEncryptedPassword sets the "encrypted_password" field.
-func (m *UserMutation) SetEncryptedPassword(s string) {
-	m.encrypted_password = &s
+// SetHashedPassword sets the "hashed_password" field.
+func (m *UserMutation) SetHashedPassword(b []byte) {
+	m.hashed_password = &b
 }
 
-// EncryptedPassword returns the value of the "encrypted_password" field in the mutation.
-func (m *UserMutation) EncryptedPassword() (r string, exists bool) {
-	v := m.encrypted_password
+// HashedPassword returns the value of the "hashed_password" field in the mutation.
+func (m *UserMutation) HashedPassword() (r []byte, exists bool) {
+	v := m.hashed_password
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldEncryptedPassword returns the old "encrypted_password" field's value of the User entity.
+// OldHashedPassword returns the old "hashed_password" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldEncryptedPassword(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldHashedPassword(ctx context.Context) (v []byte, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEncryptedPassword is only allowed on UpdateOne operations")
+		return v, errors.New("OldHashedPassword is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEncryptedPassword requires an ID field in the mutation")
+		return v, errors.New("OldHashedPassword requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEncryptedPassword: %w", err)
+		return v, fmt.Errorf("querying old value for OldHashedPassword: %w", err)
 	}
-	return oldValue.EncryptedPassword, nil
+	return oldValue.HashedPassword, nil
 }
 
-// ResetEncryptedPassword resets all changes to the "encrypted_password" field.
-func (m *UserMutation) ResetEncryptedPassword() {
-	m.encrypted_password = nil
+// ResetHashedPassword resets all changes to the "hashed_password" field.
+func (m *UserMutation) ResetHashedPassword() {
+	m.hashed_password = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -422,8 +422,8 @@ func (m *UserMutation) Fields() []string {
 	if m.role != nil {
 		fields = append(fields, user.FieldRole)
 	}
-	if m.encrypted_password != nil {
-		fields = append(fields, user.FieldEncryptedPassword)
+	if m.hashed_password != nil {
+		fields = append(fields, user.FieldHashedPassword)
 	}
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
@@ -445,8 +445,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case user.FieldRole:
 		return m.Role()
-	case user.FieldEncryptedPassword:
-		return m.EncryptedPassword()
+	case user.FieldHashedPassword:
+		return m.HashedPassword()
 	case user.FieldCreatedAt:
 		return m.CreatedAt()
 	case user.FieldUpdatedAt:
@@ -466,8 +466,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case user.FieldRole:
 		return m.OldRole(ctx)
-	case user.FieldEncryptedPassword:
-		return m.OldEncryptedPassword(ctx)
+	case user.FieldHashedPassword:
+		return m.OldHashedPassword(ctx)
 	case user.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case user.FieldUpdatedAt:
@@ -502,12 +502,12 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRole(v)
 		return nil
-	case user.FieldEncryptedPassword:
-		v, ok := value.(string)
+	case user.FieldHashedPassword:
+		v, ok := value.([]byte)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetEncryptedPassword(v)
+		m.SetHashedPassword(v)
 		return nil
 	case user.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -590,8 +590,8 @@ func (m *UserMutation) ResetField(name string) error {
 	case user.FieldRole:
 		m.ResetRole()
 		return nil
-	case user.FieldEncryptedPassword:
-		m.ResetEncryptedPassword()
+	case user.FieldHashedPassword:
+		m.ResetHashedPassword()
 		return nil
 	case user.FieldCreatedAt:
 		m.ResetCreatedAt()

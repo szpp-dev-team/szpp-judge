@@ -14,7 +14,7 @@ var (
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "role", Type: field.TypeString},
-		{Name: "encrypted_password", Type: field.TypeString},
+		{Name: "hashed_password", Type: field.TypeBytes},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 	}
