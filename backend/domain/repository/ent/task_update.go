@@ -226,14 +226,6 @@ func (tu *TaskUpdate) SetUserID(id int) *TaskUpdate {
 	return tu
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (tu *TaskUpdate) SetNillableUserID(id *int) *TaskUpdate {
-	if id != nil {
-		tu = tu.SetUserID(*id)
-	}
-	return tu
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (tu *TaskUpdate) SetUser(u *User) *TaskUpdate {
 	return tu.SetUserID(u.ID)
@@ -346,6 +338,9 @@ func (tu *TaskUpdate) check() error {
 		if err := task.JudgeTypeValidator(v); err != nil {
 			return &ValidationError{Name: "judge_type", err: fmt.Errorf(`ent: validator failed for field "Task.judge_type": %w`, err)}
 		}
+	}
+	if _, ok := tu.mutation.UserID(); tu.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Task.user"`)
 	}
 	return nil
 }
@@ -794,14 +789,6 @@ func (tuo *TaskUpdateOne) SetUserID(id int) *TaskUpdateOne {
 	return tuo
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (tuo *TaskUpdateOne) SetNillableUserID(id *int) *TaskUpdateOne {
-	if id != nil {
-		tuo = tuo.SetUserID(*id)
-	}
-	return tuo
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (tuo *TaskUpdateOne) SetUser(u *User) *TaskUpdateOne {
 	return tuo.SetUserID(u.ID)
@@ -927,6 +914,9 @@ func (tuo *TaskUpdateOne) check() error {
 		if err := task.JudgeTypeValidator(v); err != nil {
 			return &ValidationError{Name: "judge_type", err: fmt.Errorf(`ent: validator failed for field "Task.judge_type": %w`, err)}
 		}
+	}
+	if _, ok := tuo.mutation.UserID(); tuo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Task.user"`)
 	}
 	return nil
 }

@@ -74,7 +74,7 @@ var (
 		{Name: "judge_code_path", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "user_tasks", Type: field.TypeInt, Nullable: true},
+		{Name: "user_tasks", Type: field.TypeInt},
 	}
 	// TasksTable holds the schema information for the "tasks" table.
 	TasksTable = &schema.Table{
@@ -86,7 +86,7 @@ var (
 				Symbol:     "tasks_users_tasks",
 				Columns:    []*schema.Column{TasksColumns[12]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -97,7 +97,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "task_testcases", Type: field.TypeInt, Nullable: true},
+		{Name: "task_testcases", Type: field.TypeInt},
 	}
 	// TestcasesTable holds the schema information for the "testcases" table.
 	TestcasesTable = &schema.Table{
@@ -109,7 +109,7 @@ var (
 				Symbol:     "testcases_tasks_testcases",
 				Columns:    []*schema.Column{TestcasesColumns[5]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -157,7 +157,7 @@ var (
 		{Name: "is_sample", Type: field.TypeBool},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "task_testcase_sets", Type: field.TypeInt, Nullable: true},
+		{Name: "task_testcase_sets", Type: field.TypeInt},
 	}
 	// TestcaseSetsTable holds the schema information for the "testcase_sets" table.
 	TestcaseSetsTable = &schema.Table{
@@ -169,7 +169,7 @@ var (
 				Symbol:     "testcase_sets_tasks_testcase_sets",
 				Columns:    []*schema.Column{TestcaseSetsColumns[6]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{

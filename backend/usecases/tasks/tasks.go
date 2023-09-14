@@ -6,12 +6,14 @@ import (
 	"log/slog"
 
 	"github.com/samber/lo"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	ent_testcaseset "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
+	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
 	sources_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
@@ -41,8 +43,16 @@ func NewInteractor(
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
+	claims := intercepter.GetClaimsFromContext(ctx)
+
 	var task *ent.Task
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
+		userID, err := tx.User.Query().Where(ent_user.Username(claims.Username)).OnlyID(ctx)
+		if err != nil {
+			i.logger.Error("[!!!inconsistency!!!] failed to get user", slog.Any("error", err), slog.String("username", claims.Username))
+			return status.Error(codes.Internal, err.Error())
+		}
+
 		// TODO: SetUser
 		q := tx.Task.Create().
 			SetTitle(req.Task.Title).
@@ -50,7 +60,8 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 			SetDifficulty(req.Task.Difficulty.String()).
 			SetExecTimeLimit(uint(req.Task.ExecTimeLimit)).
 			SetExecMemoryLimit(uint(req.Task.ExecMemoryLimit)).
-			SetCreatedAt(timejst.Now())
+			SetCreatedAt(timejst.Now()).
+			SetUserID(userID)
 		switch ty := req.Task.JudgeType.JudgeType.(type) {
 		case *judgev1.JudgeType_Normal:
 			q.SetJudgeType(ent_task.JudgeTypeNormal)
@@ -99,9 +110,22 @@ func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest)
 }
 
 func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRequest) (*backendv1.UpdateTaskResponse, error) {
+	claims := intercepter.GetClaimsFromContext(ctx)
+
 	var task *ent.Task
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
-		// TODO: SetUser
+		task, err = tx.Task.Query().WithUser().Where(ent_task.ID(int(req.TaskId))).Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+			}
+			i.logger.Error("failed to get task", slog.Any("error", err), slog.Int("task_id", int(req.TaskId)))
+			return status.Error(codes.Internal, err.Error())
+		}
+		if claims.Username != task.Edges.User.Username {
+			return status.Errorf(codes.PermissionDenied, "the task(id: %d) is not yours", req.TaskId)
+		}
+
 		q := tx.Task.UpdateOneID(int(req.TaskId)).
 			SetTitle(req.Task.Title).
 			SetStatement(req.Task.Statement).
@@ -181,11 +205,25 @@ func (i *Interactor) GetTestcaseSets(ctx context.Context, req *backendv1.GetTest
 }
 
 func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) (*backendv1.SyncTestcaseSetsResponse, error) {
+	claims := intercepter.GetClaimsFromContext(ctx)
+
 	var (
 		testcaseSets []*ent.TestcaseSet
 		testcases    []*ent.Testcase
 	)
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
+		task, err := tx.Task.Query().WithUser().Where(ent_task.ID(int(req.TaskId))).Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+			}
+			i.logger.Error("failed to get task", slog.Any("error", err), slog.Int("task_id", int(req.TaskId)))
+			return status.Error(codes.Internal, err.Error())
+		}
+		if claims.Username != task.Edges.User.Username {
+			return status.Errorf(codes.PermissionDenied, "the task(id: %d) is not yours", req.TaskId)
+		}
+
 		// Testcase
 		testcases, err = syncTestcases(ctx, tx, int(req.TaskId), req.Testcases)
 		if err != nil {
@@ -264,7 +302,13 @@ func syncTestcases(ctx context.Context, tx *ent.Tx, taskID int, list []*backendv
 	return tx.Testcase.Query().Where(ent_testcase.IDIn(newTestcaseIDs...)).All(ctx)
 }
 
-func syncTestcaseSets(ctx context.Context, tx *ent.Tx, taskID int, testcaseSetList []*backendv1.MutationTestcaseSet, testcaseList []*ent.Testcase) ([]*ent.TestcaseSet, error) {
+func syncTestcaseSets(
+	ctx context.Context,
+	tx *ent.Tx,
+	taskID int,
+	testcaseSetList []*backendv1.MutationTestcaseSet,
+	testcaseList []*ent.Testcase,
+) ([]*ent.TestcaseSet, error) {
 	now := timejst.Now()
 
 	var (

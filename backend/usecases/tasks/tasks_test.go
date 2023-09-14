@@ -7,11 +7,13 @@ import (
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases/mock"
+	"github.com/szpp-dev-team/szpp-judge/backend/test/fixture"
 	"github.com/szpp-dev-team/szpp-judge/backend/test/utils"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
@@ -23,8 +25,7 @@ func Test_CreateTask(t *testing.T) {
 	interactor := NewInteractor(entClient, nil, nil, nil)
 
 	tests := map[string]struct {
-		prepare func(t *testing.T, req *backendv1.CreateTaskRequest)
-		modify  func(req *backendv1.CreateTaskRequest)
+		modify  func(ctx context.Context, req *backendv1.CreateTaskRequest) context.Context
 		wantErr bool
 		assert  func(ctx context.Context, t *testing.T, req *backendv1.CreateTaskRequest, resp *backendv1.CreateTaskResponse)
 	}{
@@ -43,12 +44,11 @@ func Test_CreateTask(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
+			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
+			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
 
 			if test.modify != nil {
-				test.modify(req)
-			}
-			if test.prepare != nil {
-				test.prepare(t, req)
+				ctx = test.modify(ctx, req)
 			}
 
 			resp, err := interactor.CreateTask(ctx, req)
@@ -70,7 +70,6 @@ func Test_CreateTask(t *testing.T) {
 func Test_UpdateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	interactor := NewInteractor(entClient, nil, nil, nil)
-	now := timejst.Now()
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.UpdateTaskRequest)
@@ -80,16 +79,7 @@ func Test_UpdateTask(t *testing.T) {
 	}{
 		"success": {
 			prepare: func(t *testing.T, req *backendv1.UpdateTaskRequest) {
-				task := entClient.Task.Create().
-					SetTitle("hoge").
-					SetStatement("fuga").
-					SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
-					SetExecTimeLimit(2000).
-					SetExecMemoryLimit(1024).
-					SetJudgeType(ent_task.JudgeTypeNormal).
-					SetCaseInsensitive(false).
-					SetCreatedAt(now).
-					SaveX(context.Background())
+				task := fixture.CreateTask(t, entClient, judgev1.JudgeType_Normal{Normal: &judgev1.JudgeTypeNormal{CaseInsensitive: lo.ToPtr(false)}}, 1, nil)
 				req.TaskId = int32(task.ID)
 			},
 			modify: func(req *backendv1.UpdateTaskRequest) {
@@ -109,6 +99,8 @@ func Test_UpdateTask(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
+			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
+			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
 
 			if test.modify != nil {
 				test.modify(req)
@@ -138,8 +130,6 @@ func Test_GetTask(t *testing.T) {
 	defer entClient.Close()
 	interactor := NewInteractor(entClient, nil, nil, nil)
 
-	now := timejst.Now()
-
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.GetTaskRequest)
 		wantErr bool
@@ -147,18 +137,9 @@ func Test_GetTask(t *testing.T) {
 	}{
 		"success": {
 			prepare: func(t *testing.T, req *backendv1.GetTaskRequest) {
-				task := entClient.Task.Create().
-					SetTitle("hoge").
-					SetStatement("fuga").
-					SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
-					SetExecTimeLimit(2000).
-					SetExecMemoryLimit(1024).
-					SetJudgeType(ent_task.JudgeTypeNormal).
-					SetCaseInsensitive(false).
-					SetCreatedAt(now).
-					SaveX(context.Background())
+				user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
+				task := fixture.CreateTask(t, entClient, newJudgeTypeNormal(false), user.ID, nil)
 				req.TaskId = int32(task.ID)
-
 			},
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.GetTaskRequest, resp *backendv1.GetTaskResponse) {
 				task := entClient.Task.GetX(context.Background(), int(resp.Task.Id))
@@ -194,7 +175,6 @@ func Test_GetTestcaseSets(t *testing.T) {
 	defer entClient.Close()
 	testcasesRepo := mock.NewMock()
 	interactor := NewInteractor(entClient, testcasesRepo, nil, nil)
-	now := timejst.Now()
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.GetTestcaseSetsRequest)
@@ -211,12 +191,8 @@ func Test_GetTestcaseSets(t *testing.T) {
 						In:   []byte("a"),
 						Out:  []byte("b"),
 					})
-					t := entClient.Testcase.Create().
-						SetName(testcase.Slug).
-						SetCreatedAt(now).
-						SetTaskID(int(req.TaskId)).
-						SaveX(context.Background())
-					testcaseIDByName[testcase.Slug] = t.ID
+					testcase := fixture.CreateTestcase(t, entClient, testcase.Slug, int(req.TaskId))
+					testcaseIDByName[testcase.Name] = testcase.ID
 				}
 
 				for _, testcaseSet := range testcaseSets {
@@ -224,14 +200,7 @@ func Test_GetTestcaseSets(t *testing.T) {
 					for _, testcaseSlug := range testcaseSet.TestcaseSlugs {
 						testcaseIDs = append(testcaseIDs, testcaseIDByName[testcaseSlug])
 					}
-					entClient.TestcaseSet.Create().
-						SetName(testcaseSet.Slug).
-						SetScore(int(testcaseSet.Score)).
-						SetIsSample(testcaseSet.IsSample).
-						AddTestcaseIDs(testcaseIDs...).
-						SetTaskID(int(req.TaskId)).
-						SetCreatedAt(now).
-						SaveX(context.Background())
+					_ = fixture.CreateTestcaseSet(t, entClient, testcaseSet.Slug, int(req.TaskId), testcaseIDs)
 				}
 			},
 		},
@@ -241,15 +210,8 @@ func Test_GetTestcaseSets(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			task := entClient.Task.Create().
-				SetTitle("hoge").
-				SetStatement("fuga").
-				SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
-				SetExecTimeLimit(2000).
-				SetExecMemoryLimit(1024).
-				SetJudgeType(ent_task.JudgeTypeNormal).
-				SetCreatedAt(now).
-				SaveX(ctx)
+			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
+			task := fixture.CreateTask(t, entClient, newJudgeTypeNormal(false), user.ID, nil)
 
 			req := &backendv1.GetTestcaseSetsRequest{TaskId: int32(task.ID)}
 			if test.prepare != nil {
@@ -278,7 +240,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.SyncTestcaseSetsRequest)
-		modify  func(req *backendv1.SyncTestcaseSetsRequest)
+		modify  func(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) context.Context
 		wantErr bool
 		assert  func(ctx context.Context, t *testing.T, req *backendv1.SyncTestcaseSetsRequest, resp *backendv1.SyncTestcaseSetsResponse)
 	}{
@@ -323,17 +285,10 @@ func Test_SyncTestcaseSets(t *testing.T) {
 					for _, testcaseSlug := range testcaseSet.TestcaseSlugs {
 						testcaseIDs = append(testcaseIDs, testcaseIDByName[testcaseSlug])
 					}
-					entClient.TestcaseSet.Create().
-						SetName(testcaseSet.Slug).
-						SetScore(int(testcaseSet.Score)).
-						SetIsSample(testcaseSet.IsSample).
-						AddTestcaseIDs(testcaseIDs...).
-						SetTaskID(int(req.TaskId)).
-						SetCreatedAt(timejst.Now()).
-						SaveX(context.Background())
+					_ = fixture.CreateTestcaseSet(t, entClient, testcaseSet.Slug, int(req.TaskId), testcaseIDs)
 				}
 			},
-			modify: func(req *backendv1.SyncTestcaseSetsRequest) {
+			modify: func(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) context.Context {
 				testcaseSets := []*backendv1.MutationTestcaseSet{
 					{
 						Slug:          "sample",
@@ -399,6 +354,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 				}
 				req.TestcaseSets = testcaseSets
 				req.Testcases = testcases
+				return ctx
 			},
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.SyncTestcaseSetsRequest, resp *backendv1.SyncTestcaseSetsResponse) {
 				testcaseSets := entClient.TestcaseSet.Query().WithTestcases().AllX(context.Background())
@@ -418,20 +374,22 @@ func Test_SyncTestcaseSets(t *testing.T) {
 				assert.True(t, entClient.Testcase.Query().Where(ent_testcase.Name("killer03")).ExistX(context.Background()))
 			},
 		},
+		"permission denied": {
+			modify: func(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) context.Context {
+				user := fixture.CreateUser(t, entClient, "fuga", "ADMIN")
+				return intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
+			},
+			wantErr: true,
+		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			task := entClient.Task.Create().
-				SetTitle("hoge").
-				SetStatement("fuga").
-				SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
-				SetExecTimeLimit(2000).
-				SetExecMemoryLimit(1024).
-				SetJudgeType(ent_task.JudgeTypeNormal).
-				SetCreatedAt(timejst.Now()).
-				SaveX(ctx)
+			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
+			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
+
+			task := fixture.CreateTask(t, entClient, ent_task.JudgeTypeNormal, int(user.ID), nil)
 
 			testcaseSets, testcases := seedMutationTestcasePairs()
 			req := &backendv1.SyncTestcaseSetsRequest{
@@ -443,7 +401,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 				test.prepare(t, req)
 			}
 			if test.modify != nil {
-				test.modify(req)
+				ctx = test.modify(ctx, req)
 			}
 			resp, err := interactor.SyncTestcaseSets(ctx, req)
 			if test.wantErr {
@@ -537,4 +495,39 @@ func seedMutationTestcasePairs() ([]*backendv1.MutationTestcaseSet, []*backendv1
 		},
 	}
 	return testcaseSets, testcases
+}
+
+func newJudgeTypeNormal(b bool) *judgev1.JudgeType_Normal {
+	return &judgev1.JudgeType_Normal{
+		Normal: &judgev1.JudgeTypeNormal{
+			CaseInsensitive: lo.ToPtr(b),
+		},
+	}
+}
+
+//lint:ignore U1000 this function will be used in the future
+func newJudgeTypeInteractive(p string) *judgev1.JudgeType_Interactive {
+	return &judgev1.JudgeType_Interactive{
+		Interactive: &judgev1.JudgeTypeInteractive{
+			JudgeCodePath: p,
+		},
+	}
+}
+
+//lint:ignore U1000 this function will be used in the future
+func newJudgeTypeEps(n uint32) *judgev1.JudgeType_Eps {
+	return &judgev1.JudgeType_Eps{
+		Eps: &judgev1.JudgeTypeEPS{
+			Ndigits: n,
+		},
+	}
+}
+
+//lint:ignore U1000 this function will be used in the future
+func newJudgeTypeCustom(p string) *judgev1.JudgeType_Custom {
+	return &judgev1.JudgeType_Custom{
+		Custom: &judgev1.JudgeTypeCustom{
+			JudgeCodePath: p,
+		},
+	}
 }
