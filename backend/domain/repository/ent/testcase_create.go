@@ -91,14 +91,6 @@ func (tc *TestcaseCreate) SetTaskID(id int) *TestcaseCreate {
 	return tc
 }
 
-// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
-func (tc *TestcaseCreate) SetNillableTaskID(id *int) *TestcaseCreate {
-	if id != nil {
-		tc = tc.SetTaskID(*id)
-	}
-	return tc
-}
-
 // SetTask sets the "task" edge to the Task entity.
 func (tc *TestcaseCreate) SetTask(t *Task) *TestcaseCreate {
 	return tc.SetTaskID(t.ID)
@@ -143,6 +135,9 @@ func (tc *TestcaseCreate) check() error {
 	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Testcase.created_at"`)}
+	}
+	if _, ok := tc.mutation.TaskID(); !ok {
+		return &ValidationError{Name: "task", err: errors.New(`ent: missing required edge "Testcase.task"`)}
 	}
 	return nil
 }
