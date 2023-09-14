@@ -55,21 +55,19 @@ export const TaskCollection = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {contestTasksQuery.data?.tasks.map(t => (
+                {contestTasksQuery.data?.tasks.map((t, seq) => (
                   <Tr key={t.id}>
                     <Td textAlign="center">
-                      {/* TODO: (abc1, 2) -> abc1_b */}
-                      <Link href={`/contests/${contest_slug}/tasks/${contest_slug}_${t.id}`}>{t.id}</Link>
+                      <Link href={`/contests/${contest_slug}/tasks/${seq + 1}`}>{seq + 1}</Link>
                     </Td>
                     <Td textAlign="center">
                       {/* FIXME: convert Difficulty Enum to DifficultyBadge.dif */}
-                      {/*<DifficultyBadge dif={String(t.difficulty).toLowerCase() as Difficulty} />*/}
+                      {/*<DifficultyBadge dif={t.difficulty} />*/}
                       FIXME: Difficulty {t.difficulty}
                     </Td>
                     <Td textAlign="center">{t.score}</Td>
                     <Td textAlign="left" whiteSpace="normal" minW={56}>
-                      {/* TODO: (abc1, 2) -> abc1_b */}
-                      <Link href={`/contests/${contest_slug}/tasks/${contest_slug}_${t.id}`}>{t.title}</Link>
+                      <Link href={`/contests/${contest_slug}/tasks/${seq + 1}`}>{t.title}</Link>
                     </Td>
                     <Td textAlign="center">
                       {/* TODO: get judge status (or progress) from server */}
