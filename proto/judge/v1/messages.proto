@@ -23,6 +23,7 @@ message JudgeRequest {
   optional bool want_result_detail = 8;
   optional uint32 stdout_limit_kib = 9;
   optional uint32 stderr_limit_kib = 10;
+  int32 submission_id = 11;
 }
 
 message JudgeResponse {
@@ -32,6 +33,7 @@ message JudgeResponse {
   uint32 exec_memory_kib = 4;
   string compiler_message = 5;
   optional ExecutionResultDetail detail = 6; // want_result_detail=true のときに値がセットされる
+  int32 submission_id = 7;
 }
 
 // AtCoder でいうコードテスト向けのリクエスト

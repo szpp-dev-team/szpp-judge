@@ -137,6 +137,11 @@ export class JudgeRequest extends Message<JudgeRequest> {
    */
   stderrLimitKib?: number;
 
+  /**
+   * @generated from field: int32 submission_id = 11;
+   */
+  submissionId = 0;
+
   constructor(data?: PartialMessage<JudgeRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -154,6 +159,7 @@ export class JudgeRequest extends Message<JudgeRequest> {
     { no: 8, name: "want_result_detail", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
     { no: 9, name: "stdout_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 10, name: "stderr_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
+    { no: 11, name: "submission_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): JudgeRequest {
@@ -211,6 +217,11 @@ export class JudgeResponse extends Message<JudgeResponse> {
    */
   detail?: ExecutionResultDetail;
 
+  /**
+   * @generated from field: int32 submission_id = 7;
+   */
+  submissionId = 0;
+
   constructor(data?: PartialMessage<JudgeResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -225,6 +236,7 @@ export class JudgeResponse extends Message<JudgeResponse> {
     { no: 4, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 5, name: "compiler_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "detail", kind: "message", T: ExecutionResultDetail, opt: true },
+    { no: 7, name: "submission_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): JudgeResponse {
