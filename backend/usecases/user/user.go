@@ -71,6 +71,22 @@ func (i *Interactor) ExistsUsername(ctx context.Context, req *pb.ExistsUsernameR
 	}, nil
 }
 
+func (i *Interactor) ExistsEmail(ctx context.Context, req *pb.ExistsEmailRequest) (*pb.ExistsEmailResponse, error) {
+	q := i.entClient.User.Query()
+	_, err := q.Where(entuser.Email(req.Email)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return &pb.ExistsEmailResponse{
+				Exists: false,
+			}, nil
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &pb.ExistsEmailResponse{
+		Exists: true,
+	}, nil
+}
+
 func toPbUser(t *ent.User) *backendv1.User {
 	return &backendv1.User{
 		Id:        int32(t.ID),

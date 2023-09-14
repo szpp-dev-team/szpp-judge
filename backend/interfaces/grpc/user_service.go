@@ -26,3 +26,7 @@ func (s *userServiceServer) CreateUser(ctx context.Context, req *backendv1.Creat
 func (s *userServiceServer) ExistsUsername(ctx context.Context, req *backendv1.ExistsUsernameRequest) (*backendv1.ExistsUsernameResponse, error) {
 	return s.interactor.ExistsUsername(ctx, req)
 }
+
+func (s *userServiceServer) ExistsEmail(ctx context.Context, req *backendv1.ExistsEmailRequest) (*backendv1.ExistsEmailResponse, error) {
+	return s.interactor.ExistsEmail(ctx, req)
+}
