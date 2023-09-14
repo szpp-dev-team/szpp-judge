@@ -1,9 +1,9 @@
-name: buf
+name: buf generate
 on:
   push:
     # 原則として main と develop では generate を行わない
     # 生成済みのコードを PR を通して merge するという運用にする
-    branchs-ignore:
+    branches-ignore:
       - main
       - develop
     paths:
@@ -20,6 +20,7 @@ jobs:
       - uses: bufbuild/buf-setup-action@v1
         with:
           version: "1.25.1"
+          github_token: ${{ github.token }}
       - name: generate
         run: buf generate
       - name: commit

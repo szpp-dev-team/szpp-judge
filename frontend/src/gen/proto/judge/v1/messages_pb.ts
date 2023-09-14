@@ -178,11 +178,11 @@ export class JudgeRequest extends Message<JudgeRequest> {
  */
 export class JudgeResponse extends Message<JudgeResponse> {
   /**
-   * テストケース番号 (0-indexed)
+   * テストケースの ID(DB に保存するときに使う)
    *
-   * @generated from field: uint32 seq = 1;
+   * @generated from field: uint32 testcase_id = 1;
    */
-  seq = 0;
+  testcaseId = 0;
 
   /**
    * @generated from field: judge.v1.JudgeStatus status = 2;
@@ -219,7 +219,7 @@ export class JudgeResponse extends Message<JudgeResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "judge.v1.JudgeResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "seq", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 1, name: "testcase_id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
     { no: 3, name: "exec_time_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 4, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },

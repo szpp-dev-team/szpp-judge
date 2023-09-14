@@ -1,4 +1,4 @@
-import { Table, Td, Th, Tr } from "@chakra-ui/react";
+import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta = {
@@ -10,7 +10,7 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["simple", "striped", "unstyled", "bordered"],
+      options: ["simple", "striped", "unstyled", "bordered", "bordered-narrow"],
     },
   },
 } satisfies Meta<typeof Table>;
@@ -18,18 +18,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Bordered: Story = {
-  args: {
-    variant: "bordered",
-  },
-  render: ({ ...props }) => (
-    <Table {...props}>
+const render: StoryObj["render"] = ({ ...props }) => (
+  <Table {...props}>
+    <Thead>
       <Tr>
         <Th textAlign="center">#</Th>
         <Th textAlign="center">難易度</Th>
         <Th textAlign="left">タイトル</Th>
         <Th textAlign="center">自分の提出結果</Th>
       </Tr>
+    </Thead>
+    <Tbody>
       {[
         [1, "Beginner", "すずっぴー君のおつかい", "AC"],
         [2, "Easy", "すずっぴー君のおつかい", "WA"],
@@ -43,6 +42,20 @@ export const Bordered: Story = {
           <Td textAlign="center">{s}</Td>
         </Tr>
       ))}
-    </Table>
-  ),
+    </Tbody>
+  </Table>
+);
+
+export const Bordered: Story = {
+  args: {
+    variant: "bordered",
+  },
+  render,
+};
+
+export const BorderedNarrow: Story = {
+  args: {
+    variant: "bordered-narrow",
+  },
+  render,
 };

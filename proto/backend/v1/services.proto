@@ -9,8 +9,10 @@ service UserService {
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
   // User を新たに作成する
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-  // User が存在するかどうかを確認する
-  rpc CheckUser(CheckUserRequest) returns (CheckUserResponse);
+  // Username が存在するかを確認する
+  rpc ExistsUsername(ExistsUsernameRequest) returns (ExistsUsernameResponse);
+  // Email が存在するかを確認する
+  rpc ExistsEmail(ExistsEmailRequest) returns (ExistsEmailResponse);
 }
 
 service AuthService {
@@ -18,6 +20,8 @@ service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse);
   // ログアウト
   rpc Logout(LogoutRequest) returns (LogoutResponse);
+  // refresh token を使って access token を更新する
+  rpc RefreshAccessToken(RefreshAccessTokenRequest) returns (RefreshAccessTokenResponse);
 }
 
 service TaskService {
@@ -27,6 +31,21 @@ service TaskService {
   rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
   // Task を更新する
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+
+  // TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+  // contestant によるリクエストの場合は sample のみ取得する。
+  rpc GetTestcaseSets(GetTestcaseSetsRequest) returns (GetTestcaseSetsResponse);
+  // TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+  rpc SyncTestcaseSets(SyncTestcaseSetsRequest) returns (SyncTestcaseSetsResponse);
+
+  // 提出する
+  rpc Submit(SubmitRequest) returns (SubmitResponse);
+  // 提出の詳細を取得
+  rpc GetSubmissionDetail(GetSubmissionDetailRequest) returns (GetSubmissionDetailResponse);
+  // 提出一覧を取得
+  rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse);
+  // ジャッジの進捗を取得
+  rpc GetJudgeProgress(GetJudgeProgressRequest) returns (GetJudgeProgressResponse);
   // Clarification を作成する
   rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
   // 指定された Clarification を取得する
@@ -56,4 +75,9 @@ service ContestService {
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
   rpc GetContest(GetContestRequest) returns (GetContestResponse);
   rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
+  rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
+  // 自分の問題ごとの結果情報を返す
+  rpc GetMySubmissionStatuses(GetMySubmissionStatusesRequest) returns (GetMySubmissionStatusesResponse);
+  // 順位表取得
+  rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
 }
