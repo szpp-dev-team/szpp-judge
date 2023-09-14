@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,6 +29,7 @@ func Test_GetUser(t *testing.T) {
 				q := entClient.User.Create().
 					SetUsername("hogege").
 					SetHashedPassword(HashPassword("fugafuga")).
+					SetEmail("szppi1@szpp.com").
 					SetRole("ADMIN").
 					SetCreatedAt(now).
 					SetUpdatedAt(now)
@@ -123,6 +125,7 @@ func Test_ExistsUsername(t *testing.T) {
 				q := entClient.User.Create().
 					SetUsername(req.Username).
 					SetHashedPassword(HashPassword("fugafuga")).
+					SetEmail("szppi2@szpp.com").
 					SetRole("ADMIN").
 					SetCreatedAt(timejst.Now()).
 					SetUpdatedAt(timejst.Now())
@@ -141,9 +144,10 @@ func Test_ExistsUsername(t *testing.T) {
 	}
 
 	for name, test := range tests {
+		i := 0
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			req := &backendv1.ExistsUsernameRequest{Username: "hogegege"}
+			req := &backendv1.ExistsUsernameRequest{Username: fmt.Sprintf("hogegege%d", i)}
 			if test.prepare != nil {
 				test.prepare(t, req)
 			}
@@ -158,5 +162,6 @@ func Test_ExistsUsername(t *testing.T) {
 				test.assert(ctx, t, req, resp)
 			}
 		})
+		i++
 	}
 }
