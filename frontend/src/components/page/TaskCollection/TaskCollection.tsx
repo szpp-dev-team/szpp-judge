@@ -1,7 +1,7 @@
 import { JudgeStatusBadge } from "@/src/components/model/judge/JudgeStatusBadge";
 // import { DifficultyBadge } from "@/src/components/model/task/DifficultyBadge";
 // import { Difficulty } from "@/src/model/task";
-import { useListContestTasks } from "@/src/usecases/useListContestTasks";
+import { useListContestTasks } from "@/src/usecases/contest";
 import { QuestionIcon } from "@chakra-ui/icons";
 import {
   Box,
