@@ -26,7 +26,7 @@ message JudgeRequest {
 }
 
 message JudgeResponse {
-  uint32 seq = 1; // テストケース番号 (0-indexed)
+  uint32 testcase_id = 1; // テストケースの ID(DB に保存するときに使う)
   JudgeStatus status = 2;
   uint32 exec_time_ms = 3;
   uint32 exec_memory_kib = 4;

@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, ExistsEmailRequest, ExistsEmailResponse, ExistsUsernameRequest, ExistsUsernameResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetStandingsRequest, GetStandingsResponse, GetSubmissionDetailRequest, GetSubmissionDetailResponse, GetTaskRequest, GetTaskResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListSubmissionsRequest, ListSubmissionsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, SubmitRequest, SubmitResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, CreateTaskRequest, CreateTaskResponse, CreateUserRequest, CreateUserResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, ExistsEmailRequest, ExistsEmailResponse, ExistsUsernameRequest, ExistsUsernameResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, GetSubmissionDetailRequest, GetSubmissionDetailResponse, GetTaskRequest, GetTaskResponse, GetTestcaseSetsRequest, GetTestcaseSetsResponse, GetUserRequest, GetUserResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, ListSubmissionsRequest, ListSubmissionsResponse, LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, PingRequest, PingResponse, RefreshAccessTokenRequest, RefreshAccessTokenResponse, SubmitRequest, SubmitResponse, SyncTestcaseSetsRequest, SyncTestcaseSetsResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./messages_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -87,6 +87,17 @@ export const AuthService = {
       O: LogoutResponse,
       kind: MethodKind.Unary,
     },
+    /**
+     * refresh token を使って access token を更新する
+     *
+     * @generated from rpc backend.v1.AuthService.RefreshAccessToken
+     */
+    refreshAccessToken: {
+      name: "RefreshAccessToken",
+      I: RefreshAccessTokenRequest,
+      O: RefreshAccessTokenResponse,
+      kind: MethodKind.Unary,
+    },
   }
 } as const;
 
@@ -127,6 +138,29 @@ export const TaskService = {
       name: "UpdateTask",
       I: UpdateTaskRequest,
       O: UpdateTaskResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+     * contestant によるリクエストの場合は sample のみ取得する。
+     *
+     * @generated from rpc backend.v1.TaskService.GetTestcaseSets
+     */
+    getTestcaseSets: {
+      name: "GetTestcaseSets",
+      I: GetTestcaseSetsRequest,
+      O: GetTestcaseSetsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+     *
+     * @generated from rpc backend.v1.TaskService.SyncTestcaseSets
+     */
+    syncTestcaseSets: {
+      name: "SyncTestcaseSets",
+      I: SyncTestcaseSetsRequest,
+      O: SyncTestcaseSetsResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -324,6 +358,26 @@ export const ContestService = {
       name: "ListContests",
       I: ListContestsRequest,
       O: ListContestsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc backend.v1.ContestService.ListContestTasks
+     */
+    listContestTasks: {
+      name: "ListContestTasks",
+      I: ListContestTasksRequest,
+      O: ListContestTasksResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 自分の問題ごとの結果情報を返す
+     *
+     * @generated from rpc backend.v1.ContestService.GetMySubmissionStatuses
+     */
+    getMySubmissionStatuses: {
+      name: "GetMySubmissionStatuses",
+      I: GetMySubmissionStatusesRequest,
+      O: GetMySubmissionStatusesResponse,
       kind: MethodKind.Unary,
     },
     /**
