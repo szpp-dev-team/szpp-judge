@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,7 +18,8 @@ type Claims struct {
 
 var claimsKey struct{}
 var excludeMethodSet = map[string]struct{}{
-	// todo: add excluded method
+	backendv1.TaskService_GetTask_FullMethodName:         {}, // 問題閲覧はゲストでもできるようにする
+	backendv1.TaskService_GetTestcaseSets_FullMethodName: {}, // 入力例閲覧はゲストでもできるようにする
 }
 
 func Auth(secret []byte) grpc.UnaryServerInterceptor {
