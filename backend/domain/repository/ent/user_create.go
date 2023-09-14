@@ -23,9 +23,15 @@ type UserCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetName sets the "name" field.
-func (uc *UserCreate) SetName(s string) *UserCreate {
-	uc.mutation.SetName(s)
+// SetUsername sets the "username" field.
+func (uc *UserCreate) SetUsername(s string) *UserCreate {
+	uc.mutation.SetUsername(s)
+	return uc
+}
+
+// SetEmail sets the "email" field.
+func (uc *UserCreate) SetEmail(s string) *UserCreate {
+	uc.mutation.SetEmail(s)
 	return uc
 }
 
@@ -35,9 +41,9 @@ func (uc *UserCreate) SetRole(s string) *UserCreate {
 	return uc
 }
 
-// SetEncryptedPassword sets the "encrypted_password" field.
-func (uc *UserCreate) SetEncryptedPassword(s string) *UserCreate {
-	uc.mutation.SetEncryptedPassword(s)
+// SetHashedPassword sets the "hashed_password" field.
+func (uc *UserCreate) SetHashedPassword(b []byte) *UserCreate {
+	uc.mutation.SetHashedPassword(b)
 	return uc
 }
 
@@ -116,14 +122,17 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
-	if _, ok := uc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "User.name"`)}
+	if _, ok := uc.mutation.Username(); !ok {
+		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "User.username"`)}
+	}
+	if _, ok := uc.mutation.Email(); !ok {
+		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
 	}
 	if _, ok := uc.mutation.Role(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
 	}
-	if _, ok := uc.mutation.EncryptedPassword(); !ok {
-		return &ValidationError{Name: "encrypted_password", err: errors.New(`ent: missing required field "User.encrypted_password"`)}
+	if _, ok := uc.mutation.HashedPassword(); !ok {
+		return &ValidationError{Name: "hashed_password", err: errors.New(`ent: missing required field "User.hashed_password"`)}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
@@ -161,17 +170,21 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := uc.mutation.Name(); ok {
-		_spec.SetField(user.FieldName, field.TypeString, value)
-		_node.Name = value
+	if value, ok := uc.mutation.Username(); ok {
+		_spec.SetField(user.FieldUsername, field.TypeString, value)
+		_node.Username = value
+	}
+	if value, ok := uc.mutation.Email(); ok {
+		_spec.SetField(user.FieldEmail, field.TypeString, value)
+		_node.Email = value
 	}
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
 		_node.Role = value
 	}
-	if value, ok := uc.mutation.EncryptedPassword(); ok {
-		_spec.SetField(user.FieldEncryptedPassword, field.TypeString, value)
-		_node.EncryptedPassword = value
+	if value, ok := uc.mutation.HashedPassword(); ok {
+		_spec.SetField(user.FieldHashedPassword, field.TypeBytes, value)
+		_node.HashedPassword = value
 	}
 	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
@@ -204,7 +217,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.User.Create().
-//		SetName(v).
+//		SetUsername(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -213,7 +226,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.UserUpsert) {
-//			SetName(v+v).
+//			SetUsername(v+v).
 //		}).
 //		Exec(ctx)
 func (uc *UserCreate) OnConflict(opts ...sql.ConflictOption) *UserUpsertOne {
@@ -249,15 +262,27 @@ type (
 	}
 )
 
-// SetName sets the "name" field.
-func (u *UserUpsert) SetName(v string) *UserUpsert {
-	u.Set(user.FieldName, v)
+// SetUsername sets the "username" field.
+func (u *UserUpsert) SetUsername(v string) *UserUpsert {
+	u.Set(user.FieldUsername, v)
 	return u
 }
 
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *UserUpsert) UpdateName() *UserUpsert {
-	u.SetExcluded(user.FieldName)
+// UpdateUsername sets the "username" field to the value that was provided on create.
+func (u *UserUpsert) UpdateUsername() *UserUpsert {
+	u.SetExcluded(user.FieldUsername)
+	return u
+}
+
+// SetEmail sets the "email" field.
+func (u *UserUpsert) SetEmail(v string) *UserUpsert {
+	u.Set(user.FieldEmail, v)
+	return u
+}
+
+// UpdateEmail sets the "email" field to the value that was provided on create.
+func (u *UserUpsert) UpdateEmail() *UserUpsert {
+	u.SetExcluded(user.FieldEmail)
 	return u
 }
 
@@ -273,15 +298,15 @@ func (u *UserUpsert) UpdateRole() *UserUpsert {
 	return u
 }
 
-// SetEncryptedPassword sets the "encrypted_password" field.
-func (u *UserUpsert) SetEncryptedPassword(v string) *UserUpsert {
-	u.Set(user.FieldEncryptedPassword, v)
+// SetHashedPassword sets the "hashed_password" field.
+func (u *UserUpsert) SetHashedPassword(v []byte) *UserUpsert {
+	u.Set(user.FieldHashedPassword, v)
 	return u
 }
 
-// UpdateEncryptedPassword sets the "encrypted_password" field to the value that was provided on create.
-func (u *UserUpsert) UpdateEncryptedPassword() *UserUpsert {
-	u.SetExcluded(user.FieldEncryptedPassword)
+// UpdateHashedPassword sets the "hashed_password" field to the value that was provided on create.
+func (u *UserUpsert) UpdateHashedPassword() *UserUpsert {
+	u.SetExcluded(user.FieldHashedPassword)
 	return u
 }
 
@@ -363,17 +388,31 @@ func (u *UserUpsertOne) Update(set func(*UserUpsert)) *UserUpsertOne {
 	return u
 }
 
-// SetName sets the "name" field.
-func (u *UserUpsertOne) SetName(v string) *UserUpsertOne {
+// SetUsername sets the "username" field.
+func (u *UserUpsertOne) SetUsername(v string) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
-		s.SetName(v)
+		s.SetUsername(v)
 	})
 }
 
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateName() *UserUpsertOne {
+// UpdateUsername sets the "username" field to the value that was provided on create.
+func (u *UserUpsertOne) UpdateUsername() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
-		s.UpdateName()
+		s.UpdateUsername()
+	})
+}
+
+// SetEmail sets the "email" field.
+func (u *UserUpsertOne) SetEmail(v string) *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.SetEmail(v)
+	})
+}
+
+// UpdateEmail sets the "email" field to the value that was provided on create.
+func (u *UserUpsertOne) UpdateEmail() *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateEmail()
 	})
 }
 
@@ -391,17 +430,17 @@ func (u *UserUpsertOne) UpdateRole() *UserUpsertOne {
 	})
 }
 
-// SetEncryptedPassword sets the "encrypted_password" field.
-func (u *UserUpsertOne) SetEncryptedPassword(v string) *UserUpsertOne {
+// SetHashedPassword sets the "hashed_password" field.
+func (u *UserUpsertOne) SetHashedPassword(v []byte) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
-		s.SetEncryptedPassword(v)
+		s.SetHashedPassword(v)
 	})
 }
 
-// UpdateEncryptedPassword sets the "encrypted_password" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateEncryptedPassword() *UserUpsertOne {
+// UpdateHashedPassword sets the "hashed_password" field to the value that was provided on create.
+func (u *UserUpsertOne) UpdateHashedPassword() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
-		s.UpdateEncryptedPassword()
+		s.UpdateHashedPassword()
 	})
 }
 
@@ -570,7 +609,7 @@ func (ucb *UserCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.UserUpsert) {
-//			SetName(v+v).
+//			SetUsername(v+v).
 //		}).
 //		Exec(ctx)
 func (ucb *UserCreateBulk) OnConflict(opts ...sql.ConflictOption) *UserUpsertBulk {
@@ -649,17 +688,31 @@ func (u *UserUpsertBulk) Update(set func(*UserUpsert)) *UserUpsertBulk {
 	return u
 }
 
-// SetName sets the "name" field.
-func (u *UserUpsertBulk) SetName(v string) *UserUpsertBulk {
+// SetUsername sets the "username" field.
+func (u *UserUpsertBulk) SetUsername(v string) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
-		s.SetName(v)
+		s.SetUsername(v)
 	})
 }
 
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateName() *UserUpsertBulk {
+// UpdateUsername sets the "username" field to the value that was provided on create.
+func (u *UserUpsertBulk) UpdateUsername() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
-		s.UpdateName()
+		s.UpdateUsername()
+	})
+}
+
+// SetEmail sets the "email" field.
+func (u *UserUpsertBulk) SetEmail(v string) *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.SetEmail(v)
+	})
+}
+
+// UpdateEmail sets the "email" field to the value that was provided on create.
+func (u *UserUpsertBulk) UpdateEmail() *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateEmail()
 	})
 }
 
@@ -677,17 +730,17 @@ func (u *UserUpsertBulk) UpdateRole() *UserUpsertBulk {
 	})
 }
 
-// SetEncryptedPassword sets the "encrypted_password" field.
-func (u *UserUpsertBulk) SetEncryptedPassword(v string) *UserUpsertBulk {
+// SetHashedPassword sets the "hashed_password" field.
+func (u *UserUpsertBulk) SetHashedPassword(v []byte) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
-		s.SetEncryptedPassword(v)
+		s.SetHashedPassword(v)
 	})
 }
 
-// UpdateEncryptedPassword sets the "encrypted_password" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateEncryptedPassword() *UserUpsertBulk {
+// UpdateHashedPassword sets the "hashed_password" field to the value that was provided on create.
+func (u *UserUpsertBulk) UpdateHashedPassword() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
-		s.UpdateEncryptedPassword()
+		s.UpdateHashedPassword()
 	})
 }
 
