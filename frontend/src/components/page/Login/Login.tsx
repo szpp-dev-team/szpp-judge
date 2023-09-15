@@ -1,5 +1,5 @@
 import { LoginRequest } from "@/src/gen/proto/backend/v1/messages_pb";
-import { authRepo } from "@/src/repository/auth";
+import { useLogin } from "@/src/usecases/auth";
 import { userLoginSchema } from "@/src/zschema/user";
 import { Code, ConnectError } from "@bufbuild/connect";
 import { Button, Card, CardBody, CardFooter, CardHeader, Container, Heading, Input, useToast } from "@chakra-ui/react";
@@ -29,13 +29,15 @@ export const Login = () => {
     resolver: zodResolver(userLoginSchema),
   });
 
+  const { loginMutation } = useLogin();
+
   const onSubmit = handleSubmit(async (values) => {
     console.log("onSubmit(): values=", values);
     try {
-      const resp = await authRepo.login(new LoginRequest(values));
+      const resp = await loginMutation.mutateAsync(values);
       console.log("onSubmit(): resp=", resp);
       toast({
-        title: `${resp.username} にログインしました`,
+        title: `${resp?.user?.username} にログインしました`,
         status: "success",
       });
       router.push("/");
