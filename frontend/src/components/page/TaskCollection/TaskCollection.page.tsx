@@ -1,15 +1,15 @@
 import { pageTitle } from "@/src/util/pagemeta";
 import Head from "next/head";
-import { WithHeaderFooter } from "../../layout/WithHeaderFooter";
+import { ContestLayout } from "../../layout/ContestLayout";
 import { TaskCollection } from "./TaskCollection";
 
 export const TaskCollectionPage = () => {
   return (
-    <WithHeaderFooter>
+    <ContestLayout>
       <Head>
         <title>{pageTitle("問題")}</title>
       </Head>
       <TaskCollection />
-    </WithHeaderFooter>
+    </ContestLayout>
   );
 };

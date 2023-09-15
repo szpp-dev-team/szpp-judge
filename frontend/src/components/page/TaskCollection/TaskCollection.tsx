@@ -29,8 +29,8 @@ export const TaskCollection = () => {
   });
 
   return (
-    <Box px={16} h="inherit">
-      <Card px={3} py={4} h="100%">
+    <Box px={16} h="100%">
+      <Card px={3} py={4} h="100%" borderRadius={0}>
         <CardHeader>
           <Heading as="h1">問題一覧 / 得点状況</Heading>
         </CardHeader>
