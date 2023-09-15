@@ -21,55 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Role int32
-
-const (
-	Role_UNKNOWN Role = 0
-	Role_ADMIN   Role = 1
-	Role_USER    Role = 2
-)
-
-// Enum value maps for Role.
-var (
-	Role_name = map[int32]string{
-		0: "UNKNOWN",
-		1: "ADMIN",
-		2: "USER",
-	}
-	Role_value = map[string]int32{
-		"UNKNOWN": 0,
-		"ADMIN":   1,
-		"USER":    2,
-	}
-)
-
-func (x Role) Enum() *Role {
-	p := new(Role)
-	*p = x
-	return p
-}
-
-func (x Role) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Role) Descriptor() protoreflect.EnumDescriptor {
-	return file_backend_v1_messages_proto_enumTypes[0].Descriptor()
-}
-
-func (Role) Type() protoreflect.EnumType {
-	return &file_backend_v1_messages_proto_enumTypes[0]
-}
-
-func (x Role) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Role.Descriptor instead.
-func (Role) EnumDescriptor() ([]byte, []int) {
-	return file_backend_v1_messages_proto_rawDescGZIP(), []int{0}
-}
-
 type GetUserRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3543,21 +3494,18 @@ var file_backend_v1_messages_proto_rawDesc = []byte{
 	0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e,
 	0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
 	0x52, 0x12, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74,
-	0x75, 0x73, 0x65, 0x73, 0x2a, 0x28, 0x0a, 0x04, 0x52, 0x6f, 0x6c, 0x65, 0x12, 0x0b, 0x0a, 0x07,
-	0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12, 0x09, 0x0a, 0x05, 0x41, 0x44, 0x4d,
-	0x49, 0x4e, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x55, 0x53, 0x45, 0x52, 0x10, 0x02, 0x42, 0xaf,
-	0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76,
-	0x31, 0x42, 0x0d, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x50, 0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73,
-	0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d, 0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70,
-	0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65,
-	0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b,
-	0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa,
-	0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a, 0x42,
-	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63, 0x6b,
-	0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x75, 0x73, 0x65, 0x73, 0x42, 0xaf, 0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x63,
+	0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x42, 0x0d, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d, 0x74, 0x65,
+	0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65,
+	0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76, 0x31, 0xa2,
+	0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e,
+	0x56, 0x31, 0xca, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0xe2,
+	0x02, 0x16, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42,
+	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63, 0x6b, 0x65,
+	0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3572,125 +3520,123 @@ func file_backend_v1_messages_proto_rawDescGZIP() []byte {
 	return file_backend_v1_messages_proto_rawDescData
 }
 
-var file_backend_v1_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 64)
 var file_backend_v1_messages_proto_goTypes = []interface{}{
-	(Role)(0),                               // 0: backend.v1.Role
-	(*GetUserRequest)(nil),                  // 1: backend.v1.GetUserRequest
-	(*GetUserResponse)(nil),                 // 2: backend.v1.GetUserResponse
-	(*CreateUserRequest)(nil),               // 3: backend.v1.CreateUserRequest
-	(*CreateUserResponse)(nil),              // 4: backend.v1.CreateUserResponse
-	(*ExistsUsernameRequest)(nil),           // 5: backend.v1.ExistsUsernameRequest
-	(*ExistsUsernameResponse)(nil),          // 6: backend.v1.ExistsUsernameResponse
-	(*ExistsEmailRequest)(nil),              // 7: backend.v1.ExistsEmailRequest
-	(*ExistsEmailResponse)(nil),             // 8: backend.v1.ExistsEmailResponse
-	(*LoginRequest)(nil),                    // 9: backend.v1.LoginRequest
-	(*LoginResponse)(nil),                   // 10: backend.v1.LoginResponse
-	(*RefreshAccessTokenRequest)(nil),       // 11: backend.v1.RefreshAccessTokenRequest
-	(*RefreshAccessTokenResponse)(nil),      // 12: backend.v1.RefreshAccessTokenResponse
-	(*LogoutRequest)(nil),                   // 13: backend.v1.LogoutRequest
-	(*LogoutResponse)(nil),                  // 14: backend.v1.LogoutResponse
-	(*CreateTaskRequest)(nil),               // 15: backend.v1.CreateTaskRequest
-	(*CreateTaskResponse)(nil),              // 16: backend.v1.CreateTaskResponse
-	(*GetTaskRequest)(nil),                  // 17: backend.v1.GetTaskRequest
-	(*GetTaskResponse)(nil),                 // 18: backend.v1.GetTaskResponse
-	(*UpdateTaskRequest)(nil),               // 19: backend.v1.UpdateTaskRequest
-	(*UpdateTaskResponse)(nil),              // 20: backend.v1.UpdateTaskResponse
-	(*GetTestcaseSetsRequest)(nil),          // 21: backend.v1.GetTestcaseSetsRequest
-	(*GetTestcaseSetsResponse)(nil),         // 22: backend.v1.GetTestcaseSetsResponse
-	(*SyncTestcaseSetsRequest)(nil),         // 23: backend.v1.SyncTestcaseSetsRequest
-	(*SyncTestcaseSetsResponse)(nil),        // 24: backend.v1.SyncTestcaseSetsResponse
-	(*PingRequest)(nil),                     // 25: backend.v1.PingRequest
-	(*PingResponse)(nil),                    // 26: backend.v1.PingResponse
-	(*SubmitRequest)(nil),                   // 27: backend.v1.SubmitRequest
-	(*SubmitResponse)(nil),                  // 28: backend.v1.SubmitResponse
-	(*GetSubmissionDetailRequest)(nil),      // 29: backend.v1.GetSubmissionDetailRequest
-	(*GetSubmissionDetailResponse)(nil),     // 30: backend.v1.GetSubmissionDetailResponse
-	(*ListSubmissionsRequest)(nil),          // 31: backend.v1.ListSubmissionsRequest
-	(*ListSubmissionsResponse)(nil),         // 32: backend.v1.ListSubmissionsResponse
-	(*GetJudgeProgressRequest)(nil),         // 33: backend.v1.GetJudgeProgressRequest
-	(*GetJudgeProgressResponse)(nil),        // 34: backend.v1.GetJudgeProgressResponse
-	(*CreateContestRequest)(nil),            // 35: backend.v1.CreateContestRequest
-	(*CreateContestResponse)(nil),           // 36: backend.v1.CreateContestResponse
-	(*GetContestRequest)(nil),               // 37: backend.v1.GetContestRequest
-	(*GetContestResponse)(nil),              // 38: backend.v1.GetContestResponse
-	(*ListContestsRequest)(nil),             // 39: backend.v1.ListContestsRequest
-	(*ListContestsResponse)(nil),            // 40: backend.v1.ListContestsResponse
-	(*GetStandingsRequest)(nil),             // 41: backend.v1.GetStandingsRequest
-	(*GetStandingsResponse)(nil),            // 42: backend.v1.GetStandingsResponse
-	(*CreateClarificationRequest)(nil),      // 43: backend.v1.CreateClarificationRequest
-	(*CreateClarificationResponse)(nil),     // 44: backend.v1.CreateClarificationResponse
-	(*GetClarificationRequest)(nil),         // 45: backend.v1.GetClarificationRequest
-	(*GetClarificationResponse)(nil),        // 46: backend.v1.GetClarificationResponse
-	(*ListClarificationsRequest)(nil),       // 47: backend.v1.ListClarificationsRequest
-	(*ListClarificationsResponse)(nil),      // 48: backend.v1.ListClarificationsResponse
-	(*UpdateClarificationRequest)(nil),      // 49: backend.v1.UpdateClarificationRequest
-	(*UpdateClarificationResponse)(nil),     // 50: backend.v1.UpdateClarificationResponse
-	(*DeleteClarificationRequest)(nil),      // 51: backend.v1.DeleteClarificationRequest
-	(*DeleteClarificationResponse)(nil),     // 52: backend.v1.DeleteClarificationResponse
-	(*CreateAnswerRequest)(nil),             // 53: backend.v1.CreateAnswerRequest
-	(*CreateAnswerResponse)(nil),            // 54: backend.v1.CreateAnswerResponse
-	(*GetAnswerRequest)(nil),                // 55: backend.v1.GetAnswerRequest
-	(*GetAnswerResponse)(nil),               // 56: backend.v1.GetAnswerResponse
-	(*UpdateAnswerRequest)(nil),             // 57: backend.v1.UpdateAnswerRequest
-	(*UpdateAnswerResponse)(nil),            // 58: backend.v1.UpdateAnswerResponse
-	(*DeleteAnswerRequest)(nil),             // 59: backend.v1.DeleteAnswerRequest
-	(*DeleteAnswerResponse)(nil),            // 60: backend.v1.DeleteAnswerResponse
-	(*ListContestTasksRequest)(nil),         // 61: backend.v1.ListContestTasksRequest
-	(*ListContestTasksResponse)(nil),        // 62: backend.v1.ListContestTasksResponse
-	(*GetMySubmissionStatusesRequest)(nil),  // 63: backend.v1.GetMySubmissionStatusesRequest
-	(*GetMySubmissionStatusesResponse)(nil), // 64: backend.v1.GetMySubmissionStatusesResponse
-	(*User)(nil),                            // 65: backend.v1.User
-	(*MutationTask)(nil),                    // 66: backend.v1.MutationTask
-	(*Task)(nil),                            // 67: backend.v1.Task
-	(*TestcaseSet)(nil),                     // 68: backend.v1.TestcaseSet
-	(*Testcase)(nil),                        // 69: backend.v1.Testcase
-	(*MutationTestcaseSet)(nil),             // 70: backend.v1.MutationTestcaseSet
-	(*MutationTestcase)(nil),                // 71: backend.v1.MutationTestcase
-	(*SubmissionDetail)(nil),                // 72: backend.v1.SubmissionDetail
-	(*SubmissionSummary)(nil),               // 73: backend.v1.SubmissionSummary
-	(*JudgeProgress)(nil),                   // 74: backend.v1.JudgeProgress
-	(*timestamppb.Timestamp)(nil),           // 75: google.protobuf.Timestamp
-	(*Contest)(nil),                         // 76: backend.v1.Contest
-	(*StandingsElement)(nil),                // 77: backend.v1.StandingsElement
-	(*Clarification)(nil),                   // 78: backend.v1.Clarification
-	(*Clarification_Answer)(nil),            // 79: backend.v1.Clarification.Answer
-	(*ContestTask)(nil),                     // 80: backend.v1.ContestTask
-	(*SubmissionStatus)(nil),                // 81: backend.v1.SubmissionStatus
+	(*GetUserRequest)(nil),                  // 0: backend.v1.GetUserRequest
+	(*GetUserResponse)(nil),                 // 1: backend.v1.GetUserResponse
+	(*CreateUserRequest)(nil),               // 2: backend.v1.CreateUserRequest
+	(*CreateUserResponse)(nil),              // 3: backend.v1.CreateUserResponse
+	(*ExistsUsernameRequest)(nil),           // 4: backend.v1.ExistsUsernameRequest
+	(*ExistsUsernameResponse)(nil),          // 5: backend.v1.ExistsUsernameResponse
+	(*ExistsEmailRequest)(nil),              // 6: backend.v1.ExistsEmailRequest
+	(*ExistsEmailResponse)(nil),             // 7: backend.v1.ExistsEmailResponse
+	(*LoginRequest)(nil),                    // 8: backend.v1.LoginRequest
+	(*LoginResponse)(nil),                   // 9: backend.v1.LoginResponse
+	(*RefreshAccessTokenRequest)(nil),       // 10: backend.v1.RefreshAccessTokenRequest
+	(*RefreshAccessTokenResponse)(nil),      // 11: backend.v1.RefreshAccessTokenResponse
+	(*LogoutRequest)(nil),                   // 12: backend.v1.LogoutRequest
+	(*LogoutResponse)(nil),                  // 13: backend.v1.LogoutResponse
+	(*CreateTaskRequest)(nil),               // 14: backend.v1.CreateTaskRequest
+	(*CreateTaskResponse)(nil),              // 15: backend.v1.CreateTaskResponse
+	(*GetTaskRequest)(nil),                  // 16: backend.v1.GetTaskRequest
+	(*GetTaskResponse)(nil),                 // 17: backend.v1.GetTaskResponse
+	(*UpdateTaskRequest)(nil),               // 18: backend.v1.UpdateTaskRequest
+	(*UpdateTaskResponse)(nil),              // 19: backend.v1.UpdateTaskResponse
+	(*GetTestcaseSetsRequest)(nil),          // 20: backend.v1.GetTestcaseSetsRequest
+	(*GetTestcaseSetsResponse)(nil),         // 21: backend.v1.GetTestcaseSetsResponse
+	(*SyncTestcaseSetsRequest)(nil),         // 22: backend.v1.SyncTestcaseSetsRequest
+	(*SyncTestcaseSetsResponse)(nil),        // 23: backend.v1.SyncTestcaseSetsResponse
+	(*PingRequest)(nil),                     // 24: backend.v1.PingRequest
+	(*PingResponse)(nil),                    // 25: backend.v1.PingResponse
+	(*SubmitRequest)(nil),                   // 26: backend.v1.SubmitRequest
+	(*SubmitResponse)(nil),                  // 27: backend.v1.SubmitResponse
+	(*GetSubmissionDetailRequest)(nil),      // 28: backend.v1.GetSubmissionDetailRequest
+	(*GetSubmissionDetailResponse)(nil),     // 29: backend.v1.GetSubmissionDetailResponse
+	(*ListSubmissionsRequest)(nil),          // 30: backend.v1.ListSubmissionsRequest
+	(*ListSubmissionsResponse)(nil),         // 31: backend.v1.ListSubmissionsResponse
+	(*GetJudgeProgressRequest)(nil),         // 32: backend.v1.GetJudgeProgressRequest
+	(*GetJudgeProgressResponse)(nil),        // 33: backend.v1.GetJudgeProgressResponse
+	(*CreateContestRequest)(nil),            // 34: backend.v1.CreateContestRequest
+	(*CreateContestResponse)(nil),           // 35: backend.v1.CreateContestResponse
+	(*GetContestRequest)(nil),               // 36: backend.v1.GetContestRequest
+	(*GetContestResponse)(nil),              // 37: backend.v1.GetContestResponse
+	(*ListContestsRequest)(nil),             // 38: backend.v1.ListContestsRequest
+	(*ListContestsResponse)(nil),            // 39: backend.v1.ListContestsResponse
+	(*GetStandingsRequest)(nil),             // 40: backend.v1.GetStandingsRequest
+	(*GetStandingsResponse)(nil),            // 41: backend.v1.GetStandingsResponse
+	(*CreateClarificationRequest)(nil),      // 42: backend.v1.CreateClarificationRequest
+	(*CreateClarificationResponse)(nil),     // 43: backend.v1.CreateClarificationResponse
+	(*GetClarificationRequest)(nil),         // 44: backend.v1.GetClarificationRequest
+	(*GetClarificationResponse)(nil),        // 45: backend.v1.GetClarificationResponse
+	(*ListClarificationsRequest)(nil),       // 46: backend.v1.ListClarificationsRequest
+	(*ListClarificationsResponse)(nil),      // 47: backend.v1.ListClarificationsResponse
+	(*UpdateClarificationRequest)(nil),      // 48: backend.v1.UpdateClarificationRequest
+	(*UpdateClarificationResponse)(nil),     // 49: backend.v1.UpdateClarificationResponse
+	(*DeleteClarificationRequest)(nil),      // 50: backend.v1.DeleteClarificationRequest
+	(*DeleteClarificationResponse)(nil),     // 51: backend.v1.DeleteClarificationResponse
+	(*CreateAnswerRequest)(nil),             // 52: backend.v1.CreateAnswerRequest
+	(*CreateAnswerResponse)(nil),            // 53: backend.v1.CreateAnswerResponse
+	(*GetAnswerRequest)(nil),                // 54: backend.v1.GetAnswerRequest
+	(*GetAnswerResponse)(nil),               // 55: backend.v1.GetAnswerResponse
+	(*UpdateAnswerRequest)(nil),             // 56: backend.v1.UpdateAnswerRequest
+	(*UpdateAnswerResponse)(nil),            // 57: backend.v1.UpdateAnswerResponse
+	(*DeleteAnswerRequest)(nil),             // 58: backend.v1.DeleteAnswerRequest
+	(*DeleteAnswerResponse)(nil),            // 59: backend.v1.DeleteAnswerResponse
+	(*ListContestTasksRequest)(nil),         // 60: backend.v1.ListContestTasksRequest
+	(*ListContestTasksResponse)(nil),        // 61: backend.v1.ListContestTasksResponse
+	(*GetMySubmissionStatusesRequest)(nil),  // 62: backend.v1.GetMySubmissionStatusesRequest
+	(*GetMySubmissionStatusesResponse)(nil), // 63: backend.v1.GetMySubmissionStatusesResponse
+	(*User)(nil),                            // 64: backend.v1.User
+	(*MutationTask)(nil),                    // 65: backend.v1.MutationTask
+	(*Task)(nil),                            // 66: backend.v1.Task
+	(*TestcaseSet)(nil),                     // 67: backend.v1.TestcaseSet
+	(*Testcase)(nil),                        // 68: backend.v1.Testcase
+	(*MutationTestcaseSet)(nil),             // 69: backend.v1.MutationTestcaseSet
+	(*MutationTestcase)(nil),                // 70: backend.v1.MutationTestcase
+	(*SubmissionDetail)(nil),                // 71: backend.v1.SubmissionDetail
+	(*SubmissionSummary)(nil),               // 72: backend.v1.SubmissionSummary
+	(*JudgeProgress)(nil),                   // 73: backend.v1.JudgeProgress
+	(*timestamppb.Timestamp)(nil),           // 74: google.protobuf.Timestamp
+	(*Contest)(nil),                         // 75: backend.v1.Contest
+	(*StandingsElement)(nil),                // 76: backend.v1.StandingsElement
+	(*Clarification)(nil),                   // 77: backend.v1.Clarification
+	(*Clarification_Answer)(nil),            // 78: backend.v1.Clarification.Answer
+	(*ContestTask)(nil),                     // 79: backend.v1.ContestTask
+	(*SubmissionStatus)(nil),                // 80: backend.v1.SubmissionStatus
 }
 var file_backend_v1_messages_proto_depIdxs = []int32{
-	65, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
-	65, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
-	65, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
-	66, // 3: backend.v1.CreateTaskRequest.task:type_name -> backend.v1.MutationTask
-	67, // 4: backend.v1.CreateTaskResponse.task:type_name -> backend.v1.Task
-	67, // 5: backend.v1.GetTaskResponse.task:type_name -> backend.v1.Task
-	66, // 6: backend.v1.UpdateTaskRequest.task:type_name -> backend.v1.MutationTask
-	67, // 7: backend.v1.UpdateTaskResponse.task:type_name -> backend.v1.Task
-	68, // 8: backend.v1.GetTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
-	69, // 9: backend.v1.GetTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
-	70, // 10: backend.v1.SyncTestcaseSetsRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
-	71, // 11: backend.v1.SyncTestcaseSetsRequest.testcases:type_name -> backend.v1.MutationTestcase
-	68, // 12: backend.v1.SyncTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
-	69, // 13: backend.v1.SyncTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
-	72, // 14: backend.v1.GetSubmissionDetailResponse.submission_detail:type_name -> backend.v1.SubmissionDetail
-	73, // 15: backend.v1.ListSubmissionsResponse.submissions:type_name -> backend.v1.SubmissionSummary
-	74, // 16: backend.v1.GetJudgeProgressResponse.judge_progress:type_name -> backend.v1.JudgeProgress
-	75, // 17: backend.v1.CreateContestRequest.start_at:type_name -> google.protobuf.Timestamp
-	75, // 18: backend.v1.CreateContestRequest.end_at:type_name -> google.protobuf.Timestamp
-	76, // 19: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
-	76, // 20: backend.v1.GetContestResponse.contest:type_name -> backend.v1.Contest
-	76, // 21: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
-	77, // 22: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsElement
-	78, // 23: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	78, // 24: backend.v1.GetClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	78, // 25: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
-	78, // 26: backend.v1.UpdateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	79, // 27: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	79, // 28: backend.v1.GetAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	79, // 29: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	80, // 30: backend.v1.ListContestTasksResponse.tasks:type_name -> backend.v1.ContestTask
-	81, // 31: backend.v1.GetMySubmissionStatusesResponse.submission_statuses:type_name -> backend.v1.SubmissionStatus
+	64, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
+	64, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
+	64, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
+	65, // 3: backend.v1.CreateTaskRequest.task:type_name -> backend.v1.MutationTask
+	66, // 4: backend.v1.CreateTaskResponse.task:type_name -> backend.v1.Task
+	66, // 5: backend.v1.GetTaskResponse.task:type_name -> backend.v1.Task
+	65, // 6: backend.v1.UpdateTaskRequest.task:type_name -> backend.v1.MutationTask
+	66, // 7: backend.v1.UpdateTaskResponse.task:type_name -> backend.v1.Task
+	67, // 8: backend.v1.GetTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
+	68, // 9: backend.v1.GetTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
+	69, // 10: backend.v1.SyncTestcaseSetsRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
+	70, // 11: backend.v1.SyncTestcaseSetsRequest.testcases:type_name -> backend.v1.MutationTestcase
+	67, // 12: backend.v1.SyncTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
+	68, // 13: backend.v1.SyncTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
+	71, // 14: backend.v1.GetSubmissionDetailResponse.submission_detail:type_name -> backend.v1.SubmissionDetail
+	72, // 15: backend.v1.ListSubmissionsResponse.submissions:type_name -> backend.v1.SubmissionSummary
+	73, // 16: backend.v1.GetJudgeProgressResponse.judge_progress:type_name -> backend.v1.JudgeProgress
+	74, // 17: backend.v1.CreateContestRequest.start_at:type_name -> google.protobuf.Timestamp
+	74, // 18: backend.v1.CreateContestRequest.end_at:type_name -> google.protobuf.Timestamp
+	75, // 19: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
+	75, // 20: backend.v1.GetContestResponse.contest:type_name -> backend.v1.Contest
+	75, // 21: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
+	76, // 22: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsElement
+	77, // 23: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	77, // 24: backend.v1.GetClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	77, // 25: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
+	77, // 26: backend.v1.UpdateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	78, // 27: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	78, // 28: backend.v1.GetAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	78, // 29: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	79, // 30: backend.v1.ListContestTasksResponse.tasks:type_name -> backend.v1.ContestTask
+	80, // 31: backend.v1.GetMySubmissionStatusesResponse.submission_statuses:type_name -> backend.v1.SubmissionStatus
 	32, // [32:32] is the sub-list for method output_type
 	32, // [32:32] is the sub-list for method input_type
 	32, // [32:32] is the sub-list for extension type_name
@@ -4481,14 +4427,13 @@ func file_backend_v1_messages_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_v1_messages_proto_rawDesc,
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   64,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_backend_v1_messages_proto_goTypes,
 		DependencyIndexes: file_backend_v1_messages_proto_depIdxs,
-		EnumInfos:         file_backend_v1_messages_proto_enumTypes,
 		MessageInfos:      file_backend_v1_messages_proto_msgTypes,
 	}.Build()
 	File_backend_v1_messages_proto = out.File

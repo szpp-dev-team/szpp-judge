@@ -22,6 +22,55 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Role int32
+
+const (
+	Role_ROLE_UNSPECIFIED Role = 0
+	Role_ADMIN            Role = 1
+	Role_USER             Role = 2
+)
+
+// Enum value maps for Role.
+var (
+	Role_name = map[int32]string{
+		0: "ROLE_UNSPECIFIED",
+		1: "ADMIN",
+		2: "USER",
+	}
+	Role_value = map[string]int32{
+		"ROLE_UNSPECIFIED": 0,
+		"ADMIN":            1,
+		"USER":             2,
+	}
+)
+
+func (x Role) Enum() *Role {
+	p := new(Role)
+	*p = x
+	return p
+}
+
+func (x Role) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Role) Descriptor() protoreflect.EnumDescriptor {
+	return file_backend_v1_resources_proto_enumTypes[0].Descriptor()
+}
+
+func (Role) Type() protoreflect.EnumType {
+	return &file_backend_v1_resources_proto_enumTypes[0]
+}
+
+func (x Role) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Role.Descriptor instead.
+func (Role) EnumDescriptor() ([]byte, []int) {
+	return file_backend_v1_resources_proto_rawDescGZIP(), []int{0}
+}
+
 type Visibility int32
 
 const (
@@ -55,11 +104,11 @@ func (x Visibility) String() string {
 }
 
 func (Visibility) Descriptor() protoreflect.EnumDescriptor {
-	return file_backend_v1_resources_proto_enumTypes[0].Descriptor()
+	return file_backend_v1_resources_proto_enumTypes[1].Descriptor()
 }
 
 func (Visibility) Type() protoreflect.EnumType {
-	return &file_backend_v1_resources_proto_enumTypes[0]
+	return &file_backend_v1_resources_proto_enumTypes[1]
 }
 
 func (x Visibility) Number() protoreflect.EnumNumber {
@@ -68,7 +117,7 @@ func (x Visibility) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Visibility.Descriptor instead.
 func (Visibility) EnumDescriptor() ([]byte, []int) {
-	return file_backend_v1_resources_proto_rawDescGZIP(), []int{0}
+	return file_backend_v1_resources_proto_rawDescGZIP(), []int{1}
 }
 
 type Difficulty int32
@@ -113,11 +162,11 @@ func (x Difficulty) String() string {
 }
 
 func (Difficulty) Descriptor() protoreflect.EnumDescriptor {
-	return file_backend_v1_resources_proto_enumTypes[1].Descriptor()
+	return file_backend_v1_resources_proto_enumTypes[2].Descriptor()
 }
 
 func (Difficulty) Type() protoreflect.EnumType {
-	return &file_backend_v1_resources_proto_enumTypes[1]
+	return &file_backend_v1_resources_proto_enumTypes[2]
 }
 
 func (x Difficulty) Number() protoreflect.EnumNumber {
@@ -126,7 +175,7 @@ func (x Difficulty) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Difficulty.Descriptor instead.
 func (Difficulty) EnumDescriptor() ([]byte, []int) {
-	return file_backend_v1_resources_proto_rawDescGZIP(), []int{1}
+	return file_backend_v1_resources_proto_rawDescGZIP(), []int{2}
 }
 
 type User struct {
@@ -2120,29 +2169,32 @@ var file_backend_v1_resources_proto_rawDesc = []byte{
 	0x01, 0x28, 0x05, 0x52, 0x06, 0x74, 0x61, 0x73, 0x6b, 0x49, 0x64, 0x12, 0x19, 0x0a, 0x05, 0x73,
 	0x63, 0x6f, 0x72, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x48, 0x00, 0x52, 0x05, 0x73, 0x63,
 	0x6f, 0x72, 0x65, 0x88, 0x01, 0x01, 0x42, 0x08, 0x0a, 0x06, 0x5f, 0x73, 0x63, 0x6f, 0x72, 0x65,
-	0x2a, 0x41, 0x0a, 0x0a, 0x56, 0x69, 0x73, 0x69, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x12, 0x1a,
-	0x0a, 0x16, 0x56, 0x49, 0x53, 0x49, 0x42, 0x49, 0x4c, 0x49, 0x54, 0x59, 0x5f, 0x55, 0x4e, 0x53,
-	0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x50, 0x55,
-	0x42, 0x4c, 0x49, 0x43, 0x10, 0x01, 0x12, 0x0b, 0x0a, 0x07, 0x50, 0x52, 0x49, 0x56, 0x41, 0x54,
-	0x45, 0x10, 0x02, 0x2a, 0x66, 0x0a, 0x0a, 0x44, 0x69, 0x66, 0x66, 0x69, 0x63, 0x75, 0x6c, 0x74,
-	0x79, 0x12, 0x1a, 0x0a, 0x16, 0x44, 0x49, 0x46, 0x46, 0x49, 0x43, 0x55, 0x4c, 0x54, 0x59, 0x5f,
-	0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0c, 0x0a,
-	0x08, 0x42, 0x45, 0x47, 0x49, 0x4e, 0x4e, 0x45, 0x52, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x45,
-	0x41, 0x53, 0x59, 0x10, 0x02, 0x12, 0x0a, 0x0a, 0x06, 0x4d, 0x45, 0x44, 0x49, 0x55, 0x4d, 0x10,
-	0x03, 0x12, 0x08, 0x0a, 0x04, 0x48, 0x41, 0x52, 0x44, 0x10, 0x04, 0x12, 0x0e, 0x0a, 0x0a, 0x49,
-	0x4d, 0x50, 0x4f, 0x53, 0x53, 0x49, 0x42, 0x4c, 0x45, 0x10, 0x05, 0x42, 0xb0, 0x01, 0x0a, 0x0e,
-	0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x42, 0x0e,
-	0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
-	0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x7a, 0x70,
-	0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d, 0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d,
-	0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65, 0x6e, 0x2f,
-	0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b, 0x62, 0x61,
-	0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x0a,
-	0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a, 0x42, 0x61, 0x63,
-	0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e,
-	0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
-	0xea, 0x02, 0x0b, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2a, 0x31, 0x0a, 0x04, 0x52, 0x6f, 0x6c, 0x65, 0x12, 0x14, 0x0a, 0x10, 0x52, 0x4f, 0x4c, 0x45,
+	0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x09,
+	0x0a, 0x05, 0x41, 0x44, 0x4d, 0x49, 0x4e, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x55, 0x53, 0x45,
+	0x52, 0x10, 0x02, 0x2a, 0x41, 0x0a, 0x0a, 0x56, 0x69, 0x73, 0x69, 0x62, 0x69, 0x6c, 0x69, 0x74,
+	0x79, 0x12, 0x1a, 0x0a, 0x16, 0x56, 0x49, 0x53, 0x49, 0x42, 0x49, 0x4c, 0x49, 0x54, 0x59, 0x5f,
+	0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0a, 0x0a,
+	0x06, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x43, 0x10, 0x01, 0x12, 0x0b, 0x0a, 0x07, 0x50, 0x52, 0x49,
+	0x56, 0x41, 0x54, 0x45, 0x10, 0x02, 0x2a, 0x66, 0x0a, 0x0a, 0x44, 0x69, 0x66, 0x66, 0x69, 0x63,
+	0x75, 0x6c, 0x74, 0x79, 0x12, 0x1a, 0x0a, 0x16, 0x44, 0x49, 0x46, 0x46, 0x49, 0x43, 0x55, 0x4c,
+	0x54, 0x59, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00,
+	0x12, 0x0c, 0x0a, 0x08, 0x42, 0x45, 0x47, 0x49, 0x4e, 0x4e, 0x45, 0x52, 0x10, 0x01, 0x12, 0x08,
+	0x0a, 0x04, 0x45, 0x41, 0x53, 0x59, 0x10, 0x02, 0x12, 0x0a, 0x0a, 0x06, 0x4d, 0x45, 0x44, 0x49,
+	0x55, 0x4d, 0x10, 0x03, 0x12, 0x08, 0x0a, 0x04, 0x48, 0x41, 0x52, 0x44, 0x10, 0x04, 0x12, 0x0e,
+	0x0a, 0x0a, 0x49, 0x4d, 0x50, 0x4f, 0x53, 0x53, 0x49, 0x42, 0x4c, 0x45, 0x10, 0x05, 0x42, 0xb0,
+	0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76,
+	0x31, 0x42, 0x0e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74,
+	0x6f, 0x50, 0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x73, 0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d, 0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a,
+	0x70, 0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67,
+	0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31,
+	0x3b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58,
+	0xaa, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a,
+	0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63,
+	0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56,
+	0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2157,66 +2209,67 @@ func file_backend_v1_resources_proto_rawDescGZIP() []byte {
 	return file_backend_v1_resources_proto_rawDescData
 }
 
-var file_backend_v1_resources_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_backend_v1_resources_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_backend_v1_resources_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_backend_v1_resources_proto_goTypes = []interface{}{
-	(Visibility)(0),                     // 0: backend.v1.Visibility
-	(Difficulty)(0),                     // 1: backend.v1.Difficulty
-	(*User)(nil),                        // 2: backend.v1.User
-	(*Contest)(nil),                     // 3: backend.v1.Contest
-	(*StandingsElement)(nil),            // 4: backend.v1.StandingsElement
-	(*Clarification)(nil),               // 5: backend.v1.Clarification
-	(*Task)(nil),                        // 6: backend.v1.Task
-	(*MutationTask)(nil),                // 7: backend.v1.MutationTask
-	(*ContestTask)(nil),                 // 8: backend.v1.ContestTask
-	(*TestcaseSet)(nil),                 // 9: backend.v1.TestcaseSet
-	(*MutationTestcaseSet)(nil),         // 10: backend.v1.MutationTestcaseSet
-	(*Testcase)(nil),                    // 11: backend.v1.Testcase
-	(*MutationTestcase)(nil),            // 12: backend.v1.MutationTestcase
-	(*SubmissionDetail)(nil),            // 13: backend.v1.SubmissionDetail
-	(*SubmissionSummary)(nil),           // 14: backend.v1.SubmissionSummary
-	(*TestcaseResult)(nil),              // 15: backend.v1.TestcaseResult
-	(*JudgeProgress)(nil),               // 16: backend.v1.JudgeProgress
-	(*SubmissionStatus)(nil),            // 17: backend.v1.SubmissionStatus
-	(*StandingsElement_TaskDetail)(nil), // 18: backend.v1.StandingsElement.TaskDetail
-	(*Clarification_Answer)(nil),        // 19: backend.v1.Clarification.Answer
-	(*timestamppb.Timestamp)(nil),       // 20: google.protobuf.Timestamp
-	(*v1.JudgeType)(nil),                // 21: judge.v1.JudgeType
-	(v1.JudgeStatus)(0),                 // 22: judge.v1.JudgeStatus
+	(Role)(0),                           // 0: backend.v1.Role
+	(Visibility)(0),                     // 1: backend.v1.Visibility
+	(Difficulty)(0),                     // 2: backend.v1.Difficulty
+	(*User)(nil),                        // 3: backend.v1.User
+	(*Contest)(nil),                     // 4: backend.v1.Contest
+	(*StandingsElement)(nil),            // 5: backend.v1.StandingsElement
+	(*Clarification)(nil),               // 6: backend.v1.Clarification
+	(*Task)(nil),                        // 7: backend.v1.Task
+	(*MutationTask)(nil),                // 8: backend.v1.MutationTask
+	(*ContestTask)(nil),                 // 9: backend.v1.ContestTask
+	(*TestcaseSet)(nil),                 // 10: backend.v1.TestcaseSet
+	(*MutationTestcaseSet)(nil),         // 11: backend.v1.MutationTestcaseSet
+	(*Testcase)(nil),                    // 12: backend.v1.Testcase
+	(*MutationTestcase)(nil),            // 13: backend.v1.MutationTestcase
+	(*SubmissionDetail)(nil),            // 14: backend.v1.SubmissionDetail
+	(*SubmissionSummary)(nil),           // 15: backend.v1.SubmissionSummary
+	(*TestcaseResult)(nil),              // 16: backend.v1.TestcaseResult
+	(*JudgeProgress)(nil),               // 17: backend.v1.JudgeProgress
+	(*SubmissionStatus)(nil),            // 18: backend.v1.SubmissionStatus
+	(*StandingsElement_TaskDetail)(nil), // 19: backend.v1.StandingsElement.TaskDetail
+	(*Clarification_Answer)(nil),        // 20: backend.v1.Clarification.Answer
+	(*timestamppb.Timestamp)(nil),       // 21: google.protobuf.Timestamp
+	(*v1.JudgeType)(nil),                // 22: judge.v1.JudgeType
+	(v1.JudgeStatus)(0),                 // 23: judge.v1.JudgeStatus
 }
 var file_backend_v1_resources_proto_depIdxs = []int32{
-	20, // 0: backend.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	20, // 1: backend.v1.User.updated_at:type_name -> google.protobuf.Timestamp
-	20, // 2: backend.v1.Contest.start_at:type_name -> google.protobuf.Timestamp
-	20, // 3: backend.v1.Contest.end_at:type_name -> google.protobuf.Timestamp
-	20, // 4: backend.v1.StandingsElement.latest_ac_at:type_name -> google.protobuf.Timestamp
-	18, // 5: backend.v1.StandingsElement.task_detail_list:type_name -> backend.v1.StandingsElement.TaskDetail
-	19, // 6: backend.v1.Clarification.answer:type_name -> backend.v1.Clarification.Answer
-	20, // 7: backend.v1.Clarification.created_at:type_name -> google.protobuf.Timestamp
-	20, // 8: backend.v1.Clarification.updated_at:type_name -> google.protobuf.Timestamp
-	21, // 9: backend.v1.Task.judge_type:type_name -> judge.v1.JudgeType
-	1,  // 10: backend.v1.Task.difficulty:type_name -> backend.v1.Difficulty
-	20, // 11: backend.v1.Task.created_at:type_name -> google.protobuf.Timestamp
-	20, // 12: backend.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
-	21, // 13: backend.v1.MutationTask.judge_type:type_name -> judge.v1.JudgeType
-	1,  // 14: backend.v1.MutationTask.difficulty:type_name -> backend.v1.Difficulty
-	1,  // 15: backend.v1.ContestTask.difficulty:type_name -> backend.v1.Difficulty
-	20, // 16: backend.v1.TestcaseSet.created_at:type_name -> google.protobuf.Timestamp
-	20, // 17: backend.v1.TestcaseSet.updated_at:type_name -> google.protobuf.Timestamp
-	20, // 18: backend.v1.Testcase.created_at:type_name -> google.protobuf.Timestamp
-	20, // 19: backend.v1.Testcase.updated_at:type_name -> google.protobuf.Timestamp
-	22, // 20: backend.v1.SubmissionDetail.status:type_name -> judge.v1.JudgeStatus
-	15, // 21: backend.v1.SubmissionDetail.testcase_results:type_name -> backend.v1.TestcaseResult
-	20, // 22: backend.v1.SubmissionDetail.submitted_at:type_name -> google.protobuf.Timestamp
-	20, // 23: backend.v1.SubmissionDetail.created_at:type_name -> google.protobuf.Timestamp
-	20, // 24: backend.v1.SubmissionDetail.updated_at:type_name -> google.protobuf.Timestamp
-	22, // 25: backend.v1.SubmissionSummary.judge_status:type_name -> judge.v1.JudgeStatus
-	20, // 26: backend.v1.SubmissionSummary.submitted_at:type_name -> google.protobuf.Timestamp
-	22, // 27: backend.v1.TestcaseResult.judge_status:type_name -> judge.v1.JudgeStatus
-	22, // 28: backend.v1.JudgeProgress.status:type_name -> judge.v1.JudgeStatus
-	20, // 29: backend.v1.StandingsElement.TaskDetail.ac_elapsed:type_name -> google.protobuf.Timestamp
-	20, // 30: backend.v1.Clarification.Answer.created_at:type_name -> google.protobuf.Timestamp
-	20, // 31: backend.v1.Clarification.Answer.updated_at:type_name -> google.protobuf.Timestamp
+	21, // 0: backend.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	21, // 1: backend.v1.User.updated_at:type_name -> google.protobuf.Timestamp
+	21, // 2: backend.v1.Contest.start_at:type_name -> google.protobuf.Timestamp
+	21, // 3: backend.v1.Contest.end_at:type_name -> google.protobuf.Timestamp
+	21, // 4: backend.v1.StandingsElement.latest_ac_at:type_name -> google.protobuf.Timestamp
+	19, // 5: backend.v1.StandingsElement.task_detail_list:type_name -> backend.v1.StandingsElement.TaskDetail
+	20, // 6: backend.v1.Clarification.answer:type_name -> backend.v1.Clarification.Answer
+	21, // 7: backend.v1.Clarification.created_at:type_name -> google.protobuf.Timestamp
+	21, // 8: backend.v1.Clarification.updated_at:type_name -> google.protobuf.Timestamp
+	22, // 9: backend.v1.Task.judge_type:type_name -> judge.v1.JudgeType
+	2,  // 10: backend.v1.Task.difficulty:type_name -> backend.v1.Difficulty
+	21, // 11: backend.v1.Task.created_at:type_name -> google.protobuf.Timestamp
+	21, // 12: backend.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
+	22, // 13: backend.v1.MutationTask.judge_type:type_name -> judge.v1.JudgeType
+	2,  // 14: backend.v1.MutationTask.difficulty:type_name -> backend.v1.Difficulty
+	2,  // 15: backend.v1.ContestTask.difficulty:type_name -> backend.v1.Difficulty
+	21, // 16: backend.v1.TestcaseSet.created_at:type_name -> google.protobuf.Timestamp
+	21, // 17: backend.v1.TestcaseSet.updated_at:type_name -> google.protobuf.Timestamp
+	21, // 18: backend.v1.Testcase.created_at:type_name -> google.protobuf.Timestamp
+	21, // 19: backend.v1.Testcase.updated_at:type_name -> google.protobuf.Timestamp
+	23, // 20: backend.v1.SubmissionDetail.status:type_name -> judge.v1.JudgeStatus
+	16, // 21: backend.v1.SubmissionDetail.testcase_results:type_name -> backend.v1.TestcaseResult
+	21, // 22: backend.v1.SubmissionDetail.submitted_at:type_name -> google.protobuf.Timestamp
+	21, // 23: backend.v1.SubmissionDetail.created_at:type_name -> google.protobuf.Timestamp
+	21, // 24: backend.v1.SubmissionDetail.updated_at:type_name -> google.protobuf.Timestamp
+	23, // 25: backend.v1.SubmissionSummary.judge_status:type_name -> judge.v1.JudgeStatus
+	21, // 26: backend.v1.SubmissionSummary.submitted_at:type_name -> google.protobuf.Timestamp
+	23, // 27: backend.v1.TestcaseResult.judge_status:type_name -> judge.v1.JudgeStatus
+	23, // 28: backend.v1.JudgeProgress.status:type_name -> judge.v1.JudgeStatus
+	21, // 29: backend.v1.StandingsElement.TaskDetail.ac_elapsed:type_name -> google.protobuf.Timestamp
+	21, // 30: backend.v1.Clarification.Answer.created_at:type_name -> google.protobuf.Timestamp
+	21, // 31: backend.v1.Clarification.Answer.updated_at:type_name -> google.protobuf.Timestamp
 	32, // [32:32] is the sub-list for method output_type
 	32, // [32:32] is the sub-list for method input_type
 	32, // [32:32] is the sub-list for extension type_name
@@ -2461,7 +2514,7 @@ func file_backend_v1_resources_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_v1_resources_proto_rawDesc,
-			NumEnums:      2,
+			NumEnums:      3,
 			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,

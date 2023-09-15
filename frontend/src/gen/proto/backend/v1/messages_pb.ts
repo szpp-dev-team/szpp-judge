@@ -8,32 +8,6 @@ import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Clarification, Clarification_Answer, Contest, ContestTask, JudgeProgress, MutationTask, MutationTestcase, MutationTestcaseSet, StandingsElement, SubmissionDetail, SubmissionStatus, SubmissionSummary, Task, Testcase, TestcaseSet, User } from "./resources_pb";
 
 /**
- * @generated from enum backend.v1.Role
- */
-export enum Role {
-  /**
-   * @generated from enum value: UNKNOWN = 0;
-   */
-  UNKNOWN = 0,
-
-  /**
-   * @generated from enum value: ADMIN = 1;
-   */
-  ADMIN = 1,
-
-  /**
-   * @generated from enum value: USER = 2;
-   */
-  USER = 2,
-}
-// Retrieve enum metadata with: proto3.getEnumType(Role)
-proto3.util.setEnumType(Role, "backend.v1.Role", [
-  { no: 0, name: "UNKNOWN" },
-  { no: 1, name: "ADMIN" },
-  { no: 2, name: "USER" },
-]);
-
-/**
  * @generated from message backend.v1.GetUserRequest
  */
 export class GetUserRequest extends Message<GetUserRequest> {
