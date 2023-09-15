@@ -6,7 +6,6 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
-	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slog"
 	"google.golang.org/grpc/codes"
@@ -88,11 +87,11 @@ func (i *Interactor) ExistsEmail(ctx context.Context, req *pb.ExistsEmailRequest
 	}, nil
 }
 
-func toPbUser(t *ent.User) *backendv1.User {
-	return &backendv1.User{
+func toPbUser(t *ent.User) *pb.User {
+	return &pb.User{
 		Id:        int32(t.ID),
 		Username:  t.Username,
-		IsAdmin:   backendv1.Role_value[t.Role] == backendv1.Role_value["ADMIN"],
+		IsAdmin:   pb.Role_value[t.Role] == pb.Role_value["ADMIN"],
 		CreatedAt: timestamppb.New(t.CreatedAt),
 		UpdatedAt: timestamppb.New(t.UpdatedAt),
 	}
