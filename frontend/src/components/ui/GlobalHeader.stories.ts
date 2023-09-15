@@ -17,7 +17,7 @@ export const Default: Story = {
 };
 export const Contest: Story = {
   args: {
-    contestID: 1,
+    contestSlug: "sbc001",
     contestTitle: "SZPP プログラミング講座 in 浜松 2023年4月1日",
   },
 };
