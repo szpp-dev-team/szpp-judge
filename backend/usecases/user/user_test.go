@@ -143,8 +143,8 @@ func Test_ExistsUsername(t *testing.T) {
 		},
 	}
 
+	i := 0
 	for name, test := range tests {
-		i := 0
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 			req := &backendv1.ExistsUsernameRequest{Username: fmt.Sprintf("hogegege%d", i)}
