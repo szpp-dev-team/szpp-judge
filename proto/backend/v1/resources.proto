@@ -14,6 +14,12 @@ message User {
   optional google.protobuf.Timestamp updated_at = 6;
 }
 
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ADMIN = 1;
+  USER = 2;
+}
+
 message Contest {
   int32 id = 1;
   string name = 2;
