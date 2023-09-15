@@ -18,6 +18,11 @@ plugins:
     opt:
       - target=ts
       - import_extension=none
+  - plugin: buf.build/connectrpc/query-es
+    out: ../frontend/src/gen/proto
+    opt:
+      - target=ts
+      - import_extension=none
   - plugin: buf.build/bufbuild/es
     out: ../frontend/src/gen/proto
     opt:

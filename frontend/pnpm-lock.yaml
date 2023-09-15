@@ -29,6 +29,9 @@ dependencies:
   '@chakra-ui/styled-system':
     specifier: ^2.9.1
     version: 2.9.1
+  '@connectrpc/connect-query':
+    specifier: 0.4.3
+    version: 0.4.3(@bufbuild/protobuf@1.3.0)(@connectrpc/connect@0.13.2)(@tanstack/react-query@4.35.0)(react-dom@18.2.0)(react@18.2.0)
   '@emotion/react':
     specifier: 11.11.1
     version: 11.11.1(@types/react@18.2.20)(react@18.2.0)
@@ -38,6 +41,9 @@ dependencies:
   '@hookform/resolvers':
     specifier: ^3.3.1
     version: 3.3.1(react-hook-form@7.45.4)
+  '@tanstack/react-query':
+    specifier: 4.35.0
+    version: 4.35.0(react-dom@18.2.0)(react@18.2.0)
   '@types/node':
     specifier: 20.4.10
     version: 20.4.10
@@ -2623,6 +2629,31 @@ packages:
     dev: true
     optional: true
 
+  /@connectrpc/connect-query@0.4.3(@bufbuild/protobuf@1.3.0)(@connectrpc/connect@0.13.2)(@tanstack/react-query@4.35.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-oQA/NjZdCBMPmjlCuX21f7FYWBbXoV4jbvGxx+du1DLCha42HGZO0ttb1PSFOMHeTniuoKTFo1DFHsbIgsUAjA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.3.0
+      '@connectrpc/connect': '>=0.12.0 <=1'
+      '@tanstack/react-query': ^4.20.4
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      '@bufbuild/protobuf': 1.3.0
+      '@connectrpc/connect': 0.13.2(@bufbuild/protobuf@1.3.0)
+      '@tanstack/react-query': 4.35.0(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      stable-hash: 0.0.3
+    dev: false
+
+  /@connectrpc/connect@0.13.2(@bufbuild/protobuf@1.3.0):
+    resolution: {integrity: sha512-KZg6EH8gYnQZm/d2IXXMVB2mom/A1dCD8+7JScm2tKN9OQyQSeCJOLqtv/M4M5XVS0Y9JM2/VCbiUwfhl9Rqmg==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.2.1
+    dependencies:
+      '@bufbuild/protobuf': 1.3.0
+    dev: false
+
   /@discoveryjs/json-ext@0.5.7:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
     engines: {node: '>=10.0.0'}
@@ -5164,6 +5195,28 @@ packages:
   /@swc/types@0.1.4:
     resolution: {integrity: sha512-z/G02d+59gyyUb7KYhKi9jOhicek6QD2oMaotUyG+lUkybpXoV49dY9bj7Ah5Q+y7knK2jU67UTX9FyfGzaxQg==}
     dev: true
+
+  /@tanstack/query-core@4.35.0:
+    resolution: {integrity: sha512-4GMcKQuLZQi6RFBiBZNsLhl+hQGYScRZ5ZoVq8QAzfqz9M7vcGin/2YdSESwl7WaV+Qzsb5CZOAbMBes4lNTnA==}
+    dev: false
+
+  /@tanstack/react-query@4.35.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-LLYDNnM9ewYHgjm2rzhk4KG/puN2rdoqCUD+N9+V7SwlsYwJk5ypX58rpkoZAhFyZ+KmFUJ7Iv2lIEOoUqydIg==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@tanstack/query-core': 4.35.0
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
 
   /@testing-library/dom@9.3.1:
     resolution: {integrity: sha512-0DGPd9AR3+iDTjGoMpxIkAsUihHZ3Ai6CneU6bRRrffXMgzCdlNk43jTrD2/5LT6CBb3MWTP8v510JzYtahD2w==}
@@ -11401,6 +11454,10 @@ packages:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
     dev: true
 
+  /stable-hash@0.0.3:
+    resolution: {integrity: sha512-c63fvNCQ7ip1wBfPv54MflMA5L6OE5J0p6Fg13IpKft4JAFoNal8+s/jtJ8PibrwqXm4onnbeQsADs8k0NQGUA==}
+    dev: false
+
   /stackframe@1.3.4:
     resolution: {integrity: sha512-oeVtt7eWQS+Na6F//S4kJ2K2VbRlS9D43mAlMyVpVWovy9o+jfgH8O9agzANzaiLjclA0oYzUXEM4PurhSUChw==}
     dev: true
@@ -12138,6 +12195,14 @@ packages:
       detect-node-es: 1.1.0
       react: 18.2.0
       tslib: 2.6.1
+
+  /use-sync-external-store@1.2.0(react@18.2.0):
+    resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
