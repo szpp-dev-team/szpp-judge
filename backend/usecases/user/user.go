@@ -6,7 +6,6 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
-	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slog"
 	"google.golang.org/grpc/codes"
@@ -26,7 +25,7 @@ func NewInteractor(entClient *ent.Client) *Interactor {
 
 func (i *Interactor) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 	q := i.entClient.User.Query()
-	user, err := q.Where(entuser.Name(req.Username)).Only(ctx)
+	user, err := q.Where(entuser.Username(req.Username)).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -41,8 +40,9 @@ func (i *Interactor) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.G
 func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	now := timejst.Now()
 	q := i.entClient.User.Create().
-		SetName(req.Username).
-		SetEncryptedPassword(HashPassword(req.Password)).
+		SetUsername(req.Username).
+		SetHashedPassword(HashPassword(req.Password)).
+		SetEmail(req.Email).
 		SetRole("USER").
 		SetCreatedAt(now).
 		SetUpdatedAt(now)
@@ -55,11 +55,43 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 	}, nil
 }
 
-func toPbUser(t *ent.User) *backendv1.User {
-	return &backendv1.User{
+func (i *Interactor) ExistsUsername(ctx context.Context, req *pb.ExistsUsernameRequest) (*pb.ExistsUsernameResponse, error) {
+	q := i.entClient.User.Query()
+	_, err := q.Where(entuser.Username(req.Username)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return &pb.ExistsUsernameResponse{
+				Exists: false,
+			}, nil
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &pb.ExistsUsernameResponse{
+		Exists: true,
+	}, nil
+}
+
+func (i *Interactor) ExistsEmail(ctx context.Context, req *pb.ExistsEmailRequest) (*pb.ExistsEmailResponse, error) {
+	q := i.entClient.User.Query()
+	_, err := q.Where(entuser.Email(req.Email)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return &pb.ExistsEmailResponse{
+				Exists: false,
+			}, nil
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &pb.ExistsEmailResponse{
+		Exists: true,
+	}, nil
+}
+
+func toPbUser(t *ent.User) *pb.User {
+	return &pb.User{
 		Id:        int32(t.ID),
-		Username:  t.Name,
-		IsAdmin:   backendv1.Role_value[t.Role] == backendv1.Role_value["ADMIN"],
+		Username:  t.Username,
+		IsAdmin:   pb.Role_value[t.Role] == pb.Role_value["ADMIN"],
 		CreatedAt: timestamppb.New(t.CreatedAt),
 		UpdatedAt: timestamppb.New(t.UpdatedAt),
 	}

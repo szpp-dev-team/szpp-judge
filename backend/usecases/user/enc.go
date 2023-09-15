@@ -2,11 +2,11 @@ package user
 
 import "golang.org/x/crypto/bcrypt"
 
-func HashPassword(password string) string {
+func HashPassword(password string) []byte {
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(hashed)
+	return hashed
 }
 
-func VerifyPassword(hashed, password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password))
+func VerifyPassword(hashed []byte, password string) error {
+	return bcrypt.CompareHashAndPassword(hashed, []byte(password))
 }
