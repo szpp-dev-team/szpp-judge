@@ -1,4 +1,4 @@
-import { atom, useAtom } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 
 interface ICredential {
   accessToken: string;
@@ -7,4 +7,5 @@ interface ICredential {
 
 const credential = atom<ICredential>({ accessToken: "", refreshToken: "" });
 
-export const useCredential = () => useAtom(credential);
+export const useCredentialValue = () => useAtomValue(credential);
+export const useCredentialSetter = () => useSetAtom(credential);
