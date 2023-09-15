@@ -1,5 +1,3 @@
-import { JudgeStatus, JudgeTestcaseProgress } from "@/src/model/judge";
-
 export const DifficultyValues = [
   "beginner",
   "easy",
@@ -9,22 +7,6 @@ export const DifficultyValues = [
 ] as const;
 
 export type Difficulty = (typeof DifficultyValues)[number];
-
-export type Task = {
-  id: string;
-  slug: string;
-  difficulty: Difficulty;
-  haiten: number;
-  title: string;
-};
-
-type withSubmissionSummary = {
-  status?: JudgeStatus;
-  score?: number;
-  progress?: JudgeTestcaseProgress;
-};
-
-export type TaskWithMySubmissionSummary = Task & withSubmissionSummary;
 
 export const ScoreStatusValues = [
   undefined,

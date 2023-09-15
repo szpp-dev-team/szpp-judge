@@ -73,12 +73,17 @@ proto3.util.setEnumType(JudgeStatus, "judge.v1.JudgeStatus", [
  */
 export class Testcase extends Message<Testcase> {
   /**
-   * @generated from field: string input_path = 1;
+   * @generated from field: uint32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: string input_path = 2;
    */
   inputPath = "";
 
   /**
-   * @generated from field: string expected_path = 2;
+   * @generated from field: string expected_path = 3;
    */
   expectedPath = "";
 
@@ -90,8 +95,9 @@ export class Testcase extends Message<Testcase> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "judge.v1.Testcase";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "input_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "expected_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "input_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "expected_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Testcase {
