@@ -1,12 +1,19 @@
 import { Code, ConnectError } from "@bufbuild/connect";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../gen/proto/backend/v1/services-AuthService_connectquery";
+import { useCredentialSetter } from "../globalStates/credential";
+import { useUserSetter } from "../globalStates/user";
 
 /**
- * - 使うときは mutate を呼び出す
- * - mutate を使う限りエラーは react-query で握りつぶしてくれるが username, password の
- *   間違いが原因のエラーに関してはコンポーネントに通知したいのでコールバックがある
- * @param onUnauthenticatedError
+ * ログイン用カスタムフック
+ * - フックを呼び出す側は mutate を呼び出す
+ * - mutate が成功したらこのフックによって状態( jotai )が更新されるのでフックを呼び出した側は何もすべきでない
+ * @example
+ * ```ts
+ * const { mutate } = useLogin(() => { toast({ title: "失敗" }}) });
+ * const onSubmit = handleSubmit((values) => mutate(values));
+ * ```
+ * @param onUnauthenticatedError パスワード間違いをコンポーネントに通知するためのコールバック
  * @returns
  */
 export const useLogin = (onUnauthenticatedError?: () => void) => {
@@ -14,16 +21,29 @@ export const useLogin = (onUnauthenticatedError?: () => void) => {
     if (e.code === Code.Unauthenticated && onUnauthenticatedError) {
       onUnauthenticatedError();
     } else {
-      throw e;
+      throw e; // mutate を使う限り React Query がエラーをキャッチして(握りつぶして)くれる
     }
   };
 
-  const { data, error, isLoading, mutate, mutateAsync } = useMutation({
+  const setCredential = useCredentialSetter();
+  const setUser = useUserSetter();
+
+  const { data, error, isLoading, mutate } = useMutation({
     ...login.useMutation({ onError: onConnectError }),
     onSuccess: (data) => {
-      console.log("[usecase]onSuccess");
+      console.log("[useLoginHook] onSuccess");
+
+      setCredential({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
+      setUser({
+        id: data.user!.id,
+        username: data.user!.username,
+        isAdmin: data.user!.isAdmin,
+      });
     },
   });
 
-  return { data, error, isLoading, mutate, mutateAsync };
+  return { data, error, isLoading, mutate };
 };
