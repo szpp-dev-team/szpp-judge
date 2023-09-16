@@ -61,6 +61,22 @@ func (i *Interactor) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.Log
 	return &pb.LogoutResponse{}, nil
 }
 
+func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAccessTokenRequest, secret string) (*pb.RefreshAccessTokenResponse, error) {
+	isTokenValid, err := VerifyRefreshToken(ctx, i.entClient, req.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	if !isTokenValid {
+		return nil, status.Error(codes.Unauthenticated, "invalid refresh token")
+	} else {
+		username := intercepter.GetClaimsFromContext(ctx).Username
+		accessToken, _ := GenerateAccessToken([]byte(secret), username)
+		return &pb.RefreshAccessTokenResponse{
+			AccessToken: accessToken,
+		}, nil
+	}
+}
+
 func toPbUser(t *ent.User) *pb.User {
 	return &pb.User{
 		Id:        int32(t.ID),

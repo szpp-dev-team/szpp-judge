@@ -22,3 +22,7 @@ func (s *authServiceServer) Login(ctx context.Context, req *backendv1.LoginReque
 func (s *authServiceServer) Logout(ctx context.Context, req *backendv1.LogoutRequest) (*backendv1.LogoutResponse, error) {
 	return s.interactor.Logout(ctx, req)
 }
+
+func (s *authServiceServer) RefreshAccessToken(ctx context.Context, req *backendv1.RefreshAccessTokenRequest) (*backendv1.RefreshAccessTokenResponse, error) {
+	return s.interactor.RefreshAccessToken(ctx, req, s.interactor.Secret)
+}
