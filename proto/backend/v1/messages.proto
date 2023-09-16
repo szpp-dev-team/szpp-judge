@@ -273,3 +273,10 @@ message GetMySubmissionStatusesRequest {
 message GetMySubmissionStatusesResponse {
   repeated SubmissionStatus submission_statuses = 1;
 }
+
+// コンテストに参加登録するときのリクエスト
+message RegisterRequest {
+  string contest_slug = 1;
+}
+
+message RegisterResponse {}
