@@ -3184,6 +3184,92 @@ func (x *GetMySubmissionStatusesResponse) GetSubmissionStatuses() []*SubmissionS
 	return nil
 }
 
+// コンテストに参加登録するときのリクエスト
+type RegisterRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ContestSlug string `protobuf:"bytes,1,opt,name=contest_slug,json=contestSlug,proto3" json:"contest_slug,omitempty"`
+}
+
+func (x *RegisterRequest) Reset() {
+	*x = RegisterRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[64]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RegisterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterRequest) ProtoMessage() {}
+
+func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[64]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
+func (*RegisterRequest) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{64}
+}
+
+func (x *RegisterRequest) GetContestSlug() string {
+	if x != nil {
+		return x.ContestSlug
+	}
+	return ""
+}
+
+type RegisterResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *RegisterResponse) Reset() {
+	*x = RegisterResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_v1_messages_proto_msgTypes[65]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RegisterResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterResponse) ProtoMessage() {}
+
+func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_v1_messages_proto_msgTypes[65]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
+func (*RegisterResponse) Descriptor() ([]byte, []int) {
+	return file_backend_v1_messages_proto_rawDescGZIP(), []int{65}
+}
+
 var File_backend_v1_messages_proto protoreflect.FileDescriptor
 
 var file_backend_v1_messages_proto_rawDesc = []byte{
@@ -3494,18 +3580,23 @@ var file_backend_v1_messages_proto_rawDesc = []byte{
 	0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e,
 	0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
 	0x52, 0x12, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74,
-	0x75, 0x73, 0x65, 0x73, 0x42, 0xaf, 0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x63,
-	0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x42, 0x0d, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
-	0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d, 0x74, 0x65,
-	0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70, 0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65,
-	0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76, 0x31, 0xa2,
-	0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e,
-	0x56, 0x31, 0xca, 0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0xe2,
-	0x02, 0x16, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42,
-	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63, 0x6b, 0x65,
-	0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x75, 0x73, 0x65, 0x73, 0x22, 0x34, 0x0a, 0x0f, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x73, 0x74, 0x5f, 0x73, 0x6c, 0x75, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x63,
+	0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x53, 0x6c, 0x75, 0x67, 0x22, 0x12, 0x0a, 0x10, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0xaf,
+	0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76,
+	0x31, 0x42, 0x0d, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f,
+	0x50, 0x01, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73,
+	0x7a, 0x70, 0x70, 0x2d, 0x64, 0x65, 0x76, 0x2d, 0x74, 0x65, 0x61, 0x6d, 0x2f, 0x73, 0x7a, 0x70,
+	0x70, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x67, 0x65,
+	0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x3b,
+	0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa,
+	0x02, 0x0a, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0a, 0x42,
+	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x16, 0x42, 0x61, 0x63, 0x6b,
+	0x65, 0x6e, 0x64, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0xea, 0x02, 0x0b, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x3a, 0x3a, 0x56, 0x31,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3520,7 +3611,7 @@ func file_backend_v1_messages_proto_rawDescGZIP() []byte {
 	return file_backend_v1_messages_proto_rawDescData
 }
 
-var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 64)
+var file_backend_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 66)
 var file_backend_v1_messages_proto_goTypes = []interface{}{
 	(*GetUserRequest)(nil),                  // 0: backend.v1.GetUserRequest
 	(*GetUserResponse)(nil),                 // 1: backend.v1.GetUserResponse
@@ -3586,57 +3677,59 @@ var file_backend_v1_messages_proto_goTypes = []interface{}{
 	(*ListContestTasksResponse)(nil),        // 61: backend.v1.ListContestTasksResponse
 	(*GetMySubmissionStatusesRequest)(nil),  // 62: backend.v1.GetMySubmissionStatusesRequest
 	(*GetMySubmissionStatusesResponse)(nil), // 63: backend.v1.GetMySubmissionStatusesResponse
-	(*User)(nil),                            // 64: backend.v1.User
-	(*MutationTask)(nil),                    // 65: backend.v1.MutationTask
-	(*Task)(nil),                            // 66: backend.v1.Task
-	(*TestcaseSet)(nil),                     // 67: backend.v1.TestcaseSet
-	(*Testcase)(nil),                        // 68: backend.v1.Testcase
-	(*MutationTestcaseSet)(nil),             // 69: backend.v1.MutationTestcaseSet
-	(*MutationTestcase)(nil),                // 70: backend.v1.MutationTestcase
-	(*SubmissionDetail)(nil),                // 71: backend.v1.SubmissionDetail
-	(*SubmissionSummary)(nil),               // 72: backend.v1.SubmissionSummary
-	(*JudgeProgress)(nil),                   // 73: backend.v1.JudgeProgress
-	(*timestamppb.Timestamp)(nil),           // 74: google.protobuf.Timestamp
-	(*Contest)(nil),                         // 75: backend.v1.Contest
-	(*StandingsElement)(nil),                // 76: backend.v1.StandingsElement
-	(*Clarification)(nil),                   // 77: backend.v1.Clarification
-	(*Clarification_Answer)(nil),            // 78: backend.v1.Clarification.Answer
-	(*ContestTask)(nil),                     // 79: backend.v1.ContestTask
-	(*SubmissionStatus)(nil),                // 80: backend.v1.SubmissionStatus
+	(*RegisterRequest)(nil),                 // 64: backend.v1.RegisterRequest
+	(*RegisterResponse)(nil),                // 65: backend.v1.RegisterResponse
+	(*User)(nil),                            // 66: backend.v1.User
+	(*MutationTask)(nil),                    // 67: backend.v1.MutationTask
+	(*Task)(nil),                            // 68: backend.v1.Task
+	(*TestcaseSet)(nil),                     // 69: backend.v1.TestcaseSet
+	(*Testcase)(nil),                        // 70: backend.v1.Testcase
+	(*MutationTestcaseSet)(nil),             // 71: backend.v1.MutationTestcaseSet
+	(*MutationTestcase)(nil),                // 72: backend.v1.MutationTestcase
+	(*SubmissionDetail)(nil),                // 73: backend.v1.SubmissionDetail
+	(*SubmissionSummary)(nil),               // 74: backend.v1.SubmissionSummary
+	(*JudgeProgress)(nil),                   // 75: backend.v1.JudgeProgress
+	(*timestamppb.Timestamp)(nil),           // 76: google.protobuf.Timestamp
+	(*Contest)(nil),                         // 77: backend.v1.Contest
+	(*StandingsElement)(nil),                // 78: backend.v1.StandingsElement
+	(*Clarification)(nil),                   // 79: backend.v1.Clarification
+	(*Clarification_Answer)(nil),            // 80: backend.v1.Clarification.Answer
+	(*ContestTask)(nil),                     // 81: backend.v1.ContestTask
+	(*SubmissionStatus)(nil),                // 82: backend.v1.SubmissionStatus
 }
 var file_backend_v1_messages_proto_depIdxs = []int32{
-	64, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
-	64, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
-	64, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
-	65, // 3: backend.v1.CreateTaskRequest.task:type_name -> backend.v1.MutationTask
-	66, // 4: backend.v1.CreateTaskResponse.task:type_name -> backend.v1.Task
-	66, // 5: backend.v1.GetTaskResponse.task:type_name -> backend.v1.Task
-	65, // 6: backend.v1.UpdateTaskRequest.task:type_name -> backend.v1.MutationTask
-	66, // 7: backend.v1.UpdateTaskResponse.task:type_name -> backend.v1.Task
-	67, // 8: backend.v1.GetTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
-	68, // 9: backend.v1.GetTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
-	69, // 10: backend.v1.SyncTestcaseSetsRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
-	70, // 11: backend.v1.SyncTestcaseSetsRequest.testcases:type_name -> backend.v1.MutationTestcase
-	67, // 12: backend.v1.SyncTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
-	68, // 13: backend.v1.SyncTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
-	71, // 14: backend.v1.GetSubmissionDetailResponse.submission_detail:type_name -> backend.v1.SubmissionDetail
-	72, // 15: backend.v1.ListSubmissionsResponse.submissions:type_name -> backend.v1.SubmissionSummary
-	73, // 16: backend.v1.GetJudgeProgressResponse.judge_progress:type_name -> backend.v1.JudgeProgress
-	74, // 17: backend.v1.CreateContestRequest.start_at:type_name -> google.protobuf.Timestamp
-	74, // 18: backend.v1.CreateContestRequest.end_at:type_name -> google.protobuf.Timestamp
-	75, // 19: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
-	75, // 20: backend.v1.GetContestResponse.contest:type_name -> backend.v1.Contest
-	75, // 21: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
-	76, // 22: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsElement
-	77, // 23: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	77, // 24: backend.v1.GetClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	77, // 25: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
-	77, // 26: backend.v1.UpdateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	78, // 27: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	78, // 28: backend.v1.GetAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	78, // 29: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	79, // 30: backend.v1.ListContestTasksResponse.tasks:type_name -> backend.v1.ContestTask
-	80, // 31: backend.v1.GetMySubmissionStatusesResponse.submission_statuses:type_name -> backend.v1.SubmissionStatus
+	66, // 0: backend.v1.GetUserResponse.user:type_name -> backend.v1.User
+	66, // 1: backend.v1.CreateUserResponse.user:type_name -> backend.v1.User
+	66, // 2: backend.v1.LoginResponse.user:type_name -> backend.v1.User
+	67, // 3: backend.v1.CreateTaskRequest.task:type_name -> backend.v1.MutationTask
+	68, // 4: backend.v1.CreateTaskResponse.task:type_name -> backend.v1.Task
+	68, // 5: backend.v1.GetTaskResponse.task:type_name -> backend.v1.Task
+	67, // 6: backend.v1.UpdateTaskRequest.task:type_name -> backend.v1.MutationTask
+	68, // 7: backend.v1.UpdateTaskResponse.task:type_name -> backend.v1.Task
+	69, // 8: backend.v1.GetTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
+	70, // 9: backend.v1.GetTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
+	71, // 10: backend.v1.SyncTestcaseSetsRequest.testcase_sets:type_name -> backend.v1.MutationTestcaseSet
+	72, // 11: backend.v1.SyncTestcaseSetsRequest.testcases:type_name -> backend.v1.MutationTestcase
+	69, // 12: backend.v1.SyncTestcaseSetsResponse.testcase_sets:type_name -> backend.v1.TestcaseSet
+	70, // 13: backend.v1.SyncTestcaseSetsResponse.testcases:type_name -> backend.v1.Testcase
+	73, // 14: backend.v1.GetSubmissionDetailResponse.submission_detail:type_name -> backend.v1.SubmissionDetail
+	74, // 15: backend.v1.ListSubmissionsResponse.submissions:type_name -> backend.v1.SubmissionSummary
+	75, // 16: backend.v1.GetJudgeProgressResponse.judge_progress:type_name -> backend.v1.JudgeProgress
+	76, // 17: backend.v1.CreateContestRequest.start_at:type_name -> google.protobuf.Timestamp
+	76, // 18: backend.v1.CreateContestRequest.end_at:type_name -> google.protobuf.Timestamp
+	77, // 19: backend.v1.CreateContestResponse.contest:type_name -> backend.v1.Contest
+	77, // 20: backend.v1.GetContestResponse.contest:type_name -> backend.v1.Contest
+	77, // 21: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
+	78, // 22: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsElement
+	79, // 23: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	79, // 24: backend.v1.GetClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	79, // 25: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
+	79, // 26: backend.v1.UpdateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	80, // 27: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	80, // 28: backend.v1.GetAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	80, // 29: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	81, // 30: backend.v1.ListContestTasksResponse.tasks:type_name -> backend.v1.ContestTask
+	82, // 31: backend.v1.GetMySubmissionStatusesResponse.submission_statuses:type_name -> backend.v1.SubmissionStatus
 	32, // [32:32] is the sub-list for method output_type
 	32, // [32:32] is the sub-list for method input_type
 	32, // [32:32] is the sub-list for extension type_name
@@ -4419,6 +4512,30 @@ func file_backend_v1_messages_proto_init() {
 				return nil
 			}
 		}
+		file_backend_v1_messages_proto_msgTypes[64].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegisterRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_v1_messages_proto_msgTypes[65].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegisterResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_backend_v1_messages_proto_msgTypes[26].OneofWrappers = []interface{}{}
 	file_backend_v1_messages_proto_msgTypes[30].OneofWrappers = []interface{}{}
@@ -4428,7 +4545,7 @@ func file_backend_v1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_v1_messages_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   64,
+			NumMessages:   66,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
