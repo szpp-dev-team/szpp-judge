@@ -61,6 +61,17 @@ func GenerateRefreshToken(ctx context.Context, entClient *ent.Client) (string, e
 	return token, nil
 }
 
+func KillRefreshToken(ctx context.Context, entClient *ent.Client, token string) error {
+	q := entClient.RefreshToken.Update().
+		Where(enttoken.Token(token)).
+		SetIsDead(true)
+	_, err := q.Save(ctx)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+	return nil
+}
+
 func VerifyRefreshToken(ctx context.Context, entClient *ent.Client, token string) (bool, error) {
 	now := timejst.Now()
 	// isdeadではなく、有効期限が切れていないトークンであるかどうかを確認する
