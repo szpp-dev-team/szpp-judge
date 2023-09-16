@@ -53,6 +53,14 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest, secret str
 	}, nil
 }
 
+func (i *Interactor) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.LogoutResponse, error) {
+	err := KillRefreshToken(ctx, i.entClient, req.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.LogoutResponse{}, nil
+}
+
 func toPbUser(t *ent.User) *pb.User {
 	return &pb.User{
 		Id:        int32(t.ID),

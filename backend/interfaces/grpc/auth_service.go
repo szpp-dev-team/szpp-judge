@@ -18,3 +18,7 @@ func NewAuthServiceServer(interactor *auth.Interactor) backendv1.AuthServiceServ
 func (s *authServiceServer) Login(ctx context.Context, req *backendv1.LoginRequest) (*backendv1.LoginResponse, error) {
 	return s.interactor.Login(ctx, req, s.interactor.Secret)
 }
+
+func (s *authServiceServer) Logout(ctx context.Context, req *backendv1.LogoutRequest) (*backendv1.LogoutResponse, error) {
+	return s.interactor.Logout(ctx, req)
+}
