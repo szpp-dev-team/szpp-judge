@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	enttoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -58,6 +59,20 @@ func GenerateRefreshToken(ctx context.Context, entClient *ent.Client) (string, e
 	}
 
 	return token, nil
+}
+
+func VerifyRefreshToken(ctx context.Context, entClient *ent.Client, token string) (bool, error) {
+	now := timejst.Now()
+	// isdeadではなく、有効期限が切れていないトークンであるかどうかを確認する
+	q := entClient.RefreshToken.Query().
+		Where(enttoken.Token(token)).
+		Where(enttoken.IsDead(false)).
+		Where(enttoken.ExpiresAtGT(now))
+	count, err := q.Count(ctx)
+	if err != nil {
+		return false, status.Error(codes.Internal, err.Error())
+	}
+	return count == 1, nil
 }
 
 func MakeRandomStr(digit uint32) (string, error) {
