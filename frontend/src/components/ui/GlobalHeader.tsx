@@ -1,10 +1,11 @@
 import { Box, Flex, Link } from "@chakra-ui/react";
-import type { LinkProps } from "@chakra-ui/react";
+import type { BoxProps, LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 export type GlobalHeaderProps = {
   contestSlug?: string;
   contestTitle?: string;
+  behindFillColor?: BoxProps["bg"];
 };
 
 export const GLOBAL_HEADER_H = "52px";
@@ -29,9 +30,9 @@ const NavItemLink = ({ children, ...props }: LinkProps) => {
   );
 };
 
-export const GlobalHeader = ({ contestSlug, contestTitle }: GlobalHeaderProps) => {
+export const GlobalHeader = ({ contestSlug, contestTitle, behindFillColor }: GlobalHeaderProps) => {
   return (
-    <Box as="header" width="100%">
+    <Box as="header" w="100%" bg={behindFillColor}>
       <Flex
         as="nav"
         justifyContent="space-between"

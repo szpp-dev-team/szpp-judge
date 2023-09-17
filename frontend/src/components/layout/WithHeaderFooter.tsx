@@ -23,7 +23,7 @@ export const WithHeaderFooter = ({
   const bg: BoxProps["bg"] = "gray.200";
   return (
     <>
-      <GlobalHeader {...headerProps} />
+      <GlobalHeader {...headerProps} behindFillColor={bg} />
       <Flex minW="100%" bg={bg}>
         {leftChildren}
         <Flex flexDirection="column" minH="100vh" h="1px" pt={GLOBAL_HEADER_H} flexGrow={1}>
