@@ -1,5 +1,5 @@
-import { LoginRequest, LoginResponse, LogoutRequest, LogoutResponse } from "@/src/gen/proto/backend/v1/messages_pb";
-import { AuthService } from "@/src/gen/proto/backend/v1/services_connect";
+import { LoginResponse } from "@/src/gen/proto/backend/v1/messages_pb";
+import { AuthService } from "@/src/gen/proto/backend/v1/services-AuthService_connectquery";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
@@ -34,7 +34,7 @@ export const parseAccessToken = (accessToken: string): AccessTokenClaim | null =
 
 export const authHandlers: RequestHandler[] = [
   grpcMock(AuthService, "login", async (ctx, res, decodeReq, encodeResp) => {
-    const { username, password } = await decodeReq() as LoginRequest;
+    const { username, password } = await decodeReq();
     const ok = (username === "user" || username === "admin") && password === "pass";
     if (!ok) {
       return res(
@@ -45,22 +45,20 @@ export const authHandlers: RequestHandler[] = [
 
     return res(
       ctx.delay(500),
-      encodeResp(
-        new LoginResponse({
-          user: {
-            id: 1,
-            username,
-            isAdmin: username === "admin",
-            createdAt: Timestamp.now(),
-          },
-          ...generateMockCredential(username),
-        }),
-      ),
+      encodeResp({
+        user: {
+          id: 1,
+          username,
+          isAdmin: username === "admin",
+          createdAt: Timestamp.now(),
+        },
+        ...generateMockCredential(username),
+      }),
     );
   }),
 
   grpcMock(AuthService, "logout", async (ctx, res, decodeReq, encodeResp) => {
-    const { refreshToken } = await decodeReq() as LogoutRequest;
+    const { refreshToken } = await decodeReq();
 
     const ok = refreshToken.startsWith(REFRESH_TOKEN_PREFIX);
     if (!ok) {
@@ -71,7 +69,7 @@ export const authHandlers: RequestHandler[] = [
     }
     return res(
       ctx.delay(500),
-      encodeResp(new LogoutResponse()),
+      encodeResp({}),
     );
   }),
 ];
