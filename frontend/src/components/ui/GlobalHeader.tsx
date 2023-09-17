@@ -10,26 +10,6 @@ export type GlobalHeaderProps = {
 
 export const GLOBAL_HEADER_H = "52px";
 
-const NavItemLink = ({ children, ...props }: LinkProps) => {
-  return (
-    <Box as="li" display="block">
-      <Link
-        as={NextLink}
-        display="flex"
-        alignItems="center"
-        px="0.75rem"
-        h="100%"
-        fontSize="16px"
-        fontWeight="semibold"
-        _hover={{ background: "teal.600" }}
-        {...props}
-      >
-        {children}
-      </Link>
-    </Box>
-  );
-};
-
 export const GlobalHeader = ({ contestSlug, contestTitle, behindFillColor }: GlobalHeaderProps) => {
   return (
     <Box as="header" w="100%" bg={behindFillColor}>
@@ -59,6 +39,26 @@ export const GlobalHeader = ({ contestSlug, contestTitle, behindFillColor }: Glo
           <NavItemLink href="/login" px="1.25rem">ログイン</NavItemLink>
         </Flex>
       </Flex>
+    </Box>
+  );
+};
+
+const NavItemLink = ({ children, ...props }: LinkProps) => {
+  return (
+    <Box as="li" display="block">
+      <Link
+        as={NextLink}
+        display="flex"
+        alignItems="center"
+        px="0.75rem"
+        h="100%"
+        fontSize="16px"
+        fontWeight="semibold"
+        _hover={{ background: "teal.600" }}
+        {...props}
+      >
+        {children}
+      </Link>
     </Box>
   );
 };
