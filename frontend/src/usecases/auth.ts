@@ -1,7 +1,7 @@
 import { Code, ConnectError } from "@bufbuild/connect";
 import { useMutation } from "@tanstack/react-query";
-import { login } from "../gen/proto/backend/v1/services-AuthService_connectquery";
-import { useCredentialSetter } from "../globalStates/credential";
+import { login, logout } from "../gen/proto/backend/v1/services-AuthService_connectquery";
+import { useCredentialSetter, useCredentialValueAndEraser } from "../globalStates/credential";
 import { useUserSetter } from "../globalStates/user";
 
 /**
@@ -46,4 +46,23 @@ export const useLogin = (onUnauthenticatedError?: () => void) => {
   });
 
   return { data, error, isLoading, mutate };
+};
+
+export const useLogout = () => {
+  const [cred, eraseCred] = useCredentialValueAndEraser();
+  const setUser = useUserSetter();
+
+  const { isLoading, mutate: mutateImpl } = useMutation({
+    ...logout.useMutation(),
+    onSettled: () => {
+      eraseCred();
+      setUser(null);
+    },
+  });
+
+  const mutate = (options?: Parameters<typeof mutateImpl>[1]) => {
+    return mutateImpl({ refreshToken: cred.refreshToken }, options);
+  };
+
+  return { isLoading, mutate };
 };

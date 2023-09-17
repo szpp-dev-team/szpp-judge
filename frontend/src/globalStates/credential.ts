@@ -1,5 +1,5 @@
-import { useAtomValue, useSetAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atomWithStorage, RESET } from "jotai/utils";
 
 interface ICredential {
   accessToken: string;
@@ -10,3 +10,8 @@ const credential = atomWithStorage<ICredential>("szp_tkn", { accessToken: "", re
 
 export const useCredentialValue = () => useAtomValue(credential);
 export const useCredentialSetter = () => useSetAtom(credential);
+
+export const useCredentialValueAndEraser = (): [ICredential, () => void] => {
+  const [cred, setCred] = useAtom(credential);
+  return [cred, () => setCred(RESET)];
+};
