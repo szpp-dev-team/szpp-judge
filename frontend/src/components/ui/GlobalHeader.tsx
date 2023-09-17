@@ -1,5 +1,6 @@
+import { useLogout } from "@/src/usecases/auth";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { Box, Divider, Flex, Icon, Link, Text, useOutsideClick } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Icon, Link, Text, useOutsideClick } from "@chakra-ui/react";
 import type { BoxProps, LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -106,6 +107,14 @@ const UserMenu = ({ username }: {
     },
   });
 
+  const logout = useLogout();
+  const onLogoutClick = () => {
+    logout.mutate({
+      onSettled: () => {
+      },
+    });
+  };
+
   return (
     <li ref={menuWrapperRef} style={{ position: "relative" }}>
       <Flex
@@ -144,12 +153,34 @@ const UserMenu = ({ username }: {
           <Divider />
           <MenuItem href={`/settings`} icon={IoSettings}>設定</MenuItem>
           <Divider />
-          <MenuItem as="button" icon={IoExit}>ログアウト</MenuItem>
+          <Button
+            variant={"unstyled"}
+            leftIcon={<Icon as={IoExit} />}
+            {...MENU_ITEM_COMMON_PROPS}
+            fontWeight="normal"
+            isLoading={logout.isLoading}
+            loadingText="ログアウト中..."
+            onClick={onLogoutClick}
+          >
+            ログアウト
+          </Button>
         </Box>
       </Box>
     </li>
   );
 };
+
+const MENU_ITEM_COMMON_PROPS = {
+  display: "flex",
+  justifyContent: "left",
+  alignItems: "center",
+  py: 2,
+  px: 4,
+  fontSize: "14px",
+  w: "100%",
+  textAlign: "left",
+  _hover: { background: "gray.200" },
+} as const satisfies BoxProps;
 
 const MenuItem = ({ icon, children, ...props }: {
   icon: IconType;
@@ -158,18 +189,10 @@ const MenuItem = ({ icon, children, ...props }: {
     <Box as="li" display="block">
       <Link
         as={NextLink}
-        display="flex"
-        alignItems="center"
-        gap={2}
-        py={2}
-        px={4}
-        fontSize="14px"
-        w="100%"
-        textAlign="left"
-        _hover={{ background: "gray.200" }}
+        {...MENU_ITEM_COMMON_PROPS}
         {...props}
       >
-        <Icon as={icon} />
+        <Icon mr={2} as={icon} />
         {children}
       </Link>
     </Box>
