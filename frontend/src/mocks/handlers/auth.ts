@@ -14,6 +14,7 @@ export const authHandlers: RequestHandler[] = [
         ctx.status(401), // 401 Unauthorized
       );
     }
+
     return res(
       ctx.delay(500),
       encodeResp(
@@ -24,6 +25,8 @@ export const authHandlers: RequestHandler[] = [
             isAdmin: username === "admin",
             createdAt: Timestamp.now(),
           },
+          accessToken: "eyJ..." + Date.now(), // 適当
+          refreshToken: "refreeeeesh" + Date.now(), // 適当
         }),
       ),
     );
