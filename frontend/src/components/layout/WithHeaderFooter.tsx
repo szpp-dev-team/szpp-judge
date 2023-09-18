@@ -1,4 +1,4 @@
-import { useUserValue } from "@/src/globalStates/user";
+import { useAuthUserValue } from "@/src/globalStates/credential";
 import { Box, type BoxProps, Flex } from "@chakra-ui/react";
 import { type ReactNode } from "react";
 import { GlobalFooter, type GlobalFooterProps } from "../ui/GlobalFooter";
@@ -20,7 +20,7 @@ export const WithHeaderFooter = ({
   rightChildren,
 }: WithHeaderFooterProps) => {
   const bg: BoxProps["bg"] = "gray.200";
-  const user = useUserValue();
+  const user = useAuthUserValue();
   return (
     <>
       <GlobalHeader username={user?.username} {...headerProps} behindFillColor={bg} />

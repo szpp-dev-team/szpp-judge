@@ -2,7 +2,6 @@ import { Code, ConnectError } from "@bufbuild/connect";
 import { useMutation } from "@tanstack/react-query";
 import { login, logout } from "../gen/proto/backend/v1/services-AuthService_connectquery";
 import { useCredentialSetter, useCredentialValueAndEraser } from "../globalStates/credential";
-import { useUserSetter } from "../globalStates/user";
 
 /**
  * ログイン用カスタムフック
@@ -26,8 +25,6 @@ export const useLogin = (onUnauthenticatedError?: () => void) => {
   };
 
   const setCredential = useCredentialSetter();
-  const setUser = useUserSetter();
-
   const { data, error, isLoading, mutate } = useMutation({
     ...login.useMutation({ onError: onConnectError }),
     onSuccess: (data) => {
@@ -37,11 +34,6 @@ export const useLogin = (onUnauthenticatedError?: () => void) => {
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
       });
-      setUser({
-        id: data.user!.id,
-        username: data.user!.username,
-        isAdmin: data.user!.isAdmin,
-      });
     },
   });
 
@@ -50,13 +42,11 @@ export const useLogin = (onUnauthenticatedError?: () => void) => {
 
 export const useLogout = () => {
   const [cred, eraseCred] = useCredentialValueAndEraser();
-  const setUser = useUserSetter();
 
   const { isLoading, mutate: mutateImpl } = useMutation({
     ...logout.useMutation(),
     onSettled: () => {
       eraseCred();
-      setUser(null);
     },
   });
 
