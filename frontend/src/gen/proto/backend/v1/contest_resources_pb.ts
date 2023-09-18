@@ -397,37 +397,34 @@ export class Clarification extends Message<Clarification> {
   id = 0;
 
   /**
-   * @generated from field: string username = 2;
-   */
-  username = "";
-
-  /**
-   * @generated from field: string content = 3;
+   * @generated from field: string content = 2;
    */
   content = "";
 
   /**
-   * @generated from field: int32 contest_id = 4;
-   */
-  contestId = 0;
-
-  /**
-   * @generated from field: bool is_public = 5;
+   * @generated from field: bool is_public = 3;
    */
   isPublic = false;
 
   /**
-   * @generated from field: backend.v1.Clarification.Answer answer = 6;
+   * 自分が質問したものかどうか
+   *
+   * @generated from field: bool is_mine = 4;
+   */
+  isMine = false;
+
+  /**
+   * @generated from field: optional backend.v1.Clarification.Answer answer = 5;
    */
   answer?: Clarification_Answer;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 7;
+   * @generated from field: google.protobuf.Timestamp created_at = 6;
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 8;
+   * @generated from field: google.protobuf.Timestamp updated_at = 7;
    */
   updatedAt?: Timestamp;
 
@@ -440,13 +437,12 @@ export class Clarification extends Message<Clarification> {
   static readonly typeName = "backend.v1.Clarification";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 6, name: "answer", kind: "message", T: Clarification_Answer },
-    { no: 7, name: "created_at", kind: "message", T: Timestamp },
-    { no: 8, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 2, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "is_mine", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "answer", kind: "message", T: Clarification_Answer, opt: true },
+    { no: 6, name: "created_at", kind: "message", T: Timestamp },
+    { no: 7, name: "updated_at", kind: "message", T: Timestamp },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Clarification {
@@ -476,14 +472,16 @@ export class Clarification_Answer extends Message<Clarification_Answer> {
   id = 0;
 
   /**
-   * @generated from field: string username = 2;
-   */
-  username = "";
-
-  /**
-   * @generated from field: string content = 3;
+   * @generated from field: string content = 2;
    */
   content = "";
+
+  /**
+   * 自分が回答したものかどうか 
+   *
+   * @generated from field: bool is_mine = 3;
+   */
+  isMine = false;
 
   /**
    * @generated from field: google.protobuf.Timestamp created_at = 4;
@@ -504,8 +502,8 @@ export class Clarification_Answer extends Message<Clarification_Answer> {
   static readonly typeName = "backend.v1.Clarification.Answer";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "is_mine", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 4, name: "created_at", kind: "message", T: Timestamp },
     { no: 5, name: "updated_at", kind: "message", T: Timestamp },
   ]);

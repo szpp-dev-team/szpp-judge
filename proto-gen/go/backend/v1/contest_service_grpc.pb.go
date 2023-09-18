@@ -28,12 +28,9 @@ const (
 	ContestService_GetStandings_FullMethodName            = "/backend.v1.ContestService/GetStandings"
 	ContestService_RegisterMe_FullMethodName              = "/backend.v1.ContestService/RegisterMe"
 	ContestService_CreateClarification_FullMethodName     = "/backend.v1.ContestService/CreateClarification"
-	ContestService_GetClarification_FullMethodName        = "/backend.v1.ContestService/GetClarification"
 	ContestService_ListClarifications_FullMethodName      = "/backend.v1.ContestService/ListClarifications"
-	ContestService_UpdateClarification_FullMethodName     = "/backend.v1.ContestService/UpdateClarification"
 	ContestService_DeleteClarification_FullMethodName     = "/backend.v1.ContestService/DeleteClarification"
 	ContestService_CreateAnswer_FullMethodName            = "/backend.v1.ContestService/CreateAnswer"
-	ContestService_GetAnswer_FullMethodName               = "/backend.v1.ContestService/GetAnswer"
 	ContestService_UpdateAnswer_FullMethodName            = "/backend.v1.ContestService/UpdateAnswer"
 	ContestService_DeleteAnswer_FullMethodName            = "/backend.v1.ContestService/DeleteAnswer"
 )
@@ -55,18 +52,12 @@ type ContestServiceClient interface {
 	RegisterMe(ctx context.Context, in *RegisterMeRequest, opts ...grpc.CallOption) (*RegisterMeResponse, error)
 	// Clarification を作成する
 	CreateClarification(ctx context.Context, in *CreateClarificationRequest, opts ...grpc.CallOption) (*CreateClarificationResponse, error)
-	// 指定された Clarification を取得する
-	GetClarification(ctx context.Context, in *GetClarificationRequest, opts ...grpc.CallOption) (*GetClarificationResponse, error)
 	// ClarificationListを取得する
 	ListClarifications(ctx context.Context, in *ListClarificationsRequest, opts ...grpc.CallOption) (*ListClarificationsResponse, error)
-	// Clarification を更新する
-	UpdateClarification(ctx context.Context, in *UpdateClarificationRequest, opts ...grpc.CallOption) (*UpdateClarificationResponse, error)
 	// Clarification を削除する
 	DeleteClarification(ctx context.Context, in *DeleteClarificationRequest, opts ...grpc.CallOption) (*DeleteClarificationResponse, error)
 	// Answerを追加する
 	CreateAnswer(ctx context.Context, in *CreateAnswerRequest, opts ...grpc.CallOption) (*CreateAnswerResponse, error)
-	// Answerを取得する
-	GetAnswer(ctx context.Context, in *GetAnswerRequest, opts ...grpc.CallOption) (*GetAnswerResponse, error)
 	// Answerを更新する
 	UpdateAnswer(ctx context.Context, in *UpdateAnswerRequest, opts ...grpc.CallOption) (*UpdateAnswerResponse, error)
 	// Answerを削除する
@@ -162,27 +153,9 @@ func (c *contestServiceClient) CreateClarification(ctx context.Context, in *Crea
 	return out, nil
 }
 
-func (c *contestServiceClient) GetClarification(ctx context.Context, in *GetClarificationRequest, opts ...grpc.CallOption) (*GetClarificationResponse, error) {
-	out := new(GetClarificationResponse)
-	err := c.cc.Invoke(ctx, ContestService_GetClarification_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *contestServiceClient) ListClarifications(ctx context.Context, in *ListClarificationsRequest, opts ...grpc.CallOption) (*ListClarificationsResponse, error) {
 	out := new(ListClarificationsResponse)
 	err := c.cc.Invoke(ctx, ContestService_ListClarifications_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *contestServiceClient) UpdateClarification(ctx context.Context, in *UpdateClarificationRequest, opts ...grpc.CallOption) (*UpdateClarificationResponse, error) {
-	out := new(UpdateClarificationResponse)
-	err := c.cc.Invoke(ctx, ContestService_UpdateClarification_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,15 +174,6 @@ func (c *contestServiceClient) DeleteClarification(ctx context.Context, in *Dele
 func (c *contestServiceClient) CreateAnswer(ctx context.Context, in *CreateAnswerRequest, opts ...grpc.CallOption) (*CreateAnswerResponse, error) {
 	out := new(CreateAnswerResponse)
 	err := c.cc.Invoke(ctx, ContestService_CreateAnswer_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *contestServiceClient) GetAnswer(ctx context.Context, in *GetAnswerRequest, opts ...grpc.CallOption) (*GetAnswerResponse, error) {
-	out := new(GetAnswerResponse)
-	err := c.cc.Invoke(ctx, ContestService_GetAnswer_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -251,18 +215,12 @@ type ContestServiceServer interface {
 	RegisterMe(context.Context, *RegisterMeRequest) (*RegisterMeResponse, error)
 	// Clarification を作成する
 	CreateClarification(context.Context, *CreateClarificationRequest) (*CreateClarificationResponse, error)
-	// 指定された Clarification を取得する
-	GetClarification(context.Context, *GetClarificationRequest) (*GetClarificationResponse, error)
 	// ClarificationListを取得する
 	ListClarifications(context.Context, *ListClarificationsRequest) (*ListClarificationsResponse, error)
-	// Clarification を更新する
-	UpdateClarification(context.Context, *UpdateClarificationRequest) (*UpdateClarificationResponse, error)
 	// Clarification を削除する
 	DeleteClarification(context.Context, *DeleteClarificationRequest) (*DeleteClarificationResponse, error)
 	// Answerを追加する
 	CreateAnswer(context.Context, *CreateAnswerRequest) (*CreateAnswerResponse, error)
-	// Answerを取得する
-	GetAnswer(context.Context, *GetAnswerRequest) (*GetAnswerResponse, error)
 	// Answerを更新する
 	UpdateAnswer(context.Context, *UpdateAnswerRequest) (*UpdateAnswerResponse, error)
 	// Answerを削除する
@@ -300,23 +258,14 @@ func (UnimplementedContestServiceServer) RegisterMe(context.Context, *RegisterMe
 func (UnimplementedContestServiceServer) CreateClarification(context.Context, *CreateClarificationRequest) (*CreateClarificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateClarification not implemented")
 }
-func (UnimplementedContestServiceServer) GetClarification(context.Context, *GetClarificationRequest) (*GetClarificationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetClarification not implemented")
-}
 func (UnimplementedContestServiceServer) ListClarifications(context.Context, *ListClarificationsRequest) (*ListClarificationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListClarifications not implemented")
-}
-func (UnimplementedContestServiceServer) UpdateClarification(context.Context, *UpdateClarificationRequest) (*UpdateClarificationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateClarification not implemented")
 }
 func (UnimplementedContestServiceServer) DeleteClarification(context.Context, *DeleteClarificationRequest) (*DeleteClarificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteClarification not implemented")
 }
 func (UnimplementedContestServiceServer) CreateAnswer(context.Context, *CreateAnswerRequest) (*CreateAnswerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAnswer not implemented")
-}
-func (UnimplementedContestServiceServer) GetAnswer(context.Context, *GetAnswerRequest) (*GetAnswerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAnswer not implemented")
 }
 func (UnimplementedContestServiceServer) UpdateAnswer(context.Context, *UpdateAnswerRequest) (*UpdateAnswerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAnswer not implemented")
@@ -498,24 +447,6 @@ func _ContestService_CreateClarification_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContestService_GetClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetClarificationRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContestServiceServer).GetClarification(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ContestService_GetClarification_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContestServiceServer).GetClarification(ctx, req.(*GetClarificationRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ContestService_ListClarifications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListClarificationsRequest)
 	if err := dec(in); err != nil {
@@ -530,24 +461,6 @@ func _ContestService_ListClarifications_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContestServiceServer).ListClarifications(ctx, req.(*ListClarificationsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ContestService_UpdateClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateClarificationRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContestServiceServer).UpdateClarification(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ContestService_UpdateClarification_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContestServiceServer).UpdateClarification(ctx, req.(*UpdateClarificationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -584,24 +497,6 @@ func _ContestService_CreateAnswer_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContestServiceServer).CreateAnswer(ctx, req.(*CreateAnswerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ContestService_GetAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAnswerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContestServiceServer).GetAnswer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ContestService_GetAnswer_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContestServiceServer).GetAnswer(ctx, req.(*GetAnswerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -686,16 +581,8 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContestService_CreateClarification_Handler,
 		},
 		{
-			MethodName: "GetClarification",
-			Handler:    _ContestService_GetClarification_Handler,
-		},
-		{
 			MethodName: "ListClarifications",
 			Handler:    _ContestService_ListClarifications_Handler,
-		},
-		{
-			MethodName: "UpdateClarification",
-			Handler:    _ContestService_UpdateClarification_Handler,
 		},
 		{
 			MethodName: "DeleteClarification",
@@ -704,10 +591,6 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateAnswer",
 			Handler:    _ContestService_CreateAnswer_Handler,
-		},
-		{
-			MethodName: "GetAnswer",
-			Handler:    _ContestService_GetAnswer_Handler,
 		},
 		{
 			MethodName: "UpdateAnswer",

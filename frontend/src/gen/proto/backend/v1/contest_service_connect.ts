@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -102,17 +102,6 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
-     * 指定された Clarification を取得する
-     *
-     * @generated from rpc backend.v1.ContestService.GetClarification
-     */
-    getClarification: {
-      name: "GetClarification",
-      I: GetClarificationRequest,
-      O: GetClarificationResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
      * ClarificationListを取得する
      *
      * @generated from rpc backend.v1.ContestService.ListClarifications
@@ -121,17 +110,6 @@ export const ContestService = {
       name: "ListClarifications",
       I: ListClarificationsRequest,
       O: ListClarificationsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Clarification を更新する
-     *
-     * @generated from rpc backend.v1.ContestService.UpdateClarification
-     */
-    updateClarification: {
-      name: "UpdateClarification",
-      I: UpdateClarificationRequest,
-      O: UpdateClarificationResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -154,17 +132,6 @@ export const ContestService = {
       name: "CreateAnswer",
       I: CreateAnswerRequest,
       O: CreateAnswerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Answerを取得する
-     *
-     * @generated from rpc backend.v1.ContestService.GetAnswer
-     */
-    getAnswer: {
-      name: "GetAnswer",
-      I: GetAnswerRequest,
-      O: GetAnswerResponse,
       kind: MethodKind.Unary,
     },
     /**

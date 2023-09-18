@@ -606,6 +606,16 @@ export class CreateClarificationRequest extends Message<CreateClarificationReque
    */
   content = "";
 
+  /**
+   * @generated from field: string contest_slug = 2;
+   */
+  contestSlug = "";
+
+  /**
+   * @generated from field: optional int32 task_id = 3;
+   */
+  taskId?: number;
+
   constructor(data?: PartialMessage<CreateClarificationRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -615,6 +625,8 @@ export class CreateClarificationRequest extends Message<CreateClarificationReque
   static readonly typeName = "backend.v1.CreateClarificationRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateClarificationRequest {
@@ -668,80 +680,6 @@ export class CreateClarificationResponse extends Message<CreateClarificationResp
 
   static equals(a: CreateClarificationResponse | PlainMessage<CreateClarificationResponse> | undefined, b: CreateClarificationResponse | PlainMessage<CreateClarificationResponse> | undefined): boolean {
     return proto3.util.equals(CreateClarificationResponse, a, b);
-  }
-}
-
-/**
- * @generated from message backend.v1.GetClarificationRequest
- */
-export class GetClarificationRequest extends Message<GetClarificationRequest> {
-  /**
-   * @generated from field: int32 id = 1;
-   */
-  id = 0;
-
-  constructor(data?: PartialMessage<GetClarificationRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.GetClarificationRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetClarificationRequest {
-    return new GetClarificationRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetClarificationRequest {
-    return new GetClarificationRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetClarificationRequest {
-    return new GetClarificationRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetClarificationRequest | PlainMessage<GetClarificationRequest> | undefined, b: GetClarificationRequest | PlainMessage<GetClarificationRequest> | undefined): boolean {
-    return proto3.util.equals(GetClarificationRequest, a, b);
-  }
-}
-
-/**
- * @generated from message backend.v1.GetClarificationResponse
- */
-export class GetClarificationResponse extends Message<GetClarificationResponse> {
-  /**
-   * @generated from field: backend.v1.Clarification clarification = 1;
-   */
-  clarification?: Clarification;
-
-  constructor(data?: PartialMessage<GetClarificationResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.GetClarificationResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "clarification", kind: "message", T: Clarification },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetClarificationResponse {
-    return new GetClarificationResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetClarificationResponse {
-    return new GetClarificationResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetClarificationResponse {
-    return new GetClarificationResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetClarificationResponse | PlainMessage<GetClarificationResponse> | undefined, b: GetClarificationResponse | PlainMessage<GetClarificationResponse> | undefined): boolean {
-    return proto3.util.equals(GetClarificationResponse, a, b);
   }
 }
 
@@ -810,86 +748,6 @@ export class ListClarificationsResponse extends Message<ListClarificationsRespon
 
   static equals(a: ListClarificationsResponse | PlainMessage<ListClarificationsResponse> | undefined, b: ListClarificationsResponse | PlainMessage<ListClarificationsResponse> | undefined): boolean {
     return proto3.util.equals(ListClarificationsResponse, a, b);
-  }
-}
-
-/**
- * @generated from message backend.v1.UpdateClarificationRequest
- */
-export class UpdateClarificationRequest extends Message<UpdateClarificationRequest> {
-  /**
-   * @generated from field: int32 id = 1;
-   */
-  id = 0;
-
-  /**
-   * @generated from field: string content = 2;
-   */
-  content = "";
-
-  constructor(data?: PartialMessage<UpdateClarificationRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.UpdateClarificationRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 2, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateClarificationRequest {
-    return new UpdateClarificationRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateClarificationRequest {
-    return new UpdateClarificationRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateClarificationRequest {
-    return new UpdateClarificationRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: UpdateClarificationRequest | PlainMessage<UpdateClarificationRequest> | undefined, b: UpdateClarificationRequest | PlainMessage<UpdateClarificationRequest> | undefined): boolean {
-    return proto3.util.equals(UpdateClarificationRequest, a, b);
-  }
-}
-
-/**
- * @generated from message backend.v1.UpdateClarificationResponse
- */
-export class UpdateClarificationResponse extends Message<UpdateClarificationResponse> {
-  /**
-   * @generated from field: backend.v1.Clarification clarification = 1;
-   */
-  clarification?: Clarification;
-
-  constructor(data?: PartialMessage<UpdateClarificationResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.UpdateClarificationResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "clarification", kind: "message", T: Clarification },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateClarificationResponse {
-    return new UpdateClarificationResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateClarificationResponse {
-    return new UpdateClarificationResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateClarificationResponse {
-    return new UpdateClarificationResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: UpdateClarificationResponse | PlainMessage<UpdateClarificationResponse> | undefined, b: UpdateClarificationResponse | PlainMessage<UpdateClarificationResponse> | undefined): boolean {
-    return proto3.util.equals(UpdateClarificationResponse, a, b);
   }
 }
 
@@ -1044,80 +902,6 @@ export class CreateAnswerResponse extends Message<CreateAnswerResponse> {
 
   static equals(a: CreateAnswerResponse | PlainMessage<CreateAnswerResponse> | undefined, b: CreateAnswerResponse | PlainMessage<CreateAnswerResponse> | undefined): boolean {
     return proto3.util.equals(CreateAnswerResponse, a, b);
-  }
-}
-
-/**
- * @generated from message backend.v1.GetAnswerRequest
- */
-export class GetAnswerRequest extends Message<GetAnswerRequest> {
-  /**
-   * @generated from field: int32 answer_id = 1;
-   */
-  answerId = 0;
-
-  constructor(data?: PartialMessage<GetAnswerRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.GetAnswerRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "answer_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAnswerRequest {
-    return new GetAnswerRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAnswerRequest {
-    return new GetAnswerRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAnswerRequest {
-    return new GetAnswerRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetAnswerRequest | PlainMessage<GetAnswerRequest> | undefined, b: GetAnswerRequest | PlainMessage<GetAnswerRequest> | undefined): boolean {
-    return proto3.util.equals(GetAnswerRequest, a, b);
-  }
-}
-
-/**
- * @generated from message backend.v1.GetAnswerResponse
- */
-export class GetAnswerResponse extends Message<GetAnswerResponse> {
-  /**
-   * @generated from field: backend.v1.Clarification.Answer answer = 1;
-   */
-  answer?: Clarification_Answer;
-
-  constructor(data?: PartialMessage<GetAnswerResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "backend.v1.GetAnswerResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "answer", kind: "message", T: Clarification_Answer },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAnswerResponse {
-    return new GetAnswerResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAnswerResponse {
-    return new GetAnswerResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAnswerResponse {
-    return new GetAnswerResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetAnswerResponse | PlainMessage<GetAnswerResponse> | undefined, b: GetAnswerResponse | PlainMessage<GetAnswerResponse> | undefined): boolean {
-    return proto3.util.equals(GetAnswerResponse, a, b);
   }
 }
 
