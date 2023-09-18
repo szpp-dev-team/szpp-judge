@@ -26,25 +26,6 @@ service TaskService {
   rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse);
   // ジャッジの進捗を取得
   rpc GetJudgeProgress(GetJudgeProgressRequest) returns (GetJudgeProgressResponse);
-  // Clarification を作成する
-  rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
-  // 指定された Clarification を取得する
-  rpc GetClarification(GetClarificationRequest) returns (GetClarificationResponse);
-  // ClarificationListを取得する
-  rpc ListClarifications(ListClarificationsRequest) returns (ListClarificationsResponse);
-  // Clarification を更新する
-  rpc UpdateClarification(UpdateClarificationRequest) returns (UpdateClarificationResponse);
-  // Clarification を削除する
-  rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
-
-  // Answerを追加する
-  rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
-  // Answerを取得する
-  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
-  // Answerを更新する
-  rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
-  // Answerを削除する
-  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
 }
 
 message CreateTaskRequest {
@@ -127,75 +108,3 @@ message GetJudgeProgressRequest {
 message GetJudgeProgressResponse {
   JudgeProgress judge_progress = 1;
 }
-
-message CreateClarificationRequest {
-  int32 user_id = 1;
-  string content = 2;
-  bool is_public = 3;
-}
-
-message CreateClarificationResponse {
-  Clarification clarification = 1;
-}
-
-message GetClarificationRequest {
-  int32 id = 1;
-}
-
-message GetClarificationResponse {
-  Clarification clarification = 1;
-}
-
-message ListClarificationsRequest {}
-
-message ListClarificationsResponse {
-  repeated Clarification clarifications = 1;
-}
-
-message UpdateClarificationRequest {
-  int32 id = 1;
-  string content = 2;
-  bool is_public = 3;
-}
-
-message UpdateClarificationResponse {
-  Clarification clarification = 1;
-}
-
-message DeleteClarificationRequest {
-  int32 id = 1;
-}
-
-message DeleteClarificationResponse {}
-
-message CreateAnswerRequest {
-  int32 clarification_id = 1;
-  int32 user_id = 2;
-  string content = 3;
-}
-
-message CreateAnswerResponse {
-  Clarification.Answer answer = 1;
-}
-
-message GetAnswerRequest {
-  int32 answer_id = 1;
-}
-
-message GetAnswerResponse {
-  Clarification.Answer answer = 1;
-}
-message UpdateAnswerRequest {
-  int32 answer_id = 1;
-  string content = 2;
-}
-
-message UpdateAnswerResponse {
-  Clarification.Answer answer = 1;
-}
-
-message DeleteAnswerRequest {
-  int32 answer_id = 1;
-}
-
-message DeleteAnswerResponse {}
