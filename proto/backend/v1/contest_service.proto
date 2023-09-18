@@ -19,18 +19,12 @@ service ContestService {
   rpc RegisterMe(RegisterMeRequest) returns (RegisterMeResponse);
   // Clarification を作成する
   rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
-  // 指定された Clarification を取得する
-  rpc GetClarification(GetClarificationRequest) returns (GetClarificationResponse);
   // ClarificationListを取得する
   rpc ListClarifications(ListClarificationsRequest) returns (ListClarificationsResponse);
-  // Clarification を更新する
-  rpc UpdateClarification(UpdateClarificationRequest) returns (UpdateClarificationResponse);
   // Clarification を削除する
   rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
   // Answerを追加する
   rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
-  // Answerを取得する
-  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
   // Answerを更新する
   rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
   // Answerを削除する
@@ -101,17 +95,11 @@ message RegisterMeResponse {}
 
 message CreateClarificationRequest {
   string content = 1;
+  string contest_slug = 2;
+  optional int32 task_id = 3;
 }
 
 message CreateClarificationResponse {
-  Clarification clarification = 1;
-}
-
-message GetClarificationRequest {
-  int32 id = 1;
-}
-
-message GetClarificationResponse {
   Clarification clarification = 1;
 }
 
@@ -119,15 +107,6 @@ message ListClarificationsRequest {}
 
 message ListClarificationsResponse {
   repeated Clarification clarifications = 1;
-}
-
-message UpdateClarificationRequest {
-  int32 id = 1;
-  string content = 2;
-}
-
-message UpdateClarificationResponse {
-  Clarification clarification = 1;
 }
 
 message DeleteClarificationRequest {
@@ -146,13 +125,6 @@ message CreateAnswerResponse {
   Clarification.Answer answer = 1;
 }
 
-message GetAnswerRequest {
-  int32 answer_id = 1;
-}
-
-message GetAnswerResponse {
-  Clarification.Answer answer = 1;
-}
 message UpdateAnswerRequest {
   int32 answer_id = 1;
   string content = 2;

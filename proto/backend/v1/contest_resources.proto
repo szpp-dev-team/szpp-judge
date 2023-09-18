@@ -58,18 +58,17 @@ message SubmissionStatus {
 
 message Clarification {
   int32 id = 1;
-  string username = 2;
-  string content = 3;
-  int32 contest_id = 4;
-  bool is_public = 5;
-  optional Answer answer = 6;
-  google.protobuf.Timestamp created_at = 7;
-  google.protobuf.Timestamp updated_at = 8;
+  string content = 2;
+  bool is_public = 3;
+  bool is_mine = 4; // 自分が質問したものかどうか
+  optional Answer answer = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
 
   message Answer {
     int32 id = 1;
-    string username= 2;
-    string content = 3;
+    string content = 2;
+    bool is_mine = 3; // 自分が回答したものかどうか 
     google.protobuf.Timestamp created_at = 4;
     google.protobuf.Timestamp updated_at = 5;
   }
