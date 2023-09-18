@@ -109,10 +109,7 @@ const UserMenu = ({ username }: {
 
   const logout = useLogout();
   const onLogoutClick = () => {
-    logout.mutate({
-      onSettled: () => {
-      },
-    });
+    logout.mutate();
   };
 
   return (
