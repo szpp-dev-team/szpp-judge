@@ -80,4 +80,6 @@ service ContestService {
   rpc GetMySubmissionStatuses(GetMySubmissionStatusesRequest) returns (GetMySubmissionStatusesResponse);
   // 順位表取得
   rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
+  // 参加登録
+  rpc RegisterMe(RegisterMeRequest) returns (RegisterMeResponse);
 }
