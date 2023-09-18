@@ -2,7 +2,7 @@ import { decodeJwtPayload } from "@/src/util/jwt";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomWithStorage, RESET } from "jotai/utils";
 
-export interface ICredential {
+interface ICredential {
   accessToken: string;
   refreshToken: string;
 }
