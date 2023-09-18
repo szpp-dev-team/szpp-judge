@@ -59,14 +59,4 @@ func TruncateDB(t *testing.T, client *ent.Client) {
 		_, err = client.ExecContext(ctx, "TRUNCATE TABLE "+table)
 		require.NoError(t, err)
 	}
-
-	// ctx := context.Background()
-	// _, err := client.User.Delete().Exec(ctx)
-	// require.NoError(t, err)
-	// _, err = client.Task.Delete().Exec(ctx)
-	// require.NoError(t, err)
-	// _, err = client.Testcase.Delete().Exec(ctx)
-	// require.NoError(t, err)
-	// _, err = client.TestcaseSet.Delete().Exec(ctx)
-	// require.NoError(t, err)
 }
