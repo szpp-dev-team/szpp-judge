@@ -6,40 +6,6 @@ import "google/protobuf/timestamp.proto";
 import "judge/v1/judge_type.proto";
 import "judge/v1/resources.proto";
 
-message User {
-  int32 id = 1;
-  string username = 2;
-  bool is_admin = 4;
-  google.protobuf.Timestamp created_at = 5;
-  optional google.protobuf.Timestamp updated_at = 6;
-}
-
-message Contest {
-  int32 id = 1;
-  string name = 2;
-  string slug = 3;
-  string description = 4;
-  repeated int32 task_ids = 5;
-  google.protobuf.Timestamp start_at = 6;
-  google.protobuf.Timestamp end_at = 7;
-}
-
-message StandingsElement {
-  message TaskDetail {
-    int32 task_id = 1;
-    int32 penalty_count = 2;
-    int32 ac_submit_id = 3;
-    google.protobuf.Timestamp ac_elapsed = 4;
-  }
-
-  int32 rank = 1;
-  int32 user_id = 2;
-  string user_name = 3;
-  int32 total_score = 4;
-  int32 total_penalty_count = 5;
-  google.protobuf.Timestamp latest_ac_at = 6;
-  repeated TaskDetail task_detail_list = 7;
-}
 message Clarification {
   int32 id = 1;
   int32 user_id = 2;
@@ -81,21 +47,6 @@ message MutationTask {
   int32 exec_memory_limit = 5; // 実行メモリ制限[MB]
   judge.v1.JudgeType judge_type = 6; // Judge の type(完全一致、誤差など)
   Difficulty difficulty = 7;
-}
-
-message ContestTask {
-  int32 id = 1;
-  string title = 2;
-  int32 exec_time_limit = 3;
-  int32 exec_memory_limit = 4;
-  Difficulty difficulty = 5;
-  int32 score = 6;
-}
-
-enum Visibility {
-  VISIBILITY_UNSPECIFIED = 0;
-  PUBLIC = 1;
-  PRIVATE = 2;
 }
 
 enum Difficulty {
@@ -204,9 +155,4 @@ message JudgeProgress {
   judge.v1.JudgeStatus status = 1; // ジャッジ済みのケースが全てACであれば UNSPECIFIED そうでなければ最初に出た非ACの結果
   int32 total_testcases = 2; // テストケースの総数
   int32 completed_testcases = 3; // ジャッジ済みのテストケース数
-}
-
-message SubmissionStatus {
-  int32 task_id = 1;
-  optional int32 score = 2;
 }

@@ -2,67 +2,50 @@ syntax = "proto3";
 
 package backend.v1;
 
-import "backend/v1/resources.proto";
-import "google/protobuf/timestamp.proto";
+import "backend/v1/task_resources.proto";
 
-message GetUserRequest {
-  string username = 1;
+service TaskService {
+  // Task を作成する
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  // 指定された Task を取得する
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  // Task を更新する
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+
+  // TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+  // contestant によるリクエストの場合は sample のみ取得する。
+  rpc GetTestcaseSets(GetTestcaseSetsRequest) returns (GetTestcaseSetsResponse);
+  // TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+  rpc SyncTestcaseSets(SyncTestcaseSetsRequest) returns (SyncTestcaseSetsResponse);
+
+  // 提出する
+  rpc Submit(SubmitRequest) returns (SubmitResponse);
+  // 提出の詳細を取得
+  rpc GetSubmissionDetail(GetSubmissionDetailRequest) returns (GetSubmissionDetailResponse);
+  // 提出一覧を取得
+  rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse);
+  // ジャッジの進捗を取得
+  rpc GetJudgeProgress(GetJudgeProgressRequest) returns (GetJudgeProgressResponse);
+  // Clarification を作成する
+  rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
+  // 指定された Clarification を取得する
+  rpc GetClarification(GetClarificationRequest) returns (GetClarificationResponse);
+  // ClarificationListを取得する
+  rpc ListClarifications(ListClarificationsRequest) returns (ListClarificationsResponse);
+  // Clarification を更新する
+  rpc UpdateClarification(UpdateClarificationRequest) returns (UpdateClarificationResponse);
+  // Clarification を削除する
+  rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
+
+  // Answerを追加する
+  rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
+  // Answerを取得する
+  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
+  // Answerを更新する
+  rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
+  // Answerを削除する
+  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
 }
-
-message GetUserResponse {
-  User user = 1;
-}
-
-message CreateUserRequest {
-  string username = 1;
-  string password = 2;
-  string email = 3;
-}
-
-message CreateUserResponse {
-  User user = 1;
-}
-
-message ExistsUsernameRequest {
-  string username = 1;
-}
-
-message ExistsUsernameResponse {
-  bool exists = 1;
-}
-
-message ExistsEmailRequest {
-  string email = 1;
-}
-
-message ExistsEmailResponse {
-  bool exists = 1;
-}
-
-message LoginRequest {
-  string username = 1;
-  string password = 2;
-}
-
-message LoginResponse {
-  User user = 1;
-  string access_token = 2;
-  string refresh_token = 3;
-}
-
-message RefreshAccessTokenRequest {
-  string refresh_token = 1;
-}
-
-message RefreshAccessTokenResponse {
-  string access_token = 1;
-}
-
-message LogoutRequest {
-  string refresh_token = 1;
-}
-
-message LogoutResponse {}
 
 message CreateTaskRequest {
   MutationTask task = 1;
@@ -109,14 +92,6 @@ message SyncTestcaseSetsResponse {
   repeated Testcase testcases = 2;
 }
 
-message PingRequest {
-  string name = 1;
-}
-
-message PingResponse {
-  string message = 1;
-}
-
 message SubmitRequest {
   optional int32 contest_id = 1;
   int32 task_id = 2;
@@ -153,39 +128,6 @@ message GetJudgeProgressResponse {
   JudgeProgress judge_progress = 1;
 }
 
-message CreateContestRequest {
-  string name = 1;
-  string slug = 2;
-  string description = 3;
-  google.protobuf.Timestamp start_at = 4;
-  google.protobuf.Timestamp end_at = 5;
-}
-
-message CreateContestResponse {
-  Contest contest = 1;
-}
-
-message GetContestRequest {
-  string slug = 1;
-}
-
-message GetContestResponse {
-  Contest contest = 1;
-}
-
-message ListContestsRequest {}
-
-message ListContestsResponse {
-  repeated Contest contests = 1;
-}
-
-message GetStandingsRequest {
-  int32 contest_id = 1;
-}
-
-message GetStandingsResponse {
-  repeated StandingsElement standings_list = 1;
-}
 message CreateClarificationRequest {
   int32 user_id = 1;
   string content = 2;
@@ -257,19 +199,3 @@ message DeleteAnswerRequest {
 }
 
 message DeleteAnswerResponse {}
-
-message ListContestTasksRequest {
-  string contest_slug = 1;
-}
-
-message ListContestTasksResponse {
-  repeated ContestTask tasks = 1; // 問題の並び順
-}
-
-message GetMySubmissionStatusesRequest {
-  string contest_slug = 1;
-}
-
-message GetMySubmissionStatusesResponse {
-  repeated SubmissionStatus submission_statuses = 1;
-}

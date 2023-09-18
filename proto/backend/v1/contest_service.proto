@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package backend.v1;
+
+import "google/protobuf/timestamp.proto";
+import "backend/v1/contest_resources.proto";
+
+service ContestService {
+  rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
+  rpc GetContest(GetContestRequest) returns (GetContestResponse);
+  rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
+  rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
+  // 自分の問題ごとの結果情報を返す
+  rpc GetMySubmissionStatuses(GetMySubmissionStatusesRequest) returns (GetMySubmissionStatusesResponse);
+  // 順位表取得
+  rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
+}
+
+message CreateContestRequest {
+  string name = 1;
+  string slug = 2;
+  string description = 3;
+  google.protobuf.Timestamp start_at = 4;
+  google.protobuf.Timestamp end_at = 5;
+}
+
+message CreateContestResponse {
+  Contest contest = 1;
+}
+
+message GetContestRequest {
+  string slug = 1;
+}
+
+message GetContestResponse {
+  Contest contest = 1;
+}
+
+message ListContestsRequest {}
+
+message ListContestsResponse {
+  repeated Contest contests = 1;
+}
+
+message ListContestTasksRequest {
+  string contest_slug = 1;
+}
+
+message ListContestTasksResponse {
+  repeated ContestTask tasks = 1; // 問題の並び順
+}
+
+message GetMySubmissionStatusesRequest {
+  string contest_slug = 1;
+}
+
+message GetMySubmissionStatusesResponse {
+  repeated SubmissionStatus submission_statuses = 1;
+}
+
+message GetStandingsRequest {
+  int32 contest_id = 1;
+}
+
+message GetStandingsResponse {
+  repeated StandingsElement standings_list = 1;
+}

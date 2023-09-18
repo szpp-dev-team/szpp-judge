@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package backend.v1;
+
+import "google/protobuf/timestamp.proto";
+import "backend/v1/task_resources.proto";
+
+message ContestTask {
+  int32 id = 1;
+  string title = 2;
+  int32 exec_time_limit = 3;
+  int32 exec_memory_limit = 4;
+  Difficulty difficulty = 5;
+  int32 score = 6;
+}
+
+message Contest {
+  int32 id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  repeated int32 task_ids = 5;
+  google.protobuf.Timestamp start_at = 6;
+  google.protobuf.Timestamp end_at = 7;
+}
+
+message StandingsElement {
+  message TaskDetail {
+    int32 task_id = 1;
+    int32 penalty_count = 2;
+    int32 ac_submit_id = 3;
+    google.protobuf.Timestamp ac_elapsed = 4;
+  }
+
+  int32 rank = 1;
+  int32 user_id = 2;
+  string user_name = 3;
+  int32 total_score = 4;
+  int32 total_penalty_count = 5;
+  google.protobuf.Timestamp latest_ac_at = 6;
+  repeated TaskDetail task_detail_list = 7;
+}
+
+message SubmissionStatus {
+  int32 task_id = 1;
+  optional int32 score = 2;
+}
