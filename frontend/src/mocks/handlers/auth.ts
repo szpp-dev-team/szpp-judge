@@ -1,6 +1,6 @@
 import { LoginResponse } from "@/src/gen/proto/backend/v1/messages_pb";
 import { AuthService } from "@/src/gen/proto/backend/v1/services-AuthService_connectquery";
-import type { IAuthUser } from "@/src/globalStates/credential";
+import type { AuthUser } from "@/src/model/user";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
@@ -9,7 +9,7 @@ const REFRESH_TOKEN_PREFIX = "refreeeeesh";
 
 type Credential = Pick<LoginResponse, "accessToken" | "refreshToken">;
 
-export const generateMockAccessToken = (user: IAuthUser, now: Date): string => {
+export const generateMockAccessToken = (user: AuthUser, now: Date): string => {
   const payloadObj = {
     ...user,
     sub: "1234567890",
@@ -26,7 +26,7 @@ export const generateMockRefreshToken = (now: Date): string => {
   return `${REFRESH_TOKEN_PREFIX}/${now.toLocaleString("sv-SE")}`;
 };
 
-export const generateMockCredential = (user: IAuthUser): Credential => {
+export const generateMockCredential = (user: AuthUser): Credential => {
   const now = new Date();
   const accessToken = generateMockAccessToken(user, now);
   const refreshToken = generateMockRefreshToken(now);
@@ -44,18 +44,20 @@ export const authHandlers: RequestHandler[] = [
       );
     }
 
-    const isAdmin = username == "admin";
+    const user: AuthUser = {
+      id: 1,
+      username,
+      isAdmin: username === "admin",
+    };
 
     return res(
       ctx.delay(500),
       encodeResp({
         user: {
-          id: 1,
-          username,
-          isAdmin,
+          ...user,
           createdAt: Timestamp.now(),
         },
-        ...generateMockCredential({ username, isAdmin }),
+        ...generateMockCredential(user),
       }),
     );
   }),

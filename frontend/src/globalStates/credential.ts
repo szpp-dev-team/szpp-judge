@@ -1,3 +1,4 @@
+import type { AuthUser } from "@/src/model/user";
 import { decodeJwtPayload } from "@/src/util/jwt";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomWithStorage, RESET } from "jotai/utils";
@@ -7,20 +8,15 @@ interface ICredential {
   refreshToken: string;
 }
 
-export type IAuthUser = {
-  username: string;
-  isAdmin: boolean;
-};
-
 const credential = atomWithStorage<ICredential>("szp_tkn", { accessToken: "", refreshToken: "" });
 
-const authUser = atom<Readonly<IAuthUser> | null>((get) => {
+const authUser = atom<Readonly<AuthUser> | null>((get) => {
   const jwt = get(credential).accessToken;
   if (!jwt) {
     return null;
   }
   try {
-    return decodeJwtPayload(jwt) as IAuthUser;
+    return decodeJwtPayload(jwt) as AuthUser;
   } catch (e) {
     console.error(e);
     return null;
