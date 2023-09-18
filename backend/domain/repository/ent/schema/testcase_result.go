@@ -10,19 +10,18 @@ type TestcaseResult struct {
 	ent.Schema
 }
 
-func (TestcaseResult) Field() []ent.Field {
+func (TestcaseResult) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
-		field.Int("submission_id"),
-		field.Int("testcase_id"),
 		field.String("status"),
 		field.Int("exec_time"),   // ms
 		field.Int("exec_memory"), // kib
 	}
 }
 
-func (TestcaseResult) Edge() []ent.Edge {
+func (TestcaseResult) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("submit", Submit.Type),
+		edge.From("submit", Submit.Type).Ref("testcase_results").Unique(),
+		edge.To("testcase", Testcase.Type).Unique(),
 	}
 }

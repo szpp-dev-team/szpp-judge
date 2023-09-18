@@ -87,14 +87,6 @@ func (tsu *TestcaseSetUpdate) SetTaskID(id int) *TestcaseSetUpdate {
 	return tsu
 }
 
-// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
-func (tsu *TestcaseSetUpdate) SetNillableTaskID(id *int) *TestcaseSetUpdate {
-	if id != nil {
-		tsu = tsu.SetTaskID(*id)
-	}
-	return tsu
-}
-
 // SetTask sets the "task" edge to the Task entity.
 func (tsu *TestcaseSetUpdate) SetTask(t *Task) *TestcaseSetUpdate {
 	return tsu.SetTaskID(t.ID)
@@ -174,7 +166,18 @@ func (tsu *TestcaseSetUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tsu *TestcaseSetUpdate) check() error {
+	if _, ok := tsu.mutation.TaskID(); tsu.mutation.TaskCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "TestcaseSet.task"`)
+	}
+	return nil
+}
+
 func (tsu *TestcaseSetUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := tsu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(testcaseset.Table, testcaseset.Columns, sqlgraph.NewFieldSpec(testcaseset.FieldID, field.TypeInt))
 	if ps := tsu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -355,14 +358,6 @@ func (tsuo *TestcaseSetUpdateOne) SetTaskID(id int) *TestcaseSetUpdateOne {
 	return tsuo
 }
 
-// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
-func (tsuo *TestcaseSetUpdateOne) SetNillableTaskID(id *int) *TestcaseSetUpdateOne {
-	if id != nil {
-		tsuo = tsuo.SetTaskID(*id)
-	}
-	return tsuo
-}
-
 // SetTask sets the "task" edge to the Task entity.
 func (tsuo *TestcaseSetUpdateOne) SetTask(t *Task) *TestcaseSetUpdateOne {
 	return tsuo.SetTaskID(t.ID)
@@ -455,7 +450,18 @@ func (tsuo *TestcaseSetUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tsuo *TestcaseSetUpdateOne) check() error {
+	if _, ok := tsuo.mutation.TaskID(); tsuo.mutation.TaskCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "TestcaseSet.task"`)
+	}
+	return nil
+}
+
 func (tsuo *TestcaseSetUpdateOne) sqlSave(ctx context.Context) (_node *TestcaseSet, err error) {
+	if err := tsuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(testcaseset.Table, testcaseset.Columns, sqlgraph.NewFieldSpec(testcaseset.FieldID, field.TypeInt))
 	id, ok := tsuo.mutation.ID()
 	if !ok {

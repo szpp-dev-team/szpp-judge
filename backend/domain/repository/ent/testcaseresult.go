@@ -8,16 +8,65 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 )
 
 // TestcaseResult is the model entity for the TestcaseResult schema.
 type TestcaseResult struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
-	ID                     int `json:"id,omitempty"`
-	submit_testcase_result *int
-	selectValues           sql.SelectValues
+	ID int `json:"id,omitempty"`
+	// Status holds the value of the "status" field.
+	Status string `json:"status,omitempty"`
+	// ExecTime holds the value of the "exec_time" field.
+	ExecTime int `json:"exec_time,omitempty"`
+	// ExecMemory holds the value of the "exec_memory" field.
+	ExecMemory int `json:"exec_memory,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the TestcaseResultQuery when eager-loading is set.
+	Edges                    TestcaseResultEdges `json:"edges"`
+	submit_testcase_results  *int
+	testcase_result_testcase *int
+	selectValues             sql.SelectValues
+}
+
+// TestcaseResultEdges holds the relations/edges for other nodes in the graph.
+type TestcaseResultEdges struct {
+	// Submit holds the value of the submit edge.
+	Submit *Submit `json:"submit,omitempty"`
+	// Testcase holds the value of the testcase edge.
+	Testcase *Testcase `json:"testcase,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// SubmitOrErr returns the Submit value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TestcaseResultEdges) SubmitOrErr() (*Submit, error) {
+	if e.loadedTypes[0] {
+		if e.Submit == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: submit.Label}
+		}
+		return e.Submit, nil
+	}
+	return nil, &NotLoadedError{edge: "submit"}
+}
+
+// TestcaseOrErr returns the Testcase value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TestcaseResultEdges) TestcaseOrErr() (*Testcase, error) {
+	if e.loadedTypes[1] {
+		if e.Testcase == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: testcase.Label}
+		}
+		return e.Testcase, nil
+	}
+	return nil, &NotLoadedError{edge: "testcase"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -25,9 +74,13 @@ func (*TestcaseResult) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case testcaseresult.FieldID:
+		case testcaseresult.FieldID, testcaseresult.FieldExecTime, testcaseresult.FieldExecMemory:
 			values[i] = new(sql.NullInt64)
-		case testcaseresult.ForeignKeys[0]: // submit_testcase_result
+		case testcaseresult.FieldStatus:
+			values[i] = new(sql.NullString)
+		case testcaseresult.ForeignKeys[0]: // submit_testcase_results
+			values[i] = new(sql.NullInt64)
+		case testcaseresult.ForeignKeys[1]: // testcase_result_testcase
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -50,12 +103,37 @@ func (tr *TestcaseResult) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			tr.ID = int(value.Int64)
+		case testcaseresult.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				tr.Status = value.String
+			}
+		case testcaseresult.FieldExecTime:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field exec_time", values[i])
+			} else if value.Valid {
+				tr.ExecTime = int(value.Int64)
+			}
+		case testcaseresult.FieldExecMemory:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field exec_memory", values[i])
+			} else if value.Valid {
+				tr.ExecMemory = int(value.Int64)
+			}
 		case testcaseresult.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field submit_testcase_result", value)
+				return fmt.Errorf("unexpected type %T for edge-field submit_testcase_results", value)
 			} else if value.Valid {
-				tr.submit_testcase_result = new(int)
-				*tr.submit_testcase_result = int(value.Int64)
+				tr.submit_testcase_results = new(int)
+				*tr.submit_testcase_results = int(value.Int64)
+			}
+		case testcaseresult.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field testcase_result_testcase", value)
+			} else if value.Valid {
+				tr.testcase_result_testcase = new(int)
+				*tr.testcase_result_testcase = int(value.Int64)
 			}
 		default:
 			tr.selectValues.Set(columns[i], values[i])
@@ -68,6 +146,16 @@ func (tr *TestcaseResult) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (tr *TestcaseResult) Value(name string) (ent.Value, error) {
 	return tr.selectValues.Get(name)
+}
+
+// QuerySubmit queries the "submit" edge of the TestcaseResult entity.
+func (tr *TestcaseResult) QuerySubmit() *SubmitQuery {
+	return NewTestcaseResultClient(tr.config).QuerySubmit(tr)
+}
+
+// QueryTestcase queries the "testcase" edge of the TestcaseResult entity.
+func (tr *TestcaseResult) QueryTestcase() *TestcaseQuery {
+	return NewTestcaseResultClient(tr.config).QueryTestcase(tr)
 }
 
 // Update returns a builder for updating this TestcaseResult.
@@ -92,7 +180,15 @@ func (tr *TestcaseResult) Unwrap() *TestcaseResult {
 func (tr *TestcaseResult) String() string {
 	var builder strings.Builder
 	builder.WriteString("TestcaseResult(")
-	builder.WriteString(fmt.Sprintf("id=%v", tr.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", tr.ID))
+	builder.WriteString("status=")
+	builder.WriteString(tr.Status)
+	builder.WriteString(", ")
+	builder.WriteString("exec_time=")
+	builder.WriteString(fmt.Sprintf("%v", tr.ExecTime))
+	builder.WriteString(", ")
+	builder.WriteString("exec_memory=")
+	builder.WriteString(fmt.Sprintf("%v", tr.ExecMemory))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -973,15 +974,18 @@ func (m *ContestMutation) ResetEdge(name string) error {
 // LanguageMutation represents an operation that mutates the Language nodes in the graph.
 type LanguageMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	clearedFields map[string]struct{}
-	submit        *int
-	clearedsubmit bool
-	done          bool
-	oldValue      func(context.Context) (*Language, error)
-	predicates    []predicate.Language
+	op             Op
+	typ            string
+	id             *int
+	name           *string
+	slug           *string
+	clearedFields  map[string]struct{}
+	submits        map[int]struct{}
+	removedsubmits map[int]struct{}
+	clearedsubmits bool
+	done           bool
+	oldValue       func(context.Context) (*Language, error)
+	predicates     []predicate.Language
 }
 
 var _ ent.Mutation = (*LanguageMutation)(nil)
@@ -1054,6 +1058,12 @@ func (m LanguageMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Language entities.
+func (m *LanguageMutation) SetID(id int) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
 func (m *LanguageMutation) ID() (id int, exists bool) {
@@ -1082,43 +1092,130 @@ func (m *LanguageMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetSubmitID sets the "submit" edge to the Submit entity by id.
-func (m *LanguageMutation) SetSubmitID(id int) {
-	m.submit = &id
+// SetName sets the "name" field.
+func (m *LanguageMutation) SetName(s string) {
+	m.name = &s
 }
 
-// ClearSubmit clears the "submit" edge to the Submit entity.
-func (m *LanguageMutation) ClearSubmit() {
-	m.clearedsubmit = true
+// Name returns the value of the "name" field in the mutation.
+func (m *LanguageMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
 }
 
-// SubmitCleared reports if the "submit" edge to the Submit entity was cleared.
-func (m *LanguageMutation) SubmitCleared() bool {
-	return m.clearedsubmit
+// OldName returns the old "name" field's value of the Language entity.
+// If the Language object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LanguageMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
 }
 
-// SubmitID returns the "submit" edge ID in the mutation.
-func (m *LanguageMutation) SubmitID() (id int, exists bool) {
-	if m.submit != nil {
-		return *m.submit, true
+// ResetName resets all changes to the "name" field.
+func (m *LanguageMutation) ResetName() {
+	m.name = nil
+}
+
+// SetSlug sets the "slug" field.
+func (m *LanguageMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *LanguageMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the Language entity.
+// If the Language object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LanguageMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *LanguageMutation) ResetSlug() {
+	m.slug = nil
+}
+
+// AddSubmitIDs adds the "submits" edge to the Submit entity by ids.
+func (m *LanguageMutation) AddSubmitIDs(ids ...int) {
+	if m.submits == nil {
+		m.submits = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.submits[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubmits clears the "submits" edge to the Submit entity.
+func (m *LanguageMutation) ClearSubmits() {
+	m.clearedsubmits = true
+}
+
+// SubmitsCleared reports if the "submits" edge to the Submit entity was cleared.
+func (m *LanguageMutation) SubmitsCleared() bool {
+	return m.clearedsubmits
+}
+
+// RemoveSubmitIDs removes the "submits" edge to the Submit entity by IDs.
+func (m *LanguageMutation) RemoveSubmitIDs(ids ...int) {
+	if m.removedsubmits == nil {
+		m.removedsubmits = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.submits, ids[i])
+		m.removedsubmits[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubmits returns the removed IDs of the "submits" edge to the Submit entity.
+func (m *LanguageMutation) RemovedSubmitsIDs() (ids []int) {
+	for id := range m.removedsubmits {
+		ids = append(ids, id)
 	}
 	return
 }
 
-// SubmitIDs returns the "submit" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// SubmitID instead. It exists only for internal usage by the builders.
-func (m *LanguageMutation) SubmitIDs() (ids []int) {
-	if id := m.submit; id != nil {
-		ids = append(ids, *id)
+// SubmitsIDs returns the "submits" edge IDs in the mutation.
+func (m *LanguageMutation) SubmitsIDs() (ids []int) {
+	for id := range m.submits {
+		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetSubmit resets all changes to the "submit" edge.
-func (m *LanguageMutation) ResetSubmit() {
-	m.submit = nil
-	m.clearedsubmit = false
+// ResetSubmits resets all changes to the "submits" edge.
+func (m *LanguageMutation) ResetSubmits() {
+	m.submits = nil
+	m.clearedsubmits = false
+	m.removedsubmits = nil
 }
 
 // Where appends a list predicates to the LanguageMutation builder.
@@ -1155,7 +1252,13 @@ func (m *LanguageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *LanguageMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, language.FieldName)
+	}
+	if m.slug != nil {
+		fields = append(fields, language.FieldSlug)
+	}
 	return fields
 }
 
@@ -1163,6 +1266,12 @@ func (m *LanguageMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *LanguageMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case language.FieldName:
+		return m.Name()
+	case language.FieldSlug:
+		return m.Slug()
+	}
 	return nil, false
 }
 
@@ -1170,6 +1279,12 @@ func (m *LanguageMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *LanguageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case language.FieldName:
+		return m.OldName(ctx)
+	case language.FieldSlug:
+		return m.OldSlug(ctx)
+	}
 	return nil, fmt.Errorf("unknown Language field %s", name)
 }
 
@@ -1178,6 +1293,20 @@ func (m *LanguageMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *LanguageMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case language.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case language.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Language field %s", name)
 }
@@ -1199,6 +1328,8 @@ func (m *LanguageMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *LanguageMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Language numeric field %s", name)
 }
 
@@ -1224,14 +1355,22 @@ func (m *LanguageMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *LanguageMutation) ResetField(name string) error {
+	switch name {
+	case language.FieldName:
+		m.ResetName()
+		return nil
+	case language.FieldSlug:
+		m.ResetSlug()
+		return nil
+	}
 	return fmt.Errorf("unknown Language field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *LanguageMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.submit != nil {
-		edges = append(edges, language.EdgeSubmit)
+	if m.submits != nil {
+		edges = append(edges, language.EdgeSubmits)
 	}
 	return edges
 }
@@ -1240,10 +1379,12 @@ func (m *LanguageMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case language.EdgeSubmit:
-		if id := m.submit; id != nil {
-			return []ent.Value{*id}
+	case language.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.submits))
+		for id := range m.submits {
+			ids = append(ids, id)
 		}
+		return ids
 	}
 	return nil
 }
@@ -1251,20 +1392,31 @@ func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *LanguageMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
+	if m.removedsubmits != nil {
+		edges = append(edges, language.EdgeSubmits)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *LanguageMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case language.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.removedsubmits))
+		for id := range m.removedsubmits {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *LanguageMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedsubmit {
-		edges = append(edges, language.EdgeSubmit)
+	if m.clearedsubmits {
+		edges = append(edges, language.EdgeSubmits)
 	}
 	return edges
 }
@@ -1273,8 +1425,8 @@ func (m *LanguageMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *LanguageMutation) EdgeCleared(name string) bool {
 	switch name {
-	case language.EdgeSubmit:
-		return m.clearedsubmit
+	case language.EdgeSubmits:
+		return m.clearedsubmits
 	}
 	return false
 }
@@ -1283,9 +1435,6 @@ func (m *LanguageMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *LanguageMutation) ClearEdge(name string) error {
 	switch name {
-	case language.EdgeSubmit:
-		m.ClearSubmit()
-		return nil
 	}
 	return fmt.Errorf("unknown Language unique edge %s", name)
 }
@@ -1294,8 +1443,8 @@ func (m *LanguageMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *LanguageMutation) ResetEdge(name string) error {
 	switch name {
-	case language.EdgeSubmit:
-		m.ResetSubmit()
+	case language.EdgeSubmits:
+		m.ResetSubmits()
 		return nil
 	}
 	return fmt.Errorf("unknown Language edge %s", name)
@@ -1304,25 +1453,32 @@ func (m *LanguageMutation) ResetEdge(name string) error {
 // SubmitMutation represents an operation that mutates the Submit nodes in the graph.
 type SubmitMutation struct {
 	config
-	op                     Op
-	typ                    string
-	id                     *int
-	clearedFields          map[string]struct{}
-	user                   map[int]struct{}
-	removeduser            map[int]struct{}
-	cleareduser            bool
-	language               map[int]struct{}
-	removedlanguage        map[int]struct{}
-	clearedlanguage        bool
-	testcase_result        map[int]struct{}
-	removedtestcase_result map[int]struct{}
-	clearedtestcase_result bool
-	submit_contests        map[int]struct{}
-	removedsubmit_contests map[int]struct{}
-	clearedsubmit_contests bool
-	done                   bool
-	oldValue               func(context.Context) (*Submit, error)
-	predicates             []predicate.Submit
+	op                      Op
+	typ                     string
+	id                      *int
+	status                  *string
+	exec_time               *int
+	addexec_time            *int
+	exec_memory             *int
+	addexec_memory          *int
+	score                   *int
+	addscore                *int
+	submitted_at            *time.Time
+	created_at              *time.Time
+	updated_at              *time.Time
+	clearedFields           map[string]struct{}
+	user                    *int
+	cleareduser             bool
+	task                    *int
+	clearedtask             bool
+	language                *int
+	clearedlanguage         bool
+	testcase_results        map[int]struct{}
+	removedtestcase_results map[int]struct{}
+	clearedtestcase_results bool
+	done                    bool
+	oldValue                func(context.Context) (*Submit, error)
+	predicates              []predicate.Submit
 }
 
 var _ ent.Mutation = (*SubmitMutation)(nil)
@@ -1395,6 +1551,12 @@ func (m SubmitMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Submit entities.
+func (m *SubmitMutation) SetID(id int) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
 func (m *SubmitMutation) ID() (id int, exists bool) {
@@ -1423,14 +1585,389 @@ func (m *SubmitMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// AddUserIDs adds the "user" edge to the User entity by ids.
-func (m *SubmitMutation) AddUserIDs(ids ...int) {
-	if m.user == nil {
-		m.user = make(map[int]struct{})
+// SetStatus sets the "status" field.
+func (m *SubmitMutation) SetStatus(s string) {
+	m.status = &s
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *SubmitMutation) Status() (r string, exists bool) {
+	v := m.status
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		m.user[ids[i]] = struct{}{}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldStatus(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ClearStatus clears the value of the "status" field.
+func (m *SubmitMutation) ClearStatus() {
+	m.status = nil
+	m.clearedFields[submit.FieldStatus] = struct{}{}
+}
+
+// StatusCleared returns if the "status" field was cleared in this mutation.
+func (m *SubmitMutation) StatusCleared() bool {
+	_, ok := m.clearedFields[submit.FieldStatus]
+	return ok
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *SubmitMutation) ResetStatus() {
+	m.status = nil
+	delete(m.clearedFields, submit.FieldStatus)
+}
+
+// SetExecTime sets the "exec_time" field.
+func (m *SubmitMutation) SetExecTime(i int) {
+	m.exec_time = &i
+	m.addexec_time = nil
+}
+
+// ExecTime returns the value of the "exec_time" field in the mutation.
+func (m *SubmitMutation) ExecTime() (r int, exists bool) {
+	v := m.exec_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecTime returns the old "exec_time" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldExecTime(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecTime: %w", err)
+	}
+	return oldValue.ExecTime, nil
+}
+
+// AddExecTime adds i to the "exec_time" field.
+func (m *SubmitMutation) AddExecTime(i int) {
+	if m.addexec_time != nil {
+		*m.addexec_time += i
+	} else {
+		m.addexec_time = &i
+	}
+}
+
+// AddedExecTime returns the value that was added to the "exec_time" field in this mutation.
+func (m *SubmitMutation) AddedExecTime() (r int, exists bool) {
+	v := m.addexec_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearExecTime clears the value of the "exec_time" field.
+func (m *SubmitMutation) ClearExecTime() {
+	m.exec_time = nil
+	m.addexec_time = nil
+	m.clearedFields[submit.FieldExecTime] = struct{}{}
+}
+
+// ExecTimeCleared returns if the "exec_time" field was cleared in this mutation.
+func (m *SubmitMutation) ExecTimeCleared() bool {
+	_, ok := m.clearedFields[submit.FieldExecTime]
+	return ok
+}
+
+// ResetExecTime resets all changes to the "exec_time" field.
+func (m *SubmitMutation) ResetExecTime() {
+	m.exec_time = nil
+	m.addexec_time = nil
+	delete(m.clearedFields, submit.FieldExecTime)
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (m *SubmitMutation) SetExecMemory(i int) {
+	m.exec_memory = &i
+	m.addexec_memory = nil
+}
+
+// ExecMemory returns the value of the "exec_memory" field in the mutation.
+func (m *SubmitMutation) ExecMemory() (r int, exists bool) {
+	v := m.exec_memory
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecMemory returns the old "exec_memory" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldExecMemory(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecMemory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecMemory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecMemory: %w", err)
+	}
+	return oldValue.ExecMemory, nil
+}
+
+// AddExecMemory adds i to the "exec_memory" field.
+func (m *SubmitMutation) AddExecMemory(i int) {
+	if m.addexec_memory != nil {
+		*m.addexec_memory += i
+	} else {
+		m.addexec_memory = &i
+	}
+}
+
+// AddedExecMemory returns the value that was added to the "exec_memory" field in this mutation.
+func (m *SubmitMutation) AddedExecMemory() (r int, exists bool) {
+	v := m.addexec_memory
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearExecMemory clears the value of the "exec_memory" field.
+func (m *SubmitMutation) ClearExecMemory() {
+	m.exec_memory = nil
+	m.addexec_memory = nil
+	m.clearedFields[submit.FieldExecMemory] = struct{}{}
+}
+
+// ExecMemoryCleared returns if the "exec_memory" field was cleared in this mutation.
+func (m *SubmitMutation) ExecMemoryCleared() bool {
+	_, ok := m.clearedFields[submit.FieldExecMemory]
+	return ok
+}
+
+// ResetExecMemory resets all changes to the "exec_memory" field.
+func (m *SubmitMutation) ResetExecMemory() {
+	m.exec_memory = nil
+	m.addexec_memory = nil
+	delete(m.clearedFields, submit.FieldExecMemory)
+}
+
+// SetScore sets the "score" field.
+func (m *SubmitMutation) SetScore(i int) {
+	m.score = &i
+	m.addscore = nil
+}
+
+// Score returns the value of the "score" field in the mutation.
+func (m *SubmitMutation) Score() (r int, exists bool) {
+	v := m.score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScore returns the old "score" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldScore(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScore: %w", err)
+	}
+	return oldValue.Score, nil
+}
+
+// AddScore adds i to the "score" field.
+func (m *SubmitMutation) AddScore(i int) {
+	if m.addscore != nil {
+		*m.addscore += i
+	} else {
+		m.addscore = &i
+	}
+}
+
+// AddedScore returns the value that was added to the "score" field in this mutation.
+func (m *SubmitMutation) AddedScore() (r int, exists bool) {
+	v := m.addscore
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearScore clears the value of the "score" field.
+func (m *SubmitMutation) ClearScore() {
+	m.score = nil
+	m.addscore = nil
+	m.clearedFields[submit.FieldScore] = struct{}{}
+}
+
+// ScoreCleared returns if the "score" field was cleared in this mutation.
+func (m *SubmitMutation) ScoreCleared() bool {
+	_, ok := m.clearedFields[submit.FieldScore]
+	return ok
+}
+
+// ResetScore resets all changes to the "score" field.
+func (m *SubmitMutation) ResetScore() {
+	m.score = nil
+	m.addscore = nil
+	delete(m.clearedFields, submit.FieldScore)
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (m *SubmitMutation) SetSubmittedAt(t time.Time) {
+	m.submitted_at = &t
+}
+
+// SubmittedAt returns the value of the "submitted_at" field in the mutation.
+func (m *SubmitMutation) SubmittedAt() (r time.Time, exists bool) {
+	v := m.submitted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubmittedAt returns the old "submitted_at" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldSubmittedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubmittedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubmittedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubmittedAt: %w", err)
+	}
+	return oldValue.SubmittedAt, nil
+}
+
+// ResetSubmittedAt resets all changes to the "submitted_at" field.
+func (m *SubmitMutation) ResetSubmittedAt() {
+	m.submitted_at = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *SubmitMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *SubmitMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *SubmitMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *SubmitMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *SubmitMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *SubmitMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[submit.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *SubmitMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[submit.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *SubmitMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, submit.FieldUpdatedAt)
+}
+
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *SubmitMutation) SetUserID(id int) {
+	m.user = &id
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -1443,29 +1980,20 @@ func (m *SubmitMutation) UserCleared() bool {
 	return m.cleareduser
 }
 
-// RemoveUserIDs removes the "user" edge to the User entity by IDs.
-func (m *SubmitMutation) RemoveUserIDs(ids ...int) {
-	if m.removeduser == nil {
-		m.removeduser = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.user, ids[i])
-		m.removeduser[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedUser returns the removed IDs of the "user" edge to the User entity.
-func (m *SubmitMutation) RemovedUserIDs() (ids []int) {
-	for id := range m.removeduser {
-		ids = append(ids, id)
+// UserID returns the "user" edge ID in the mutation.
+func (m *SubmitMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
 	}
 	return
 }
 
 // UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
 func (m *SubmitMutation) UserIDs() (ids []int) {
-	for id := range m.user {
-		ids = append(ids, id)
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -1474,17 +2002,50 @@ func (m *SubmitMutation) UserIDs() (ids []int) {
 func (m *SubmitMutation) ResetUser() {
 	m.user = nil
 	m.cleareduser = false
-	m.removeduser = nil
 }
 
-// AddLanguageIDs adds the "language" edge to the Language entity by ids.
-func (m *SubmitMutation) AddLanguageIDs(ids ...int) {
-	if m.language == nil {
-		m.language = make(map[int]struct{})
+// SetTaskID sets the "task" edge to the Task entity by id.
+func (m *SubmitMutation) SetTaskID(id int) {
+	m.task = &id
+}
+
+// ClearTask clears the "task" edge to the Task entity.
+func (m *SubmitMutation) ClearTask() {
+	m.clearedtask = true
+}
+
+// TaskCleared reports if the "task" edge to the Task entity was cleared.
+func (m *SubmitMutation) TaskCleared() bool {
+	return m.clearedtask
+}
+
+// TaskID returns the "task" edge ID in the mutation.
+func (m *SubmitMutation) TaskID() (id int, exists bool) {
+	if m.task != nil {
+		return *m.task, true
 	}
-	for i := range ids {
-		m.language[ids[i]] = struct{}{}
+	return
+}
+
+// TaskIDs returns the "task" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TaskID instead. It exists only for internal usage by the builders.
+func (m *SubmitMutation) TaskIDs() (ids []int) {
+	if id := m.task; id != nil {
+		ids = append(ids, *id)
 	}
+	return
+}
+
+// ResetTask resets all changes to the "task" edge.
+func (m *SubmitMutation) ResetTask() {
+	m.task = nil
+	m.clearedtask = false
+}
+
+// SetLanguageID sets the "language" edge to the Language entity by id.
+func (m *SubmitMutation) SetLanguageID(id int) {
+	m.language = &id
 }
 
 // ClearLanguage clears the "language" edge to the Language entity.
@@ -1497,29 +2058,20 @@ func (m *SubmitMutation) LanguageCleared() bool {
 	return m.clearedlanguage
 }
 
-// RemoveLanguageIDs removes the "language" edge to the Language entity by IDs.
-func (m *SubmitMutation) RemoveLanguageIDs(ids ...int) {
-	if m.removedlanguage == nil {
-		m.removedlanguage = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.language, ids[i])
-		m.removedlanguage[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedLanguage returns the removed IDs of the "language" edge to the Language entity.
-func (m *SubmitMutation) RemovedLanguageIDs() (ids []int) {
-	for id := range m.removedlanguage {
-		ids = append(ids, id)
+// LanguageID returns the "language" edge ID in the mutation.
+func (m *SubmitMutation) LanguageID() (id int, exists bool) {
+	if m.language != nil {
+		return *m.language, true
 	}
 	return
 }
 
 // LanguageIDs returns the "language" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// LanguageID instead. It exists only for internal usage by the builders.
 func (m *SubmitMutation) LanguageIDs() (ids []int) {
-	for id := range m.language {
-		ids = append(ids, id)
+	if id := m.language; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -1528,115 +2080,60 @@ func (m *SubmitMutation) LanguageIDs() (ids []int) {
 func (m *SubmitMutation) ResetLanguage() {
 	m.language = nil
 	m.clearedlanguage = false
-	m.removedlanguage = nil
 }
 
-// AddTestcaseResultIDs adds the "testcase_result" edge to the TestcaseResult entity by ids.
+// AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by ids.
 func (m *SubmitMutation) AddTestcaseResultIDs(ids ...int) {
-	if m.testcase_result == nil {
-		m.testcase_result = make(map[int]struct{})
+	if m.testcase_results == nil {
+		m.testcase_results = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.testcase_result[ids[i]] = struct{}{}
+		m.testcase_results[ids[i]] = struct{}{}
 	}
 }
 
-// ClearTestcaseResult clears the "testcase_result" edge to the TestcaseResult entity.
-func (m *SubmitMutation) ClearTestcaseResult() {
-	m.clearedtestcase_result = true
+// ClearTestcaseResults clears the "testcase_results" edge to the TestcaseResult entity.
+func (m *SubmitMutation) ClearTestcaseResults() {
+	m.clearedtestcase_results = true
 }
 
-// TestcaseResultCleared reports if the "testcase_result" edge to the TestcaseResult entity was cleared.
-func (m *SubmitMutation) TestcaseResultCleared() bool {
-	return m.clearedtestcase_result
+// TestcaseResultsCleared reports if the "testcase_results" edge to the TestcaseResult entity was cleared.
+func (m *SubmitMutation) TestcaseResultsCleared() bool {
+	return m.clearedtestcase_results
 }
 
-// RemoveTestcaseResultIDs removes the "testcase_result" edge to the TestcaseResult entity by IDs.
+// RemoveTestcaseResultIDs removes the "testcase_results" edge to the TestcaseResult entity by IDs.
 func (m *SubmitMutation) RemoveTestcaseResultIDs(ids ...int) {
-	if m.removedtestcase_result == nil {
-		m.removedtestcase_result = make(map[int]struct{})
+	if m.removedtestcase_results == nil {
+		m.removedtestcase_results = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.testcase_result, ids[i])
-		m.removedtestcase_result[ids[i]] = struct{}{}
+		delete(m.testcase_results, ids[i])
+		m.removedtestcase_results[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedTestcaseResult returns the removed IDs of the "testcase_result" edge to the TestcaseResult entity.
-func (m *SubmitMutation) RemovedTestcaseResultIDs() (ids []int) {
-	for id := range m.removedtestcase_result {
+// RemovedTestcaseResults returns the removed IDs of the "testcase_results" edge to the TestcaseResult entity.
+func (m *SubmitMutation) RemovedTestcaseResultsIDs() (ids []int) {
+	for id := range m.removedtestcase_results {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// TestcaseResultIDs returns the "testcase_result" edge IDs in the mutation.
-func (m *SubmitMutation) TestcaseResultIDs() (ids []int) {
-	for id := range m.testcase_result {
+// TestcaseResultsIDs returns the "testcase_results" edge IDs in the mutation.
+func (m *SubmitMutation) TestcaseResultsIDs() (ids []int) {
+	for id := range m.testcase_results {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetTestcaseResult resets all changes to the "testcase_result" edge.
-func (m *SubmitMutation) ResetTestcaseResult() {
-	m.testcase_result = nil
-	m.clearedtestcase_result = false
-	m.removedtestcase_result = nil
-}
-
-// AddSubmitContestIDs adds the "submit_contests" edge to the Contest entity by ids.
-func (m *SubmitMutation) AddSubmitContestIDs(ids ...int) {
-	if m.submit_contests == nil {
-		m.submit_contests = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.submit_contests[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSubmitContests clears the "submit_contests" edge to the Contest entity.
-func (m *SubmitMutation) ClearSubmitContests() {
-	m.clearedsubmit_contests = true
-}
-
-// SubmitContestsCleared reports if the "submit_contests" edge to the Contest entity was cleared.
-func (m *SubmitMutation) SubmitContestsCleared() bool {
-	return m.clearedsubmit_contests
-}
-
-// RemoveSubmitContestIDs removes the "submit_contests" edge to the Contest entity by IDs.
-func (m *SubmitMutation) RemoveSubmitContestIDs(ids ...int) {
-	if m.removedsubmit_contests == nil {
-		m.removedsubmit_contests = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.submit_contests, ids[i])
-		m.removedsubmit_contests[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubmitContests returns the removed IDs of the "submit_contests" edge to the Contest entity.
-func (m *SubmitMutation) RemovedSubmitContestsIDs() (ids []int) {
-	for id := range m.removedsubmit_contests {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SubmitContestsIDs returns the "submit_contests" edge IDs in the mutation.
-func (m *SubmitMutation) SubmitContestsIDs() (ids []int) {
-	for id := range m.submit_contests {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSubmitContests resets all changes to the "submit_contests" edge.
-func (m *SubmitMutation) ResetSubmitContests() {
-	m.submit_contests = nil
-	m.clearedsubmit_contests = false
-	m.removedsubmit_contests = nil
+// ResetTestcaseResults resets all changes to the "testcase_results" edge.
+func (m *SubmitMutation) ResetTestcaseResults() {
+	m.testcase_results = nil
+	m.clearedtestcase_results = false
+	m.removedtestcase_results = nil
 }
 
 // Where appends a list predicates to the SubmitMutation builder.
@@ -1673,7 +2170,28 @@ func (m *SubmitMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubmitMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 7)
+	if m.status != nil {
+		fields = append(fields, submit.FieldStatus)
+	}
+	if m.exec_time != nil {
+		fields = append(fields, submit.FieldExecTime)
+	}
+	if m.exec_memory != nil {
+		fields = append(fields, submit.FieldExecMemory)
+	}
+	if m.score != nil {
+		fields = append(fields, submit.FieldScore)
+	}
+	if m.submitted_at != nil {
+		fields = append(fields, submit.FieldSubmittedAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, submit.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, submit.FieldUpdatedAt)
+	}
 	return fields
 }
 
@@ -1681,6 +2199,22 @@ func (m *SubmitMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *SubmitMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case submit.FieldStatus:
+		return m.Status()
+	case submit.FieldExecTime:
+		return m.ExecTime()
+	case submit.FieldExecMemory:
+		return m.ExecMemory()
+	case submit.FieldScore:
+		return m.Score()
+	case submit.FieldSubmittedAt:
+		return m.SubmittedAt()
+	case submit.FieldCreatedAt:
+		return m.CreatedAt()
+	case submit.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
 	return nil, false
 }
 
@@ -1688,6 +2222,22 @@ func (m *SubmitMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *SubmitMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case submit.FieldStatus:
+		return m.OldStatus(ctx)
+	case submit.FieldExecTime:
+		return m.OldExecTime(ctx)
+	case submit.FieldExecMemory:
+		return m.OldExecMemory(ctx)
+	case submit.FieldScore:
+		return m.OldScore(ctx)
+	case submit.FieldSubmittedAt:
+		return m.OldSubmittedAt(ctx)
+	case submit.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case submit.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
 	return nil, fmt.Errorf("unknown Submit field %s", name)
 }
 
@@ -1696,6 +2246,55 @@ func (m *SubmitMutation) OldField(ctx context.Context, name string) (ent.Value, 
 // type.
 func (m *SubmitMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case submit.FieldStatus:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case submit.FieldExecTime:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecTime(v)
+		return nil
+	case submit.FieldExecMemory:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecMemory(v)
+		return nil
+	case submit.FieldScore:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScore(v)
+		return nil
+	case submit.FieldSubmittedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubmittedAt(v)
+		return nil
+	case submit.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case submit.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Submit field %s", name)
 }
@@ -1703,13 +2302,31 @@ func (m *SubmitMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *SubmitMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addexec_time != nil {
+		fields = append(fields, submit.FieldExecTime)
+	}
+	if m.addexec_memory != nil {
+		fields = append(fields, submit.FieldExecMemory)
+	}
+	if m.addscore != nil {
+		fields = append(fields, submit.FieldScore)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *SubmitMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case submit.FieldExecTime:
+		return m.AddedExecTime()
+	case submit.FieldExecMemory:
+		return m.AddedExecMemory()
+	case submit.FieldScore:
+		return m.AddedScore()
+	}
 	return nil, false
 }
 
@@ -1717,13 +2334,52 @@ func (m *SubmitMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *SubmitMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case submit.FieldExecTime:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExecTime(v)
+		return nil
+	case submit.FieldExecMemory:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExecMemory(v)
+		return nil
+	case submit.FieldScore:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddScore(v)
+		return nil
+	}
 	return fmt.Errorf("unknown Submit numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *SubmitMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(submit.FieldStatus) {
+		fields = append(fields, submit.FieldStatus)
+	}
+	if m.FieldCleared(submit.FieldExecTime) {
+		fields = append(fields, submit.FieldExecTime)
+	}
+	if m.FieldCleared(submit.FieldExecMemory) {
+		fields = append(fields, submit.FieldExecMemory)
+	}
+	if m.FieldCleared(submit.FieldScore) {
+		fields = append(fields, submit.FieldScore)
+	}
+	if m.FieldCleared(submit.FieldUpdatedAt) {
+		fields = append(fields, submit.FieldUpdatedAt)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1736,12 +2392,52 @@ func (m *SubmitMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *SubmitMutation) ClearField(name string) error {
+	switch name {
+	case submit.FieldStatus:
+		m.ClearStatus()
+		return nil
+	case submit.FieldExecTime:
+		m.ClearExecTime()
+		return nil
+	case submit.FieldExecMemory:
+		m.ClearExecMemory()
+		return nil
+	case submit.FieldScore:
+		m.ClearScore()
+		return nil
+	case submit.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	}
 	return fmt.Errorf("unknown Submit nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *SubmitMutation) ResetField(name string) error {
+	switch name {
+	case submit.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case submit.FieldExecTime:
+		m.ResetExecTime()
+		return nil
+	case submit.FieldExecMemory:
+		m.ResetExecMemory()
+		return nil
+	case submit.FieldScore:
+		m.ResetScore()
+		return nil
+	case submit.FieldSubmittedAt:
+		m.ResetSubmittedAt()
+		return nil
+	case submit.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case submit.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
 	return fmt.Errorf("unknown Submit field %s", name)
 }
 
@@ -1751,14 +2447,14 @@ func (m *SubmitMutation) AddedEdges() []string {
 	if m.user != nil {
 		edges = append(edges, submit.EdgeUser)
 	}
+	if m.task != nil {
+		edges = append(edges, submit.EdgeTask)
+	}
 	if m.language != nil {
 		edges = append(edges, submit.EdgeLanguage)
 	}
-	if m.testcase_result != nil {
-		edges = append(edges, submit.EdgeTestcaseResult)
-	}
-	if m.submit_contests != nil {
-		edges = append(edges, submit.EdgeSubmitContests)
+	if m.testcase_results != nil {
+		edges = append(edges, submit.EdgeTestcaseResults)
 	}
 	return edges
 }
@@ -1768,26 +2464,20 @@ func (m *SubmitMutation) AddedEdges() []string {
 func (m *SubmitMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case submit.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.user))
-		for id := range m.user {
-			ids = append(ids, id)
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
+	case submit.EdgeTask:
+		if id := m.task; id != nil {
+			return []ent.Value{*id}
+		}
 	case submit.EdgeLanguage:
-		ids := make([]ent.Value, 0, len(m.language))
-		for id := range m.language {
-			ids = append(ids, id)
+		if id := m.language; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
-	case submit.EdgeTestcaseResult:
-		ids := make([]ent.Value, 0, len(m.testcase_result))
-		for id := range m.testcase_result {
-			ids = append(ids, id)
-		}
-		return ids
-	case submit.EdgeSubmitContests:
-		ids := make([]ent.Value, 0, len(m.submit_contests))
-		for id := range m.submit_contests {
+	case submit.EdgeTestcaseResults:
+		ids := make([]ent.Value, 0, len(m.testcase_results))
+		for id := range m.testcase_results {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1798,17 +2488,8 @@ func (m *SubmitMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SubmitMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.removeduser != nil {
-		edges = append(edges, submit.EdgeUser)
-	}
-	if m.removedlanguage != nil {
-		edges = append(edges, submit.EdgeLanguage)
-	}
-	if m.removedtestcase_result != nil {
-		edges = append(edges, submit.EdgeTestcaseResult)
-	}
-	if m.removedsubmit_contests != nil {
-		edges = append(edges, submit.EdgeSubmitContests)
+	if m.removedtestcase_results != nil {
+		edges = append(edges, submit.EdgeTestcaseResults)
 	}
 	return edges
 }
@@ -1817,27 +2498,9 @@ func (m *SubmitMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *SubmitMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case submit.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.removeduser))
-		for id := range m.removeduser {
-			ids = append(ids, id)
-		}
-		return ids
-	case submit.EdgeLanguage:
-		ids := make([]ent.Value, 0, len(m.removedlanguage))
-		for id := range m.removedlanguage {
-			ids = append(ids, id)
-		}
-		return ids
-	case submit.EdgeTestcaseResult:
-		ids := make([]ent.Value, 0, len(m.removedtestcase_result))
-		for id := range m.removedtestcase_result {
-			ids = append(ids, id)
-		}
-		return ids
-	case submit.EdgeSubmitContests:
-		ids := make([]ent.Value, 0, len(m.removedsubmit_contests))
-		for id := range m.removedsubmit_contests {
+	case submit.EdgeTestcaseResults:
+		ids := make([]ent.Value, 0, len(m.removedtestcase_results))
+		for id := range m.removedtestcase_results {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1851,14 +2514,14 @@ func (m *SubmitMutation) ClearedEdges() []string {
 	if m.cleareduser {
 		edges = append(edges, submit.EdgeUser)
 	}
+	if m.clearedtask {
+		edges = append(edges, submit.EdgeTask)
+	}
 	if m.clearedlanguage {
 		edges = append(edges, submit.EdgeLanguage)
 	}
-	if m.clearedtestcase_result {
-		edges = append(edges, submit.EdgeTestcaseResult)
-	}
-	if m.clearedsubmit_contests {
-		edges = append(edges, submit.EdgeSubmitContests)
+	if m.clearedtestcase_results {
+		edges = append(edges, submit.EdgeTestcaseResults)
 	}
 	return edges
 }
@@ -1869,12 +2532,12 @@ func (m *SubmitMutation) EdgeCleared(name string) bool {
 	switch name {
 	case submit.EdgeUser:
 		return m.cleareduser
+	case submit.EdgeTask:
+		return m.clearedtask
 	case submit.EdgeLanguage:
 		return m.clearedlanguage
-	case submit.EdgeTestcaseResult:
-		return m.clearedtestcase_result
-	case submit.EdgeSubmitContests:
-		return m.clearedsubmit_contests
+	case submit.EdgeTestcaseResults:
+		return m.clearedtestcase_results
 	}
 	return false
 }
@@ -1883,6 +2546,15 @@ func (m *SubmitMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *SubmitMutation) ClearEdge(name string) error {
 	switch name {
+	case submit.EdgeUser:
+		m.ClearUser()
+		return nil
+	case submit.EdgeTask:
+		m.ClearTask()
+		return nil
+	case submit.EdgeLanguage:
+		m.ClearLanguage()
+		return nil
 	}
 	return fmt.Errorf("unknown Submit unique edge %s", name)
 }
@@ -1894,14 +2566,14 @@ func (m *SubmitMutation) ResetEdge(name string) error {
 	case submit.EdgeUser:
 		m.ResetUser()
 		return nil
+	case submit.EdgeTask:
+		m.ResetTask()
+		return nil
 	case submit.EdgeLanguage:
 		m.ResetLanguage()
 		return nil
-	case submit.EdgeTestcaseResult:
-		m.ResetTestcaseResult()
-		return nil
-	case submit.EdgeSubmitContests:
-		m.ResetSubmitContests()
+	case submit.EdgeTestcaseResults:
+		m.ResetTestcaseResults()
 		return nil
 	}
 	return fmt.Errorf("unknown Submit edge %s", name)
@@ -1934,11 +2606,11 @@ type TaskMutation struct {
 	testcases            map[int]struct{}
 	removedtestcases     map[int]struct{}
 	clearedtestcases     bool
+	submits              map[int]struct{}
+	removedsubmits       map[int]struct{}
+	clearedsubmits       bool
 	user                 *int
 	cleareduser          bool
-	task_contests        map[int]struct{}
-	removedtask_contests map[int]struct{}
-	clearedtask_contests bool
 	done                 bool
 	oldValue             func(context.Context) (*Task, error)
 	predicates           []predicate.Task
@@ -2665,6 +3337,60 @@ func (m *TaskMutation) ResetTestcases() {
 	m.removedtestcases = nil
 }
 
+// AddSubmitIDs adds the "submits" edge to the Submit entity by ids.
+func (m *TaskMutation) AddSubmitIDs(ids ...int) {
+	if m.submits == nil {
+		m.submits = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.submits[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubmits clears the "submits" edge to the Submit entity.
+func (m *TaskMutation) ClearSubmits() {
+	m.clearedsubmits = true
+}
+
+// SubmitsCleared reports if the "submits" edge to the Submit entity was cleared.
+func (m *TaskMutation) SubmitsCleared() bool {
+	return m.clearedsubmits
+}
+
+// RemoveSubmitIDs removes the "submits" edge to the Submit entity by IDs.
+func (m *TaskMutation) RemoveSubmitIDs(ids ...int) {
+	if m.removedsubmits == nil {
+		m.removedsubmits = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.submits, ids[i])
+		m.removedsubmits[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubmits returns the removed IDs of the "submits" edge to the Submit entity.
+func (m *TaskMutation) RemovedSubmitsIDs() (ids []int) {
+	for id := range m.removedsubmits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubmitsIDs returns the "submits" edge IDs in the mutation.
+func (m *TaskMutation) SubmitsIDs() (ids []int) {
+	for id := range m.submits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubmits resets all changes to the "submits" edge.
+func (m *TaskMutation) ResetSubmits() {
+	m.submits = nil
+	m.clearedsubmits = false
+	m.removedsubmits = nil
+}
+
 // SetUserID sets the "user" edge to the User entity by id.
 func (m *TaskMutation) SetUserID(id int) {
 	m.user = &id
@@ -2702,60 +3428,6 @@ func (m *TaskMutation) UserIDs() (ids []int) {
 func (m *TaskMutation) ResetUser() {
 	m.user = nil
 	m.cleareduser = false
-}
-
-// AddTaskContestIDs adds the "task_contests" edge to the Contest entity by ids.
-func (m *TaskMutation) AddTaskContestIDs(ids ...int) {
-	if m.task_contests == nil {
-		m.task_contests = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.task_contests[ids[i]] = struct{}{}
-	}
-}
-
-// ClearTaskContests clears the "task_contests" edge to the Contest entity.
-func (m *TaskMutation) ClearTaskContests() {
-	m.clearedtask_contests = true
-}
-
-// TaskContestsCleared reports if the "task_contests" edge to the Contest entity was cleared.
-func (m *TaskMutation) TaskContestsCleared() bool {
-	return m.clearedtask_contests
-}
-
-// RemoveTaskContestIDs removes the "task_contests" edge to the Contest entity by IDs.
-func (m *TaskMutation) RemoveTaskContestIDs(ids ...int) {
-	if m.removedtask_contests == nil {
-		m.removedtask_contests = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.task_contests, ids[i])
-		m.removedtask_contests[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTaskContests returns the removed IDs of the "task_contests" edge to the Contest entity.
-func (m *TaskMutation) RemovedTaskContestsIDs() (ids []int) {
-	for id := range m.removedtask_contests {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// TaskContestsIDs returns the "task_contests" edge IDs in the mutation.
-func (m *TaskMutation) TaskContestsIDs() (ids []int) {
-	for id := range m.task_contests {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetTaskContests resets all changes to the "task_contests" edge.
-func (m *TaskMutation) ResetTaskContests() {
-	m.task_contests = nil
-	m.clearedtask_contests = false
-	m.removedtask_contests = nil
 }
 
 // Where appends a list predicates to the TaskMutation builder.
@@ -3134,11 +3806,11 @@ func (m *TaskMutation) AddedEdges() []string {
 	if m.testcases != nil {
 		edges = append(edges, task.EdgeTestcases)
 	}
+	if m.submits != nil {
+		edges = append(edges, task.EdgeSubmits)
+	}
 	if m.user != nil {
 		edges = append(edges, task.EdgeUser)
-	}
-	if m.task_contests != nil {
-		edges = append(edges, task.EdgeTaskContests)
 	}
 	return edges
 }
@@ -3159,16 +3831,16 @@ func (m *TaskMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case task.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.submits))
+		for id := range m.submits {
+			ids = append(ids, id)
+		}
+		return ids
 	case task.EdgeUser:
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
 		}
-	case task.EdgeTaskContests:
-		ids := make([]ent.Value, 0, len(m.task_contests))
-		for id := range m.task_contests {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
@@ -3182,8 +3854,8 @@ func (m *TaskMutation) RemovedEdges() []string {
 	if m.removedtestcases != nil {
 		edges = append(edges, task.EdgeTestcases)
 	}
-	if m.removedtask_contests != nil {
-		edges = append(edges, task.EdgeTaskContests)
+	if m.removedsubmits != nil {
+		edges = append(edges, task.EdgeSubmits)
 	}
 	return edges
 }
@@ -3204,9 +3876,9 @@ func (m *TaskMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case task.EdgeTaskContests:
-		ids := make([]ent.Value, 0, len(m.removedtask_contests))
-		for id := range m.removedtask_contests {
+	case task.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.removedsubmits))
+		for id := range m.removedsubmits {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3223,11 +3895,11 @@ func (m *TaskMutation) ClearedEdges() []string {
 	if m.clearedtestcases {
 		edges = append(edges, task.EdgeTestcases)
 	}
+	if m.clearedsubmits {
+		edges = append(edges, task.EdgeSubmits)
+	}
 	if m.cleareduser {
 		edges = append(edges, task.EdgeUser)
-	}
-	if m.clearedtask_contests {
-		edges = append(edges, task.EdgeTaskContests)
 	}
 	return edges
 }
@@ -3240,10 +3912,10 @@ func (m *TaskMutation) EdgeCleared(name string) bool {
 		return m.clearedtestcase_sets
 	case task.EdgeTestcases:
 		return m.clearedtestcases
+	case task.EdgeSubmits:
+		return m.clearedsubmits
 	case task.EdgeUser:
 		return m.cleareduser
-	case task.EdgeTaskContests:
-		return m.clearedtask_contests
 	}
 	return false
 }
@@ -3269,11 +3941,11 @@ func (m *TaskMutation) ResetEdge(name string) error {
 	case task.EdgeTestcases:
 		m.ResetTestcases()
 		return nil
+	case task.EdgeSubmits:
+		m.ResetSubmits()
+		return nil
 	case task.EdgeUser:
 		m.ResetUser()
-		return nil
-	case task.EdgeTaskContests:
-		m.ResetTaskContests()
 		return nil
 	}
 	return fmt.Errorf("unknown Task edge %s", name)
@@ -3969,13 +4641,22 @@ func (m *TestcaseMutation) ResetEdge(name string) error {
 // TestcaseResultMutation represents an operation that mutates the TestcaseResult nodes in the graph.
 type TestcaseResultMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*TestcaseResult, error)
-	predicates    []predicate.TestcaseResult
+	op              Op
+	typ             string
+	id              *int
+	status          *string
+	exec_time       *int
+	addexec_time    *int
+	exec_memory     *int
+	addexec_memory  *int
+	clearedFields   map[string]struct{}
+	submit          *int
+	clearedsubmit   bool
+	testcase        *int
+	clearedtestcase bool
+	done            bool
+	oldValue        func(context.Context) (*TestcaseResult, error)
+	predicates      []predicate.TestcaseResult
 }
 
 var _ ent.Mutation = (*TestcaseResultMutation)(nil)
@@ -4048,6 +4729,12 @@ func (m TestcaseResultMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TestcaseResult entities.
+func (m *TestcaseResultMutation) SetID(id int) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
 func (m *TestcaseResultMutation) ID() (id int, exists bool) {
@@ -4074,6 +4761,232 @@ func (m *TestcaseResultMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetStatus sets the "status" field.
+func (m *TestcaseResultMutation) SetStatus(s string) {
+	m.status = &s
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *TestcaseResultMutation) Status() (r string, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the TestcaseResult entity.
+// If the TestcaseResult object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TestcaseResultMutation) OldStatus(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *TestcaseResultMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetExecTime sets the "exec_time" field.
+func (m *TestcaseResultMutation) SetExecTime(i int) {
+	m.exec_time = &i
+	m.addexec_time = nil
+}
+
+// ExecTime returns the value of the "exec_time" field in the mutation.
+func (m *TestcaseResultMutation) ExecTime() (r int, exists bool) {
+	v := m.exec_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecTime returns the old "exec_time" field's value of the TestcaseResult entity.
+// If the TestcaseResult object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TestcaseResultMutation) OldExecTime(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecTime: %w", err)
+	}
+	return oldValue.ExecTime, nil
+}
+
+// AddExecTime adds i to the "exec_time" field.
+func (m *TestcaseResultMutation) AddExecTime(i int) {
+	if m.addexec_time != nil {
+		*m.addexec_time += i
+	} else {
+		m.addexec_time = &i
+	}
+}
+
+// AddedExecTime returns the value that was added to the "exec_time" field in this mutation.
+func (m *TestcaseResultMutation) AddedExecTime() (r int, exists bool) {
+	v := m.addexec_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetExecTime resets all changes to the "exec_time" field.
+func (m *TestcaseResultMutation) ResetExecTime() {
+	m.exec_time = nil
+	m.addexec_time = nil
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (m *TestcaseResultMutation) SetExecMemory(i int) {
+	m.exec_memory = &i
+	m.addexec_memory = nil
+}
+
+// ExecMemory returns the value of the "exec_memory" field in the mutation.
+func (m *TestcaseResultMutation) ExecMemory() (r int, exists bool) {
+	v := m.exec_memory
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecMemory returns the old "exec_memory" field's value of the TestcaseResult entity.
+// If the TestcaseResult object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TestcaseResultMutation) OldExecMemory(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecMemory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecMemory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecMemory: %w", err)
+	}
+	return oldValue.ExecMemory, nil
+}
+
+// AddExecMemory adds i to the "exec_memory" field.
+func (m *TestcaseResultMutation) AddExecMemory(i int) {
+	if m.addexec_memory != nil {
+		*m.addexec_memory += i
+	} else {
+		m.addexec_memory = &i
+	}
+}
+
+// AddedExecMemory returns the value that was added to the "exec_memory" field in this mutation.
+func (m *TestcaseResultMutation) AddedExecMemory() (r int, exists bool) {
+	v := m.addexec_memory
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetExecMemory resets all changes to the "exec_memory" field.
+func (m *TestcaseResultMutation) ResetExecMemory() {
+	m.exec_memory = nil
+	m.addexec_memory = nil
+}
+
+// SetSubmitID sets the "submit" edge to the Submit entity by id.
+func (m *TestcaseResultMutation) SetSubmitID(id int) {
+	m.submit = &id
+}
+
+// ClearSubmit clears the "submit" edge to the Submit entity.
+func (m *TestcaseResultMutation) ClearSubmit() {
+	m.clearedsubmit = true
+}
+
+// SubmitCleared reports if the "submit" edge to the Submit entity was cleared.
+func (m *TestcaseResultMutation) SubmitCleared() bool {
+	return m.clearedsubmit
+}
+
+// SubmitID returns the "submit" edge ID in the mutation.
+func (m *TestcaseResultMutation) SubmitID() (id int, exists bool) {
+	if m.submit != nil {
+		return *m.submit, true
+	}
+	return
+}
+
+// SubmitIDs returns the "submit" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SubmitID instead. It exists only for internal usage by the builders.
+func (m *TestcaseResultMutation) SubmitIDs() (ids []int) {
+	if id := m.submit; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSubmit resets all changes to the "submit" edge.
+func (m *TestcaseResultMutation) ResetSubmit() {
+	m.submit = nil
+	m.clearedsubmit = false
+}
+
+// SetTestcaseID sets the "testcase" edge to the Testcase entity by id.
+func (m *TestcaseResultMutation) SetTestcaseID(id int) {
+	m.testcase = &id
+}
+
+// ClearTestcase clears the "testcase" edge to the Testcase entity.
+func (m *TestcaseResultMutation) ClearTestcase() {
+	m.clearedtestcase = true
+}
+
+// TestcaseCleared reports if the "testcase" edge to the Testcase entity was cleared.
+func (m *TestcaseResultMutation) TestcaseCleared() bool {
+	return m.clearedtestcase
+}
+
+// TestcaseID returns the "testcase" edge ID in the mutation.
+func (m *TestcaseResultMutation) TestcaseID() (id int, exists bool) {
+	if m.testcase != nil {
+		return *m.testcase, true
+	}
+	return
+}
+
+// TestcaseIDs returns the "testcase" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TestcaseID instead. It exists only for internal usage by the builders.
+func (m *TestcaseResultMutation) TestcaseIDs() (ids []int) {
+	if id := m.testcase; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTestcase resets all changes to the "testcase" edge.
+func (m *TestcaseResultMutation) ResetTestcase() {
+	m.testcase = nil
+	m.clearedtestcase = false
 }
 
 // Where appends a list predicates to the TestcaseResultMutation builder.
@@ -4110,7 +5023,16 @@ func (m *TestcaseResultMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TestcaseResultMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 3)
+	if m.status != nil {
+		fields = append(fields, testcaseresult.FieldStatus)
+	}
+	if m.exec_time != nil {
+		fields = append(fields, testcaseresult.FieldExecTime)
+	}
+	if m.exec_memory != nil {
+		fields = append(fields, testcaseresult.FieldExecMemory)
+	}
 	return fields
 }
 
@@ -4118,6 +5040,14 @@ func (m *TestcaseResultMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *TestcaseResultMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case testcaseresult.FieldStatus:
+		return m.Status()
+	case testcaseresult.FieldExecTime:
+		return m.ExecTime()
+	case testcaseresult.FieldExecMemory:
+		return m.ExecMemory()
+	}
 	return nil, false
 }
 
@@ -4125,6 +5055,14 @@ func (m *TestcaseResultMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *TestcaseResultMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case testcaseresult.FieldStatus:
+		return m.OldStatus(ctx)
+	case testcaseresult.FieldExecTime:
+		return m.OldExecTime(ctx)
+	case testcaseresult.FieldExecMemory:
+		return m.OldExecMemory(ctx)
+	}
 	return nil, fmt.Errorf("unknown TestcaseResult field %s", name)
 }
 
@@ -4133,6 +5071,27 @@ func (m *TestcaseResultMutation) OldField(ctx context.Context, name string) (ent
 // type.
 func (m *TestcaseResultMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case testcaseresult.FieldStatus:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case testcaseresult.FieldExecTime:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecTime(v)
+		return nil
+	case testcaseresult.FieldExecMemory:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecMemory(v)
+		return nil
 	}
 	return fmt.Errorf("unknown TestcaseResult field %s", name)
 }
@@ -4140,13 +5099,26 @@ func (m *TestcaseResultMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *TestcaseResultMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addexec_time != nil {
+		fields = append(fields, testcaseresult.FieldExecTime)
+	}
+	if m.addexec_memory != nil {
+		fields = append(fields, testcaseresult.FieldExecMemory)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *TestcaseResultMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case testcaseresult.FieldExecTime:
+		return m.AddedExecTime()
+	case testcaseresult.FieldExecMemory:
+		return m.AddedExecMemory()
+	}
 	return nil, false
 }
 
@@ -4154,6 +5126,22 @@ func (m *TestcaseResultMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *TestcaseResultMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case testcaseresult.FieldExecTime:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExecTime(v)
+		return nil
+	case testcaseresult.FieldExecMemory:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExecMemory(v)
+		return nil
+	}
 	return fmt.Errorf("unknown TestcaseResult numeric field %s", name)
 }
 
@@ -4179,24 +5167,51 @@ func (m *TestcaseResultMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *TestcaseResultMutation) ResetField(name string) error {
+	switch name {
+	case testcaseresult.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case testcaseresult.FieldExecTime:
+		m.ResetExecTime()
+		return nil
+	case testcaseresult.FieldExecMemory:
+		m.ResetExecMemory()
+		return nil
+	}
 	return fmt.Errorf("unknown TestcaseResult field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TestcaseResultMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.submit != nil {
+		edges = append(edges, testcaseresult.EdgeSubmit)
+	}
+	if m.testcase != nil {
+		edges = append(edges, testcaseresult.EdgeTestcase)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *TestcaseResultMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case testcaseresult.EdgeSubmit:
+		if id := m.submit; id != nil {
+			return []ent.Value{*id}
+		}
+	case testcaseresult.EdgeTestcase:
+		if id := m.testcase; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TestcaseResultMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -4208,25 +5223,53 @@ func (m *TestcaseResultMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TestcaseResultMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.clearedsubmit {
+		edges = append(edges, testcaseresult.EdgeSubmit)
+	}
+	if m.clearedtestcase {
+		edges = append(edges, testcaseresult.EdgeTestcase)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *TestcaseResultMutation) EdgeCleared(name string) bool {
+	switch name {
+	case testcaseresult.EdgeSubmit:
+		return m.clearedsubmit
+	case testcaseresult.EdgeTestcase:
+		return m.clearedtestcase
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *TestcaseResultMutation) ClearEdge(name string) error {
+	switch name {
+	case testcaseresult.EdgeSubmit:
+		m.ClearSubmit()
+		return nil
+	case testcaseresult.EdgeTestcase:
+		m.ClearTestcase()
+		return nil
+	}
 	return fmt.Errorf("unknown TestcaseResult unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *TestcaseResultMutation) ResetEdge(name string) error {
+	switch name {
+	case testcaseresult.EdgeSubmit:
+		m.ResetSubmit()
+		return nil
+	case testcaseresult.EdgeTestcase:
+		m.ResetTestcase()
+		return nil
+	}
 	return fmt.Errorf("unknown TestcaseResult edge %s", name)
 }
 
@@ -4991,24 +6034,28 @@ func (m *TestcaseSetMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *int
-	name               *string
-	role               *string
-	encrypted_password *string
-	created_at         *time.Time
-	updated_at         *time.Time
-	clearedFields      map[string]struct{}
-	contests           map[int]struct{}
-	removedcontests    map[int]struct{}
-	clearedcontests    bool
-	tasks              map[int]struct{}
-	removedtasks       map[int]struct{}
-	clearedtasks       bool
-	done               bool
-	oldValue           func(context.Context) (*User, error)
-	predicates         []predicate.User
+	op              Op
+	typ             string
+	id              *int
+	username        *string
+	email           *string
+	role            *string
+	hashed_password *[]byte
+	created_at      *time.Time
+	updated_at      *time.Time
+	clearedFields   map[string]struct{}
+	contests        map[int]struct{}
+	removedcontests map[int]struct{}
+	clearedcontests bool
+	tasks           map[int]struct{}
+	removedtasks    map[int]struct{}
+	clearedtasks    bool
+	submits         map[int]struct{}
+	removedsubmits  map[int]struct{}
+	clearedsubmits  bool
+	done            bool
+	oldValue        func(context.Context) (*User, error)
+	predicates      []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -5115,40 +6162,76 @@ func (m *UserMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetName sets the "name" field.
-func (m *UserMutation) SetName(s string) {
-	m.name = &s
+// SetUsername sets the "username" field.
+func (m *UserMutation) SetUsername(s string) {
+	m.username = &s
 }
 
-// Name returns the value of the "name" field in the mutation.
-func (m *UserMutation) Name() (r string, exists bool) {
-	v := m.name
+// Username returns the value of the "username" field in the mutation.
+func (m *UserMutation) Username() (r string, exists bool) {
+	v := m.username
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the User entity.
+// OldUsername returns the old "username" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldUsername(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
+		return v, errors.New("OldUsername is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
+		return v, errors.New("OldUsername requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
+		return v, fmt.Errorf("querying old value for OldUsername: %w", err)
 	}
-	return oldValue.Name, nil
+	return oldValue.Username, nil
 }
 
-// ResetName resets all changes to the "name" field.
-func (m *UserMutation) ResetName() {
-	m.name = nil
+// ResetUsername resets all changes to the "username" field.
+func (m *UserMutation) ResetUsername() {
+	m.username = nil
+}
+
+// SetEmail sets the "email" field.
+func (m *UserMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *UserMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *UserMutation) ResetEmail() {
+	m.email = nil
 }
 
 // SetRole sets the "role" field.
@@ -5187,40 +6270,40 @@ func (m *UserMutation) ResetRole() {
 	m.role = nil
 }
 
-// SetEncryptedPassword sets the "encrypted_password" field.
-func (m *UserMutation) SetEncryptedPassword(s string) {
-	m.encrypted_password = &s
+// SetHashedPassword sets the "hashed_password" field.
+func (m *UserMutation) SetHashedPassword(b []byte) {
+	m.hashed_password = &b
 }
 
-// EncryptedPassword returns the value of the "encrypted_password" field in the mutation.
-func (m *UserMutation) EncryptedPassword() (r string, exists bool) {
-	v := m.encrypted_password
+// HashedPassword returns the value of the "hashed_password" field in the mutation.
+func (m *UserMutation) HashedPassword() (r []byte, exists bool) {
+	v := m.hashed_password
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldEncryptedPassword returns the old "encrypted_password" field's value of the User entity.
+// OldHashedPassword returns the old "hashed_password" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldEncryptedPassword(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldHashedPassword(ctx context.Context) (v []byte, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEncryptedPassword is only allowed on UpdateOne operations")
+		return v, errors.New("OldHashedPassword is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEncryptedPassword requires an ID field in the mutation")
+		return v, errors.New("OldHashedPassword requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEncryptedPassword: %w", err)
+		return v, fmt.Errorf("querying old value for OldHashedPassword: %w", err)
 	}
-	return oldValue.EncryptedPassword, nil
+	return oldValue.HashedPassword, nil
 }
 
-// ResetEncryptedPassword resets all changes to the "encrypted_password" field.
-func (m *UserMutation) ResetEncryptedPassword() {
-	m.encrypted_password = nil
+// ResetHashedPassword resets all changes to the "hashed_password" field.
+func (m *UserMutation) ResetHashedPassword() {
+	m.hashed_password = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -5416,6 +6499,60 @@ func (m *UserMutation) ResetTasks() {
 	m.removedtasks = nil
 }
 
+// AddSubmitIDs adds the "submits" edge to the Submit entity by ids.
+func (m *UserMutation) AddSubmitIDs(ids ...int) {
+	if m.submits == nil {
+		m.submits = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.submits[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubmits clears the "submits" edge to the Submit entity.
+func (m *UserMutation) ClearSubmits() {
+	m.clearedsubmits = true
+}
+
+// SubmitsCleared reports if the "submits" edge to the Submit entity was cleared.
+func (m *UserMutation) SubmitsCleared() bool {
+	return m.clearedsubmits
+}
+
+// RemoveSubmitIDs removes the "submits" edge to the Submit entity by IDs.
+func (m *UserMutation) RemoveSubmitIDs(ids ...int) {
+	if m.removedsubmits == nil {
+		m.removedsubmits = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.submits, ids[i])
+		m.removedsubmits[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubmits returns the removed IDs of the "submits" edge to the Submit entity.
+func (m *UserMutation) RemovedSubmitsIDs() (ids []int) {
+	for id := range m.removedsubmits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubmitsIDs returns the "submits" edge IDs in the mutation.
+func (m *UserMutation) SubmitsIDs() (ids []int) {
+	for id := range m.submits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubmits resets all changes to the "submits" edge.
+func (m *UserMutation) ResetSubmits() {
+	m.submits = nil
+	m.clearedsubmits = false
+	m.removedsubmits = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -5450,15 +6587,18 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 5)
-	if m.name != nil {
-		fields = append(fields, user.FieldName)
+	fields := make([]string, 0, 6)
+	if m.username != nil {
+		fields = append(fields, user.FieldUsername)
+	}
+	if m.email != nil {
+		fields = append(fields, user.FieldEmail)
 	}
 	if m.role != nil {
 		fields = append(fields, user.FieldRole)
 	}
-	if m.encrypted_password != nil {
-		fields = append(fields, user.FieldEncryptedPassword)
+	if m.hashed_password != nil {
+		fields = append(fields, user.FieldHashedPassword)
 	}
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
@@ -5474,12 +6614,14 @@ func (m *UserMutation) Fields() []string {
 // schema.
 func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case user.FieldName:
-		return m.Name()
+	case user.FieldUsername:
+		return m.Username()
+	case user.FieldEmail:
+		return m.Email()
 	case user.FieldRole:
 		return m.Role()
-	case user.FieldEncryptedPassword:
-		return m.EncryptedPassword()
+	case user.FieldHashedPassword:
+		return m.HashedPassword()
 	case user.FieldCreatedAt:
 		return m.CreatedAt()
 	case user.FieldUpdatedAt:
@@ -5493,12 +6635,14 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case user.FieldName:
-		return m.OldName(ctx)
+	case user.FieldUsername:
+		return m.OldUsername(ctx)
+	case user.FieldEmail:
+		return m.OldEmail(ctx)
 	case user.FieldRole:
 		return m.OldRole(ctx)
-	case user.FieldEncryptedPassword:
-		return m.OldEncryptedPassword(ctx)
+	case user.FieldHashedPassword:
+		return m.OldHashedPassword(ctx)
 	case user.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case user.FieldUpdatedAt:
@@ -5512,12 +6656,19 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case user.FieldName:
+	case user.FieldUsername:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetName(v)
+		m.SetUsername(v)
+		return nil
+	case user.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
 		return nil
 	case user.FieldRole:
 		v, ok := value.(string)
@@ -5526,12 +6677,12 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRole(v)
 		return nil
-	case user.FieldEncryptedPassword:
-		v, ok := value.(string)
+	case user.FieldHashedPassword:
+		v, ok := value.([]byte)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetEncryptedPassword(v)
+		m.SetHashedPassword(v)
 		return nil
 	case user.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -5605,14 +6756,17 @@ func (m *UserMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserMutation) ResetField(name string) error {
 	switch name {
-	case user.FieldName:
-		m.ResetName()
+	case user.FieldUsername:
+		m.ResetUsername()
+		return nil
+	case user.FieldEmail:
+		m.ResetEmail()
 		return nil
 	case user.FieldRole:
 		m.ResetRole()
 		return nil
-	case user.FieldEncryptedPassword:
-		m.ResetEncryptedPassword()
+	case user.FieldHashedPassword:
+		m.ResetHashedPassword()
 		return nil
 	case user.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -5626,12 +6780,15 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.contests != nil {
 		edges = append(edges, user.EdgeContests)
 	}
 	if m.tasks != nil {
 		edges = append(edges, user.EdgeTasks)
+	}
+	if m.submits != nil {
+		edges = append(edges, user.EdgeSubmits)
 	}
 	return edges
 }
@@ -5652,18 +6809,27 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.submits))
+		for id := range m.submits {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedcontests != nil {
 		edges = append(edges, user.EdgeContests)
 	}
 	if m.removedtasks != nil {
 		edges = append(edges, user.EdgeTasks)
+	}
+	if m.removedsubmits != nil {
+		edges = append(edges, user.EdgeSubmits)
 	}
 	return edges
 }
@@ -5684,18 +6850,27 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSubmits:
+		ids := make([]ent.Value, 0, len(m.removedsubmits))
+		for id := range m.removedsubmits {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedcontests {
 		edges = append(edges, user.EdgeContests)
 	}
 	if m.clearedtasks {
 		edges = append(edges, user.EdgeTasks)
+	}
+	if m.clearedsubmits {
+		edges = append(edges, user.EdgeSubmits)
 	}
 	return edges
 }
@@ -5708,6 +6883,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedcontests
 	case user.EdgeTasks:
 		return m.clearedtasks
+	case user.EdgeSubmits:
+		return m.clearedsubmits
 	}
 	return false
 }
@@ -5729,6 +6906,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeTasks:
 		m.ResetTasks()
+		return nil
+	case user.EdgeSubmits:
+		m.ResetSubmits()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

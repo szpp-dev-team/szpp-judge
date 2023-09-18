@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 )
 
@@ -27,9 +29,91 @@ func (tru *TestcaseResultUpdate) Where(ps ...predicate.TestcaseResult) *Testcase
 	return tru
 }
 
+// SetStatus sets the "status" field.
+func (tru *TestcaseResultUpdate) SetStatus(s string) *TestcaseResultUpdate {
+	tru.mutation.SetStatus(s)
+	return tru
+}
+
+// SetExecTime sets the "exec_time" field.
+func (tru *TestcaseResultUpdate) SetExecTime(i int) *TestcaseResultUpdate {
+	tru.mutation.ResetExecTime()
+	tru.mutation.SetExecTime(i)
+	return tru
+}
+
+// AddExecTime adds i to the "exec_time" field.
+func (tru *TestcaseResultUpdate) AddExecTime(i int) *TestcaseResultUpdate {
+	tru.mutation.AddExecTime(i)
+	return tru
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (tru *TestcaseResultUpdate) SetExecMemory(i int) *TestcaseResultUpdate {
+	tru.mutation.ResetExecMemory()
+	tru.mutation.SetExecMemory(i)
+	return tru
+}
+
+// AddExecMemory adds i to the "exec_memory" field.
+func (tru *TestcaseResultUpdate) AddExecMemory(i int) *TestcaseResultUpdate {
+	tru.mutation.AddExecMemory(i)
+	return tru
+}
+
+// SetSubmitID sets the "submit" edge to the Submit entity by ID.
+func (tru *TestcaseResultUpdate) SetSubmitID(id int) *TestcaseResultUpdate {
+	tru.mutation.SetSubmitID(id)
+	return tru
+}
+
+// SetNillableSubmitID sets the "submit" edge to the Submit entity by ID if the given value is not nil.
+func (tru *TestcaseResultUpdate) SetNillableSubmitID(id *int) *TestcaseResultUpdate {
+	if id != nil {
+		tru = tru.SetSubmitID(*id)
+	}
+	return tru
+}
+
+// SetSubmit sets the "submit" edge to the Submit entity.
+func (tru *TestcaseResultUpdate) SetSubmit(s *Submit) *TestcaseResultUpdate {
+	return tru.SetSubmitID(s.ID)
+}
+
+// SetTestcaseID sets the "testcase" edge to the Testcase entity by ID.
+func (tru *TestcaseResultUpdate) SetTestcaseID(id int) *TestcaseResultUpdate {
+	tru.mutation.SetTestcaseID(id)
+	return tru
+}
+
+// SetNillableTestcaseID sets the "testcase" edge to the Testcase entity by ID if the given value is not nil.
+func (tru *TestcaseResultUpdate) SetNillableTestcaseID(id *int) *TestcaseResultUpdate {
+	if id != nil {
+		tru = tru.SetTestcaseID(*id)
+	}
+	return tru
+}
+
+// SetTestcase sets the "testcase" edge to the Testcase entity.
+func (tru *TestcaseResultUpdate) SetTestcase(t *Testcase) *TestcaseResultUpdate {
+	return tru.SetTestcaseID(t.ID)
+}
+
 // Mutation returns the TestcaseResultMutation object of the builder.
 func (tru *TestcaseResultUpdate) Mutation() *TestcaseResultMutation {
 	return tru.mutation
+}
+
+// ClearSubmit clears the "submit" edge to the Submit entity.
+func (tru *TestcaseResultUpdate) ClearSubmit() *TestcaseResultUpdate {
+	tru.mutation.ClearSubmit()
+	return tru
+}
+
+// ClearTestcase clears the "testcase" edge to the Testcase entity.
+func (tru *TestcaseResultUpdate) ClearTestcase() *TestcaseResultUpdate {
+	tru.mutation.ClearTestcase()
+	return tru
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -68,6 +152,79 @@ func (tru *TestcaseResultUpdate) sqlSave(ctx context.Context) (n int, err error)
 			}
 		}
 	}
+	if value, ok := tru.mutation.Status(); ok {
+		_spec.SetField(testcaseresult.FieldStatus, field.TypeString, value)
+	}
+	if value, ok := tru.mutation.ExecTime(); ok {
+		_spec.SetField(testcaseresult.FieldExecTime, field.TypeInt, value)
+	}
+	if value, ok := tru.mutation.AddedExecTime(); ok {
+		_spec.AddField(testcaseresult.FieldExecTime, field.TypeInt, value)
+	}
+	if value, ok := tru.mutation.ExecMemory(); ok {
+		_spec.SetField(testcaseresult.FieldExecMemory, field.TypeInt, value)
+	}
+	if value, ok := tru.mutation.AddedExecMemory(); ok {
+		_spec.AddField(testcaseresult.FieldExecMemory, field.TypeInt, value)
+	}
+	if tru.mutation.SubmitCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcaseresult.SubmitTable,
+			Columns: []string{testcaseresult.SubmitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tru.mutation.SubmitIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcaseresult.SubmitTable,
+			Columns: []string{testcaseresult.SubmitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tru.mutation.TestcaseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   testcaseresult.TestcaseTable,
+			Columns: []string{testcaseresult.TestcaseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tru.mutation.TestcaseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   testcaseresult.TestcaseTable,
+			Columns: []string{testcaseresult.TestcaseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{testcaseresult.Label}
@@ -88,9 +245,91 @@ type TestcaseResultUpdateOne struct {
 	mutation *TestcaseResultMutation
 }
 
+// SetStatus sets the "status" field.
+func (truo *TestcaseResultUpdateOne) SetStatus(s string) *TestcaseResultUpdateOne {
+	truo.mutation.SetStatus(s)
+	return truo
+}
+
+// SetExecTime sets the "exec_time" field.
+func (truo *TestcaseResultUpdateOne) SetExecTime(i int) *TestcaseResultUpdateOne {
+	truo.mutation.ResetExecTime()
+	truo.mutation.SetExecTime(i)
+	return truo
+}
+
+// AddExecTime adds i to the "exec_time" field.
+func (truo *TestcaseResultUpdateOne) AddExecTime(i int) *TestcaseResultUpdateOne {
+	truo.mutation.AddExecTime(i)
+	return truo
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (truo *TestcaseResultUpdateOne) SetExecMemory(i int) *TestcaseResultUpdateOne {
+	truo.mutation.ResetExecMemory()
+	truo.mutation.SetExecMemory(i)
+	return truo
+}
+
+// AddExecMemory adds i to the "exec_memory" field.
+func (truo *TestcaseResultUpdateOne) AddExecMemory(i int) *TestcaseResultUpdateOne {
+	truo.mutation.AddExecMemory(i)
+	return truo
+}
+
+// SetSubmitID sets the "submit" edge to the Submit entity by ID.
+func (truo *TestcaseResultUpdateOne) SetSubmitID(id int) *TestcaseResultUpdateOne {
+	truo.mutation.SetSubmitID(id)
+	return truo
+}
+
+// SetNillableSubmitID sets the "submit" edge to the Submit entity by ID if the given value is not nil.
+func (truo *TestcaseResultUpdateOne) SetNillableSubmitID(id *int) *TestcaseResultUpdateOne {
+	if id != nil {
+		truo = truo.SetSubmitID(*id)
+	}
+	return truo
+}
+
+// SetSubmit sets the "submit" edge to the Submit entity.
+func (truo *TestcaseResultUpdateOne) SetSubmit(s *Submit) *TestcaseResultUpdateOne {
+	return truo.SetSubmitID(s.ID)
+}
+
+// SetTestcaseID sets the "testcase" edge to the Testcase entity by ID.
+func (truo *TestcaseResultUpdateOne) SetTestcaseID(id int) *TestcaseResultUpdateOne {
+	truo.mutation.SetTestcaseID(id)
+	return truo
+}
+
+// SetNillableTestcaseID sets the "testcase" edge to the Testcase entity by ID if the given value is not nil.
+func (truo *TestcaseResultUpdateOne) SetNillableTestcaseID(id *int) *TestcaseResultUpdateOne {
+	if id != nil {
+		truo = truo.SetTestcaseID(*id)
+	}
+	return truo
+}
+
+// SetTestcase sets the "testcase" edge to the Testcase entity.
+func (truo *TestcaseResultUpdateOne) SetTestcase(t *Testcase) *TestcaseResultUpdateOne {
+	return truo.SetTestcaseID(t.ID)
+}
+
 // Mutation returns the TestcaseResultMutation object of the builder.
 func (truo *TestcaseResultUpdateOne) Mutation() *TestcaseResultMutation {
 	return truo.mutation
+}
+
+// ClearSubmit clears the "submit" edge to the Submit entity.
+func (truo *TestcaseResultUpdateOne) ClearSubmit() *TestcaseResultUpdateOne {
+	truo.mutation.ClearSubmit()
+	return truo
+}
+
+// ClearTestcase clears the "testcase" edge to the Testcase entity.
+func (truo *TestcaseResultUpdateOne) ClearTestcase() *TestcaseResultUpdateOne {
+	truo.mutation.ClearTestcase()
+	return truo
 }
 
 // Where appends a list predicates to the TestcaseResultUpdate builder.
@@ -158,6 +397,79 @@ func (truo *TestcaseResultUpdateOne) sqlSave(ctx context.Context) (_node *Testca
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := truo.mutation.Status(); ok {
+		_spec.SetField(testcaseresult.FieldStatus, field.TypeString, value)
+	}
+	if value, ok := truo.mutation.ExecTime(); ok {
+		_spec.SetField(testcaseresult.FieldExecTime, field.TypeInt, value)
+	}
+	if value, ok := truo.mutation.AddedExecTime(); ok {
+		_spec.AddField(testcaseresult.FieldExecTime, field.TypeInt, value)
+	}
+	if value, ok := truo.mutation.ExecMemory(); ok {
+		_spec.SetField(testcaseresult.FieldExecMemory, field.TypeInt, value)
+	}
+	if value, ok := truo.mutation.AddedExecMemory(); ok {
+		_spec.AddField(testcaseresult.FieldExecMemory, field.TypeInt, value)
+	}
+	if truo.mutation.SubmitCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcaseresult.SubmitTable,
+			Columns: []string{testcaseresult.SubmitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := truo.mutation.SubmitIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcaseresult.SubmitTable,
+			Columns: []string{testcaseresult.SubmitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if truo.mutation.TestcaseCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   testcaseresult.TestcaseTable,
+			Columns: []string{testcaseresult.TestcaseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := truo.mutation.TestcaseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   testcaseresult.TestcaseTable,
+			Columns: []string{testcaseresult.TestcaseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &TestcaseResult{config: truo.config}
 	_spec.Assign = _node.assignValues

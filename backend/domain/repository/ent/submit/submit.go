@@ -12,59 +12,90 @@ const (
 	Label = "submit"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// FieldExecTime holds the string denoting the exec_time field in the database.
+	FieldExecTime = "exec_time"
+	// FieldExecMemory holds the string denoting the exec_memory field in the database.
+	FieldExecMemory = "exec_memory"
+	// FieldScore holds the string denoting the score field in the database.
+	FieldScore = "score"
+	// FieldSubmittedAt holds the string denoting the submitted_at field in the database.
+	FieldSubmittedAt = "submitted_at"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
+	// EdgeTask holds the string denoting the task edge name in mutations.
+	EdgeTask = "task"
 	// EdgeLanguage holds the string denoting the language edge name in mutations.
 	EdgeLanguage = "language"
-	// EdgeTestcaseResult holds the string denoting the testcase_result edge name in mutations.
-	EdgeTestcaseResult = "testcase_result"
-	// EdgeSubmitContests holds the string denoting the submit_contests edge name in mutations.
-	EdgeSubmitContests = "submit_contests"
+	// EdgeTestcaseResults holds the string denoting the testcase_results edge name in mutations.
+	EdgeTestcaseResults = "testcase_results"
 	// Table holds the table name of the submit in the database.
 	Table = "submits"
 	// UserTable is the table that holds the user relation/edge.
-	UserTable = "users"
+	UserTable = "submits"
 	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "submit_user"
+	UserColumn = "user_submits"
+	// TaskTable is the table that holds the task relation/edge.
+	TaskTable = "submits"
+	// TaskInverseTable is the table name for the Task entity.
+	// It exists in this package in order to avoid circular dependency with the "task" package.
+	TaskInverseTable = "tasks"
+	// TaskColumn is the table column denoting the task relation/edge.
+	TaskColumn = "task_submits"
 	// LanguageTable is the table that holds the language relation/edge.
-	LanguageTable = "languages"
+	LanguageTable = "submits"
 	// LanguageInverseTable is the table name for the Language entity.
 	// It exists in this package in order to avoid circular dependency with the "language" package.
 	LanguageInverseTable = "languages"
 	// LanguageColumn is the table column denoting the language relation/edge.
-	LanguageColumn = "submit_language"
-	// TestcaseResultTable is the table that holds the testcase_result relation/edge.
-	TestcaseResultTable = "testcase_results"
-	// TestcaseResultInverseTable is the table name for the TestcaseResult entity.
+	LanguageColumn = "language_submits"
+	// TestcaseResultsTable is the table that holds the testcase_results relation/edge.
+	TestcaseResultsTable = "testcase_results"
+	// TestcaseResultsInverseTable is the table name for the TestcaseResult entity.
 	// It exists in this package in order to avoid circular dependency with the "testcaseresult" package.
-	TestcaseResultInverseTable = "testcase_results"
-	// TestcaseResultColumn is the table column denoting the testcase_result relation/edge.
-	TestcaseResultColumn = "submit_testcase_result"
-	// SubmitContestsTable is the table that holds the submit_contests relation/edge. The primary key declared below.
-	SubmitContestsTable = "contest_submits"
-	// SubmitContestsInverseTable is the table name for the Contest entity.
-	// It exists in this package in order to avoid circular dependency with the "contest" package.
-	SubmitContestsInverseTable = "contests"
+	TestcaseResultsInverseTable = "testcase_results"
+	// TestcaseResultsColumn is the table column denoting the testcase_results relation/edge.
+	TestcaseResultsColumn = "submit_testcase_results"
 )
 
 // Columns holds all SQL columns for submit fields.
 var Columns = []string{
 	FieldID,
+	FieldStatus,
+	FieldExecTime,
+	FieldExecMemory,
+	FieldScore,
+	FieldSubmittedAt,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 }
 
-var (
-	// SubmitContestsPrimaryKey and SubmitContestsColumn2 are the table columns denoting the
-	// primary key for the submit_contests relation (M2M).
-	SubmitContestsPrimaryKey = []string{"contest_id", "submit_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the "submits"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"contest_submits",
+	"language_submits",
+	"task_submits",
+	"user_submits",
+}
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -79,86 +110,100 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByUserCount orders the results by user count.
-func ByUserCount(opts ...sql.OrderTermOption) OrderOption {
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByExecTime orders the results by the exec_time field.
+func ByExecTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecTime, opts...).ToFunc()
+}
+
+// ByExecMemory orders the results by the exec_memory field.
+func ByExecMemory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecMemory, opts...).ToFunc()
+}
+
+// ByScore orders the results by the score field.
+func ByScore(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScore, opts...).ToFunc()
+}
+
+// BySubmittedAt orders the results by the submitted_at field.
+func BySubmittedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSubmittedAt, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByUser orders the results by user terms.
-func ByUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByTaskField orders the results by task field.
+func ByTaskField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newTaskStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByLanguageCount orders the results by language count.
-func ByLanguageCount(opts ...sql.OrderTermOption) OrderOption {
+// ByLanguageField orders the results by language field.
+func ByLanguageField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newLanguageStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newLanguageStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByLanguage orders the results by language terms.
-func ByLanguage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByTestcaseResultsCount orders the results by testcase_results count.
+func ByTestcaseResultsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newLanguageStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborsCount(s, newTestcaseResultsStep(), opts...)
 	}
 }
 
-// ByTestcaseResultCount orders the results by testcase_result count.
-func ByTestcaseResultCount(opts ...sql.OrderTermOption) OrderOption {
+// ByTestcaseResults orders the results by testcase_results terms.
+func ByTestcaseResults(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newTestcaseResultStep(), opts...)
-	}
-}
-
-// ByTestcaseResult orders the results by testcase_result terms.
-func ByTestcaseResult(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTestcaseResultStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// BySubmitContestsCount orders the results by submit_contests count.
-func BySubmitContestsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubmitContestsStep(), opts...)
-	}
-}
-
-// BySubmitContests orders the results by submit_contests terms.
-func BySubmitContests(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubmitContestsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newTestcaseResultsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, UserTable, UserColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+	)
+}
+func newTaskStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TaskInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, TaskTable, TaskColumn),
 	)
 }
 func newLanguageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LanguageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, LanguageTable, LanguageColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, LanguageTable, LanguageColumn),
 	)
 }
-func newTestcaseResultStep() *sqlgraph.Step {
+func newTestcaseResultsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TestcaseResultInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, TestcaseResultTable, TestcaseResultColumn),
-	)
-}
-func newSubmitContestsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubmitContestsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SubmitContestsTable, SubmitContestsPrimaryKey...),
+		sqlgraph.To(TestcaseResultsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TestcaseResultsTable, TestcaseResultsColumn),
 	)
 }

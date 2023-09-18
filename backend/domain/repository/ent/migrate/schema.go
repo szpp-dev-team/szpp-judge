@@ -27,31 +27,61 @@ var (
 	// LanguagesColumns holds the columns for the "languages" table.
 	LanguagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "submit_language", Type: field.TypeInt, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString, Unique: true},
 	}
 	// LanguagesTable holds the schema information for the "languages" table.
 	LanguagesTable = &schema.Table{
 		Name:       "languages",
 		Columns:    LanguagesColumns,
 		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "languages_submits_language",
-				Columns:    []*schema.Column{LanguagesColumns[1]},
-				RefColumns: []*schema.Column{SubmitsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// SubmitsColumns holds the columns for the "submits" table.
 	SubmitsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "status", Type: field.TypeString, Nullable: true},
+		{Name: "exec_time", Type: field.TypeInt, Nullable: true},
+		{Name: "exec_memory", Type: field.TypeInt, Nullable: true},
+		{Name: "score", Type: field.TypeInt, Nullable: true},
+		{Name: "submitted_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "contest_submits", Type: field.TypeInt, Nullable: true},
+		{Name: "language_submits", Type: field.TypeInt, Nullable: true},
+		{Name: "task_submits", Type: field.TypeInt, Nullable: true},
+		{Name: "user_submits", Type: field.TypeInt, Nullable: true},
 	}
 	// SubmitsTable holds the schema information for the "submits" table.
 	SubmitsTable = &schema.Table{
 		Name:       "submits",
 		Columns:    SubmitsColumns,
 		PrimaryKey: []*schema.Column{SubmitsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "submits_contests_submits",
+				Columns:    []*schema.Column{SubmitsColumns[8]},
+				RefColumns: []*schema.Column{ContestsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "submits_languages_submits",
+				Columns:    []*schema.Column{SubmitsColumns[9]},
+				RefColumns: []*schema.Column{LanguagesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "submits_tasks_submits",
+				Columns:    []*schema.Column{SubmitsColumns[10]},
+				RefColumns: []*schema.Column{TasksColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "submits_users_submits",
+				Columns:    []*schema.Column{SubmitsColumns[11]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// TasksColumns holds the columns for the "tasks" table.
 	TasksColumns = []*schema.Column{
@@ -67,7 +97,8 @@ var (
 		{Name: "judge_code_path", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "user_tasks", Type: field.TypeInt, Nullable: true},
+		{Name: "contest_tasks", Type: field.TypeInt, Nullable: true},
+		{Name: "user_tasks", Type: field.TypeInt},
 	}
 	// TasksTable holds the schema information for the "tasks" table.
 	TasksTable = &schema.Table{
@@ -76,10 +107,16 @@ var (
 		PrimaryKey: []*schema.Column{TasksColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "tasks_users_tasks",
+				Symbol:     "tasks_contests_tasks",
 				Columns:    []*schema.Column{TasksColumns[12]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{ContestsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "tasks_users_tasks",
+				Columns:    []*schema.Column{TasksColumns[13]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -90,7 +127,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "task_testcases", Type: field.TypeInt, Nullable: true},
+		{Name: "task_testcases", Type: field.TypeInt},
 	}
 	// TestcasesTable holds the schema information for the "testcases" table.
 	TestcasesTable = &schema.Table{
@@ -102,7 +139,7 @@ var (
 				Symbol:     "testcases_tasks_testcases",
 				Columns:    []*schema.Column{TestcasesColumns[5]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -116,7 +153,11 @@ var (
 	// TestcaseResultsColumns holds the columns for the "testcase_results" table.
 	TestcaseResultsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "submit_testcase_result", Type: field.TypeInt, Nullable: true},
+		{Name: "status", Type: field.TypeString},
+		{Name: "exec_time", Type: field.TypeInt},
+		{Name: "exec_memory", Type: field.TypeInt},
+		{Name: "submit_testcase_results", Type: field.TypeInt, Nullable: true},
+		{Name: "testcase_result_testcase", Type: field.TypeInt, Nullable: true},
 	}
 	// TestcaseResultsTable holds the schema information for the "testcase_results" table.
 	TestcaseResultsTable = &schema.Table{
@@ -125,9 +166,15 @@ var (
 		PrimaryKey: []*schema.Column{TestcaseResultsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "testcase_results_submits_testcase_result",
-				Columns:    []*schema.Column{TestcaseResultsColumns[1]},
+				Symbol:     "testcase_results_submits_testcase_results",
+				Columns:    []*schema.Column{TestcaseResultsColumns[4]},
 				RefColumns: []*schema.Column{SubmitsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "testcase_results_testcases_testcase",
+				Columns:    []*schema.Column{TestcaseResultsColumns[5]},
+				RefColumns: []*schema.Column{TestcasesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -140,7 +187,7 @@ var (
 		{Name: "is_sample", Type: field.TypeBool},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "task_testcase_sets", Type: field.TypeInt, Nullable: true},
+		{Name: "task_testcase_sets", Type: field.TypeInt},
 	}
 	// TestcaseSetsTable holds the schema information for the "testcase_sets" table.
 	TestcaseSetsTable = &schema.Table{
@@ -152,7 +199,7 @@ var (
 				Symbol:     "testcase_sets_tasks_testcase_sets",
 				Columns:    []*schema.Column{TestcaseSetsColumns[6]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -166,76 +213,18 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "username", Type: field.TypeString, Unique: true},
+		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "role", Type: field.TypeString},
-		{Name: "encrypted_password", Type: field.TypeString},
+		{Name: "hashed_password", Type: field.TypeBytes},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "submit_user", Type: field.TypeInt, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "users_submits_user",
-				Columns:    []*schema.Column{UsersColumns[6]},
-				RefColumns: []*schema.Column{SubmitsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// ContestTasksColumns holds the columns for the "contest_tasks" table.
-	ContestTasksColumns = []*schema.Column{
-		{Name: "contest_id", Type: field.TypeInt},
-		{Name: "task_id", Type: field.TypeInt},
-	}
-	// ContestTasksTable holds the schema information for the "contest_tasks" table.
-	ContestTasksTable = &schema.Table{
-		Name:       "contest_tasks",
-		Columns:    ContestTasksColumns,
-		PrimaryKey: []*schema.Column{ContestTasksColumns[0], ContestTasksColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "contest_tasks_contest_id",
-				Columns:    []*schema.Column{ContestTasksColumns[0]},
-				RefColumns: []*schema.Column{ContestsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "contest_tasks_task_id",
-				Columns:    []*schema.Column{ContestTasksColumns[1]},
-				RefColumns: []*schema.Column{TasksColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// ContestSubmitsColumns holds the columns for the "contest_submits" table.
-	ContestSubmitsColumns = []*schema.Column{
-		{Name: "contest_id", Type: field.TypeInt},
-		{Name: "submit_id", Type: field.TypeInt},
-	}
-	// ContestSubmitsTable holds the schema information for the "contest_submits" table.
-	ContestSubmitsTable = &schema.Table{
-		Name:       "contest_submits",
-		Columns:    ContestSubmitsColumns,
-		PrimaryKey: []*schema.Column{ContestSubmitsColumns[0], ContestSubmitsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "contest_submits_contest_id",
-				Columns:    []*schema.Column{ContestSubmitsColumns[0]},
-				RefColumns: []*schema.Column{ContestsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "contest_submits_submit_id",
-				Columns:    []*schema.Column{ContestSubmitsColumns[1]},
-				RefColumns: []*schema.Column{SubmitsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
 	}
 	// TestcaseSetTestcasesColumns holds the columns for the "testcase_set_testcases" table.
 	TestcaseSetTestcasesColumns = []*schema.Column{
@@ -297,24 +286,22 @@ var (
 		TestcaseResultsTable,
 		TestcaseSetsTable,
 		UsersTable,
-		ContestTasksTable,
-		ContestSubmitsTable,
 		TestcaseSetTestcasesTable,
 		UserContestsTable,
 	}
 )
 
 func init() {
-	LanguagesTable.ForeignKeys[0].RefTable = SubmitsTable
-	TasksTable.ForeignKeys[0].RefTable = UsersTable
+	SubmitsTable.ForeignKeys[0].RefTable = ContestsTable
+	SubmitsTable.ForeignKeys[1].RefTable = LanguagesTable
+	SubmitsTable.ForeignKeys[2].RefTable = TasksTable
+	SubmitsTable.ForeignKeys[3].RefTable = UsersTable
+	TasksTable.ForeignKeys[0].RefTable = ContestsTable
+	TasksTable.ForeignKeys[1].RefTable = UsersTable
 	TestcasesTable.ForeignKeys[0].RefTable = TasksTable
 	TestcaseResultsTable.ForeignKeys[0].RefTable = SubmitsTable
+	TestcaseResultsTable.ForeignKeys[1].RefTable = TestcasesTable
 	TestcaseSetsTable.ForeignKeys[0].RefTable = TasksTable
-	UsersTable.ForeignKeys[0].RefTable = SubmitsTable
-	ContestTasksTable.ForeignKeys[0].RefTable = ContestsTable
-	ContestTasksTable.ForeignKeys[1].RefTable = TasksTable
-	ContestSubmitsTable.ForeignKeys[0].RefTable = ContestsTable
-	ContestSubmitsTable.ForeignKeys[1].RefTable = SubmitsTable
 	TestcaseSetTestcasesTable.ForeignKeys[0].RefTable = TestcaseSetsTable
 	TestcaseSetTestcasesTable.ForeignKeys[1].RefTable = TestcasesTable
 	UserContestsTable.ForeignKeys[0].RefTable = UsersTable

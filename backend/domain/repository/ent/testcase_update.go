@@ -103,14 +103,6 @@ func (tu *TestcaseUpdate) SetTaskID(id int) *TestcaseUpdate {
 	return tu
 }
 
-// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
-func (tu *TestcaseUpdate) SetNillableTaskID(id *int) *TestcaseUpdate {
-	if id != nil {
-		tu = tu.SetTaskID(*id)
-	}
-	return tu
-}
-
 // SetTask sets the "task" edge to the Task entity.
 func (tu *TestcaseUpdate) SetTask(t *Task) *TestcaseUpdate {
 	return tu.SetTaskID(t.ID)
@@ -175,7 +167,18 @@ func (tu *TestcaseUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tu *TestcaseUpdate) check() error {
+	if _, ok := tu.mutation.TaskID(); tu.mutation.TaskCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Testcase.task"`)
+	}
+	return nil
+}
+
 func (tu *TestcaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := tu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(testcase.Table, testcase.Columns, sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt))
 	if ps := tu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -369,14 +372,6 @@ func (tuo *TestcaseUpdateOne) SetTaskID(id int) *TestcaseUpdateOne {
 	return tuo
 }
 
-// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
-func (tuo *TestcaseUpdateOne) SetNillableTaskID(id *int) *TestcaseUpdateOne {
-	if id != nil {
-		tuo = tuo.SetTaskID(*id)
-	}
-	return tuo
-}
-
 // SetTask sets the "task" edge to the Task entity.
 func (tuo *TestcaseUpdateOne) SetTask(t *Task) *TestcaseUpdateOne {
 	return tuo.SetTaskID(t.ID)
@@ -454,7 +449,18 @@ func (tuo *TestcaseUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tuo *TestcaseUpdateOne) check() error {
+	if _, ok := tuo.mutation.TaskID(); tuo.mutation.TaskCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Testcase.task"`)
+	}
+	return nil
+}
+
 func (tuo *TestcaseUpdateOne) sqlSave(ctx context.Context) (_node *Testcase, err error) {
+	if err := tuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(testcase.Table, testcase.Columns, sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt))
 	id, ok := tuo.mutation.ID()
 	if !ok {

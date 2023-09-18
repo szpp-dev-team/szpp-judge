@@ -10,16 +10,16 @@ type Language struct {
 	ent.Schema
 }
 
-func (Language) Field() []ent.Field {
+func (Language) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
-		field.String("name"),
-		field.String("language_slug"),
+		field.String("name"), // display name
+		field.String("slug").Unique(),
 	}
 }
 
 func (Language) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("submit", Submit.Type).Ref("language").Unique(),
+		edge.To("submits", Submit.Type),
 	}
 }

@@ -68,18 +68,28 @@ message Task {
   repeated int32 contest_ids = 6; // 属するコンテストの ID
   judge.v1.JudgeType judge_type = 7; // Judge の type(完全一致、誤差など)
   Difficulty difficulty = 8;
-  google.protobuf.Timestamp created_at = 9;
-  optional google.protobuf.Timestamp updated_at = 10;
+  int32 score = 9;
+  google.protobuf.Timestamp created_at = 10;
+  optional google.protobuf.Timestamp updated_at = 11;
 }
 
 message MutationTask {
-  optional int32 id = 1; // Update 時のみ set
+  optional int32 id = 1; // update の時のみ
   string title = 2; // 問題名
   string statement = 3; // 問題文
   int32 exec_time_limit = 4; // 実行時間制限[ms]
   int32 exec_memory_limit = 5; // 実行メモリ制限[MB]
   judge.v1.JudgeType judge_type = 6; // Judge の type(完全一致、誤差など)
   Difficulty difficulty = 7;
+}
+
+message ContestTask {
+  int32 id = 1;
+  string title = 2;
+  int32 exec_time_limit = 3;
+  int32 exec_memory_limit = 4;
+  Difficulty difficulty = 5;
+  int32 score = 6;
 }
 
 enum Visibility {
@@ -196,4 +206,9 @@ message JudgeProgress {
   judge.v1.JudgeStatus status = 1; // ジャッジ済みのケースが全てACであれば UNSPECIFIED そうでなければ最初に出た非ACの結果
   int32 total_testcases = 2; // テストケースの総数
   int32 completed_testcases = 3; // ジャッジ済みのテストケース数
+}
+
+message SubmissionStatus {
+  int32 task_id = 1;
+  optional int32 score = 2;
 }

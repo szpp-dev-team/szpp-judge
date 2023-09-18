@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 )
 
@@ -19,6 +21,68 @@ type TestcaseResultCreate struct {
 	mutation *TestcaseResultMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetStatus sets the "status" field.
+func (trc *TestcaseResultCreate) SetStatus(s string) *TestcaseResultCreate {
+	trc.mutation.SetStatus(s)
+	return trc
+}
+
+// SetExecTime sets the "exec_time" field.
+func (trc *TestcaseResultCreate) SetExecTime(i int) *TestcaseResultCreate {
+	trc.mutation.SetExecTime(i)
+	return trc
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (trc *TestcaseResultCreate) SetExecMemory(i int) *TestcaseResultCreate {
+	trc.mutation.SetExecMemory(i)
+	return trc
+}
+
+// SetID sets the "id" field.
+func (trc *TestcaseResultCreate) SetID(i int) *TestcaseResultCreate {
+	trc.mutation.SetID(i)
+	return trc
+}
+
+// SetSubmitID sets the "submit" edge to the Submit entity by ID.
+func (trc *TestcaseResultCreate) SetSubmitID(id int) *TestcaseResultCreate {
+	trc.mutation.SetSubmitID(id)
+	return trc
+}
+
+// SetNillableSubmitID sets the "submit" edge to the Submit entity by ID if the given value is not nil.
+func (trc *TestcaseResultCreate) SetNillableSubmitID(id *int) *TestcaseResultCreate {
+	if id != nil {
+		trc = trc.SetSubmitID(*id)
+	}
+	return trc
+}
+
+// SetSubmit sets the "submit" edge to the Submit entity.
+func (trc *TestcaseResultCreate) SetSubmit(s *Submit) *TestcaseResultCreate {
+	return trc.SetSubmitID(s.ID)
+}
+
+// SetTestcaseID sets the "testcase" edge to the Testcase entity by ID.
+func (trc *TestcaseResultCreate) SetTestcaseID(id int) *TestcaseResultCreate {
+	trc.mutation.SetTestcaseID(id)
+	return trc
+}
+
+// SetNillableTestcaseID sets the "testcase" edge to the Testcase entity by ID if the given value is not nil.
+func (trc *TestcaseResultCreate) SetNillableTestcaseID(id *int) *TestcaseResultCreate {
+	if id != nil {
+		trc = trc.SetTestcaseID(*id)
+	}
+	return trc
+}
+
+// SetTestcase sets the "testcase" edge to the Testcase entity.
+func (trc *TestcaseResultCreate) SetTestcase(t *Testcase) *TestcaseResultCreate {
+	return trc.SetTestcaseID(t.ID)
 }
 
 // Mutation returns the TestcaseResultMutation object of the builder.
@@ -55,6 +119,15 @@ func (trc *TestcaseResultCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (trc *TestcaseResultCreate) check() error {
+	if _, ok := trc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "TestcaseResult.status"`)}
+	}
+	if _, ok := trc.mutation.ExecTime(); !ok {
+		return &ValidationError{Name: "exec_time", err: errors.New(`ent: missing required field "TestcaseResult.exec_time"`)}
+	}
+	if _, ok := trc.mutation.ExecMemory(); !ok {
+		return &ValidationError{Name: "exec_memory", err: errors.New(`ent: missing required field "TestcaseResult.exec_memory"`)}
+	}
 	return nil
 }
 
@@ -69,8 +142,10 @@ func (trc *TestcaseResultCreate) sqlSave(ctx context.Context) (*TestcaseResult, 
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	trc.mutation.id = &_node.ID
 	trc.mutation.done = true
 	return _node, nil
@@ -82,6 +157,56 @@ func (trc *TestcaseResultCreate) createSpec() (*TestcaseResult, *sqlgraph.Create
 		_spec = sqlgraph.NewCreateSpec(testcaseresult.Table, sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt))
 	)
 	_spec.OnConflict = trc.conflict
+	if id, ok := trc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
+	if value, ok := trc.mutation.Status(); ok {
+		_spec.SetField(testcaseresult.FieldStatus, field.TypeString, value)
+		_node.Status = value
+	}
+	if value, ok := trc.mutation.ExecTime(); ok {
+		_spec.SetField(testcaseresult.FieldExecTime, field.TypeInt, value)
+		_node.ExecTime = value
+	}
+	if value, ok := trc.mutation.ExecMemory(); ok {
+		_spec.SetField(testcaseresult.FieldExecMemory, field.TypeInt, value)
+		_node.ExecMemory = value
+	}
+	if nodes := trc.mutation.SubmitIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testcaseresult.SubmitTable,
+			Columns: []string{testcaseresult.SubmitColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.submit_testcase_results = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := trc.mutation.TestcaseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   testcaseresult.TestcaseTable,
+			Columns: []string{testcaseresult.TestcaseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testcase.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.testcase_result_testcase = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -89,11 +214,17 @@ func (trc *TestcaseResultCreate) createSpec() (*TestcaseResult, *sqlgraph.Create
 // of the `INSERT` statement. For example:
 //
 //	client.TestcaseResult.Create().
+//		SetStatus(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestcaseResultUpsert) {
+//			SetStatus(v+v).
+//		}).
 //		Exec(ctx)
 func (trc *TestcaseResultCreate) OnConflict(opts ...sql.ConflictOption) *TestcaseResultUpsertOne {
 	trc.conflict = opts
@@ -128,16 +259,72 @@ type (
 	}
 )
 
-// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// SetStatus sets the "status" field.
+func (u *TestcaseResultUpsert) SetStatus(v string) *TestcaseResultUpsert {
+	u.Set(testcaseresult.FieldStatus, v)
+	return u
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *TestcaseResultUpsert) UpdateStatus() *TestcaseResultUpsert {
+	u.SetExcluded(testcaseresult.FieldStatus)
+	return u
+}
+
+// SetExecTime sets the "exec_time" field.
+func (u *TestcaseResultUpsert) SetExecTime(v int) *TestcaseResultUpsert {
+	u.Set(testcaseresult.FieldExecTime, v)
+	return u
+}
+
+// UpdateExecTime sets the "exec_time" field to the value that was provided on create.
+func (u *TestcaseResultUpsert) UpdateExecTime() *TestcaseResultUpsert {
+	u.SetExcluded(testcaseresult.FieldExecTime)
+	return u
+}
+
+// AddExecTime adds v to the "exec_time" field.
+func (u *TestcaseResultUpsert) AddExecTime(v int) *TestcaseResultUpsert {
+	u.Add(testcaseresult.FieldExecTime, v)
+	return u
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (u *TestcaseResultUpsert) SetExecMemory(v int) *TestcaseResultUpsert {
+	u.Set(testcaseresult.FieldExecMemory, v)
+	return u
+}
+
+// UpdateExecMemory sets the "exec_memory" field to the value that was provided on create.
+func (u *TestcaseResultUpsert) UpdateExecMemory() *TestcaseResultUpsert {
+	u.SetExcluded(testcaseresult.FieldExecMemory)
+	return u
+}
+
+// AddExecMemory adds v to the "exec_memory" field.
+func (u *TestcaseResultUpsert) AddExecMemory(v int) *TestcaseResultUpsert {
+	u.Add(testcaseresult.FieldExecMemory, v)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
 //	client.TestcaseResult.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(testcaseresult.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 func (u *TestcaseResultUpsertOne) UpdateNewValues() *TestcaseResultUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(testcaseresult.FieldID)
+		}
+	}))
 	return u
 }
 
@@ -166,6 +353,62 @@ func (u *TestcaseResultUpsertOne) Update(set func(*TestcaseResultUpsert)) *Testc
 		set(&TestcaseResultUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *TestcaseResultUpsertOne) SetStatus(v string) *TestcaseResultUpsertOne {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *TestcaseResultUpsertOne) UpdateStatus() *TestcaseResultUpsertOne {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetExecTime sets the "exec_time" field.
+func (u *TestcaseResultUpsertOne) SetExecTime(v int) *TestcaseResultUpsertOne {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.SetExecTime(v)
+	})
+}
+
+// AddExecTime adds v to the "exec_time" field.
+func (u *TestcaseResultUpsertOne) AddExecTime(v int) *TestcaseResultUpsertOne {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.AddExecTime(v)
+	})
+}
+
+// UpdateExecTime sets the "exec_time" field to the value that was provided on create.
+func (u *TestcaseResultUpsertOne) UpdateExecTime() *TestcaseResultUpsertOne {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.UpdateExecTime()
+	})
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (u *TestcaseResultUpsertOne) SetExecMemory(v int) *TestcaseResultUpsertOne {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.SetExecMemory(v)
+	})
+}
+
+// AddExecMemory adds v to the "exec_memory" field.
+func (u *TestcaseResultUpsertOne) AddExecMemory(v int) *TestcaseResultUpsertOne {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.AddExecMemory(v)
+	})
+}
+
+// UpdateExecMemory sets the "exec_memory" field to the value that was provided on create.
+func (u *TestcaseResultUpsertOne) UpdateExecMemory() *TestcaseResultUpsertOne {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.UpdateExecMemory()
+	})
 }
 
 // Exec executes the query.
@@ -243,7 +486,7 @@ func (trcb *TestcaseResultCreateBulk) Save(ctx context.Context) ([]*TestcaseResu
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}
@@ -295,6 +538,11 @@ func (trcb *TestcaseResultCreateBulk) ExecX(ctx context.Context) {
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestcaseResultUpsert) {
+//			SetStatus(v+v).
+//		}).
 //		Exec(ctx)
 func (trcb *TestcaseResultCreateBulk) OnConflict(opts ...sql.ConflictOption) *TestcaseResultUpsertBulk {
 	trcb.conflict = opts
@@ -328,10 +576,20 @@ type TestcaseResultUpsertBulk struct {
 //	client.TestcaseResult.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(testcaseresult.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 func (u *TestcaseResultUpsertBulk) UpdateNewValues() *TestcaseResultUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(testcaseresult.FieldID)
+			}
+		}
+	}))
 	return u
 }
 
@@ -360,6 +618,62 @@ func (u *TestcaseResultUpsertBulk) Update(set func(*TestcaseResultUpsert)) *Test
 		set(&TestcaseResultUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *TestcaseResultUpsertBulk) SetStatus(v string) *TestcaseResultUpsertBulk {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *TestcaseResultUpsertBulk) UpdateStatus() *TestcaseResultUpsertBulk {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetExecTime sets the "exec_time" field.
+func (u *TestcaseResultUpsertBulk) SetExecTime(v int) *TestcaseResultUpsertBulk {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.SetExecTime(v)
+	})
+}
+
+// AddExecTime adds v to the "exec_time" field.
+func (u *TestcaseResultUpsertBulk) AddExecTime(v int) *TestcaseResultUpsertBulk {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.AddExecTime(v)
+	})
+}
+
+// UpdateExecTime sets the "exec_time" field to the value that was provided on create.
+func (u *TestcaseResultUpsertBulk) UpdateExecTime() *TestcaseResultUpsertBulk {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.UpdateExecTime()
+	})
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (u *TestcaseResultUpsertBulk) SetExecMemory(v int) *TestcaseResultUpsertBulk {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.SetExecMemory(v)
+	})
+}
+
+// AddExecMemory adds v to the "exec_memory" field.
+func (u *TestcaseResultUpsertBulk) AddExecMemory(v int) *TestcaseResultUpsertBulk {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.AddExecMemory(v)
+	})
+}
+
+// UpdateExecMemory sets the "exec_memory" field to the value that was provided on create.
+func (u *TestcaseResultUpsertBulk) UpdateExecMemory() *TestcaseResultUpsertBulk {
+	return u.Update(func(s *TestcaseResultUpsert) {
+		s.UpdateExecMemory()
+	})
 }
 
 // Exec executes the query.

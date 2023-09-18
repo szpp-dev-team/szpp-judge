@@ -5,72 +5,106 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
 // Submit is the model entity for the Submit schema.
 type Submit struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Status holds the value of the "status" field.
+	Status *string `json:"status,omitempty"`
+	// ExecTime holds the value of the "exec_time" field.
+	ExecTime int `json:"exec_time,omitempty"`
+	// ExecMemory holds the value of the "exec_memory" field.
+	ExecMemory int `json:"exec_memory,omitempty"`
+	// Score holds the value of the "score" field.
+	Score int `json:"score,omitempty"`
+	// SubmittedAt holds the value of the "submitted_at" field.
+	SubmittedAt time.Time `json:"submitted_at,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubmitQuery when eager-loading is set.
-	Edges        SubmitEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges            SubmitEdges `json:"edges"`
+	contest_submits  *int
+	language_submits *int
+	task_submits     *int
+	user_submits     *int
+	selectValues     sql.SelectValues
 }
 
 // SubmitEdges holds the relations/edges for other nodes in the graph.
 type SubmitEdges struct {
 	// User holds the value of the user edge.
-	User []*User `json:"user,omitempty"`
+	User *User `json:"user,omitempty"`
+	// Task holds the value of the task edge.
+	Task *Task `json:"task,omitempty"`
 	// Language holds the value of the language edge.
-	Language []*Language `json:"language,omitempty"`
-	// TestcaseResult holds the value of the testcase_result edge.
-	TestcaseResult []*TestcaseResult `json:"testcase_result,omitempty"`
-	// SubmitContests holds the value of the submit_contests edge.
-	SubmitContests []*Contest `json:"submit_contests,omitempty"`
+	Language *Language `json:"language,omitempty"`
+	// TestcaseResults holds the value of the testcase_results edge.
+	TestcaseResults []*TestcaseResult `json:"testcase_results,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [4]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
-// was not loaded in eager-loading.
-func (e SubmitEdges) UserOrErr() ([]*User, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SubmitEdges) UserOrErr() (*User, error) {
 	if e.loadedTypes[0] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
 		return e.User, nil
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }
 
-// LanguageOrErr returns the Language value or an error if the edge
-// was not loaded in eager-loading.
-func (e SubmitEdges) LanguageOrErr() ([]*Language, error) {
+// TaskOrErr returns the Task value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SubmitEdges) TaskOrErr() (*Task, error) {
 	if e.loadedTypes[1] {
+		if e.Task == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: task.Label}
+		}
+		return e.Task, nil
+	}
+	return nil, &NotLoadedError{edge: "task"}
+}
+
+// LanguageOrErr returns the Language value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SubmitEdges) LanguageOrErr() (*Language, error) {
+	if e.loadedTypes[2] {
+		if e.Language == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: language.Label}
+		}
 		return e.Language, nil
 	}
 	return nil, &NotLoadedError{edge: "language"}
 }
 
-// TestcaseResultOrErr returns the TestcaseResult value or an error if the edge
+// TestcaseResultsOrErr returns the TestcaseResults value or an error if the edge
 // was not loaded in eager-loading.
-func (e SubmitEdges) TestcaseResultOrErr() ([]*TestcaseResult, error) {
-	if e.loadedTypes[2] {
-		return e.TestcaseResult, nil
-	}
-	return nil, &NotLoadedError{edge: "testcase_result"}
-}
-
-// SubmitContestsOrErr returns the SubmitContests value or an error if the edge
-// was not loaded in eager-loading.
-func (e SubmitEdges) SubmitContestsOrErr() ([]*Contest, error) {
+func (e SubmitEdges) TestcaseResultsOrErr() ([]*TestcaseResult, error) {
 	if e.loadedTypes[3] {
-		return e.SubmitContests, nil
+		return e.TestcaseResults, nil
 	}
-	return nil, &NotLoadedError{edge: "submit_contests"}
+	return nil, &NotLoadedError{edge: "testcase_results"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -78,7 +112,19 @@ func (*Submit) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case submit.FieldID:
+		case submit.FieldID, submit.FieldExecTime, submit.FieldExecMemory, submit.FieldScore:
+			values[i] = new(sql.NullInt64)
+		case submit.FieldStatus:
+			values[i] = new(sql.NullString)
+		case submit.FieldSubmittedAt, submit.FieldCreatedAt, submit.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
+		case submit.ForeignKeys[0]: // contest_submits
+			values[i] = new(sql.NullInt64)
+		case submit.ForeignKeys[1]: // language_submits
+			values[i] = new(sql.NullInt64)
+		case submit.ForeignKeys[2]: // task_submits
+			values[i] = new(sql.NullInt64)
+		case submit.ForeignKeys[3]: // user_submits
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -101,6 +147,78 @@ func (s *Submit) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			s.ID = int(value.Int64)
+		case submit.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				s.Status = new(string)
+				*s.Status = value.String
+			}
+		case submit.FieldExecTime:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field exec_time", values[i])
+			} else if value.Valid {
+				s.ExecTime = int(value.Int64)
+			}
+		case submit.FieldExecMemory:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field exec_memory", values[i])
+			} else if value.Valid {
+				s.ExecMemory = int(value.Int64)
+			}
+		case submit.FieldScore:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field score", values[i])
+			} else if value.Valid {
+				s.Score = int(value.Int64)
+			}
+		case submit.FieldSubmittedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field submitted_at", values[i])
+			} else if value.Valid {
+				s.SubmittedAt = value.Time
+			}
+		case submit.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				s.CreatedAt = value.Time
+			}
+		case submit.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				s.UpdatedAt = new(time.Time)
+				*s.UpdatedAt = value.Time
+			}
+		case submit.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field contest_submits", value)
+			} else if value.Valid {
+				s.contest_submits = new(int)
+				*s.contest_submits = int(value.Int64)
+			}
+		case submit.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field language_submits", value)
+			} else if value.Valid {
+				s.language_submits = new(int)
+				*s.language_submits = int(value.Int64)
+			}
+		case submit.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field task_submits", value)
+			} else if value.Valid {
+				s.task_submits = new(int)
+				*s.task_submits = int(value.Int64)
+			}
+		case submit.ForeignKeys[3]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field user_submits", value)
+			} else if value.Valid {
+				s.user_submits = new(int)
+				*s.user_submits = int(value.Int64)
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -119,19 +237,19 @@ func (s *Submit) QueryUser() *UserQuery {
 	return NewSubmitClient(s.config).QueryUser(s)
 }
 
+// QueryTask queries the "task" edge of the Submit entity.
+func (s *Submit) QueryTask() *TaskQuery {
+	return NewSubmitClient(s.config).QueryTask(s)
+}
+
 // QueryLanguage queries the "language" edge of the Submit entity.
 func (s *Submit) QueryLanguage() *LanguageQuery {
 	return NewSubmitClient(s.config).QueryLanguage(s)
 }
 
-// QueryTestcaseResult queries the "testcase_result" edge of the Submit entity.
-func (s *Submit) QueryTestcaseResult() *TestcaseResultQuery {
-	return NewSubmitClient(s.config).QueryTestcaseResult(s)
-}
-
-// QuerySubmitContests queries the "submit_contests" edge of the Submit entity.
-func (s *Submit) QuerySubmitContests() *ContestQuery {
-	return NewSubmitClient(s.config).QuerySubmitContests(s)
+// QueryTestcaseResults queries the "testcase_results" edge of the Submit entity.
+func (s *Submit) QueryTestcaseResults() *TestcaseResultQuery {
+	return NewSubmitClient(s.config).QueryTestcaseResults(s)
 }
 
 // Update returns a builder for updating this Submit.
@@ -156,7 +274,31 @@ func (s *Submit) Unwrap() *Submit {
 func (s *Submit) String() string {
 	var builder strings.Builder
 	builder.WriteString("Submit(")
-	builder.WriteString(fmt.Sprintf("id=%v", s.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	if v := s.Status; v != nil {
+		builder.WriteString("status=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("exec_time=")
+	builder.WriteString(fmt.Sprintf("%v", s.ExecTime))
+	builder.WriteString(", ")
+	builder.WriteString("exec_memory=")
+	builder.WriteString(fmt.Sprintf("%v", s.ExecMemory))
+	builder.WriteString(", ")
+	builder.WriteString("score=")
+	builder.WriteString(fmt.Sprintf("%v", s.Score))
+	builder.WriteString(", ")
+	builder.WriteString("submitted_at=")
+	builder.WriteString(s.SubmittedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := s.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

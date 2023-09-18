@@ -6,13 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -25,64 +26,164 @@ type SubmitCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (sc *SubmitCreate) AddUserIDs(ids ...int) *SubmitCreate {
-	sc.mutation.AddUserIDs(ids...)
+// SetStatus sets the "status" field.
+func (sc *SubmitCreate) SetStatus(s string) *SubmitCreate {
+	sc.mutation.SetStatus(s)
 	return sc
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (sc *SubmitCreate) AddUser(u ...*User) *SubmitCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (sc *SubmitCreate) SetNillableStatus(s *string) *SubmitCreate {
+	if s != nil {
+		sc.SetStatus(*s)
 	}
-	return sc.AddUserIDs(ids...)
-}
-
-// AddLanguageIDs adds the "language" edge to the Language entity by IDs.
-func (sc *SubmitCreate) AddLanguageIDs(ids ...int) *SubmitCreate {
-	sc.mutation.AddLanguageIDs(ids...)
 	return sc
 }
 
-// AddLanguage adds the "language" edges to the Language entity.
-func (sc *SubmitCreate) AddLanguage(l ...*Language) *SubmitCreate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return sc.AddLanguageIDs(ids...)
+// SetExecTime sets the "exec_time" field.
+func (sc *SubmitCreate) SetExecTime(i int) *SubmitCreate {
+	sc.mutation.SetExecTime(i)
+	return sc
 }
 
-// AddTestcaseResultIDs adds the "testcase_result" edge to the TestcaseResult entity by IDs.
+// SetNillableExecTime sets the "exec_time" field if the given value is not nil.
+func (sc *SubmitCreate) SetNillableExecTime(i *int) *SubmitCreate {
+	if i != nil {
+		sc.SetExecTime(*i)
+	}
+	return sc
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (sc *SubmitCreate) SetExecMemory(i int) *SubmitCreate {
+	sc.mutation.SetExecMemory(i)
+	return sc
+}
+
+// SetNillableExecMemory sets the "exec_memory" field if the given value is not nil.
+func (sc *SubmitCreate) SetNillableExecMemory(i *int) *SubmitCreate {
+	if i != nil {
+		sc.SetExecMemory(*i)
+	}
+	return sc
+}
+
+// SetScore sets the "score" field.
+func (sc *SubmitCreate) SetScore(i int) *SubmitCreate {
+	sc.mutation.SetScore(i)
+	return sc
+}
+
+// SetNillableScore sets the "score" field if the given value is not nil.
+func (sc *SubmitCreate) SetNillableScore(i *int) *SubmitCreate {
+	if i != nil {
+		sc.SetScore(*i)
+	}
+	return sc
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (sc *SubmitCreate) SetSubmittedAt(t time.Time) *SubmitCreate {
+	sc.mutation.SetSubmittedAt(t)
+	return sc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (sc *SubmitCreate) SetCreatedAt(t time.Time) *SubmitCreate {
+	sc.mutation.SetCreatedAt(t)
+	return sc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (sc *SubmitCreate) SetUpdatedAt(t time.Time) *SubmitCreate {
+	sc.mutation.SetUpdatedAt(t)
+	return sc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (sc *SubmitCreate) SetNillableUpdatedAt(t *time.Time) *SubmitCreate {
+	if t != nil {
+		sc.SetUpdatedAt(*t)
+	}
+	return sc
+}
+
+// SetID sets the "id" field.
+func (sc *SubmitCreate) SetID(i int) *SubmitCreate {
+	sc.mutation.SetID(i)
+	return sc
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (sc *SubmitCreate) SetUserID(id int) *SubmitCreate {
+	sc.mutation.SetUserID(id)
+	return sc
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (sc *SubmitCreate) SetNillableUserID(id *int) *SubmitCreate {
+	if id != nil {
+		sc = sc.SetUserID(*id)
+	}
+	return sc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (sc *SubmitCreate) SetUser(u *User) *SubmitCreate {
+	return sc.SetUserID(u.ID)
+}
+
+// SetTaskID sets the "task" edge to the Task entity by ID.
+func (sc *SubmitCreate) SetTaskID(id int) *SubmitCreate {
+	sc.mutation.SetTaskID(id)
+	return sc
+}
+
+// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
+func (sc *SubmitCreate) SetNillableTaskID(id *int) *SubmitCreate {
+	if id != nil {
+		sc = sc.SetTaskID(*id)
+	}
+	return sc
+}
+
+// SetTask sets the "task" edge to the Task entity.
+func (sc *SubmitCreate) SetTask(t *Task) *SubmitCreate {
+	return sc.SetTaskID(t.ID)
+}
+
+// SetLanguageID sets the "language" edge to the Language entity by ID.
+func (sc *SubmitCreate) SetLanguageID(id int) *SubmitCreate {
+	sc.mutation.SetLanguageID(id)
+	return sc
+}
+
+// SetNillableLanguageID sets the "language" edge to the Language entity by ID if the given value is not nil.
+func (sc *SubmitCreate) SetNillableLanguageID(id *int) *SubmitCreate {
+	if id != nil {
+		sc = sc.SetLanguageID(*id)
+	}
+	return sc
+}
+
+// SetLanguage sets the "language" edge to the Language entity.
+func (sc *SubmitCreate) SetLanguage(l *Language) *SubmitCreate {
+	return sc.SetLanguageID(l.ID)
+}
+
+// AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by IDs.
 func (sc *SubmitCreate) AddTestcaseResultIDs(ids ...int) *SubmitCreate {
 	sc.mutation.AddTestcaseResultIDs(ids...)
 	return sc
 }
 
-// AddTestcaseResult adds the "testcase_result" edges to the TestcaseResult entity.
-func (sc *SubmitCreate) AddTestcaseResult(t ...*TestcaseResult) *SubmitCreate {
+// AddTestcaseResults adds the "testcase_results" edges to the TestcaseResult entity.
+func (sc *SubmitCreate) AddTestcaseResults(t ...*TestcaseResult) *SubmitCreate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
 	return sc.AddTestcaseResultIDs(ids...)
-}
-
-// AddSubmitContestIDs adds the "submit_contests" edge to the Contest entity by IDs.
-func (sc *SubmitCreate) AddSubmitContestIDs(ids ...int) *SubmitCreate {
-	sc.mutation.AddSubmitContestIDs(ids...)
-	return sc
-}
-
-// AddSubmitContests adds the "submit_contests" edges to the Contest entity.
-func (sc *SubmitCreate) AddSubmitContests(c ...*Contest) *SubmitCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return sc.AddSubmitContestIDs(ids...)
 }
 
 // Mutation returns the SubmitMutation object of the builder.
@@ -119,6 +220,12 @@ func (sc *SubmitCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *SubmitCreate) check() error {
+	if _, ok := sc.mutation.SubmittedAt(); !ok {
+		return &ValidationError{Name: "submitted_at", err: errors.New(`ent: missing required field "Submit.submitted_at"`)}
+	}
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Submit.created_at"`)}
+	}
 	return nil
 }
 
@@ -133,8 +240,10 @@ func (sc *SubmitCreate) sqlSave(ctx context.Context) (*Submit, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	sc.mutation.id = &_node.ID
 	sc.mutation.done = true
 	return _node, nil
@@ -146,10 +255,42 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 		_spec = sqlgraph.NewCreateSpec(submit.Table, sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt))
 	)
 	_spec.OnConflict = sc.conflict
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
+	if value, ok := sc.mutation.Status(); ok {
+		_spec.SetField(submit.FieldStatus, field.TypeString, value)
+		_node.Status = &value
+	}
+	if value, ok := sc.mutation.ExecTime(); ok {
+		_spec.SetField(submit.FieldExecTime, field.TypeInt, value)
+		_node.ExecTime = value
+	}
+	if value, ok := sc.mutation.ExecMemory(); ok {
+		_spec.SetField(submit.FieldExecMemory, field.TypeInt, value)
+		_node.ExecMemory = value
+	}
+	if value, ok := sc.mutation.Score(); ok {
+		_spec.SetField(submit.FieldScore, field.TypeInt, value)
+		_node.Score = value
+	}
+	if value, ok := sc.mutation.SubmittedAt(); ok {
+		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)
+		_node.SubmittedAt = value
+	}
+	if value, ok := sc.mutation.CreatedAt(); ok {
+		_spec.SetField(submit.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := sc.mutation.UpdatedAt(); ok {
+		_spec.SetField(submit.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = &value
+	}
 	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
 			Table:   submit.UserTable,
 			Columns: []string{submit.UserColumn},
 			Bidi:    false,
@@ -160,12 +301,30 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.user_submits = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.TaskIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   submit.TaskTable,
+			Columns: []string{submit.TaskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.task_submits = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.LanguageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
 			Table:   submit.LanguageTable,
 			Columns: []string{submit.LanguageColumn},
 			Bidi:    false,
@@ -176,33 +335,18 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.language_submits = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := sc.mutation.TestcaseResultIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.TestcaseResultsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   submit.TestcaseResultTable,
-			Columns: []string{submit.TestcaseResultColumn},
+			Table:   submit.TestcaseResultsTable,
+			Columns: []string{submit.TestcaseResultsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := sc.mutation.SubmitContestsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   submit.SubmitContestsTable,
-			Columns: submit.SubmitContestsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -217,11 +361,17 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Submit.Create().
+//		SetStatus(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.SubmitUpsert) {
+//			SetStatus(v+v).
+//		}).
 //		Exec(ctx)
 func (sc *SubmitCreate) OnConflict(opts ...sql.ConflictOption) *SubmitUpsertOne {
 	sc.conflict = opts
@@ -256,16 +406,156 @@ type (
 	}
 )
 
-// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// SetStatus sets the "status" field.
+func (u *SubmitUpsert) SetStatus(v string) *SubmitUpsert {
+	u.Set(submit.FieldStatus, v)
+	return u
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateStatus() *SubmitUpsert {
+	u.SetExcluded(submit.FieldStatus)
+	return u
+}
+
+// ClearStatus clears the value of the "status" field.
+func (u *SubmitUpsert) ClearStatus() *SubmitUpsert {
+	u.SetNull(submit.FieldStatus)
+	return u
+}
+
+// SetExecTime sets the "exec_time" field.
+func (u *SubmitUpsert) SetExecTime(v int) *SubmitUpsert {
+	u.Set(submit.FieldExecTime, v)
+	return u
+}
+
+// UpdateExecTime sets the "exec_time" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateExecTime() *SubmitUpsert {
+	u.SetExcluded(submit.FieldExecTime)
+	return u
+}
+
+// AddExecTime adds v to the "exec_time" field.
+func (u *SubmitUpsert) AddExecTime(v int) *SubmitUpsert {
+	u.Add(submit.FieldExecTime, v)
+	return u
+}
+
+// ClearExecTime clears the value of the "exec_time" field.
+func (u *SubmitUpsert) ClearExecTime() *SubmitUpsert {
+	u.SetNull(submit.FieldExecTime)
+	return u
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (u *SubmitUpsert) SetExecMemory(v int) *SubmitUpsert {
+	u.Set(submit.FieldExecMemory, v)
+	return u
+}
+
+// UpdateExecMemory sets the "exec_memory" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateExecMemory() *SubmitUpsert {
+	u.SetExcluded(submit.FieldExecMemory)
+	return u
+}
+
+// AddExecMemory adds v to the "exec_memory" field.
+func (u *SubmitUpsert) AddExecMemory(v int) *SubmitUpsert {
+	u.Add(submit.FieldExecMemory, v)
+	return u
+}
+
+// ClearExecMemory clears the value of the "exec_memory" field.
+func (u *SubmitUpsert) ClearExecMemory() *SubmitUpsert {
+	u.SetNull(submit.FieldExecMemory)
+	return u
+}
+
+// SetScore sets the "score" field.
+func (u *SubmitUpsert) SetScore(v int) *SubmitUpsert {
+	u.Set(submit.FieldScore, v)
+	return u
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateScore() *SubmitUpsert {
+	u.SetExcluded(submit.FieldScore)
+	return u
+}
+
+// AddScore adds v to the "score" field.
+func (u *SubmitUpsert) AddScore(v int) *SubmitUpsert {
+	u.Add(submit.FieldScore, v)
+	return u
+}
+
+// ClearScore clears the value of the "score" field.
+func (u *SubmitUpsert) ClearScore() *SubmitUpsert {
+	u.SetNull(submit.FieldScore)
+	return u
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (u *SubmitUpsert) SetSubmittedAt(v time.Time) *SubmitUpsert {
+	u.Set(submit.FieldSubmittedAt, v)
+	return u
+}
+
+// UpdateSubmittedAt sets the "submitted_at" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateSubmittedAt() *SubmitUpsert {
+	u.SetExcluded(submit.FieldSubmittedAt)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *SubmitUpsert) SetCreatedAt(v time.Time) *SubmitUpsert {
+	u.Set(submit.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateCreatedAt() *SubmitUpsert {
+	u.SetExcluded(submit.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *SubmitUpsert) SetUpdatedAt(v time.Time) *SubmitUpsert {
+	u.Set(submit.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateUpdatedAt() *SubmitUpsert {
+	u.SetExcluded(submit.FieldUpdatedAt)
+	return u
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (u *SubmitUpsert) ClearUpdatedAt() *SubmitUpsert {
+	u.SetNull(submit.FieldUpdatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
 //	client.Submit.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(submit.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 func (u *SubmitUpsertOne) UpdateNewValues() *SubmitUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(submit.FieldID)
+		}
+	}))
 	return u
 }
 
@@ -294,6 +584,160 @@ func (u *SubmitUpsertOne) Update(set func(*SubmitUpsert)) *SubmitUpsertOne {
 		set(&SubmitUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *SubmitUpsertOne) SetStatus(v string) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateStatus() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// ClearStatus clears the value of the "status" field.
+func (u *SubmitUpsertOne) ClearStatus() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearStatus()
+	})
+}
+
+// SetExecTime sets the "exec_time" field.
+func (u *SubmitUpsertOne) SetExecTime(v int) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetExecTime(v)
+	})
+}
+
+// AddExecTime adds v to the "exec_time" field.
+func (u *SubmitUpsertOne) AddExecTime(v int) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.AddExecTime(v)
+	})
+}
+
+// UpdateExecTime sets the "exec_time" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateExecTime() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateExecTime()
+	})
+}
+
+// ClearExecTime clears the value of the "exec_time" field.
+func (u *SubmitUpsertOne) ClearExecTime() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearExecTime()
+	})
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (u *SubmitUpsertOne) SetExecMemory(v int) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetExecMemory(v)
+	})
+}
+
+// AddExecMemory adds v to the "exec_memory" field.
+func (u *SubmitUpsertOne) AddExecMemory(v int) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.AddExecMemory(v)
+	})
+}
+
+// UpdateExecMemory sets the "exec_memory" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateExecMemory() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateExecMemory()
+	})
+}
+
+// ClearExecMemory clears the value of the "exec_memory" field.
+func (u *SubmitUpsertOne) ClearExecMemory() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearExecMemory()
+	})
+}
+
+// SetScore sets the "score" field.
+func (u *SubmitUpsertOne) SetScore(v int) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetScore(v)
+	})
+}
+
+// AddScore adds v to the "score" field.
+func (u *SubmitUpsertOne) AddScore(v int) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.AddScore(v)
+	})
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateScore() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateScore()
+	})
+}
+
+// ClearScore clears the value of the "score" field.
+func (u *SubmitUpsertOne) ClearScore() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearScore()
+	})
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (u *SubmitUpsertOne) SetSubmittedAt(v time.Time) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetSubmittedAt(v)
+	})
+}
+
+// UpdateSubmittedAt sets the "submitted_at" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateSubmittedAt() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateSubmittedAt()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *SubmitUpsertOne) SetCreatedAt(v time.Time) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateCreatedAt() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *SubmitUpsertOne) SetUpdatedAt(v time.Time) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateUpdatedAt() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (u *SubmitUpsertOne) ClearUpdatedAt() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearUpdatedAt()
+	})
 }
 
 // Exec executes the query.
@@ -371,7 +815,7 @@ func (scb *SubmitCreateBulk) Save(ctx context.Context) ([]*Submit, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}
@@ -423,6 +867,11 @@ func (scb *SubmitCreateBulk) ExecX(ctx context.Context) {
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.SubmitUpsert) {
+//			SetStatus(v+v).
+//		}).
 //		Exec(ctx)
 func (scb *SubmitCreateBulk) OnConflict(opts ...sql.ConflictOption) *SubmitUpsertBulk {
 	scb.conflict = opts
@@ -456,10 +905,20 @@ type SubmitUpsertBulk struct {
 //	client.Submit.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(submit.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 func (u *SubmitUpsertBulk) UpdateNewValues() *SubmitUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(submit.FieldID)
+			}
+		}
+	}))
 	return u
 }
 
@@ -488,6 +947,160 @@ func (u *SubmitUpsertBulk) Update(set func(*SubmitUpsert)) *SubmitUpsertBulk {
 		set(&SubmitUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *SubmitUpsertBulk) SetStatus(v string) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateStatus() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// ClearStatus clears the value of the "status" field.
+func (u *SubmitUpsertBulk) ClearStatus() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearStatus()
+	})
+}
+
+// SetExecTime sets the "exec_time" field.
+func (u *SubmitUpsertBulk) SetExecTime(v int) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetExecTime(v)
+	})
+}
+
+// AddExecTime adds v to the "exec_time" field.
+func (u *SubmitUpsertBulk) AddExecTime(v int) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.AddExecTime(v)
+	})
+}
+
+// UpdateExecTime sets the "exec_time" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateExecTime() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateExecTime()
+	})
+}
+
+// ClearExecTime clears the value of the "exec_time" field.
+func (u *SubmitUpsertBulk) ClearExecTime() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearExecTime()
+	})
+}
+
+// SetExecMemory sets the "exec_memory" field.
+func (u *SubmitUpsertBulk) SetExecMemory(v int) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetExecMemory(v)
+	})
+}
+
+// AddExecMemory adds v to the "exec_memory" field.
+func (u *SubmitUpsertBulk) AddExecMemory(v int) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.AddExecMemory(v)
+	})
+}
+
+// UpdateExecMemory sets the "exec_memory" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateExecMemory() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateExecMemory()
+	})
+}
+
+// ClearExecMemory clears the value of the "exec_memory" field.
+func (u *SubmitUpsertBulk) ClearExecMemory() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearExecMemory()
+	})
+}
+
+// SetScore sets the "score" field.
+func (u *SubmitUpsertBulk) SetScore(v int) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetScore(v)
+	})
+}
+
+// AddScore adds v to the "score" field.
+func (u *SubmitUpsertBulk) AddScore(v int) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.AddScore(v)
+	})
+}
+
+// UpdateScore sets the "score" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateScore() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateScore()
+	})
+}
+
+// ClearScore clears the value of the "score" field.
+func (u *SubmitUpsertBulk) ClearScore() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearScore()
+	})
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (u *SubmitUpsertBulk) SetSubmittedAt(v time.Time) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetSubmittedAt(v)
+	})
+}
+
+// UpdateSubmittedAt sets the "submitted_at" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateSubmittedAt() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateSubmittedAt()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *SubmitUpsertBulk) SetCreatedAt(v time.Time) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateCreatedAt() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *SubmitUpsertBulk) SetUpdatedAt(v time.Time) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateUpdatedAt() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (u *SubmitUpsertBulk) ClearUpdatedAt() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearUpdatedAt()
+	})
 }
 
 // Exec executes the query.

@@ -15,8 +15,9 @@ enum JudgeStatus {
 }
 
 message Testcase {
-  string input_path = 1;
-  string expected_path = 2;
+  uint32 id = 1;
+  string input_path = 2;
+  string expected_path = 3;
 }
 
 message ExecutionResultDetail {

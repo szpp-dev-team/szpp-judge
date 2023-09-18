@@ -12,39 +12,34 @@ const (
 	Label = "language"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// EdgeSubmit holds the string denoting the submit edge name in mutations.
-	EdgeSubmit = "submit"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldSlug holds the string denoting the slug field in the database.
+	FieldSlug = "slug"
+	// EdgeSubmits holds the string denoting the submits edge name in mutations.
+	EdgeSubmits = "submits"
 	// Table holds the table name of the language in the database.
 	Table = "languages"
-	// SubmitTable is the table that holds the submit relation/edge.
-	SubmitTable = "languages"
-	// SubmitInverseTable is the table name for the Submit entity.
+	// SubmitsTable is the table that holds the submits relation/edge.
+	SubmitsTable = "submits"
+	// SubmitsInverseTable is the table name for the Submit entity.
 	// It exists in this package in order to avoid circular dependency with the "submit" package.
-	SubmitInverseTable = "submits"
-	// SubmitColumn is the table column denoting the submit relation/edge.
-	SubmitColumn = "submit_language"
+	SubmitsInverseTable = "submits"
+	// SubmitsColumn is the table column denoting the submits relation/edge.
+	SubmitsColumn = "language_submits"
 )
 
 // Columns holds all SQL columns for language fields.
 var Columns = []string{
 	FieldID,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "languages"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"submit_language",
+	FieldName,
+	FieldSlug,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -59,16 +54,33 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// BySubmitField orders the results by submit field.
-func BySubmitField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// BySlug orders the results by the slug field.
+func BySlug(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSlug, opts...).ToFunc()
+}
+
+// BySubmitsCount orders the results by submits count.
+func BySubmitsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubmitStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newSubmitsStep(), opts...)
 	}
 }
-func newSubmitStep() *sqlgraph.Step {
+
+// BySubmits orders the results by submits terms.
+func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubmitsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newSubmitsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubmitInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, SubmitTable, SubmitColumn),
+		sqlgraph.To(SubmitsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
 	)
 }

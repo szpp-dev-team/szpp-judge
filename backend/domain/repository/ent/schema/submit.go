@@ -10,28 +10,24 @@ type Submit struct {
 	ent.Schema
 }
 
-func (Submit) Field() []ent.Field {
+func (Submit) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
-		field.Int("user_id"),
-		field.Int("contest_id").Optional().Nillable(),
-		field.Int("task_id"),
-		field.Int("language_id"),
-		field.String("status"),
-		field.Int("exec_time"),   // ms
-		field.Int("exec_memory"), // kib
+		field.String("status").Optional().Nillable(),
+		field.Int("exec_time").Optional(),   // ms
+		field.Int("exec_memory").Optional(), // kib
+		field.Int("score").Optional(),
 		field.Time("submitted_at"),
 		field.Time("created_at"),
-		field.Time("updated_at"),
+		field.Time("updated_at").Optional().Nillable(),
 	}
 }
 
 func (Submit) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", User.Type),
-		// edge.To("task", Task.Type),
-		edge.To("language", Language.Type),
-		edge.To("testcase_result", TestcaseResult.Type),
-		edge.From("submit_contests", Contest.Type).Ref("submits"),
+		edge.From("user", User.Type).Ref("submits").Unique(),
+		edge.From("task", Task.Type).Ref("submits").Unique(),
+		edge.From("language", Language.Type).Ref("submits").Unique(),
+		edge.To("testcase_results", TestcaseResult.Type),
 	}
 }

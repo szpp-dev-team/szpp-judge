@@ -11,10 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
@@ -22,14 +22,15 @@ import (
 // SubmitQuery is the builder for querying Submit entities.
 type SubmitQuery struct {
 	config
-	ctx                *QueryContext
-	order              []submit.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.Submit
-	withUser           *UserQuery
-	withLanguage       *LanguageQuery
-	withTestcaseResult *TestcaseResultQuery
-	withSubmitContests *ContestQuery
+	ctx                 *QueryContext
+	order               []submit.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.Submit
+	withUser            *UserQuery
+	withTask            *TaskQuery
+	withLanguage        *LanguageQuery
+	withTestcaseResults *TestcaseResultQuery
+	withFKs             bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -80,7 +81,29 @@ func (sq *SubmitQuery) QueryUser() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(submit.Table, submit.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, submit.UserTable, submit.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.UserTable, submit.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTask chains the current query on the "task" edge.
+func (sq *SubmitQuery) QueryTask() *TaskQuery {
+	query := (&TaskClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(submit.Table, submit.FieldID, selector),
+			sqlgraph.To(task.Table, task.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.TaskTable, submit.TaskColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -102,7 +125,7 @@ func (sq *SubmitQuery) QueryLanguage() *LanguageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(submit.Table, submit.FieldID, selector),
 			sqlgraph.To(language.Table, language.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, submit.LanguageTable, submit.LanguageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.LanguageTable, submit.LanguageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -110,8 +133,8 @@ func (sq *SubmitQuery) QueryLanguage() *LanguageQuery {
 	return query
 }
 
-// QueryTestcaseResult chains the current query on the "testcase_result" edge.
-func (sq *SubmitQuery) QueryTestcaseResult() *TestcaseResultQuery {
+// QueryTestcaseResults chains the current query on the "testcase_results" edge.
+func (sq *SubmitQuery) QueryTestcaseResults() *TestcaseResultQuery {
 	query := (&TestcaseResultClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
@@ -124,29 +147,7 @@ func (sq *SubmitQuery) QueryTestcaseResult() *TestcaseResultQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(submit.Table, submit.FieldID, selector),
 			sqlgraph.To(testcaseresult.Table, testcaseresult.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, submit.TestcaseResultTable, submit.TestcaseResultColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubmitContests chains the current query on the "submit_contests" edge.
-func (sq *SubmitQuery) QuerySubmitContests() *ContestQuery {
-	query := (&ContestClient{config: sq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := sq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := sq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(submit.Table, submit.FieldID, selector),
-			sqlgraph.To(contest.Table, contest.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, submit.SubmitContestsTable, submit.SubmitContestsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, submit.TestcaseResultsTable, submit.TestcaseResultsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -341,15 +342,15 @@ func (sq *SubmitQuery) Clone() *SubmitQuery {
 		return nil
 	}
 	return &SubmitQuery{
-		config:             sq.config,
-		ctx:                sq.ctx.Clone(),
-		order:              append([]submit.OrderOption{}, sq.order...),
-		inters:             append([]Interceptor{}, sq.inters...),
-		predicates:         append([]predicate.Submit{}, sq.predicates...),
-		withUser:           sq.withUser.Clone(),
-		withLanguage:       sq.withLanguage.Clone(),
-		withTestcaseResult: sq.withTestcaseResult.Clone(),
-		withSubmitContests: sq.withSubmitContests.Clone(),
+		config:              sq.config,
+		ctx:                 sq.ctx.Clone(),
+		order:               append([]submit.OrderOption{}, sq.order...),
+		inters:              append([]Interceptor{}, sq.inters...),
+		predicates:          append([]predicate.Submit{}, sq.predicates...),
+		withUser:            sq.withUser.Clone(),
+		withTask:            sq.withTask.Clone(),
+		withLanguage:        sq.withLanguage.Clone(),
+		withTestcaseResults: sq.withTestcaseResults.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
@@ -367,6 +368,17 @@ func (sq *SubmitQuery) WithUser(opts ...func(*UserQuery)) *SubmitQuery {
 	return sq
 }
 
+// WithTask tells the query-builder to eager-load the nodes that are connected to
+// the "task" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SubmitQuery) WithTask(opts ...func(*TaskQuery)) *SubmitQuery {
+	query := (&TaskClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withTask = query
+	return sq
+}
+
 // WithLanguage tells the query-builder to eager-load the nodes that are connected to
 // the "language" edge. The optional arguments are used to configure the query builder of the edge.
 func (sq *SubmitQuery) WithLanguage(opts ...func(*LanguageQuery)) *SubmitQuery {
@@ -378,30 +390,31 @@ func (sq *SubmitQuery) WithLanguage(opts ...func(*LanguageQuery)) *SubmitQuery {
 	return sq
 }
 
-// WithTestcaseResult tells the query-builder to eager-load the nodes that are connected to
-// the "testcase_result" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *SubmitQuery) WithTestcaseResult(opts ...func(*TestcaseResultQuery)) *SubmitQuery {
+// WithTestcaseResults tells the query-builder to eager-load the nodes that are connected to
+// the "testcase_results" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SubmitQuery) WithTestcaseResults(opts ...func(*TestcaseResultQuery)) *SubmitQuery {
 	query := (&TestcaseResultClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withTestcaseResult = query
-	return sq
-}
-
-// WithSubmitContests tells the query-builder to eager-load the nodes that are connected to
-// the "submit_contests" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *SubmitQuery) WithSubmitContests(opts ...func(*ContestQuery)) *SubmitQuery {
-	query := (&ContestClient{config: sq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	sq.withSubmitContests = query
+	sq.withTestcaseResults = query
 	return sq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Status string `json:"status,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Submit.Query().
+//		GroupBy(submit.FieldStatus).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (sq *SubmitQuery) GroupBy(field string, fields ...string) *SubmitGroupBy {
 	sq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &SubmitGroupBy{build: sq}
@@ -413,6 +426,16 @@ func (sq *SubmitQuery) GroupBy(field string, fields ...string) *SubmitGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Status string `json:"status,omitempty"`
+//	}
+//
+//	client.Submit.Query().
+//		Select(submit.FieldStatus).
+//		Scan(ctx, &v)
 func (sq *SubmitQuery) Select(fields ...string) *SubmitSelect {
 	sq.ctx.Fields = append(sq.ctx.Fields, fields...)
 	sbuild := &SubmitSelect{SubmitQuery: sq}
@@ -455,14 +478,21 @@ func (sq *SubmitQuery) prepareQuery(ctx context.Context) error {
 func (sq *SubmitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Submit, error) {
 	var (
 		nodes       = []*Submit{}
+		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
 		loadedTypes = [4]bool{
 			sq.withUser != nil,
+			sq.withTask != nil,
 			sq.withLanguage != nil,
-			sq.withTestcaseResult != nil,
-			sq.withSubmitContests != nil,
+			sq.withTestcaseResults != nil,
 		}
 	)
+	if sq.withUser != nil || sq.withTask != nil || sq.withLanguage != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, submit.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Submit).scanValues(nil, columns)
 	}
@@ -482,30 +512,27 @@ func (sq *SubmitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Submi
 		return nodes, nil
 	}
 	if query := sq.withUser; query != nil {
-		if err := sq.loadUser(ctx, query, nodes,
-			func(n *Submit) { n.Edges.User = []*User{} },
-			func(n *Submit, e *User) { n.Edges.User = append(n.Edges.User, e) }); err != nil {
+		if err := sq.loadUser(ctx, query, nodes, nil,
+			func(n *Submit, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withTask; query != nil {
+		if err := sq.loadTask(ctx, query, nodes, nil,
+			func(n *Submit, e *Task) { n.Edges.Task = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := sq.withLanguage; query != nil {
-		if err := sq.loadLanguage(ctx, query, nodes,
-			func(n *Submit) { n.Edges.Language = []*Language{} },
-			func(n *Submit, e *Language) { n.Edges.Language = append(n.Edges.Language, e) }); err != nil {
+		if err := sq.loadLanguage(ctx, query, nodes, nil,
+			func(n *Submit, e *Language) { n.Edges.Language = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := sq.withTestcaseResult; query != nil {
-		if err := sq.loadTestcaseResult(ctx, query, nodes,
-			func(n *Submit) { n.Edges.TestcaseResult = []*TestcaseResult{} },
-			func(n *Submit, e *TestcaseResult) { n.Edges.TestcaseResult = append(n.Edges.TestcaseResult, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := sq.withSubmitContests; query != nil {
-		if err := sq.loadSubmitContests(ctx, query, nodes,
-			func(n *Submit) { n.Edges.SubmitContests = []*Contest{} },
-			func(n *Submit, e *Contest) { n.Edges.SubmitContests = append(n.Edges.SubmitContests, e) }); err != nil {
+	if query := sq.withTestcaseResults; query != nil {
+		if err := sq.loadTestcaseResults(ctx, query, nodes,
+			func(n *Submit) { n.Edges.TestcaseResults = []*TestcaseResult{} },
+			func(n *Submit, e *TestcaseResult) { n.Edges.TestcaseResults = append(n.Edges.TestcaseResults, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -513,68 +540,102 @@ func (sq *SubmitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Submi
 }
 
 func (sq *SubmitQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Submit, init func(*Submit), assign func(*Submit, *User)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Submit)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Submit)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].user_submits == nil {
+			continue
 		}
+		fk := *nodes[i].user_submits
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.User(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(submit.UserColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.submit_user
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "submit_user" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "submit_user" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_submits" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (sq *SubmitQuery) loadTask(ctx context.Context, query *TaskQuery, nodes []*Submit, init func(*Submit), assign func(*Submit, *Task)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Submit)
+	for i := range nodes {
+		if nodes[i].task_submits == nil {
+			continue
+		}
+		fk := *nodes[i].task_submits
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(task.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "task_submits" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
 func (sq *SubmitQuery) loadLanguage(ctx context.Context, query *LanguageQuery, nodes []*Submit, init func(*Submit), assign func(*Submit, *Language)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Submit)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Submit)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].language_submits == nil {
+			continue
 		}
+		fk := *nodes[i].language_submits
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Language(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(submit.LanguageColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(language.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.submit_language
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "submit_language" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "submit_language" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "language_submits" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
-func (sq *SubmitQuery) loadTestcaseResult(ctx context.Context, query *TestcaseResultQuery, nodes []*Submit, init func(*Submit), assign func(*Submit, *TestcaseResult)) error {
+func (sq *SubmitQuery) loadTestcaseResults(ctx context.Context, query *TestcaseResultQuery, nodes []*Submit, init func(*Submit), assign func(*Submit, *TestcaseResult)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Submit)
 	for i := range nodes {
@@ -586,83 +647,22 @@ func (sq *SubmitQuery) loadTestcaseResult(ctx context.Context, query *TestcaseRe
 	}
 	query.withFKs = true
 	query.Where(predicate.TestcaseResult(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(submit.TestcaseResultColumn), fks...))
+		s.Where(sql.InValues(s.C(submit.TestcaseResultsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.submit_testcase_result
+		fk := n.submit_testcase_results
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "submit_testcase_result" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "submit_testcase_results" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "submit_testcase_result" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "submit_testcase_results" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
-	}
-	return nil
-}
-func (sq *SubmitQuery) loadSubmitContests(ctx context.Context, query *ContestQuery, nodes []*Submit, init func(*Submit), assign func(*Submit, *Contest)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Submit)
-	nids := make(map[int]map[*Submit]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(submit.SubmitContestsTable)
-		s.Join(joinT).On(s.C(contest.FieldID), joinT.C(submit.SubmitContestsPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(submit.SubmitContestsPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(submit.SubmitContestsPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Submit]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Contest](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "submit_contests" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
 	}
 	return nil
 }

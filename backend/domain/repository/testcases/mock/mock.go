@@ -27,11 +27,8 @@ func (i *mockImpl) DownloadTestcase(ctx context.Context, taskID int, name string
 	return testcase, nil
 }
 
-func (i *mockImpl) UploadTestcase(ctx context.Context, taskID int, testcase *testcases.Testcase) error {
+func (i *mockImpl) UpsertTestcase(ctx context.Context, taskID int, testcase *testcases.Testcase) error {
 	key := generateKey(taskID, testcase.Name)
-	if _, ok := i.testcaseMap[key]; ok {
-		return status.Error(codes.AlreadyExists, "")
-	}
 	i.testcaseMap[key] = testcase
 	return nil
 }

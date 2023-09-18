@@ -17,12 +17,14 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
+	// Username holds the value of the "username" field.
+	Username string `json:"username,omitempty"`
+	// Email holds the value of the "email" field.
+	Email string `json:"email,omitempty"`
 	// Role holds the value of the "role" field.
 	Role string `json:"role,omitempty"`
-	// EncryptedPassword holds the value of the "encrypted_password" field.
-	EncryptedPassword string `json:"encrypted_password,omitempty"`
+	// HashedPassword holds the value of the "hashed_password" field.
+	HashedPassword []byte `json:"hashed_password,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -30,7 +32,6 @@ type User struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
-	submit_user  *int
 	selectValues sql.SelectValues
 }
 
@@ -40,9 +41,11 @@ type UserEdges struct {
 	Contests []*Contest `json:"contests,omitempty"`
 	// Tasks holds the value of the tasks edge.
 	Tasks []*Task `json:"tasks,omitempty"`
+	// Submits holds the value of the submits edge.
+	Submits []*Submit `json:"submits,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // ContestsOrErr returns the Contests value or an error if the edge
@@ -63,19 +66,28 @@ func (e UserEdges) TasksOrErr() ([]*Task, error) {
 	return nil, &NotLoadedError{edge: "tasks"}
 }
 
+// SubmitsOrErr returns the Submits value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) SubmitsOrErr() ([]*Submit, error) {
+	if e.loadedTypes[2] {
+		return e.Submits, nil
+	}
+	return nil, &NotLoadedError{edge: "submits"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case user.FieldHashedPassword:
+			values[i] = new([]byte)
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldRole, user.FieldEncryptedPassword:
+		case user.FieldUsername, user.FieldEmail, user.FieldRole:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case user.ForeignKeys[0]: // submit_user
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -97,11 +109,17 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			u.ID = int(value.Int64)
-		case user.FieldName:
+		case user.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
+				return fmt.Errorf("unexpected type %T for field username", values[i])
 			} else if value.Valid {
-				u.Name = value.String
+				u.Username = value.String
+			}
+		case user.FieldEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field email", values[i])
+			} else if value.Valid {
+				u.Email = value.String
 			}
 		case user.FieldRole:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -109,11 +127,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Role = value.String
 			}
-		case user.FieldEncryptedPassword:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field encrypted_password", values[i])
-			} else if value.Valid {
-				u.EncryptedPassword = value.String
+		case user.FieldHashedPassword:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field hashed_password", values[i])
+			} else if value != nil {
+				u.HashedPassword = *value
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -126,13 +144,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				u.UpdatedAt = value.Time
-			}
-		case user.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field submit_user", value)
-			} else if value.Valid {
-				u.submit_user = new(int)
-				*u.submit_user = int(value.Int64)
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -155,6 +166,11 @@ func (u *User) QueryContests() *ContestQuery {
 // QueryTasks queries the "tasks" edge of the User entity.
 func (u *User) QueryTasks() *TaskQuery {
 	return NewUserClient(u.config).QueryTasks(u)
+}
+
+// QuerySubmits queries the "submits" edge of the User entity.
+func (u *User) QuerySubmits() *SubmitQuery {
+	return NewUserClient(u.config).QuerySubmits(u)
 }
 
 // Update returns a builder for updating this User.
@@ -180,14 +196,17 @@ func (u *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
-	builder.WriteString("name=")
-	builder.WriteString(u.Name)
+	builder.WriteString("username=")
+	builder.WriteString(u.Username)
+	builder.WriteString(", ")
+	builder.WriteString("email=")
+	builder.WriteString(u.Email)
 	builder.WriteString(", ")
 	builder.WriteString("role=")
 	builder.WriteString(u.Role)
 	builder.WriteString(", ")
-	builder.WriteString("encrypted_password=")
-	builder.WriteString(u.EncryptedPassword)
+	builder.WriteString("hashed_password=")
+	builder.WriteString(fmt.Sprintf("%v", u.HashedPassword))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(u.CreatedAt.Format(time.ANSIC))

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -18,12 +19,11 @@ import (
 // LanguageQuery is the builder for querying Language entities.
 type LanguageQuery struct {
 	config
-	ctx        *QueryContext
-	order      []language.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Language
-	withSubmit *SubmitQuery
-	withFKs    bool
+	ctx         *QueryContext
+	order       []language.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Language
+	withSubmits *SubmitQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,8 +60,8 @@ func (lq *LanguageQuery) Order(o ...language.OrderOption) *LanguageQuery {
 	return lq
 }
 
-// QuerySubmit chains the current query on the "submit" edge.
-func (lq *LanguageQuery) QuerySubmit() *SubmitQuery {
+// QuerySubmits chains the current query on the "submits" edge.
+func (lq *LanguageQuery) QuerySubmits() *SubmitQuery {
 	query := (&SubmitClient{config: lq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := lq.prepareQuery(ctx); err != nil {
@@ -74,7 +74,7 @@ func (lq *LanguageQuery) QuerySubmit() *SubmitQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(language.Table, language.FieldID, selector),
 			sqlgraph.To(submit.Table, submit.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, language.SubmitTable, language.SubmitColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, language.SubmitsTable, language.SubmitsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,31 +269,43 @@ func (lq *LanguageQuery) Clone() *LanguageQuery {
 		return nil
 	}
 	return &LanguageQuery{
-		config:     lq.config,
-		ctx:        lq.ctx.Clone(),
-		order:      append([]language.OrderOption{}, lq.order...),
-		inters:     append([]Interceptor{}, lq.inters...),
-		predicates: append([]predicate.Language{}, lq.predicates...),
-		withSubmit: lq.withSubmit.Clone(),
+		config:      lq.config,
+		ctx:         lq.ctx.Clone(),
+		order:       append([]language.OrderOption{}, lq.order...),
+		inters:      append([]Interceptor{}, lq.inters...),
+		predicates:  append([]predicate.Language{}, lq.predicates...),
+		withSubmits: lq.withSubmits.Clone(),
 		// clone intermediate query.
 		sql:  lq.sql.Clone(),
 		path: lq.path,
 	}
 }
 
-// WithSubmit tells the query-builder to eager-load the nodes that are connected to
-// the "submit" edge. The optional arguments are used to configure the query builder of the edge.
-func (lq *LanguageQuery) WithSubmit(opts ...func(*SubmitQuery)) *LanguageQuery {
+// WithSubmits tells the query-builder to eager-load the nodes that are connected to
+// the "submits" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LanguageQuery) WithSubmits(opts ...func(*SubmitQuery)) *LanguageQuery {
 	query := (&SubmitClient{config: lq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	lq.withSubmit = query
+	lq.withSubmits = query
 	return lq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Language.Query().
+//		GroupBy(language.FieldName).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (lq *LanguageQuery) GroupBy(field string, fields ...string) *LanguageGroupBy {
 	lq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &LanguageGroupBy{build: lq}
@@ -305,6 +317,16 @@ func (lq *LanguageQuery) GroupBy(field string, fields ...string) *LanguageGroupB
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//	}
+//
+//	client.Language.Query().
+//		Select(language.FieldName).
+//		Scan(ctx, &v)
 func (lq *LanguageQuery) Select(fields ...string) *LanguageSelect {
 	lq.ctx.Fields = append(lq.ctx.Fields, fields...)
 	sbuild := &LanguageSelect{LanguageQuery: lq}
@@ -347,18 +369,11 @@ func (lq *LanguageQuery) prepareQuery(ctx context.Context) error {
 func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Language, error) {
 	var (
 		nodes       = []*Language{}
-		withFKs     = lq.withFKs
 		_spec       = lq.querySpec()
 		loadedTypes = [1]bool{
-			lq.withSubmit != nil,
+			lq.withSubmits != nil,
 		}
 	)
-	if lq.withSubmit != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, language.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Language).scanValues(nil, columns)
 	}
@@ -377,44 +392,44 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := lq.withSubmit; query != nil {
-		if err := lq.loadSubmit(ctx, query, nodes, nil,
-			func(n *Language, e *Submit) { n.Edges.Submit = e }); err != nil {
+	if query := lq.withSubmits; query != nil {
+		if err := lq.loadSubmits(ctx, query, nodes,
+			func(n *Language) { n.Edges.Submits = []*Submit{} },
+			func(n *Language, e *Submit) { n.Edges.Submits = append(n.Edges.Submits, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (lq *LanguageQuery) loadSubmit(ctx context.Context, query *SubmitQuery, nodes []*Language, init func(*Language), assign func(*Language, *Submit)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Language)
+func (lq *LanguageQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nodes []*Language, init func(*Language), assign func(*Language, *Submit)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Language)
 	for i := range nodes {
-		if nodes[i].submit_language == nil {
-			continue
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
 		}
-		fk := *nodes[i].submit_language
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(submit.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Submit(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(language.SubmitsColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.language_submits
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "language_submits" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "submit_language" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "language_submits" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }

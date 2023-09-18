@@ -1,15 +1,12 @@
 package testcases
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 
 	"cloud.google.com/go/storage"
+	"github.com/szpp-dev-team/szpp-judge/backend/core/gcs"
 )
-
-const tasksFolderID = "1d4TxRKqttep964mM-k60lsNjxhVVY8HI"
 
 type gcsImpl struct {
 	client *storage.Client
@@ -21,11 +18,11 @@ func NewRepository(client *storage.Client) Repository {
 
 func (i *gcsImpl) DownloadTestcase(ctx context.Context, taskID int, name string) (*Testcase, error) {
 	bucket := i.client.Bucket("szpp-judge")
-	inBytes, err := download(ctx, bucket, fmt.Sprintf("/testcases/%d/in/%s", taskID, name))
+	inBytes, err := gcs.DownloadFile(ctx, bucket, BuildTestcaseInPath(taskID, name))
 	if err != nil {
 		return nil, err
 	}
-	outBytes, err := download(ctx, bucket, fmt.Sprintf("/testcases/%d/out/%s", taskID, name))
+	outBytes, err := gcs.DownloadFile(ctx, bucket, BuildTestcaseOutPath(taskID, name))
 	if err != nil {
 		return nil, err
 	}
@@ -36,33 +33,23 @@ func (i *gcsImpl) DownloadTestcase(ctx context.Context, taskID int, name string)
 	}, nil
 }
 
-func (i *gcsImpl) UploadTestcase(ctx context.Context, taskID int, testcase *Testcase) error {
+func (i *gcsImpl) UpsertTestcase(ctx context.Context, taskID int, testcase *Testcase) error {
 	bucket := i.client.Bucket("szpp-judge")
-	if err := upload(ctx, bucket, fmt.Sprintf("/testcases/%d/in/%s", taskID, testcase.Name), testcase.In); err != nil {
+	if err := gcs.UploadFile(ctx, bucket, BuildTestcaseInPath(taskID, testcase.Name), testcase.In); err != nil {
 		return err
 	}
-	if err := upload(ctx, bucket, fmt.Sprintf("/testcases/%d/out/%s", taskID, testcase.Name), testcase.Out); err != nil {
+	if err := gcs.UploadFile(ctx, bucket, BuildTestcaseOutPath(taskID, testcase.Name), testcase.Out); err != nil {
 		return err
 	}
 	return nil
 }
 
-func download(ctx context.Context, bucketHandle *storage.BucketHandle, name string) ([]byte, error) {
-	r, err := bucketHandle.Object(name).NewReader(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer r.Close()
-	return io.ReadAll(r)
+func BuildTestcaseInPath(taskID int, name string) string {
+	return fmt.Sprintf("/testcases/%d/in/%s", taskID, name)
 }
 
-func upload(ctx context.Context, bucketHandle *storage.BucketHandle, name string, b []byte) error {
-	w := bucketHandle.Object(name).NewWriter(ctx)
-	defer w.Close()
-	if _, err := io.Copy(w, bytes.NewReader(b)); err != nil {
-		return err
-	}
-	return nil
+func BuildTestcaseOutPath(taskID int, name string) string {
+	return fmt.Sprintf("/testcases/%d/out/%s", taskID, name)
 }
 
 var _ Repository = (*gcsImpl)(nil)

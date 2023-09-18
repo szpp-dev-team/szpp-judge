@@ -4,6 +4,7 @@ package testcaseresult
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -11,19 +12,47 @@ const (
 	Label = "testcase_result"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// FieldExecTime holds the string denoting the exec_time field in the database.
+	FieldExecTime = "exec_time"
+	// FieldExecMemory holds the string denoting the exec_memory field in the database.
+	FieldExecMemory = "exec_memory"
+	// EdgeSubmit holds the string denoting the submit edge name in mutations.
+	EdgeSubmit = "submit"
+	// EdgeTestcase holds the string denoting the testcase edge name in mutations.
+	EdgeTestcase = "testcase"
 	// Table holds the table name of the testcaseresult in the database.
 	Table = "testcase_results"
+	// SubmitTable is the table that holds the submit relation/edge.
+	SubmitTable = "testcase_results"
+	// SubmitInverseTable is the table name for the Submit entity.
+	// It exists in this package in order to avoid circular dependency with the "submit" package.
+	SubmitInverseTable = "submits"
+	// SubmitColumn is the table column denoting the submit relation/edge.
+	SubmitColumn = "submit_testcase_results"
+	// TestcaseTable is the table that holds the testcase relation/edge.
+	TestcaseTable = "testcase_results"
+	// TestcaseInverseTable is the table name for the Testcase entity.
+	// It exists in this package in order to avoid circular dependency with the "testcase" package.
+	TestcaseInverseTable = "testcases"
+	// TestcaseColumn is the table column denoting the testcase relation/edge.
+	TestcaseColumn = "testcase_result_testcase"
 )
 
 // Columns holds all SQL columns for testcaseresult fields.
 var Columns = []string{
 	FieldID,
+	FieldStatus,
+	FieldExecTime,
+	FieldExecMemory,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "testcase_results"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"submit_testcase_result",
+	"submit_testcase_results",
+	"testcase_result_testcase",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -47,4 +76,47 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByExecTime orders the results by the exec_time field.
+func ByExecTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecTime, opts...).ToFunc()
+}
+
+// ByExecMemory orders the results by the exec_memory field.
+func ByExecMemory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecMemory, opts...).ToFunc()
+}
+
+// BySubmitField orders the results by submit field.
+func BySubmitField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubmitStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByTestcaseField orders the results by testcase field.
+func ByTestcaseField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTestcaseStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newSubmitStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubmitInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SubmitTable, SubmitColumn),
+	)
+}
+func newTestcaseStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TestcaseInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, TestcaseTable, TestcaseColumn),
+	)
 }

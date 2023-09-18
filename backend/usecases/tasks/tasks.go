@@ -3,16 +3,19 @@ package tasks
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 
 	"github.com/samber/lo"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	ent_testcaseset "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
+	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
+	sources_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
@@ -22,53 +25,226 @@ import (
 )
 
 type Interactor struct {
-	entClient  *ent.Client
-	repository testcases_repo.Repository
-	logger     *slog.Logger
+	entClient     *ent.Client
+	testcasesRepo testcases_repo.Repository
+	sourcesRepo   sources_repo.Repository
+	judgeQueue    judge_queue.JudgeQueue
+	logger        *slog.Logger
 }
 
-func NewInteractor(entClient *ent.Client, repository testcases_repo.Repository) *Interactor {
+func NewInteractor(
+	entClient *ent.Client,
+	testcasesRepo testcases_repo.Repository,
+	sourcesRepo sources_repo.Repository,
+	judgeQueue judge_queue.JudgeQueue,
+) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "tasks"))
-	return &Interactor{entClient, repository, logger}
+	return &Interactor{entClient, testcasesRepo, sourcesRepo, judgeQueue, logger}
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
+	claims := intercepter.GetClaimsFromContext(ctx)
+
+	var task *ent.Task
+	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
+		userID, err := tx.User.Query().Where(ent_user.Username(claims.Username)).OnlyID(ctx)
+		if err != nil {
+			i.logger.Error("[!!!inconsistency!!!] failed to get user", slog.Any("error", err), slog.String("username", claims.Username))
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		// TODO: SetUser
+		q := tx.Task.Create().
+			SetTitle(req.Task.Title).
+			SetStatement(req.Task.Statement).
+			SetDifficulty(req.Task.Difficulty.String()).
+			SetExecTimeLimit(uint(req.Task.ExecTimeLimit)).
+			SetExecMemoryLimit(uint(req.Task.ExecMemoryLimit)).
+			SetCreatedAt(timejst.Now()).
+			SetUserID(userID)
+		switch ty := req.Task.JudgeType.JudgeType.(type) {
+		case *judgev1.JudgeType_Normal:
+			q.SetJudgeType(ent_task.JudgeTypeNormal)
+			q.SetCaseInsensitive(*ty.Normal.CaseInsensitive)
+		case *judgev1.JudgeType_Eps:
+			q.SetJudgeType(ent_task.JudgeTypeEps)
+			q.SetNdigits(uint(ty.Eps.Ndigits))
+		case *judgev1.JudgeType_Interactive:
+			q.SetJudgeType(ent_task.JudgeTypeInteractive)
+			q.SetJudgeCodePath(ty.Interactive.JudgeCodePath)
+		case *judgev1.JudgeType_Custom:
+			q.SetJudgeType(ent_task.JudgeTypeCustom)
+			q.SetJudgeCodePath(ty.Custom.JudgeCodePath)
+		default:
+			return fmt.Errorf("unrecognized JudgeType: %T", ty)
+		}
+		task, err = q.Save(ctx)
+		if err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		i.logger.Error("failed to register task information", slog.Any("error", err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	i.logger.Info("succeeded to register task information", slog.Int("task_id", task.ID))
+
+	return &backendv1.CreateTaskResponse{
+		Task: toPbTask(task),
+	}, nil
+}
+
+func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest) (*backendv1.GetTaskResponse, error) {
+	task, err := i.entClient.Task.Get(ctx, int(req.TaskId))
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &backendv1.GetTaskResponse{
+		Task: toPbTask(task),
+	}, nil
+}
+
+func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRequest) (*backendv1.UpdateTaskResponse, error) {
+	claims := intercepter.GetClaimsFromContext(ctx)
+
+	var task *ent.Task
+	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
+		task, err = tx.Task.Query().WithUser().Where(ent_task.ID(int(req.TaskId))).Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+			}
+			i.logger.Error("failed to get task", slog.Any("error", err), slog.Int("task_id", int(req.TaskId)))
+			return status.Error(codes.Internal, err.Error())
+		}
+		if claims.Username != task.Edges.User.Username {
+			return status.Errorf(codes.PermissionDenied, "the task(id: %d) is not yours", req.TaskId)
+		}
+
+		q := tx.Task.UpdateOneID(int(req.TaskId)).
+			SetTitle(req.Task.Title).
+			SetStatement(req.Task.Statement).
+			SetDifficulty(req.Task.Difficulty.String()).
+			SetExecTimeLimit(uint(req.Task.ExecTimeLimit)).
+			SetExecMemoryLimit(uint(req.Task.ExecMemoryLimit)).
+			SetUpdatedAt(timejst.Now())
+		switch ty := req.Task.JudgeType.JudgeType.(type) {
+		case *judgev1.JudgeType_Normal:
+			q.SetJudgeType(ent_task.JudgeTypeNormal)
+			q.SetCaseInsensitive(*ty.Normal.CaseInsensitive)
+		case *judgev1.JudgeType_Eps:
+			q.SetJudgeType(ent_task.JudgeTypeEps)
+			q.SetNdigits(uint(ty.Eps.Ndigits))
+		case *judgev1.JudgeType_Interactive:
+			q.SetJudgeType(ent_task.JudgeTypeInteractive)
+			q.SetJudgeCodePath(ty.Interactive.JudgeCodePath)
+		case *judgev1.JudgeType_Custom:
+			q.SetJudgeType(ent_task.JudgeTypeCustom)
+			q.SetJudgeCodePath(ty.Custom.JudgeCodePath)
+		default:
+			return fmt.Errorf("unrecognized JudgeType: %T", ty)
+		}
+		task, err = q.Save(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+			}
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	i.logger.Info("succeeded to update task information", slog.Int("task_id", task.ID))
+
+	return &backendv1.UpdateTaskResponse{
+		Task: toPbTask(task),
+	}, nil
+}
+
+func (i *Interactor) GetTestcaseSets(ctx context.Context, req *backendv1.GetTestcaseSetsRequest) (*backendv1.GetTestcaseSetsResponse, error) {
+	testcaseSets, err := i.entClient.TestcaseSet.Query().
+		WithTestcases().
+		Where(ent_testcaseset.HasTaskWith(ent_task.ID(int(req.TaskId)))).
+		All(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	testcaseByName := make(map[string]*backendv1.Testcase)
+	for _, ts := range testcaseSets {
+		for _, t := range ts.Edges.Testcases {
+			if _, ok := testcaseByName[t.Name]; ok {
+				continue
+			}
+			testcase, err := i.testcasesRepo.DownloadTestcase(ctx, int(req.TaskId), t.Name)
+			if err != nil {
+				i.logger.Error("failed to download testcase", slog.Int("task_id", int(req.TaskId)), slog.String("testcase_name", t.Name))
+				return nil, status.Error(codes.Internal, err.Error())
+			}
+			testcaseByName[t.Name] = toPbTestcase(t, testcase.In, testcase.Out)
+		}
+	}
+
+	return &backendv1.GetTestcaseSetsResponse{
+		Testcases: lo.MapToSlice(testcaseByName, func(name string, t *backendv1.Testcase) *backendv1.Testcase {
+			return t
+		}),
+		TestcaseSets: lo.Map(testcaseSets, func(ts *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
+			return toPbTestcaseSet(ts)
+		}),
+	}, nil
+
+}
+
+func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) (*backendv1.SyncTestcaseSetsResponse, error) {
+	claims := intercepter.GetClaimsFromContext(ctx)
+
 	var (
-		task         *ent.Task
 		testcaseSets []*ent.TestcaseSet
 		testcases    []*ent.Testcase
 	)
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
+		task, err := tx.Task.Query().WithUser().Where(ent_task.ID(int(req.TaskId))).Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+			}
+			i.logger.Error("failed to get task", slog.Any("error", err), slog.Int("task_id", int(req.TaskId)))
+			return status.Error(codes.Internal, err.Error())
+		}
+		if claims.Username != task.Edges.User.Username {
+			return status.Errorf(codes.PermissionDenied, "the task(id: %d) is not yours", req.TaskId)
+		}
+
 		// Testcase
-		testcases, err = upsertTestcases(ctx, tx, nil, req.Testcases)
+		testcases, err = syncTestcases(ctx, tx, int(req.TaskId), req.Testcases)
 		if err != nil {
 			i.logger.Error("failed to upsert testcases", slog.Any("error", err))
 			return err
 		}
 
 		// TestcaseSet
-		testcaseSets, err = upsertTestcaseSets(ctx, tx, nil, req.TestcaseSets, testcases)
+		testcaseSets, err = syncTestcaseSets(ctx, tx, int(req.TaskId), req.TestcaseSets, testcases)
 		if err != nil {
 			i.logger.Error("failed to upsert testcase_sets", slog.Any("error", err))
 			return err
 		}
 
-		// Task
-		task, err = upsertTask(ctx, tx, nil, req.Task, testcaseSets, testcases)
-		if err != nil {
-			i.logger.Error("failed to upsert task", slog.Any("error", err))
-			return err
-		}
-
 		return nil
 	}); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	i.logger.Info("succeeded to register task information", slog.Int("task_id", task.ID))
-
 	for _, testcase := range req.Testcases {
-		if err := i.repository.UploadTestcase(ctx, task.ID, &testcases_repo.Testcase{
+		if err := i.testcasesRepo.UpsertTestcase(ctx, int(req.TaskId), &testcases_repo.Testcase{
 			Name: testcase.Slug,
 			In:   []byte(testcase.Input),
 			Out:  []byte(testcase.Output),
@@ -77,123 +253,25 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 			return nil, err
 		}
 	}
-
-	i.logger.Info("succeeded to upload testcases", slog.Int("task_id", task.ID))
-
-	return &backendv1.CreateTaskResponse{
-		Task: toPbTask(task),
-		Testcases: lo.Map(testcases, func(t *ent.Testcase, i int) *backendv1.Testcase {
-			return toPbTestcase(t, []byte(req.Testcases[i].Input), []byte(req.Testcases[i].Output))
+	return &backendv1.SyncTestcaseSetsResponse{
+		TestcaseSets: lo.Map(testcaseSets, func(ts *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
+			return toPbTestcaseSet(ts)
 		}),
-		TestcaseSets: lo.Map(testcaseSets, func(t *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
-			return toPbTestcaseSet(t)
+		Testcases: lo.Map(testcases, func(t *ent.Testcase, _ int) *backendv1.Testcase {
+			return toPbTestcase(t, nil, nil)
 		}),
 	}, nil
 }
 
-func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRequest) (*backendv1.UpdateTaskResponse, error) {
-	var (
-		task         *ent.Task
-		testcaseSets []*ent.TestcaseSet
-		testcases    []*ent.Testcase
-	)
-
-	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
-		// Testcase
-		testcases, err = upsertTestcases(ctx, tx, lo.ToPtr(int(req.Id)), req.Testcases)
-		if err != nil {
-			i.logger.Error("failed to upsert testcases", slog.Any("error", err), slog.Int("task_id", int(req.Id)))
-			return err
-		}
-
-		// TestcaseSet
-		testcaseSets, err = upsertTestcaseSets(ctx, tx, lo.ToPtr(int(req.Id)), req.TestcaseSets, testcases)
-		if err != nil {
-			i.logger.Error("failed to upsert testcase_sets", slog.Any("error", err), slog.Int("task_id", int(req.Id)))
-			return err
-		}
-
-		// Task
-		task, err = upsertTask(ctx, tx, lo.ToPtr(int(req.Id)), req.Task, testcaseSets, testcases)
-		if err != nil {
-			i.logger.Error("failed to upsert task", slog.Any("error", err), slog.Int("task_id", int(req.Id)))
-			return err
-		}
-
-		return nil
-	}); err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	i.logger.Info("succeeded to register task information", slog.Int("task_id", task.ID))
-
-	for _, testcase := range req.Testcases {
-		if err := i.repository.UploadTestcase(ctx, task.ID, &testcases_repo.Testcase{
-			Name: testcase.Slug,
-			In:   []byte(testcase.Input),
-			Out:  []byte(testcase.Output),
-		}); err != nil {
-			i.logger.Error("failed to upload a testcase", slog.Any("error", err))
-			return nil, err
-		}
-	}
-
-	i.logger.Info("succeeded to upload testcases", slog.Int("task_id", task.ID))
-
-	return &backendv1.UpdateTaskResponse{
-		Task: toPbTask(task),
-		Testcases: lo.Map(testcases, func(t *ent.Testcase, i int) *backendv1.Testcase {
-			return toPbTestcase(t, []byte(req.Testcases[i].Input), []byte(req.Testcases[i].Output))
-		}),
-		TestcaseSets: lo.Map(testcaseSets, func(t *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
-			return toPbTestcaseSet(t)
-		}),
-	}, nil
-}
-
-func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest) (*backendv1.GetTaskResponse, error) {
-	q := i.entClient.Task.Query()
-	task, err := q.WithTestcaseSets().
-		WithTestcases().
-		Where(ent_task.ID(int(req.Id))).Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "the user(id: %d) is not found", req.Id)
-		}
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	testcases := make([]*testcases_repo.Testcase, 0, len(task.Edges.Testcases))
-	for _, t := range task.Edges.Testcases {
-		testcase, err := i.repository.DownloadTestcase(ctx, int(req.Id), t.Name)
-		if err != nil {
-			i.logger.Error("failed to download testcase", slog.Int("task_id", int(req.Id)), slog.String("testcase_name", t.Name))
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-		testcases = append(testcases, testcase)
-	}
-
-	return &backendv1.GetTaskResponse{
-		Task: toPbTask(task),
-		TestcaseSets: lo.Map(task.Edges.TestcaseSets, func(t *ent.TestcaseSet, _ int) *backendv1.TestcaseSet {
-			return toPbTestcaseSet(t)
-		}),
-		Testcases: lo.Map(task.Edges.Testcases, func(t *ent.Testcase, i int) *backendv1.Testcase {
-			return toPbTestcase(t, testcases[i].In, testcases[i].Out)
-		}),
-	}, nil
-}
-
-func upsertTestcases(ctx context.Context, tx *ent.Tx, taskID *int, list []*backendv1.MutationTestcase) ([]*ent.Testcase, error) {
+func syncTestcases(ctx context.Context, tx *ent.Tx, taskID int, list []*backendv1.MutationTestcase) ([]*ent.Testcase, error) {
 	var (
 		oldTestcaseIDs []int
 		err            error
 	)
-	if taskID != nil {
-		oldTestcaseIDs, err = tx.Testcase.Query().Where(ent_testcase.HasTaskWith(ent_task.ID(*taskID))).IDs(ctx)
-		if err != nil {
-			return nil, err
-		}
+
+	oldTestcaseIDs, err = tx.Testcase.Query().Where(ent_testcase.HasTaskWith(ent_task.ID(taskID))).IDs(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	newTestcaseIDs := make([]int, 0, len(list))
@@ -202,6 +280,7 @@ func upsertTestcases(ctx context.Context, tx *ent.Tx, taskID *int, list []*backe
 		testcaseID, err := tx.Testcase.Create().
 			SetName(mt.Slug).
 			SetNillableDescription(mt.Description).
+			SetTaskID(taskID).
 			SetCreatedAt(now).
 			OnConflict().
 			UpdateNewValues().
@@ -214,31 +293,32 @@ func upsertTestcases(ctx context.Context, tx *ent.Tx, taskID *int, list []*backe
 		newTestcaseIDs = append(newTestcaseIDs, testcaseID)
 	}
 
-	if taskID != nil {
-		// 使われなくなった Testcase を削除
-		_, removeIDs := diffSlices(oldTestcaseIDs, newTestcaseIDs)
-		if _, err := tx.Testcase.Delete().Where(ent_testcase.IDIn(removeIDs...)).Exec(ctx); err != nil {
-			return nil, err
-		}
+	// 使われなくなった Testcase を削除
+	_, removeIDs := diffSlices(oldTestcaseIDs, newTestcaseIDs)
+	if _, err := tx.Testcase.Delete().Where(ent_testcase.IDIn(removeIDs...)).Exec(ctx); err != nil {
+		return nil, err
 	}
 
 	return tx.Testcase.Query().Where(ent_testcase.IDIn(newTestcaseIDs...)).All(ctx)
 }
 
-func upsertTestcaseSets(ctx context.Context, tx *ent.Tx, taskID *int, testcaseSetList []*backendv1.MutationTestcaseSet, testcaseList []*ent.Testcase) ([]*ent.TestcaseSet, error) {
+func syncTestcaseSets(
+	ctx context.Context,
+	tx *ent.Tx,
+	taskID int,
+	testcaseSetList []*backendv1.MutationTestcaseSet,
+	testcaseList []*ent.Testcase,
+) ([]*ent.TestcaseSet, error) {
 	now := timejst.Now()
 
 	var (
 		testcaseSetAllIDs []int
 		err               error
 	)
-	if taskID != nil {
-		testcaseSetAllIDs, err = tx.TestcaseSet.Query().Where(ent_testcaseset.HasTaskWith(ent_task.ID(*taskID))).IDs(ctx)
-		if err != nil {
-			return nil, err
-		}
+	testcaseSetAllIDs, err = tx.TestcaseSet.Query().Where(ent_testcaseset.HasTaskWith(ent_task.ID(taskID))).IDs(ctx)
+	if err != nil {
+		return nil, err
 	}
-
 	testcaseByName := lo.Associate(testcaseList, func(t *ent.Testcase) (string, *ent.Testcase) { return t.Name, t })
 
 	testcaseSetIDs := make([]int, 0, len(testcaseSetList))
@@ -253,6 +333,7 @@ func upsertTestcaseSets(ctx context.Context, tx *ent.Tx, taskID *int, testcaseSe
 			SetName(testcaseSet.Slug).
 			SetScore(int(testcaseSet.Score)).
 			SetIsSample(testcaseSet.IsSample).
+			SetTaskID(taskID).
 			AddTestcaseIDs(newTestcaseIDs...).
 			SetCreatedAt(now).
 			OnConflict().
@@ -273,75 +354,13 @@ func upsertTestcaseSets(ctx context.Context, tx *ent.Tx, taskID *int, testcaseSe
 		testcaseSetIDs = append(testcaseSetIDs, testcaseSetID)
 	}
 
-	if taskID != nil {
-		// 使われなくなった TestcaseSet を削除
-		_, removeIDs := diffSlices(testcaseSetAllIDs, testcaseSetIDs)
-		if _, err := tx.Testcase.Delete().Where(ent_testcase.IDIn(removeIDs...)).Exec(ctx); err != nil {
-			return nil, err
-		}
-	}
-
-	return tx.TestcaseSet.Query().Where(ent_testcaseset.IDIn(testcaseSetIDs...)).All(ctx)
-}
-
-func upsertTask(ctx context.Context, tx *ent.Tx, taskID *int, task *backendv1.MutationTask, testcaseSetList []*ent.TestcaseSet, testcaseList []*ent.Testcase) (*ent.Task, error) {
-	now := timejst.Now()
-
-	testcaseSetIDs := lo.Map(testcaseSetList, func(t *ent.TestcaseSet, _ int) int { return t.ID })
-	testcaseIDs := lo.Map(testcaseList, func(t *ent.Testcase, _ int) int { return t.ID })
-
-	// TODO: SetUser
-	q := tx.Task.Create().
-		SetTitle(task.Title).
-		SetStatement(task.Statement).
-		SetDifficulty(task.Difficulty.String()).
-		SetExecTimeLimit(uint(task.ExecTimeLimit)).
-		SetExecMemoryLimit(uint(task.ExecMemoryLimit)).
-		SetCreatedAt(now)
-	if taskID != nil {
-		q.SetID(*taskID)
-	} else {
-		q.AddTestcaseIDs(testcaseIDs...).
-			AddTestcaseSetIDs(testcaseSetIDs...)
-	}
-	switch ty := task.JudgeType.JudgeType.(type) {
-	case *judgev1.JudgeType_Normal:
-		q.SetJudgeType(ent_task.JudgeTypeNormal)
-		q.SetCaseInsensitive(*ty.Normal.CaseInsensitive)
-	case *judgev1.JudgeType_Eps:
-		q.SetJudgeType(ent_task.JudgeTypeEps)
-		q.SetNdigits(uint(ty.Eps.Ndigits))
-	case *judgev1.JudgeType_Interactive:
-		q.SetJudgeType(ent_task.JudgeTypeInteractive)
-		q.SetJudgeCodePath(ty.Interactive.JudgeCodePath)
-	case *judgev1.JudgeType_Custom:
-		q.SetJudgeType(ent_task.JudgeTypeCustom)
-		q.SetJudgeCodePath(ty.Custom.JudgeCodePath)
-	default:
-		return nil, fmt.Errorf("unrecognized JudgeType: %T", ty)
-	}
-
-	id, err := q.OnConflict().
-		UpdateNewValues().
-		Update(func(tu *ent.TaskUpsert) {
-			tu.SetUpdatedAt(now)
-		}).ID(ctx)
-	if err != nil {
-		log.Println(err)
+	// 使われなくなった TestcaseSet を削除
+	_, removeIDs := diffSlices(testcaseSetAllIDs, testcaseSetIDs)
+	if _, err := tx.Testcase.Delete().Where(ent_testcase.IDIn(removeIDs...)).Exec(ctx); err != nil {
 		return nil, err
 	}
 
-	if taskID != nil {
-		if err := tx.Task.UpdateOneID(id).ClearTestcases().ClearTestcaseSets().Exec(ctx); err != nil {
-			return nil, err
-		}
-		return tx.Task.UpdateOneID(id).
-			AddTestcaseIDs(testcaseIDs...).
-			AddTestcaseSetIDs(testcaseSetIDs...).
-			Save(ctx)
-	}
-
-	return tx.Task.Get(ctx, id)
+	return tx.TestcaseSet.Query().Where(ent_testcaseset.IDIn(testcaseSetIDs...)).All(ctx)
 }
 
 func diffSlices[T comparable](prevList, nextList []T) (addList, removeList []T) {

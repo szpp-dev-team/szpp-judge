@@ -40,10 +40,10 @@ const (
 	EdgeTestcaseSets = "testcase_sets"
 	// EdgeTestcases holds the string denoting the testcases edge name in mutations.
 	EdgeTestcases = "testcases"
+	// EdgeSubmits holds the string denoting the submits edge name in mutations.
+	EdgeSubmits = "submits"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
-	// EdgeTaskContests holds the string denoting the task_contests edge name in mutations.
-	EdgeTaskContests = "task_contests"
 	// Table holds the table name of the task in the database.
 	Table = "tasks"
 	// TestcaseSetsTable is the table that holds the testcase_sets relation/edge.
@@ -60,6 +60,13 @@ const (
 	TestcasesInverseTable = "testcases"
 	// TestcasesColumn is the table column denoting the testcases relation/edge.
 	TestcasesColumn = "task_testcases"
+	// SubmitsTable is the table that holds the submits relation/edge.
+	SubmitsTable = "submits"
+	// SubmitsInverseTable is the table name for the Submit entity.
+	// It exists in this package in order to avoid circular dependency with the "submit" package.
+	SubmitsInverseTable = "submits"
+	// SubmitsColumn is the table column denoting the submits relation/edge.
+	SubmitsColumn = "task_submits"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "tasks"
 	// UserInverseTable is the table name for the User entity.
@@ -67,11 +74,6 @@ const (
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user_tasks"
-	// TaskContestsTable is the table that holds the task_contests relation/edge. The primary key declared below.
-	TaskContestsTable = "contest_tasks"
-	// TaskContestsInverseTable is the table name for the Contest entity.
-	// It exists in this package in order to avoid circular dependency with the "contest" package.
-	TaskContestsInverseTable = "contests"
 )
 
 // Columns holds all SQL columns for task fields.
@@ -93,14 +95,9 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "tasks"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"contest_tasks",
 	"user_tasks",
 }
-
-var (
-	// TaskContestsPrimaryKey and TaskContestsColumn2 are the table columns denoting the
-	// primary key for the task_contests relation (M2M).
-	TaskContestsPrimaryKey = []string{"contest_id", "task_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -233,24 +230,24 @@ func ByTestcases(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// BySubmitsCount orders the results by submits count.
+func BySubmitsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubmitsStep(), opts...)
+	}
+}
+
+// BySubmits orders the results by submits terms.
+func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubmitsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByUserField orders the results by user field.
 func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// ByTaskContestsCount orders the results by task_contests count.
-func ByTaskContestsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newTaskContestsStep(), opts...)
-	}
-}
-
-// ByTaskContests orders the results by task_contests terms.
-func ByTaskContests(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTaskContestsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newTestcaseSetsStep() *sqlgraph.Step {
@@ -267,17 +264,17 @@ func newTestcasesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, TestcasesTable, TestcasesColumn),
 	)
 }
+func newSubmitsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubmitsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
+	)
+}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
-	)
-}
-func newTaskContestsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TaskContestsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, TaskContestsTable, TaskContestsPrimaryKey...),
 	)
 }

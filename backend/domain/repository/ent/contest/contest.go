@@ -32,16 +32,20 @@ const (
 	EdgeContestUsers = "contest_users"
 	// Table holds the table name of the contest in the database.
 	Table = "contests"
-	// TasksTable is the table that holds the tasks relation/edge. The primary key declared below.
-	TasksTable = "contest_tasks"
+	// TasksTable is the table that holds the tasks relation/edge.
+	TasksTable = "tasks"
 	// TasksInverseTable is the table name for the Task entity.
 	// It exists in this package in order to avoid circular dependency with the "task" package.
 	TasksInverseTable = "tasks"
-	// SubmitsTable is the table that holds the submits relation/edge. The primary key declared below.
-	SubmitsTable = "contest_submits"
+	// TasksColumn is the table column denoting the tasks relation/edge.
+	TasksColumn = "contest_tasks"
+	// SubmitsTable is the table that holds the submits relation/edge.
+	SubmitsTable = "submits"
 	// SubmitsInverseTable is the table name for the Submit entity.
 	// It exists in this package in order to avoid circular dependency with the "submit" package.
 	SubmitsInverseTable = "submits"
+	// SubmitsColumn is the table column denoting the submits relation/edge.
+	SubmitsColumn = "contest_submits"
 	// ContestUsersTable is the table that holds the contest_users relation/edge. The primary key declared below.
 	ContestUsersTable = "user_contests"
 	// ContestUsersInverseTable is the table name for the User entity.
@@ -61,12 +65,6 @@ var Columns = []string{
 }
 
 var (
-	// TasksPrimaryKey and TasksColumn2 are the table columns denoting the
-	// primary key for the tasks relation (M2M).
-	TasksPrimaryKey = []string{"contest_id", "task_id"}
-	// SubmitsPrimaryKey and SubmitsColumn2 are the table columns denoting the
-	// primary key for the submits relation (M2M).
-	SubmitsPrimaryKey = []string{"contest_id", "submit_id"}
 	// ContestUsersPrimaryKey and ContestUsersColumn2 are the table columns denoting the
 	// primary key for the contest_users relation (M2M).
 	ContestUsersPrimaryKey = []string{"user_id", "contest_id"}
@@ -165,14 +163,14 @@ func newTasksStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TasksInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, TasksTable, TasksPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, TasksTable, TasksColumn),
 	)
 }
 func newSubmitsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubmitsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, SubmitsTable, SubmitsPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
 	)
 }
 func newContestUsersStep() *sqlgraph.Step {
