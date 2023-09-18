@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,6 +14,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/restapi_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
@@ -67,11 +69,22 @@ func main() {
 	// logger
 	logger := slog.Default()
 
-	srv := grpc_server.New(
+	httpSrv := &http.Server{
+		Handler: restapi_server.New(api.WithLogger(logger), api.WithEntClient(entClient), api.WithJudgeClient(judgeClient)),
+		Addr:    ":" + config.HttpPort,
+	}
+	go func() {
+		logger.Info("http server launched")
+		if err := httpSrv.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	grpcSrv := grpc_server.New(
 		api.WithLogger(logger),
 		api.WithEntClient(entClient),
 		api.WithReflection(config.ModeDev),
 		api.WithJudgeClient(judgeClient),
+		api.WithCloudtasksClient(cloudtasksClient),
 	)
 	lsnr, err := net.Listen("tcp", ":"+config.GrpcPort)
 	if err != nil {
@@ -79,14 +92,19 @@ func main() {
 	}
 	defer lsnr.Close()
 	go func() {
-		logger.Info("server launched")
-		if err := srv.Serve(lsnr); err != nil {
+		logger.Info("grpc server launched")
+		if err := grpcSrv.Serve(lsnr); err != nil {
 			log.Fatal(err)
 		}
 	}()
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	<-sigCh
-	logger.Info("server is being stopped")
-	srv.GracefulStop()
+	logger.Info("servers are being stopped")
+	grpcSrv.GracefulStop()
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := httpSrv.Shutdown(shutdownCtx); err != nil {
+		log.Fatal(err)
+	}
 }

@@ -8,6 +8,7 @@ type Config struct {
 	DBAddr    string `envconfig:"BACKEND_DB_ADDR" required:"true"`
 	DBName    string `envconfig:"MYSQL_DATABASE" required:"true"`
 	GrpcPort  string `envconfig:"BACKEND_GRPC_PORT" default:"50051"`
+	HttpPort  string `envconfig:"BACKEND_HTTP_PORT" default:"8080"`
 	ModeDev   bool   `envconfig:"MODE_DEV" default:"true"`
 	JudgeAddr string `envconfig:"BACKEND_JUDGE_ADDR" required:"true"`
 }
