@@ -33,7 +33,7 @@ message MutationContest {
   bool is_public = 6;
 }
 
-message StandingsElement {
+message StandingsRecord {
   message TaskDetail {
     int32 task_id = 1;
     int32 penalty_count = 2;

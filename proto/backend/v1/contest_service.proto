@@ -71,7 +71,7 @@ message GetStandingsRequest {
 }
 
 message GetStandingsResponse {
-  repeated StandingsElement standings_list = 1;
+  repeated StandingsRecord standings_list = 1;
 }
 
 // コンテストに参加登録するときのリクエスト
