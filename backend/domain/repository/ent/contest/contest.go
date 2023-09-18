@@ -20,21 +20,14 @@ const (
 	FieldStartAt = "start_at"
 	// FieldEndAt holds the string denoting the end_at field in the database.
 	FieldEndAt = "end_at"
-	// EdgeTasks holds the string denoting the tasks edge name in mutations.
-	EdgeTasks = "tasks"
 	// EdgeSubmits holds the string denoting the submits edge name in mutations.
 	EdgeSubmits = "submits"
-	// EdgeContestUsers holds the string denoting the contest_users edge name in mutations.
-	EdgeContestUsers = "contest_users"
+	// EdgeContestUser holds the string denoting the contest_user edge name in mutations.
+	EdgeContestUser = "contest_user"
+	// EdgeContestTask holds the string denoting the contest_task edge name in mutations.
+	EdgeContestTask = "contest_task"
 	// Table holds the table name of the contest in the database.
 	Table = "contests"
-	// TasksTable is the table that holds the tasks relation/edge.
-	TasksTable = "tasks"
-	// TasksInverseTable is the table name for the Task entity.
-	// It exists in this package in order to avoid circular dependency with the "task" package.
-	TasksInverseTable = "tasks"
-	// TasksColumn is the table column denoting the tasks relation/edge.
-	TasksColumn = "contest_tasks"
 	// SubmitsTable is the table that holds the submits relation/edge.
 	SubmitsTable = "submits"
 	// SubmitsInverseTable is the table name for the Submit entity.
@@ -42,13 +35,20 @@ const (
 	SubmitsInverseTable = "submits"
 	// SubmitsColumn is the table column denoting the submits relation/edge.
 	SubmitsColumn = "contest_submits"
-	// ContestUsersTable is the table that holds the contest_users relation/edge.
-	ContestUsersTable = "contest_users"
-	// ContestUsersInverseTable is the table name for the ContestUsers entity.
-	// It exists in this package in order to avoid circular dependency with the "contestusers" package.
-	ContestUsersInverseTable = "contest_users"
-	// ContestUsersColumn is the table column denoting the contest_users relation/edge.
-	ContestUsersColumn = "contest_id"
+	// ContestUserTable is the table that holds the contest_user relation/edge.
+	ContestUserTable = "contest_users"
+	// ContestUserInverseTable is the table name for the ContestUser entity.
+	// It exists in this package in order to avoid circular dependency with the "contestuser" package.
+	ContestUserInverseTable = "contest_users"
+	// ContestUserColumn is the table column denoting the contest_user relation/edge.
+	ContestUserColumn = "contest_id"
+	// ContestTaskTable is the table that holds the contest_task relation/edge.
+	ContestTaskTable = "contest_tasks"
+	// ContestTaskInverseTable is the table name for the ContestTask entity.
+	// It exists in this package in order to avoid circular dependency with the "contesttask" package.
+	ContestTaskInverseTable = "contest_tasks"
+	// ContestTaskColumn is the table column denoting the contest_task relation/edge.
+	ContestTaskColumn = "contest_id"
 )
 
 // Columns holds all SQL columns for contest fields.
@@ -98,20 +98,6 @@ func ByEndAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEndAt, opts...).ToFunc()
 }
 
-// ByTasksCount orders the results by tasks count.
-func ByTasksCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newTasksStep(), opts...)
-	}
-}
-
-// ByTasks orders the results by tasks terms.
-func ByTasks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTasksStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // BySubmitsCount orders the results by submits count.
 func BySubmitsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -126,25 +112,32 @@ func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByContestUsersCount orders the results by contest_users count.
-func ByContestUsersCount(opts ...sql.OrderTermOption) OrderOption {
+// ByContestUserCount orders the results by contest_user count.
+func ByContestUserCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newContestUsersStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newContestUserStep(), opts...)
 	}
 }
 
-// ByContestUsers orders the results by contest_users terms.
-func ByContestUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByContestUser orders the results by contest_user terms.
+func ByContestUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newContestUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newContestUserStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newTasksStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TasksInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, TasksTable, TasksColumn),
-	)
+
+// ByContestTaskCount orders the results by contest_task count.
+func ByContestTaskCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newContestTaskStep(), opts...)
+	}
+}
+
+// ByContestTask orders the results by contest_task terms.
+func ByContestTask(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newContestTaskStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
 }
 func newSubmitsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
@@ -153,10 +146,17 @@ func newSubmitsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
 	)
 }
-func newContestUsersStep() *sqlgraph.Step {
+func newContestUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ContestUsersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ContestUsersTable, ContestUsersColumn),
+		sqlgraph.To(ContestUserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ContestUserTable, ContestUserColumn),
+	)
+}
+func newContestTaskStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ContestTaskInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ContestTaskTable, ContestTaskColumn),
 	)
 }

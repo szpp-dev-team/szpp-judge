@@ -11,76 +11,64 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
-// ContestUsersCreate is the builder for creating a ContestUsers entity.
-type ContestUsersCreate struct {
+// ContestUserCreate is the builder for creating a ContestUser entity.
+type ContestUserCreate struct {
 	config
-	mutation *ContestUsersMutation
+	mutation *ContestUserMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
 }
 
 // SetRole sets the "role" field.
-func (cuc *ContestUsersCreate) SetRole(s string) *ContestUsersCreate {
+func (cuc *ContestUserCreate) SetRole(s string) *ContestUserCreate {
 	cuc.mutation.SetRole(s)
 	return cuc
 }
 
 // SetContestID sets the "contest_id" field.
-func (cuc *ContestUsersCreate) SetContestID(i int) *ContestUsersCreate {
+func (cuc *ContestUserCreate) SetContestID(i int) *ContestUserCreate {
 	cuc.mutation.SetContestID(i)
 	return cuc
 }
 
 // SetUserID sets the "user_id" field.
-func (cuc *ContestUsersCreate) SetUserID(i int) *ContestUsersCreate {
+func (cuc *ContestUserCreate) SetUserID(i int) *ContestUserCreate {
 	cuc.mutation.SetUserID(i)
 	return cuc
 }
 
 // SetID sets the "id" field.
-func (cuc *ContestUsersCreate) SetID(i int) *ContestUsersCreate {
+func (cuc *ContestUserCreate) SetID(i int) *ContestUserCreate {
 	cuc.mutation.SetID(i)
 	return cuc
 }
 
-// SetContestsID sets the "contests" edge to the Contest entity by ID.
-func (cuc *ContestUsersCreate) SetContestsID(id int) *ContestUsersCreate {
-	cuc.mutation.SetContestsID(id)
-	return cuc
+// SetContest sets the "contest" edge to the Contest entity.
+func (cuc *ContestUserCreate) SetContest(c *Contest) *ContestUserCreate {
+	return cuc.SetContestID(c.ID)
 }
 
-// SetContests sets the "contests" edge to the Contest entity.
-func (cuc *ContestUsersCreate) SetContests(c *Contest) *ContestUsersCreate {
-	return cuc.SetContestsID(c.ID)
+// SetUser sets the "user" edge to the User entity.
+func (cuc *ContestUserCreate) SetUser(u *User) *ContestUserCreate {
+	return cuc.SetUserID(u.ID)
 }
 
-// SetUsersID sets the "users" edge to the User entity by ID.
-func (cuc *ContestUsersCreate) SetUsersID(id int) *ContestUsersCreate {
-	cuc.mutation.SetUsersID(id)
-	return cuc
-}
-
-// SetUsers sets the "users" edge to the User entity.
-func (cuc *ContestUsersCreate) SetUsers(u *User) *ContestUsersCreate {
-	return cuc.SetUsersID(u.ID)
-}
-
-// Mutation returns the ContestUsersMutation object of the builder.
-func (cuc *ContestUsersCreate) Mutation() *ContestUsersMutation {
+// Mutation returns the ContestUserMutation object of the builder.
+func (cuc *ContestUserCreate) Mutation() *ContestUserMutation {
 	return cuc.mutation
 }
 
-// Save creates the ContestUsers in the database.
-func (cuc *ContestUsersCreate) Save(ctx context.Context) (*ContestUsers, error) {
+// Save creates the ContestUser in the database.
+func (cuc *ContestUserCreate) Save(ctx context.Context) (*ContestUser, error) {
 	return withHooks(ctx, cuc.sqlSave, cuc.mutation, cuc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (cuc *ContestUsersCreate) SaveX(ctx context.Context) *ContestUsers {
+func (cuc *ContestUserCreate) SaveX(ctx context.Context) *ContestUser {
 	v, err := cuc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -89,39 +77,39 @@ func (cuc *ContestUsersCreate) SaveX(ctx context.Context) *ContestUsers {
 }
 
 // Exec executes the query.
-func (cuc *ContestUsersCreate) Exec(ctx context.Context) error {
+func (cuc *ContestUserCreate) Exec(ctx context.Context) error {
 	_, err := cuc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cuc *ContestUsersCreate) ExecX(ctx context.Context) {
+func (cuc *ContestUserCreate) ExecX(ctx context.Context) {
 	if err := cuc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cuc *ContestUsersCreate) check() error {
+func (cuc *ContestUserCreate) check() error {
 	if _, ok := cuc.mutation.Role(); !ok {
-		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "ContestUsers.role"`)}
+		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "ContestUser.role"`)}
 	}
 	if _, ok := cuc.mutation.ContestID(); !ok {
-		return &ValidationError{Name: "contest_id", err: errors.New(`ent: missing required field "ContestUsers.contest_id"`)}
+		return &ValidationError{Name: "contest_id", err: errors.New(`ent: missing required field "ContestUser.contest_id"`)}
 	}
 	if _, ok := cuc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "ContestUsers.user_id"`)}
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "ContestUser.user_id"`)}
 	}
-	if _, ok := cuc.mutation.ContestsID(); !ok {
-		return &ValidationError{Name: "contests", err: errors.New(`ent: missing required edge "ContestUsers.contests"`)}
+	if _, ok := cuc.mutation.ContestID(); !ok {
+		return &ValidationError{Name: "contest", err: errors.New(`ent: missing required edge "ContestUser.contest"`)}
 	}
-	if _, ok := cuc.mutation.UsersID(); !ok {
-		return &ValidationError{Name: "users", err: errors.New(`ent: missing required edge "ContestUsers.users"`)}
+	if _, ok := cuc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "ContestUser.user"`)}
 	}
 	return nil
 }
 
-func (cuc *ContestUsersCreate) sqlSave(ctx context.Context) (*ContestUsers, error) {
+func (cuc *ContestUserCreate) sqlSave(ctx context.Context) (*ContestUser, error) {
 	if err := cuc.check(); err != nil {
 		return nil, err
 	}
@@ -141,10 +129,10 @@ func (cuc *ContestUsersCreate) sqlSave(ctx context.Context) (*ContestUsers, erro
 	return _node, nil
 }
 
-func (cuc *ContestUsersCreate) createSpec() (*ContestUsers, *sqlgraph.CreateSpec) {
+func (cuc *ContestUserCreate) createSpec() (*ContestUser, *sqlgraph.CreateSpec) {
 	var (
-		_node = &ContestUsers{config: cuc.config}
-		_spec = sqlgraph.NewCreateSpec(contestusers.Table, sqlgraph.NewFieldSpec(contestusers.FieldID, field.TypeInt))
+		_node = &ContestUser{config: cuc.config}
+		_spec = sqlgraph.NewCreateSpec(contestuser.Table, sqlgraph.NewFieldSpec(contestuser.FieldID, field.TypeInt))
 	)
 	_spec.OnConflict = cuc.conflict
 	if id, ok := cuc.mutation.ID(); ok {
@@ -152,15 +140,15 @@ func (cuc *ContestUsersCreate) createSpec() (*ContestUsers, *sqlgraph.CreateSpec
 		_spec.ID.Value = id
 	}
 	if value, ok := cuc.mutation.Role(); ok {
-		_spec.SetField(contestusers.FieldRole, field.TypeString, value)
+		_spec.SetField(contestuser.FieldRole, field.TypeString, value)
 		_node.Role = value
 	}
-	if nodes := cuc.mutation.ContestsIDs(); len(nodes) > 0 {
+	if nodes := cuc.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   contestusers.ContestsTable,
-			Columns: []string{contestusers.ContestsColumn},
+			Table:   contestuser.ContestTable,
+			Columns: []string{contestuser.ContestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
@@ -172,12 +160,12 @@ func (cuc *ContestUsersCreate) createSpec() (*ContestUsers, *sqlgraph.CreateSpec
 		_node.ContestID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cuc.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := cuc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   contestusers.UsersTable,
-			Columns: []string{contestusers.UsersColumn},
+			Table:   contestuser.UserTable,
+			Columns: []string{contestuser.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -195,7 +183,7 @@ func (cuc *ContestUsersCreate) createSpec() (*ContestUsers, *sqlgraph.CreateSpec
 // OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
 // of the `INSERT` statement. For example:
 //
-//	client.ContestUsers.Create().
+//	client.ContestUser.Create().
 //		SetRole(v).
 //		OnConflict(
 //			// Update the row with the new values
@@ -204,13 +192,13 @@ func (cuc *ContestUsersCreate) createSpec() (*ContestUsers, *sqlgraph.CreateSpec
 //		).
 //		// Override some of the fields with custom
 //		// update values.
-//		Update(func(u *ent.ContestUsersUpsert) {
+//		Update(func(u *ent.ContestUserUpsert) {
 //			SetRole(v+v).
 //		}).
 //		Exec(ctx)
-func (cuc *ContestUsersCreate) OnConflict(opts ...sql.ConflictOption) *ContestUsersUpsertOne {
+func (cuc *ContestUserCreate) OnConflict(opts ...sql.ConflictOption) *ContestUserUpsertOne {
 	cuc.conflict = opts
-	return &ContestUsersUpsertOne{
+	return &ContestUserUpsertOne{
 		create: cuc,
 	}
 }
@@ -218,81 +206,81 @@ func (cuc *ContestUsersCreate) OnConflict(opts ...sql.ConflictOption) *ContestUs
 // OnConflictColumns calls `OnConflict` and configures the columns
 // as conflict target. Using this option is equivalent to using:
 //
-//	client.ContestUsers.Create().
+//	client.ContestUser.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (cuc *ContestUsersCreate) OnConflictColumns(columns ...string) *ContestUsersUpsertOne {
+func (cuc *ContestUserCreate) OnConflictColumns(columns ...string) *ContestUserUpsertOne {
 	cuc.conflict = append(cuc.conflict, sql.ConflictColumns(columns...))
-	return &ContestUsersUpsertOne{
+	return &ContestUserUpsertOne{
 		create: cuc,
 	}
 }
 
 type (
-	// ContestUsersUpsertOne is the builder for "upsert"-ing
-	//  one ContestUsers node.
-	ContestUsersUpsertOne struct {
-		create *ContestUsersCreate
+	// ContestUserUpsertOne is the builder for "upsert"-ing
+	//  one ContestUser node.
+	ContestUserUpsertOne struct {
+		create *ContestUserCreate
 	}
 
-	// ContestUsersUpsert is the "OnConflict" setter.
-	ContestUsersUpsert struct {
+	// ContestUserUpsert is the "OnConflict" setter.
+	ContestUserUpsert struct {
 		*sql.UpdateSet
 	}
 )
 
 // SetRole sets the "role" field.
-func (u *ContestUsersUpsert) SetRole(v string) *ContestUsersUpsert {
-	u.Set(contestusers.FieldRole, v)
+func (u *ContestUserUpsert) SetRole(v string) *ContestUserUpsert {
+	u.Set(contestuser.FieldRole, v)
 	return u
 }
 
 // UpdateRole sets the "role" field to the value that was provided on create.
-func (u *ContestUsersUpsert) UpdateRole() *ContestUsersUpsert {
-	u.SetExcluded(contestusers.FieldRole)
+func (u *ContestUserUpsert) UpdateRole() *ContestUserUpsert {
+	u.SetExcluded(contestuser.FieldRole)
 	return u
 }
 
 // SetContestID sets the "contest_id" field.
-func (u *ContestUsersUpsert) SetContestID(v int) *ContestUsersUpsert {
-	u.Set(contestusers.FieldContestID, v)
+func (u *ContestUserUpsert) SetContestID(v int) *ContestUserUpsert {
+	u.Set(contestuser.FieldContestID, v)
 	return u
 }
 
 // UpdateContestID sets the "contest_id" field to the value that was provided on create.
-func (u *ContestUsersUpsert) UpdateContestID() *ContestUsersUpsert {
-	u.SetExcluded(contestusers.FieldContestID)
+func (u *ContestUserUpsert) UpdateContestID() *ContestUserUpsert {
+	u.SetExcluded(contestuser.FieldContestID)
 	return u
 }
 
 // SetUserID sets the "user_id" field.
-func (u *ContestUsersUpsert) SetUserID(v int) *ContestUsersUpsert {
-	u.Set(contestusers.FieldUserID, v)
+func (u *ContestUserUpsert) SetUserID(v int) *ContestUserUpsert {
+	u.Set(contestuser.FieldUserID, v)
 	return u
 }
 
 // UpdateUserID sets the "user_id" field to the value that was provided on create.
-func (u *ContestUsersUpsert) UpdateUserID() *ContestUsersUpsert {
-	u.SetExcluded(contestusers.FieldUserID)
+func (u *ContestUserUpsert) UpdateUserID() *ContestUserUpsert {
+	u.SetExcluded(contestuser.FieldUserID)
 	return u
 }
 
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
-//	client.ContestUsers.Create().
+//	client.ContestUser.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
 //			sql.ResolveWith(func(u *sql.UpdateSet) {
-//				u.SetIgnore(contestusers.FieldID)
+//				u.SetIgnore(contestuser.FieldID)
 //			}),
 //		).
 //		Exec(ctx)
-func (u *ContestUsersUpsertOne) UpdateNewValues() *ContestUsersUpsertOne {
+func (u *ContestUserUpsertOne) UpdateNewValues() *ContestUserUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
-			s.SetIgnore(contestusers.FieldID)
+			s.SetIgnore(contestuser.FieldID)
 		}
 	}))
 	return u
@@ -301,89 +289,89 @@ func (u *ContestUsersUpsertOne) UpdateNewValues() *ContestUsersUpsertOne {
 // Ignore sets each column to itself in case of conflict.
 // Using this option is equivalent to using:
 //
-//	client.ContestUsers.Create().
+//	client.ContestUser.Create().
 //	    OnConflict(sql.ResolveWithIgnore()).
 //	    Exec(ctx)
-func (u *ContestUsersUpsertOne) Ignore() *ContestUsersUpsertOne {
+func (u *ContestUserUpsertOne) Ignore() *ContestUserUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u
 }
 
 // DoNothing configures the conflict_action to `DO NOTHING`.
 // Supported only by SQLite and PostgreSQL.
-func (u *ContestUsersUpsertOne) DoNothing() *ContestUsersUpsertOne {
+func (u *ContestUserUpsertOne) DoNothing() *ContestUserUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.DoNothing())
 	return u
 }
 
-// Update allows overriding fields `UPDATE` values. See the ContestUsersCreate.OnConflict
+// Update allows overriding fields `UPDATE` values. See the ContestUserCreate.OnConflict
 // documentation for more info.
-func (u *ContestUsersUpsertOne) Update(set func(*ContestUsersUpsert)) *ContestUsersUpsertOne {
+func (u *ContestUserUpsertOne) Update(set func(*ContestUserUpsert)) *ContestUserUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
-		set(&ContestUsersUpsert{UpdateSet: update})
+		set(&ContestUserUpsert{UpdateSet: update})
 	}))
 	return u
 }
 
 // SetRole sets the "role" field.
-func (u *ContestUsersUpsertOne) SetRole(v string) *ContestUsersUpsertOne {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertOne) SetRole(v string) *ContestUserUpsertOne {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.SetRole(v)
 	})
 }
 
 // UpdateRole sets the "role" field to the value that was provided on create.
-func (u *ContestUsersUpsertOne) UpdateRole() *ContestUsersUpsertOne {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertOne) UpdateRole() *ContestUserUpsertOne {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.UpdateRole()
 	})
 }
 
 // SetContestID sets the "contest_id" field.
-func (u *ContestUsersUpsertOne) SetContestID(v int) *ContestUsersUpsertOne {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertOne) SetContestID(v int) *ContestUserUpsertOne {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.SetContestID(v)
 	})
 }
 
 // UpdateContestID sets the "contest_id" field to the value that was provided on create.
-func (u *ContestUsersUpsertOne) UpdateContestID() *ContestUsersUpsertOne {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertOne) UpdateContestID() *ContestUserUpsertOne {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.UpdateContestID()
 	})
 }
 
 // SetUserID sets the "user_id" field.
-func (u *ContestUsersUpsertOne) SetUserID(v int) *ContestUsersUpsertOne {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertOne) SetUserID(v int) *ContestUserUpsertOne {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.SetUserID(v)
 	})
 }
 
 // UpdateUserID sets the "user_id" field to the value that was provided on create.
-func (u *ContestUsersUpsertOne) UpdateUserID() *ContestUsersUpsertOne {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertOne) UpdateUserID() *ContestUserUpsertOne {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.UpdateUserID()
 	})
 }
 
 // Exec executes the query.
-func (u *ContestUsersUpsertOne) Exec(ctx context.Context) error {
+func (u *ContestUserUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
-		return errors.New("ent: missing options for ContestUsersCreate.OnConflict")
+		return errors.New("ent: missing options for ContestUserCreate.OnConflict")
 	}
 	return u.create.Exec(ctx)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (u *ContestUsersUpsertOne) ExecX(ctx context.Context) {
+func (u *ContestUserUpsertOne) ExecX(ctx context.Context) {
 	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *ContestUsersUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *ContestUserUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -392,7 +380,7 @@ func (u *ContestUsersUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *ContestUsersUpsertOne) IDX(ctx context.Context) int {
+func (u *ContestUserUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -400,23 +388,23 @@ func (u *ContestUsersUpsertOne) IDX(ctx context.Context) int {
 	return id
 }
 
-// ContestUsersCreateBulk is the builder for creating many ContestUsers entities in bulk.
-type ContestUsersCreateBulk struct {
+// ContestUserCreateBulk is the builder for creating many ContestUser entities in bulk.
+type ContestUserCreateBulk struct {
 	config
-	builders []*ContestUsersCreate
+	builders []*ContestUserCreate
 	conflict []sql.ConflictOption
 }
 
-// Save creates the ContestUsers entities in the database.
-func (cucb *ContestUsersCreateBulk) Save(ctx context.Context) ([]*ContestUsers, error) {
+// Save creates the ContestUser entities in the database.
+func (cucb *ContestUserCreateBulk) Save(ctx context.Context) ([]*ContestUser, error) {
 	specs := make([]*sqlgraph.CreateSpec, len(cucb.builders))
-	nodes := make([]*ContestUsers, len(cucb.builders))
+	nodes := make([]*ContestUser, len(cucb.builders))
 	mutators := make([]Mutator, len(cucb.builders))
 	for i := range cucb.builders {
 		func(i int, root context.Context) {
 			builder := cucb.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*ContestUsersMutation)
+				mutation, ok := m.(*ContestUserMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -464,7 +452,7 @@ func (cucb *ContestUsersCreateBulk) Save(ctx context.Context) ([]*ContestUsers, 
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cucb *ContestUsersCreateBulk) SaveX(ctx context.Context) []*ContestUsers {
+func (cucb *ContestUserCreateBulk) SaveX(ctx context.Context) []*ContestUser {
 	v, err := cucb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -473,13 +461,13 @@ func (cucb *ContestUsersCreateBulk) SaveX(ctx context.Context) []*ContestUsers {
 }
 
 // Exec executes the query.
-func (cucb *ContestUsersCreateBulk) Exec(ctx context.Context) error {
+func (cucb *ContestUserCreateBulk) Exec(ctx context.Context) error {
 	_, err := cucb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cucb *ContestUsersCreateBulk) ExecX(ctx context.Context) {
+func (cucb *ContestUserCreateBulk) ExecX(ctx context.Context) {
 	if err := cucb.Exec(ctx); err != nil {
 		panic(err)
 	}
@@ -488,7 +476,7 @@ func (cucb *ContestUsersCreateBulk) ExecX(ctx context.Context) {
 // OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
 // of the `INSERT` statement. For example:
 //
-//	client.ContestUsers.CreateBulk(builders...).
+//	client.ContestUser.CreateBulk(builders...).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -496,13 +484,13 @@ func (cucb *ContestUsersCreateBulk) ExecX(ctx context.Context) {
 //		).
 //		// Override some of the fields with custom
 //		// update values.
-//		Update(func(u *ent.ContestUsersUpsert) {
+//		Update(func(u *ent.ContestUserUpsert) {
 //			SetRole(v+v).
 //		}).
 //		Exec(ctx)
-func (cucb *ContestUsersCreateBulk) OnConflict(opts ...sql.ConflictOption) *ContestUsersUpsertBulk {
+func (cucb *ContestUserCreateBulk) OnConflict(opts ...sql.ConflictOption) *ContestUserUpsertBulk {
 	cucb.conflict = opts
-	return &ContestUsersUpsertBulk{
+	return &ContestUserUpsertBulk{
 		create: cucb,
 	}
 }
@@ -510,39 +498,39 @@ func (cucb *ContestUsersCreateBulk) OnConflict(opts ...sql.ConflictOption) *Cont
 // OnConflictColumns calls `OnConflict` and configures the columns
 // as conflict target. Using this option is equivalent to using:
 //
-//	client.ContestUsers.Create().
+//	client.ContestUser.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (cucb *ContestUsersCreateBulk) OnConflictColumns(columns ...string) *ContestUsersUpsertBulk {
+func (cucb *ContestUserCreateBulk) OnConflictColumns(columns ...string) *ContestUserUpsertBulk {
 	cucb.conflict = append(cucb.conflict, sql.ConflictColumns(columns...))
-	return &ContestUsersUpsertBulk{
+	return &ContestUserUpsertBulk{
 		create: cucb,
 	}
 }
 
-// ContestUsersUpsertBulk is the builder for "upsert"-ing
-// a bulk of ContestUsers nodes.
-type ContestUsersUpsertBulk struct {
-	create *ContestUsersCreateBulk
+// ContestUserUpsertBulk is the builder for "upsert"-ing
+// a bulk of ContestUser nodes.
+type ContestUserUpsertBulk struct {
+	create *ContestUserCreateBulk
 }
 
 // UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
-//	client.ContestUsers.Create().
+//	client.ContestUser.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
 //			sql.ResolveWith(func(u *sql.UpdateSet) {
-//				u.SetIgnore(contestusers.FieldID)
+//				u.SetIgnore(contestuser.FieldID)
 //			}),
 //		).
 //		Exec(ctx)
-func (u *ContestUsersUpsertBulk) UpdateNewValues() *ContestUsersUpsertBulk {
+func (u *ContestUserUpsertBulk) UpdateNewValues() *ContestUserUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
-				s.SetIgnore(contestusers.FieldID)
+				s.SetIgnore(contestuser.FieldID)
 			}
 		}
 	}))
@@ -552,87 +540,87 @@ func (u *ContestUsersUpsertBulk) UpdateNewValues() *ContestUsersUpsertBulk {
 // Ignore sets each column to itself in case of conflict.
 // Using this option is equivalent to using:
 //
-//	client.ContestUsers.Create().
+//	client.ContestUser.Create().
 //		OnConflict(sql.ResolveWithIgnore()).
 //		Exec(ctx)
-func (u *ContestUsersUpsertBulk) Ignore() *ContestUsersUpsertBulk {
+func (u *ContestUserUpsertBulk) Ignore() *ContestUserUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u
 }
 
 // DoNothing configures the conflict_action to `DO NOTHING`.
 // Supported only by SQLite and PostgreSQL.
-func (u *ContestUsersUpsertBulk) DoNothing() *ContestUsersUpsertBulk {
+func (u *ContestUserUpsertBulk) DoNothing() *ContestUserUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.DoNothing())
 	return u
 }
 
-// Update allows overriding fields `UPDATE` values. See the ContestUsersCreateBulk.OnConflict
+// Update allows overriding fields `UPDATE` values. See the ContestUserCreateBulk.OnConflict
 // documentation for more info.
-func (u *ContestUsersUpsertBulk) Update(set func(*ContestUsersUpsert)) *ContestUsersUpsertBulk {
+func (u *ContestUserUpsertBulk) Update(set func(*ContestUserUpsert)) *ContestUserUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
-		set(&ContestUsersUpsert{UpdateSet: update})
+		set(&ContestUserUpsert{UpdateSet: update})
 	}))
 	return u
 }
 
 // SetRole sets the "role" field.
-func (u *ContestUsersUpsertBulk) SetRole(v string) *ContestUsersUpsertBulk {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertBulk) SetRole(v string) *ContestUserUpsertBulk {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.SetRole(v)
 	})
 }
 
 // UpdateRole sets the "role" field to the value that was provided on create.
-func (u *ContestUsersUpsertBulk) UpdateRole() *ContestUsersUpsertBulk {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertBulk) UpdateRole() *ContestUserUpsertBulk {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.UpdateRole()
 	})
 }
 
 // SetContestID sets the "contest_id" field.
-func (u *ContestUsersUpsertBulk) SetContestID(v int) *ContestUsersUpsertBulk {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertBulk) SetContestID(v int) *ContestUserUpsertBulk {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.SetContestID(v)
 	})
 }
 
 // UpdateContestID sets the "contest_id" field to the value that was provided on create.
-func (u *ContestUsersUpsertBulk) UpdateContestID() *ContestUsersUpsertBulk {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertBulk) UpdateContestID() *ContestUserUpsertBulk {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.UpdateContestID()
 	})
 }
 
 // SetUserID sets the "user_id" field.
-func (u *ContestUsersUpsertBulk) SetUserID(v int) *ContestUsersUpsertBulk {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertBulk) SetUserID(v int) *ContestUserUpsertBulk {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.SetUserID(v)
 	})
 }
 
 // UpdateUserID sets the "user_id" field to the value that was provided on create.
-func (u *ContestUsersUpsertBulk) UpdateUserID() *ContestUsersUpsertBulk {
-	return u.Update(func(s *ContestUsersUpsert) {
+func (u *ContestUserUpsertBulk) UpdateUserID() *ContestUserUpsertBulk {
+	return u.Update(func(s *ContestUserUpsert) {
 		s.UpdateUserID()
 	})
 }
 
 // Exec executes the query.
-func (u *ContestUsersUpsertBulk) Exec(ctx context.Context) error {
+func (u *ContestUserUpsertBulk) Exec(ctx context.Context) error {
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
-			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ContestUsersCreateBulk instead", i)
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ContestUserCreateBulk instead", i)
 		}
 	}
 	if len(u.create.conflict) == 0 {
-		return errors.New("ent: missing options for ContestUsersCreateBulk.OnConflict")
+		return errors.New("ent: missing options for ContestUserCreateBulk.OnConflict")
 	}
 	return u.create.Exec(ctx)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (u *ContestUsersUpsertBulk) ExecX(ctx context.Context) {
+func (u *ContestUserUpsertBulk) ExecX(ctx context.Context) {
 	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}

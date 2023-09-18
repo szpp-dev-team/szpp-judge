@@ -35,5 +35,6 @@ func (Task) Edges() []ent.Edge {
 		edge.To("testcases", Testcase.Type),
 		edge.To("submits", Submit.Type),
 		edge.From("user", User.Type).Ref("tasks").Unique().Required(),
+		edge.From("contest_task", ContestTask.Type).Ref("task"),
 	}
 }

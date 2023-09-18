@@ -12,22 +12,22 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 )
 
 // ContestQuery is the builder for querying Contest entities.
 type ContestQuery struct {
 	config
-	ctx              *QueryContext
-	order            []contest.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.Contest
-	withTasks        *TaskQuery
-	withSubmits      *SubmitQuery
-	withContestUsers *ContestUsersQuery
+	ctx             *QueryContext
+	order           []contest.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Contest
+	withSubmits     *SubmitQuery
+	withContestUser *ContestUserQuery
+	withContestTask *ContestTaskQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -64,28 +64,6 @@ func (cq *ContestQuery) Order(o ...contest.OrderOption) *ContestQuery {
 	return cq
 }
 
-// QueryTasks chains the current query on the "tasks" edge.
-func (cq *ContestQuery) QueryTasks() *TaskQuery {
-	query := (&TaskClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(contest.Table, contest.FieldID, selector),
-			sqlgraph.To(task.Table, task.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, contest.TasksTable, contest.TasksColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QuerySubmits chains the current query on the "submits" edge.
 func (cq *ContestQuery) QuerySubmits() *SubmitQuery {
 	query := (&SubmitClient{config: cq.config}).Query()
@@ -108,9 +86,9 @@ func (cq *ContestQuery) QuerySubmits() *SubmitQuery {
 	return query
 }
 
-// QueryContestUsers chains the current query on the "contest_users" edge.
-func (cq *ContestQuery) QueryContestUsers() *ContestUsersQuery {
-	query := (&ContestUsersClient{config: cq.config}).Query()
+// QueryContestUser chains the current query on the "contest_user" edge.
+func (cq *ContestQuery) QueryContestUser() *ContestUserQuery {
+	query := (&ContestUserClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -121,8 +99,30 @@ func (cq *ContestQuery) QueryContestUsers() *ContestUsersQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(contest.Table, contest.FieldID, selector),
-			sqlgraph.To(contestusers.Table, contestusers.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestUsersTable, contest.ContestUsersColumn),
+			sqlgraph.To(contestuser.Table, contestuser.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestUserTable, contest.ContestUserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryContestTask chains the current query on the "contest_task" edge.
+func (cq *ContestQuery) QueryContestTask() *ContestTaskQuery {
+	query := (&ContestTaskClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contest.Table, contest.FieldID, selector),
+			sqlgraph.To(contesttask.Table, contesttask.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestTaskTable, contest.ContestTaskColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -317,29 +317,18 @@ func (cq *ContestQuery) Clone() *ContestQuery {
 		return nil
 	}
 	return &ContestQuery{
-		config:           cq.config,
-		ctx:              cq.ctx.Clone(),
-		order:            append([]contest.OrderOption{}, cq.order...),
-		inters:           append([]Interceptor{}, cq.inters...),
-		predicates:       append([]predicate.Contest{}, cq.predicates...),
-		withTasks:        cq.withTasks.Clone(),
-		withSubmits:      cq.withSubmits.Clone(),
-		withContestUsers: cq.withContestUsers.Clone(),
+		config:          cq.config,
+		ctx:             cq.ctx.Clone(),
+		order:           append([]contest.OrderOption{}, cq.order...),
+		inters:          append([]Interceptor{}, cq.inters...),
+		predicates:      append([]predicate.Contest{}, cq.predicates...),
+		withSubmits:     cq.withSubmits.Clone(),
+		withContestUser: cq.withContestUser.Clone(),
+		withContestTask: cq.withContestTask.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
-}
-
-// WithTasks tells the query-builder to eager-load the nodes that are connected to
-// the "tasks" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ContestQuery) WithTasks(opts ...func(*TaskQuery)) *ContestQuery {
-	query := (&TaskClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withTasks = query
-	return cq
 }
 
 // WithSubmits tells the query-builder to eager-load the nodes that are connected to
@@ -353,14 +342,25 @@ func (cq *ContestQuery) WithSubmits(opts ...func(*SubmitQuery)) *ContestQuery {
 	return cq
 }
 
-// WithContestUsers tells the query-builder to eager-load the nodes that are connected to
-// the "contest_users" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ContestQuery) WithContestUsers(opts ...func(*ContestUsersQuery)) *ContestQuery {
-	query := (&ContestUsersClient{config: cq.config}).Query()
+// WithContestUser tells the query-builder to eager-load the nodes that are connected to
+// the "contest_user" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ContestQuery) WithContestUser(opts ...func(*ContestUserQuery)) *ContestQuery {
+	query := (&ContestUserClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withContestUsers = query
+	cq.withContestUser = query
+	return cq
+}
+
+// WithContestTask tells the query-builder to eager-load the nodes that are connected to
+// the "contest_task" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ContestQuery) WithContestTask(opts ...func(*ContestTaskQuery)) *ContestQuery {
+	query := (&ContestTaskClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withContestTask = query
 	return cq
 }
 
@@ -443,9 +443,9 @@ func (cq *ContestQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 		nodes       = []*Contest{}
 		_spec       = cq.querySpec()
 		loadedTypes = [3]bool{
-			cq.withTasks != nil,
 			cq.withSubmits != nil,
-			cq.withContestUsers != nil,
+			cq.withContestUser != nil,
+			cq.withContestTask != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -466,13 +466,6 @@ func (cq *ContestQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withTasks; query != nil {
-		if err := cq.loadTasks(ctx, query, nodes,
-			func(n *Contest) { n.Edges.Tasks = []*Task{} },
-			func(n *Contest, e *Task) { n.Edges.Tasks = append(n.Edges.Tasks, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := cq.withSubmits; query != nil {
 		if err := cq.loadSubmits(ctx, query, nodes,
 			func(n *Contest) { n.Edges.Submits = []*Submit{} },
@@ -480,47 +473,23 @@ func (cq *ContestQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 			return nil, err
 		}
 	}
-	if query := cq.withContestUsers; query != nil {
-		if err := cq.loadContestUsers(ctx, query, nodes,
-			func(n *Contest) { n.Edges.ContestUsers = []*ContestUsers{} },
-			func(n *Contest, e *ContestUsers) { n.Edges.ContestUsers = append(n.Edges.ContestUsers, e) }); err != nil {
+	if query := cq.withContestUser; query != nil {
+		if err := cq.loadContestUser(ctx, query, nodes,
+			func(n *Contest) { n.Edges.ContestUser = []*ContestUser{} },
+			func(n *Contest, e *ContestUser) { n.Edges.ContestUser = append(n.Edges.ContestUser, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withContestTask; query != nil {
+		if err := cq.loadContestTask(ctx, query, nodes,
+			func(n *Contest) { n.Edges.ContestTask = []*ContestTask{} },
+			func(n *Contest, e *ContestTask) { n.Edges.ContestTask = append(n.Edges.ContestTask, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (cq *ContestQuery) loadTasks(ctx context.Context, query *TaskQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *Task)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Contest)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Task(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(contest.TasksColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.contest_tasks
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "contest_tasks" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "contest_tasks" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 func (cq *ContestQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *Submit)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Contest)
@@ -552,7 +521,7 @@ func (cq *ContestQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nod
 	}
 	return nil
 }
-func (cq *ContestQuery) loadContestUsers(ctx context.Context, query *ContestUsersQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *ContestUsers)) error {
+func (cq *ContestQuery) loadContestUser(ctx context.Context, query *ContestUserQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *ContestUser)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Contest)
 	for i := range nodes {
@@ -563,10 +532,40 @@ func (cq *ContestQuery) loadContestUsers(ctx context.Context, query *ContestUser
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(contestusers.FieldContestID)
+		query.ctx.AppendFieldOnce(contestuser.FieldContestID)
 	}
-	query.Where(predicate.ContestUsers(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(contest.ContestUsersColumn), fks...))
+	query.Where(predicate.ContestUser(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contest.ContestUserColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ContestID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "contest_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (cq *ContestQuery) loadContestTask(ctx context.Context, query *ContestTaskQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *ContestTask)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contest)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(contesttask.FieldContestID)
+	}
+	query.Where(predicate.ContestTask(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contest.ContestTaskColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

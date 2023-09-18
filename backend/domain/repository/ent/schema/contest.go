@@ -25,8 +25,8 @@ func (Contest) Fields() []ent.Field {
 // Edges of the Contest.
 func (Contest) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("tasks", Task.Type),
 		edge.To("submits", Submit.Type),
-		edge.To("contest_users", ContestUsers.Type),
+		edge.To("contest_user", ContestUser.Type),
+		edge.To("contest_task", ContestTask.Type),
 	}
 }

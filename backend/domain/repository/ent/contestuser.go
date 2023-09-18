@@ -9,12 +9,12 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
-// ContestUsers is the model entity for the ContestUsers schema.
-type ContestUsers struct {
+// ContestUser is the model entity for the ContestUser schema.
+type ContestUser struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -25,56 +25,56 @@ type ContestUsers struct {
 	// UserID holds the value of the "user_id" field.
 	UserID int `json:"user_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ContestUsersQuery when eager-loading is set.
-	Edges        ContestUsersEdges `json:"edges"`
+	// The values are being populated by the ContestUserQuery when eager-loading is set.
+	Edges        ContestUserEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// ContestUsersEdges holds the relations/edges for other nodes in the graph.
-type ContestUsersEdges struct {
-	// Contests holds the value of the contests edge.
-	Contests *Contest `json:"contests,omitempty"`
-	// Users holds the value of the users edge.
-	Users *User `json:"users,omitempty"`
+// ContestUserEdges holds the relations/edges for other nodes in the graph.
+type ContestUserEdges struct {
+	// Contest holds the value of the contest edge.
+	Contest *Contest `json:"contest,omitempty"`
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// ContestsOrErr returns the Contests value or an error if the edge
+// ContestOrErr returns the Contest value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ContestUsersEdges) ContestsOrErr() (*Contest, error) {
+func (e ContestUserEdges) ContestOrErr() (*Contest, error) {
 	if e.loadedTypes[0] {
-		if e.Contests == nil {
+		if e.Contest == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: contest.Label}
 		}
-		return e.Contests, nil
+		return e.Contest, nil
 	}
-	return nil, &NotLoadedError{edge: "contests"}
+	return nil, &NotLoadedError{edge: "contest"}
 }
 
-// UsersOrErr returns the Users value or an error if the edge
+// UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ContestUsersEdges) UsersOrErr() (*User, error) {
+func (e ContestUserEdges) UserOrErr() (*User, error) {
 	if e.loadedTypes[1] {
-		if e.Users == nil {
+		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
 		}
-		return e.Users, nil
+		return e.User, nil
 	}
-	return nil, &NotLoadedError{edge: "users"}
+	return nil, &NotLoadedError{edge: "user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*ContestUsers) scanValues(columns []string) ([]any, error) {
+func (*ContestUser) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case contestusers.FieldID, contestusers.FieldContestID, contestusers.FieldUserID:
+		case contestuser.FieldID, contestuser.FieldContestID, contestuser.FieldUserID:
 			values[i] = new(sql.NullInt64)
-		case contestusers.FieldRole:
+		case contestuser.FieldRole:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -84,32 +84,32 @@ func (*ContestUsers) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the ContestUsers fields.
-func (cu *ContestUsers) assignValues(columns []string, values []any) error {
+// to the ContestUser fields.
+func (cu *ContestUser) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case contestusers.FieldID:
+		case contestuser.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			cu.ID = int(value.Int64)
-		case contestusers.FieldRole:
+		case contestuser.FieldRole:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field role", values[i])
 			} else if value.Valid {
 				cu.Role = value.String
 			}
-		case contestusers.FieldContestID:
+		case contestuser.FieldContestID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field contest_id", values[i])
 			} else if value.Valid {
 				cu.ContestID = int(value.Int64)
 			}
-		case contestusers.FieldUserID:
+		case contestuser.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
@@ -122,44 +122,44 @@ func (cu *ContestUsers) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the ContestUsers.
+// Value returns the ent.Value that was dynamically selected and assigned to the ContestUser.
 // This includes values selected through modifiers, order, etc.
-func (cu *ContestUsers) Value(name string) (ent.Value, error) {
+func (cu *ContestUser) Value(name string) (ent.Value, error) {
 	return cu.selectValues.Get(name)
 }
 
-// QueryContests queries the "contests" edge of the ContestUsers entity.
-func (cu *ContestUsers) QueryContests() *ContestQuery {
-	return NewContestUsersClient(cu.config).QueryContests(cu)
+// QueryContest queries the "contest" edge of the ContestUser entity.
+func (cu *ContestUser) QueryContest() *ContestQuery {
+	return NewContestUserClient(cu.config).QueryContest(cu)
 }
 
-// QueryUsers queries the "users" edge of the ContestUsers entity.
-func (cu *ContestUsers) QueryUsers() *UserQuery {
-	return NewContestUsersClient(cu.config).QueryUsers(cu)
+// QueryUser queries the "user" edge of the ContestUser entity.
+func (cu *ContestUser) QueryUser() *UserQuery {
+	return NewContestUserClient(cu.config).QueryUser(cu)
 }
 
-// Update returns a builder for updating this ContestUsers.
-// Note that you need to call ContestUsers.Unwrap() before calling this method if this ContestUsers
+// Update returns a builder for updating this ContestUser.
+// Note that you need to call ContestUser.Unwrap() before calling this method if this ContestUser
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (cu *ContestUsers) Update() *ContestUsersUpdateOne {
-	return NewContestUsersClient(cu.config).UpdateOne(cu)
+func (cu *ContestUser) Update() *ContestUserUpdateOne {
+	return NewContestUserClient(cu.config).UpdateOne(cu)
 }
 
-// Unwrap unwraps the ContestUsers entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the ContestUser entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (cu *ContestUsers) Unwrap() *ContestUsers {
+func (cu *ContestUser) Unwrap() *ContestUser {
 	_tx, ok := cu.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: ContestUsers is not a transactional entity")
+		panic("ent: ContestUser is not a transactional entity")
 	}
 	cu.config.driver = _tx.drv
 	return cu
 }
 
 // String implements the fmt.Stringer.
-func (cu *ContestUsers) String() string {
+func (cu *ContestUser) String() string {
 	var builder strings.Builder
-	builder.WriteString("ContestUsers(")
+	builder.WriteString("ContestUser(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", cu.ID))
 	builder.WriteString("role=")
 	builder.WriteString(cu.Role)
@@ -173,5 +173,5 @@ func (cu *ContestUsers) String() string {
 	return builder.String()
 }
 
-// ContestUsersSlice is a parsable slice of ContestUsers.
-type ContestUsersSlice []*ContestUsers
+// ContestUsers is a parsable slice of ContestUser.
+type ContestUsers []*ContestUser

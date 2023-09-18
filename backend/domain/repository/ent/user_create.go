@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
@@ -105,14 +105,14 @@ func (uc *UserCreate) AddSubmits(s ...*Submit) *UserCreate {
 	return uc.AddSubmitIDs(ids...)
 }
 
-// AddContestUserIDs adds the "contest_users" edge to the ContestUsers entity by IDs.
+// AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by IDs.
 func (uc *UserCreate) AddContestUserIDs(ids ...int) *UserCreate {
 	uc.mutation.AddContestUserIDs(ids...)
 	return uc
 }
 
-// AddContestUsers adds the "contest_users" edges to the ContestUsers entity.
-func (uc *UserCreate) AddContestUsers(c ...*ContestUsers) *UserCreate {
+// AddContestUser adds the "contest_user" edges to the ContestUser entity.
+func (uc *UserCreate) AddContestUser(c ...*ContestUser) *UserCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -258,15 +258,15 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.ContestUsersIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.ContestUserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.ContestUsersTable,
-			Columns: []string{user.ContestUsersColumn},
+			Table:   user.ContestUserTable,
+			Columns: []string{user.ContestUserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(contestusers.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(contestuser.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

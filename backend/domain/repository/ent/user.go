@@ -41,8 +41,8 @@ type UserEdges struct {
 	Tasks []*Task `json:"tasks,omitempty"`
 	// Submits holds the value of the submits edge.
 	Submits []*Submit `json:"submits,omitempty"`
-	// ContestUsers holds the value of the contest_users edge.
-	ContestUsers []*ContestUsers `json:"contest_users,omitempty"`
+	// ContestUser holds the value of the contest_user edge.
+	ContestUser []*ContestUser `json:"contest_user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -66,13 +66,13 @@ func (e UserEdges) SubmitsOrErr() ([]*Submit, error) {
 	return nil, &NotLoadedError{edge: "submits"}
 }
 
-// ContestUsersOrErr returns the ContestUsers value or an error if the edge
+// ContestUserOrErr returns the ContestUser value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) ContestUsersOrErr() ([]*ContestUsers, error) {
+func (e UserEdges) ContestUserOrErr() ([]*ContestUser, error) {
 	if e.loadedTypes[2] {
-		return e.ContestUsers, nil
+		return e.ContestUser, nil
 	}
-	return nil, &NotLoadedError{edge: "contest_users"}
+	return nil, &NotLoadedError{edge: "contest_user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -168,9 +168,9 @@ func (u *User) QuerySubmits() *SubmitQuery {
 	return NewUserClient(u.config).QuerySubmits(u)
 }
 
-// QueryContestUsers queries the "contest_users" edge of the User entity.
-func (u *User) QueryContestUsers() *ContestUsersQuery {
-	return NewUserClient(u.config).QueryContestUsers(u)
+// QueryContestUser queries the "contest_user" edge of the User entity.
+func (u *User) QueryContestUser() *ContestUserQuery {
+	return NewUserClient(u.config).QueryContestUser(u)
 }
 
 // Update returns a builder for updating this User.

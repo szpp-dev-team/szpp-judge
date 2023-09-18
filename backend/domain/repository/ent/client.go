@@ -15,7 +15,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -34,8 +35,10 @@ type Client struct {
 	Schema *migrate.Schema
 	// Contest is the client for interacting with the Contest builders.
 	Contest *ContestClient
-	// ContestUsers is the client for interacting with the ContestUsers builders.
-	ContestUsers *ContestUsersClient
+	// ContestTask is the client for interacting with the ContestTask builders.
+	ContestTask *ContestTaskClient
+	// ContestUser is the client for interacting with the ContestUser builders.
+	ContestUser *ContestUserClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
 	// Submit is the client for interacting with the Submit builders.
@@ -64,7 +67,8 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Contest = NewContestClient(c.config)
-	c.ContestUsers = NewContestUsersClient(c.config)
+	c.ContestTask = NewContestTaskClient(c.config)
+	c.ContestUser = NewContestUserClient(c.config)
 	c.Language = NewLanguageClient(c.config)
 	c.Submit = NewSubmitClient(c.config)
 	c.Task = NewTaskClient(c.config)
@@ -155,7 +159,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:            ctx,
 		config:         cfg,
 		Contest:        NewContestClient(cfg),
-		ContestUsers:   NewContestUsersClient(cfg),
+		ContestTask:    NewContestTaskClient(cfg),
+		ContestUser:    NewContestUserClient(cfg),
 		Language:       NewLanguageClient(cfg),
 		Submit:         NewSubmitClient(cfg),
 		Task:           NewTaskClient(cfg),
@@ -183,7 +188,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:            ctx,
 		config:         cfg,
 		Contest:        NewContestClient(cfg),
-		ContestUsers:   NewContestUsersClient(cfg),
+		ContestTask:    NewContestTaskClient(cfg),
+		ContestUser:    NewContestUserClient(cfg),
 		Language:       NewLanguageClient(cfg),
 		Submit:         NewSubmitClient(cfg),
 		Task:           NewTaskClient(cfg),
@@ -220,8 +226,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Contest, c.ContestUsers, c.Language, c.Submit, c.Task, c.Testcase,
-		c.TestcaseResult, c.TestcaseSet, c.User,
+		c.Contest, c.ContestTask, c.ContestUser, c.Language, c.Submit, c.Task,
+		c.Testcase, c.TestcaseResult, c.TestcaseSet, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -231,8 +237,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Contest, c.ContestUsers, c.Language, c.Submit, c.Task, c.Testcase,
-		c.TestcaseResult, c.TestcaseSet, c.User,
+		c.Contest, c.ContestTask, c.ContestUser, c.Language, c.Submit, c.Task,
+		c.Testcase, c.TestcaseResult, c.TestcaseSet, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -243,8 +249,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *ContestMutation:
 		return c.Contest.mutate(ctx, m)
-	case *ContestUsersMutation:
-		return c.ContestUsers.mutate(ctx, m)
+	case *ContestTaskMutation:
+		return c.ContestTask.mutate(ctx, m)
+	case *ContestUserMutation:
+		return c.ContestUser.mutate(ctx, m)
 	case *LanguageMutation:
 		return c.Language.mutate(ctx, m)
 	case *SubmitMutation:
@@ -357,22 +365,6 @@ func (c *ContestClient) GetX(ctx context.Context, id int) *Contest {
 	return obj
 }
 
-// QueryTasks queries the tasks edge of a Contest.
-func (c *ContestClient) QueryTasks(co *Contest) *TaskQuery {
-	query := (&TaskClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(contest.Table, contest.FieldID, id),
-			sqlgraph.To(task.Table, task.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, contest.TasksTable, contest.TasksColumn),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QuerySubmits queries the submits edge of a Contest.
 func (c *ContestClient) QuerySubmits(co *Contest) *SubmitQuery {
 	query := (&SubmitClient{config: c.config}).Query()
@@ -389,15 +381,31 @@ func (c *ContestClient) QuerySubmits(co *Contest) *SubmitQuery {
 	return query
 }
 
-// QueryContestUsers queries the contest_users edge of a Contest.
-func (c *ContestClient) QueryContestUsers(co *Contest) *ContestUsersQuery {
-	query := (&ContestUsersClient{config: c.config}).Query()
+// QueryContestUser queries the contest_user edge of a Contest.
+func (c *ContestClient) QueryContestUser(co *Contest) *ContestUserQuery {
+	query := (&ContestUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(contest.Table, contest.FieldID, id),
-			sqlgraph.To(contestusers.Table, contestusers.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestUsersTable, contest.ContestUsersColumn),
+			sqlgraph.To(contestuser.Table, contestuser.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestUserTable, contest.ContestUserColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryContestTask queries the contest_task edge of a Contest.
+func (c *ContestClient) QueryContestTask(co *Contest) *ContestTaskQuery {
+	query := (&ContestTaskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contest.Table, contest.FieldID, id),
+			sqlgraph.To(contesttask.Table, contesttask.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestTaskTable, contest.ContestTaskColumn),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -430,92 +438,92 @@ func (c *ContestClient) mutate(ctx context.Context, m *ContestMutation) (Value, 
 	}
 }
 
-// ContestUsersClient is a client for the ContestUsers schema.
-type ContestUsersClient struct {
+// ContestTaskClient is a client for the ContestTask schema.
+type ContestTaskClient struct {
 	config
 }
 
-// NewContestUsersClient returns a client for the ContestUsers from the given config.
-func NewContestUsersClient(c config) *ContestUsersClient {
-	return &ContestUsersClient{config: c}
+// NewContestTaskClient returns a client for the ContestTask from the given config.
+func NewContestTaskClient(c config) *ContestTaskClient {
+	return &ContestTaskClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `contestusers.Hooks(f(g(h())))`.
-func (c *ContestUsersClient) Use(hooks ...Hook) {
-	c.hooks.ContestUsers = append(c.hooks.ContestUsers, hooks...)
+// A call to `Use(f, g, h)` equals to `contesttask.Hooks(f(g(h())))`.
+func (c *ContestTaskClient) Use(hooks ...Hook) {
+	c.hooks.ContestTask = append(c.hooks.ContestTask, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `contestusers.Intercept(f(g(h())))`.
-func (c *ContestUsersClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ContestUsers = append(c.inters.ContestUsers, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `contesttask.Intercept(f(g(h())))`.
+func (c *ContestTaskClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ContestTask = append(c.inters.ContestTask, interceptors...)
 }
 
-// Create returns a builder for creating a ContestUsers entity.
-func (c *ContestUsersClient) Create() *ContestUsersCreate {
-	mutation := newContestUsersMutation(c.config, OpCreate)
-	return &ContestUsersCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a ContestTask entity.
+func (c *ContestTaskClient) Create() *ContestTaskCreate {
+	mutation := newContestTaskMutation(c.config, OpCreate)
+	return &ContestTaskCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of ContestUsers entities.
-func (c *ContestUsersClient) CreateBulk(builders ...*ContestUsersCreate) *ContestUsersCreateBulk {
-	return &ContestUsersCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of ContestTask entities.
+func (c *ContestTaskClient) CreateBulk(builders ...*ContestTaskCreate) *ContestTaskCreateBulk {
+	return &ContestTaskCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for ContestUsers.
-func (c *ContestUsersClient) Update() *ContestUsersUpdate {
-	mutation := newContestUsersMutation(c.config, OpUpdate)
-	return &ContestUsersUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for ContestTask.
+func (c *ContestTaskClient) Update() *ContestTaskUpdate {
+	mutation := newContestTaskMutation(c.config, OpUpdate)
+	return &ContestTaskUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ContestUsersClient) UpdateOne(cu *ContestUsers) *ContestUsersUpdateOne {
-	mutation := newContestUsersMutation(c.config, OpUpdateOne, withContestUsers(cu))
-	return &ContestUsersUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ContestTaskClient) UpdateOne(ct *ContestTask) *ContestTaskUpdateOne {
+	mutation := newContestTaskMutation(c.config, OpUpdateOne, withContestTask(ct))
+	return &ContestTaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ContestUsersClient) UpdateOneID(id int) *ContestUsersUpdateOne {
-	mutation := newContestUsersMutation(c.config, OpUpdateOne, withContestUsersID(id))
-	return &ContestUsersUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ContestTaskClient) UpdateOneID(id int) *ContestTaskUpdateOne {
+	mutation := newContestTaskMutation(c.config, OpUpdateOne, withContestTaskID(id))
+	return &ContestTaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for ContestUsers.
-func (c *ContestUsersClient) Delete() *ContestUsersDelete {
-	mutation := newContestUsersMutation(c.config, OpDelete)
-	return &ContestUsersDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for ContestTask.
+func (c *ContestTaskClient) Delete() *ContestTaskDelete {
+	mutation := newContestTaskMutation(c.config, OpDelete)
+	return &ContestTaskDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ContestUsersClient) DeleteOne(cu *ContestUsers) *ContestUsersDeleteOne {
-	return c.DeleteOneID(cu.ID)
+func (c *ContestTaskClient) DeleteOne(ct *ContestTask) *ContestTaskDeleteOne {
+	return c.DeleteOneID(ct.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ContestUsersClient) DeleteOneID(id int) *ContestUsersDeleteOne {
-	builder := c.Delete().Where(contestusers.ID(id))
+func (c *ContestTaskClient) DeleteOneID(id int) *ContestTaskDeleteOne {
+	builder := c.Delete().Where(contesttask.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &ContestUsersDeleteOne{builder}
+	return &ContestTaskDeleteOne{builder}
 }
 
-// Query returns a query builder for ContestUsers.
-func (c *ContestUsersClient) Query() *ContestUsersQuery {
-	return &ContestUsersQuery{
+// Query returns a query builder for ContestTask.
+func (c *ContestTaskClient) Query() *ContestTaskQuery {
+	return &ContestTaskQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeContestUsers},
+		ctx:    &QueryContext{Type: TypeContestTask},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a ContestUsers entity by its id.
-func (c *ContestUsersClient) Get(ctx context.Context, id int) (*ContestUsers, error) {
-	return c.Query().Where(contestusers.ID(id)).Only(ctx)
+// Get returns a ContestTask entity by its id.
+func (c *ContestTaskClient) Get(ctx context.Context, id int) (*ContestTask, error) {
+	return c.Query().Where(contesttask.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ContestUsersClient) GetX(ctx context.Context, id int) *ContestUsers {
+func (c *ContestTaskClient) GetX(ctx context.Context, id int) *ContestTask {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -523,15 +531,165 @@ func (c *ContestUsersClient) GetX(ctx context.Context, id int) *ContestUsers {
 	return obj
 }
 
-// QueryContests queries the contests edge of a ContestUsers.
-func (c *ContestUsersClient) QueryContests(cu *ContestUsers) *ContestQuery {
+// QueryContest queries the contest edge of a ContestTask.
+func (c *ContestTaskClient) QueryContest(ct *ContestTask) *ContestQuery {
+	query := (&ContestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ct.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contesttask.Table, contesttask.FieldID, id),
+			sqlgraph.To(contest.Table, contest.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, contesttask.ContestTable, contesttask.ContestColumn),
+		)
+		fromV = sqlgraph.Neighbors(ct.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTask queries the task edge of a ContestTask.
+func (c *ContestTaskClient) QueryTask(ct *ContestTask) *TaskQuery {
+	query := (&TaskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ct.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contesttask.Table, contesttask.FieldID, id),
+			sqlgraph.To(task.Table, task.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, contesttask.TaskTable, contesttask.TaskColumn),
+		)
+		fromV = sqlgraph.Neighbors(ct.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ContestTaskClient) Hooks() []Hook {
+	return c.hooks.ContestTask
+}
+
+// Interceptors returns the client interceptors.
+func (c *ContestTaskClient) Interceptors() []Interceptor {
+	return c.inters.ContestTask
+}
+
+func (c *ContestTaskClient) mutate(ctx context.Context, m *ContestTaskMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ContestTaskCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ContestTaskUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ContestTaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ContestTaskDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ContestTask mutation op: %q", m.Op())
+	}
+}
+
+// ContestUserClient is a client for the ContestUser schema.
+type ContestUserClient struct {
+	config
+}
+
+// NewContestUserClient returns a client for the ContestUser from the given config.
+func NewContestUserClient(c config) *ContestUserClient {
+	return &ContestUserClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `contestuser.Hooks(f(g(h())))`.
+func (c *ContestUserClient) Use(hooks ...Hook) {
+	c.hooks.ContestUser = append(c.hooks.ContestUser, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `contestuser.Intercept(f(g(h())))`.
+func (c *ContestUserClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ContestUser = append(c.inters.ContestUser, interceptors...)
+}
+
+// Create returns a builder for creating a ContestUser entity.
+func (c *ContestUserClient) Create() *ContestUserCreate {
+	mutation := newContestUserMutation(c.config, OpCreate)
+	return &ContestUserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ContestUser entities.
+func (c *ContestUserClient) CreateBulk(builders ...*ContestUserCreate) *ContestUserCreateBulk {
+	return &ContestUserCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ContestUser.
+func (c *ContestUserClient) Update() *ContestUserUpdate {
+	mutation := newContestUserMutation(c.config, OpUpdate)
+	return &ContestUserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ContestUserClient) UpdateOne(cu *ContestUser) *ContestUserUpdateOne {
+	mutation := newContestUserMutation(c.config, OpUpdateOne, withContestUser(cu))
+	return &ContestUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ContestUserClient) UpdateOneID(id int) *ContestUserUpdateOne {
+	mutation := newContestUserMutation(c.config, OpUpdateOne, withContestUserID(id))
+	return &ContestUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ContestUser.
+func (c *ContestUserClient) Delete() *ContestUserDelete {
+	mutation := newContestUserMutation(c.config, OpDelete)
+	return &ContestUserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ContestUserClient) DeleteOne(cu *ContestUser) *ContestUserDeleteOne {
+	return c.DeleteOneID(cu.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ContestUserClient) DeleteOneID(id int) *ContestUserDeleteOne {
+	builder := c.Delete().Where(contestuser.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ContestUserDeleteOne{builder}
+}
+
+// Query returns a query builder for ContestUser.
+func (c *ContestUserClient) Query() *ContestUserQuery {
+	return &ContestUserQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeContestUser},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ContestUser entity by its id.
+func (c *ContestUserClient) Get(ctx context.Context, id int) (*ContestUser, error) {
+	return c.Query().Where(contestuser.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ContestUserClient) GetX(ctx context.Context, id int) *ContestUser {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryContest queries the contest edge of a ContestUser.
+func (c *ContestUserClient) QueryContest(cu *ContestUser) *ContestQuery {
 	query := (&ContestClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cu.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(contestusers.Table, contestusers.FieldID, id),
+			sqlgraph.From(contestuser.Table, contestuser.FieldID, id),
 			sqlgraph.To(contest.Table, contest.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, contestusers.ContestsTable, contestusers.ContestsColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, contestuser.ContestTable, contestuser.ContestColumn),
 		)
 		fromV = sqlgraph.Neighbors(cu.driver.Dialect(), step)
 		return fromV, nil
@@ -539,15 +697,15 @@ func (c *ContestUsersClient) QueryContests(cu *ContestUsers) *ContestQuery {
 	return query
 }
 
-// QueryUsers queries the users edge of a ContestUsers.
-func (c *ContestUsersClient) QueryUsers(cu *ContestUsers) *UserQuery {
+// QueryUser queries the user edge of a ContestUser.
+func (c *ContestUserClient) QueryUser(cu *ContestUser) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cu.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(contestusers.Table, contestusers.FieldID, id),
+			sqlgraph.From(contestuser.Table, contestuser.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, contestusers.UsersTable, contestusers.UsersColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, contestuser.UserTable, contestuser.UserColumn),
 		)
 		fromV = sqlgraph.Neighbors(cu.driver.Dialect(), step)
 		return fromV, nil
@@ -556,27 +714,27 @@ func (c *ContestUsersClient) QueryUsers(cu *ContestUsers) *UserQuery {
 }
 
 // Hooks returns the client hooks.
-func (c *ContestUsersClient) Hooks() []Hook {
-	return c.hooks.ContestUsers
+func (c *ContestUserClient) Hooks() []Hook {
+	return c.hooks.ContestUser
 }
 
 // Interceptors returns the client interceptors.
-func (c *ContestUsersClient) Interceptors() []Interceptor {
-	return c.inters.ContestUsers
+func (c *ContestUserClient) Interceptors() []Interceptor {
+	return c.inters.ContestUser
 }
 
-func (c *ContestUsersClient) mutate(ctx context.Context, m *ContestUsersMutation) (Value, error) {
+func (c *ContestUserClient) mutate(ctx context.Context, m *ContestUserMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&ContestUsersCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ContestUserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&ContestUsersUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ContestUserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&ContestUsersUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ContestUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&ContestUsersDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ContestUserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown ContestUsers mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown ContestUser mutation op: %q", m.Op())
 	}
 }
 
@@ -1046,6 +1204,22 @@ func (c *TaskClient) QueryUser(t *Task) *UserQuery {
 			sqlgraph.From(task.Table, task.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, task.UserTable, task.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryContestTask queries the contest_task edge of a Task.
+func (c *TaskClient) QueryContestTask(t *Task) *ContestTaskQuery {
+	query := (&ContestTaskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, id),
+			sqlgraph.To(contesttask.Table, contesttask.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, task.ContestTaskTable, task.ContestTaskColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1653,15 +1827,15 @@ func (c *UserClient) QuerySubmits(u *User) *SubmitQuery {
 	return query
 }
 
-// QueryContestUsers queries the contest_users edge of a User.
-func (c *UserClient) QueryContestUsers(u *User) *ContestUsersQuery {
-	query := (&ContestUsersClient{config: c.config}).Query()
+// QueryContestUser queries the contest_user edge of a User.
+func (c *UserClient) QueryContestUser(u *User) *ContestUserQuery {
+	query := (&ContestUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(contestusers.Table, contestusers.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.ContestUsersTable, user.ContestUsersColumn),
+			sqlgraph.To(contestuser.Table, contestuser.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.ContestUserTable, user.ContestUserColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1697,12 +1871,12 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Contest, ContestUsers, Language, Submit, Task, Testcase, TestcaseResult,
-		TestcaseSet, User []ent.Hook
+		Contest, ContestTask, ContestUser, Language, Submit, Task, Testcase,
+		TestcaseResult, TestcaseSet, User []ent.Hook
 	}
 	inters struct {
-		Contest, ContestUsers, Language, Submit, Task, Testcase, TestcaseResult,
-		TestcaseSet, User []ent.Interceptor
+		Contest, ContestTask, ContestUser, Language, Submit, Task, Testcase,
+		TestcaseResult, TestcaseSet, User []ent.Interceptor
 	}
 )
 

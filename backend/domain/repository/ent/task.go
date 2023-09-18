@@ -42,10 +42,9 @@ type Task struct {
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TaskQuery when eager-loading is set.
-	Edges         TaskEdges `json:"edges"`
-	contest_tasks *int
-	user_tasks    *int
-	selectValues  sql.SelectValues
+	Edges        TaskEdges `json:"edges"`
+	user_tasks   *int
+	selectValues sql.SelectValues
 }
 
 // TaskEdges holds the relations/edges for other nodes in the graph.
@@ -58,9 +57,11 @@ type TaskEdges struct {
 	Submits []*Submit `json:"submits,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
+	// ContestTask holds the value of the contest_task edge.
+	ContestTask []*ContestTask `json:"contest_task,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // TestcaseSetsOrErr returns the TestcaseSets value or an error if the edge
@@ -103,6 +104,15 @@ func (e TaskEdges) UserOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "user"}
 }
 
+// ContestTaskOrErr returns the ContestTask value or an error if the edge
+// was not loaded in eager-loading.
+func (e TaskEdges) ContestTaskOrErr() ([]*ContestTask, error) {
+	if e.loadedTypes[4] {
+		return e.ContestTask, nil
+	}
+	return nil, &NotLoadedError{edge: "contest_task"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Task) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -116,9 +126,7 @@ func (*Task) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case task.FieldCreatedAt, task.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case task.ForeignKeys[0]: // contest_tasks
-			values[i] = new(sql.NullInt64)
-		case task.ForeignKeys[1]: // user_tasks
+		case task.ForeignKeys[0]: // user_tasks
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -213,13 +221,6 @@ func (t *Task) assignValues(columns []string, values []any) error {
 			}
 		case task.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field contest_tasks", value)
-			} else if value.Valid {
-				t.contest_tasks = new(int)
-				*t.contest_tasks = int(value.Int64)
-			}
-		case task.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_tasks", value)
 			} else if value.Valid {
 				t.user_tasks = new(int)
@@ -256,6 +257,11 @@ func (t *Task) QuerySubmits() *SubmitQuery {
 // QueryUser queries the "user" edge of the Task entity.
 func (t *Task) QueryUser() *UserQuery {
 	return NewTaskClient(t.config).QueryUser(t)
+}
+
+// QueryContestTask queries the "contest_task" edge of the Task entity.
+func (t *Task) QueryContestTask() *ContestTaskQuery {
+	return NewTaskClient(t.config).QueryContestTask(t)
 }
 
 // Update returns a builder for updating this Task.

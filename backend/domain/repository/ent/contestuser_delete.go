@@ -8,30 +8,30 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 )
 
-// ContestUsersDelete is the builder for deleting a ContestUsers entity.
-type ContestUsersDelete struct {
+// ContestUserDelete is the builder for deleting a ContestUser entity.
+type ContestUserDelete struct {
 	config
 	hooks    []Hook
-	mutation *ContestUsersMutation
+	mutation *ContestUserMutation
 }
 
-// Where appends a list predicates to the ContestUsersDelete builder.
-func (cud *ContestUsersDelete) Where(ps ...predicate.ContestUsers) *ContestUsersDelete {
+// Where appends a list predicates to the ContestUserDelete builder.
+func (cud *ContestUserDelete) Where(ps ...predicate.ContestUser) *ContestUserDelete {
 	cud.mutation.Where(ps...)
 	return cud
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (cud *ContestUsersDelete) Exec(ctx context.Context) (int, error) {
+func (cud *ContestUserDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, cud.sqlExec, cud.mutation, cud.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cud *ContestUsersDelete) ExecX(ctx context.Context) int {
+func (cud *ContestUserDelete) ExecX(ctx context.Context) int {
 	n, err := cud.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -39,8 +39,8 @@ func (cud *ContestUsersDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (cud *ContestUsersDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(contestusers.Table, sqlgraph.NewFieldSpec(contestusers.FieldID, field.TypeInt))
+func (cud *ContestUserDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(contestuser.Table, sqlgraph.NewFieldSpec(contestuser.FieldID, field.TypeInt))
 	if ps := cud.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -56,32 +56,32 @@ func (cud *ContestUsersDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// ContestUsersDeleteOne is the builder for deleting a single ContestUsers entity.
-type ContestUsersDeleteOne struct {
-	cud *ContestUsersDelete
+// ContestUserDeleteOne is the builder for deleting a single ContestUser entity.
+type ContestUserDeleteOne struct {
+	cud *ContestUserDelete
 }
 
-// Where appends a list predicates to the ContestUsersDelete builder.
-func (cudo *ContestUsersDeleteOne) Where(ps ...predicate.ContestUsers) *ContestUsersDeleteOne {
+// Where appends a list predicates to the ContestUserDelete builder.
+func (cudo *ContestUserDeleteOne) Where(ps ...predicate.ContestUser) *ContestUserDeleteOne {
 	cudo.cud.mutation.Where(ps...)
 	return cudo
 }
 
 // Exec executes the deletion query.
-func (cudo *ContestUsersDeleteOne) Exec(ctx context.Context) error {
+func (cudo *ContestUserDeleteOne) Exec(ctx context.Context) error {
 	n, err := cudo.cud.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{contestusers.Label}
+		return &NotFoundError{contestuser.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cudo *ContestUsersDeleteOne) ExecX(ctx context.Context) {
+func (cudo *ContestUserDeleteOne) ExecX(ctx context.Context) {
 	if err := cudo.Exec(ctx); err != nil {
 		panic(err)
 	}

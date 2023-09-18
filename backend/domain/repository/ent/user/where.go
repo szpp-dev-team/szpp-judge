@@ -456,21 +456,21 @@ func HasSubmitsWith(preds ...predicate.Submit) predicate.User {
 	})
 }
 
-// HasContestUsers applies the HasEdge predicate on the "contest_users" edge.
-func HasContestUsers() predicate.User {
+// HasContestUser applies the HasEdge predicate on the "contest_user" edge.
+func HasContestUser() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, ContestUsersTable, ContestUsersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, ContestUserTable, ContestUserColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasContestUsersWith applies the HasEdge predicate on the "contest_users" edge with a given conditions (other predicates).
-func HasContestUsersWith(preds ...predicate.ContestUsers) predicate.User {
+// HasContestUserWith applies the HasEdge predicate on the "contest_user" edge with a given conditions (other predicates).
+func HasContestUserWith(preds ...predicate.ContestUser) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newContestUsersStep()
+		step := newContestUserStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
