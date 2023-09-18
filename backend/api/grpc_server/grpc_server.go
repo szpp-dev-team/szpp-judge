@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	grpc_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/grpc"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slog"
@@ -11,8 +12,8 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func New(opts ...optionFunc) *grpc.Server {
-	opt := defaultOption()
+func New(opts ...api.OptionFunc) *grpc.Server {
+	opt := api.DefaultOption()
 	for _, f := range opts {
 		f(opt)
 	}
@@ -20,12 +21,12 @@ func New(opts ...optionFunc) *grpc.Server {
 	serverOptions := make([]grpc.ServerOption, 0)
 	// set logging interceptor
 	serverOptions = append(serverOptions,
-		grpc.ChainUnaryInterceptor(logging.UnaryServerInterceptor(interceptorLogger(opt.logger))),
-		grpc.ChainStreamInterceptor(logging.StreamServerInterceptor(interceptorLogger(opt.logger))),
+		grpc.ChainUnaryInterceptor(logging.UnaryServerInterceptor(interceptorLogger(opt.Logger))),
+		grpc.ChainStreamInterceptor(logging.StreamServerInterceptor(interceptorLogger(opt.Logger))),
 	)
 
 	srv := grpc.NewServer(serverOptions...)
-	if opt.useReflection {
+	if opt.UseReflection {
 		reflection.Register(srv)
 	}
 	healthcheckSrv := grpc_interfaces.NewHealthcheckServiceServer()

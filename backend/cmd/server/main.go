@@ -11,10 +11,14 @@ import (
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"github.com/go-sql-driver/mysql"
+	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"golang.org/x/exp/slog"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -53,14 +57,21 @@ func main() {
 		log.Fatal(err)
 	}
 	defer cloudtasksClient.Close()
+	judgeConn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer judgeConn.Close()
+	judgeClient := judgev1.NewJudgeServiceClient(judgeConn)
 
 	// logger
 	logger := slog.Default()
 
 	srv := grpc_server.New(
-		grpc_server.WithLogger(logger),
-		grpc_server.WithEntClient(entClient),
-		grpc_server.WithReflection(config.ModeDev),
+		api.WithLogger(logger),
+		api.WithEntClient(entClient),
+		api.WithReflection(config.ModeDev),
+		api.WithJudgeClient(judgeClient),
 	)
 	lsnr, err := net.Listen("tcp", ":"+config.GrpcPort)
 	if err != nil {
