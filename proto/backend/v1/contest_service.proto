@@ -8,6 +8,7 @@ import "google/protobuf/timestamp.proto";
 service ContestService {
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
   rpc GetContest(GetContestRequest) returns (GetContestResponse);
+  rpc UpdateContest(UpdateContestRequest) returns (UpdateContestResponse);
   rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
   rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
   // 自分の問題ごとの結果情報を返す
@@ -19,11 +20,7 @@ service ContestService {
 }
 
 message CreateContestRequest {
-  string name = 1;
-  string slug = 2;
-  string description = 3;
-  google.protobuf.Timestamp start_at = 4;
-  google.protobuf.Timestamp end_at = 5;
+  MutationContest contest = 1;
 }
 
 message CreateContestResponse {
@@ -35,6 +32,15 @@ message GetContestRequest {
 }
 
 message GetContestResponse {
+  Contest contest = 1;
+}
+
+message UpdateContestRequest {
+  int32 id = 1;
+  MutationContest contest = 2;
+}
+
+message UpdateContestResponse {
   Contest contest = 1;
 }
 
