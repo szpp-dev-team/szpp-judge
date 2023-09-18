@@ -81,5 +81,5 @@ service ContestService {
   // 順位表取得
   rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
   // 参加登録
-  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc RegisterMe(RegisterMeRequest) returns (RegisterMeResponse);
 }

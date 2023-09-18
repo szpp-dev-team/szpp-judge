@@ -275,8 +275,8 @@ message GetMySubmissionStatusesResponse {
 }
 
 // コンテストに参加登録するときのリクエスト
-message RegisterRequest {
+message RegisterMeRequest {
   string contest_slug = 1;
 }
 
-message RegisterResponse {}
+message RegisterMeResponse {}
