@@ -1,35 +1,36 @@
 import { LoginResponse } from "@/src/gen/proto/backend/v1/messages_pb";
 import { AuthService } from "@/src/gen/proto/backend/v1/services-AuthService_connectquery";
+import type { IAuthUser } from "@/src/globalStates/credential";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
 
-const ACCESS_TOKEN_PREFIX = "eyJxxx";
 const REFRESH_TOKEN_PREFIX = "refreeeeesh";
 
 type Credential = Pick<LoginResponse, "accessToken" | "refreshToken">;
-type AccessTokenClaim = {
-  username: string;
-  isAdmin: boolean;
-};
 
-export const generateMockCredential = (username: string): Credential => {
-  const now = new Date().toLocaleString("sv-SE"); // JST で "YYYY-mm-dd HH:MM:SS" を返してくれる
-  return {
-    accessToken: `${ACCESS_TOKEN_PREFIX}/${username}/${now}`,
-    refreshToken: `${REFRESH_TOKEN_PREFIX}/${now}`,
+export const generateMockAccessToken = (user: IAuthUser, now: Date): string => {
+  const payloadObj = {
+    ...user,
+    sub: "1234567890",
+    iat: now.getTime(),
   };
+  const header = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // { alg: "HS256", typ: "JWT" } のエンコード文字列
+  const payload = Buffer.from(JSON.stringify(payloadObj)).toString("base64");
+  const hash = "hassssh";
+  return `${header}.${payload}.${hash}`;
 };
 
-// パースに失敗した場合 or 不正なトークンの場合は null を返す (モックなので厳密なチェックはしない)
-export const parseAccessToken = (accessToken: string): AccessTokenClaim | null => {
-  const a = accessToken.split("/");
-  const [prefix, username] = a;
-  if (a.length !== 3 || prefix !== ACCESS_TOKEN_PREFIX) {
-    return null;
-  }
-  const isAdmin = username === "admin";
-  return { username, isAdmin };
+export const generateMockRefreshToken = (now: Date): string => {
+  // sv-SE ローケルでのフォーマットは `YYYY-mm-dd HH:MM:SS`
+  return `${REFRESH_TOKEN_PREFIX}/${now.toLocaleString("sv-SE")}`;
+};
+
+export const generateMockCredential = (user: IAuthUser): Credential => {
+  const now = new Date();
+  const accessToken = generateMockAccessToken(user, now);
+  const refreshToken = generateMockRefreshToken(now);
+  return { accessToken, refreshToken };
 };
 
 export const authHandlers: RequestHandler[] = [
@@ -43,16 +44,18 @@ export const authHandlers: RequestHandler[] = [
       );
     }
 
+    const isAdmin = username == "admin";
+
     return res(
       ctx.delay(500),
       encodeResp({
         user: {
           id: 1,
           username,
-          isAdmin: username === "admin",
+          isAdmin,
           createdAt: Timestamp.now(),
         },
-        ...generateMockCredential(username),
+        ...generateMockCredential({ username, isAdmin }),
       }),
     );
   }),
