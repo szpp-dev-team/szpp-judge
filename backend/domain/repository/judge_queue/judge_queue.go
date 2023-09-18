@@ -35,7 +35,7 @@ func (i *cloudtasksImpl) Push(ctx context.Context, submitID int, req *judgev1.Ju
 			MessageType: &cloudtaskspb.Task_AppEngineHttpRequest{
 				AppEngineHttpRequest: &cloudtaskspb.AppEngineHttpRequest{
 					HttpMethod:  cloudtaskspb.HttpMethod_POST,
-					RelativeUri: "/judge",
+					RelativeUri: "/post-judge-request",
 					Body:        reqBytes,
 				},
 			},
