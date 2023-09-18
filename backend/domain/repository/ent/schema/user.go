@@ -27,8 +27,8 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("contests", Contest.Type),
 		edge.To("tasks", Task.Type),
 		edge.To("submits", Submit.Type),
+		edge.From("contest_users", ContestUsers.Type).Ref("users"),
 	}
 }

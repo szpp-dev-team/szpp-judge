@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
 // ContestCreate is the builder for creating a Contest entity.
@@ -34,18 +34,6 @@ func (cc *ContestCreate) SetSlug(s string) *ContestCreate {
 // SetDescription sets the "description" field.
 func (cc *ContestCreate) SetDescription(s string) *ContestCreate {
 	cc.mutation.SetDescription(s)
-	return cc
-}
-
-// SetTaskID sets the "task_id" field.
-func (cc *ContestCreate) SetTaskID(i int) *ContestCreate {
-	cc.mutation.SetTaskID(i)
-	return cc
-}
-
-// SetClarificationID sets the "clarification_id" field.
-func (cc *ContestCreate) SetClarificationID(i int) *ContestCreate {
-	cc.mutation.SetClarificationID(i)
 	return cc
 }
 
@@ -97,17 +85,17 @@ func (cc *ContestCreate) AddSubmits(s ...*Submit) *ContestCreate {
 	return cc.AddSubmitIDs(ids...)
 }
 
-// AddContestUserIDs adds the "contest_users" edge to the User entity by IDs.
+// AddContestUserIDs adds the "contest_users" edge to the ContestUsers entity by IDs.
 func (cc *ContestCreate) AddContestUserIDs(ids ...int) *ContestCreate {
 	cc.mutation.AddContestUserIDs(ids...)
 	return cc
 }
 
-// AddContestUsers adds the "contest_users" edges to the User entity.
-func (cc *ContestCreate) AddContestUsers(u ...*User) *ContestCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// AddContestUsers adds the "contest_users" edges to the ContestUsers entity.
+func (cc *ContestCreate) AddContestUsers(c ...*ContestUsers) *ContestCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
 	return cc.AddContestUserIDs(ids...)
 }
@@ -151,12 +139,6 @@ func (cc *ContestCreate) check() error {
 	}
 	if _, ok := cc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Contest.description"`)}
-	}
-	if _, ok := cc.mutation.TaskID(); !ok {
-		return &ValidationError{Name: "task_id", err: errors.New(`ent: missing required field "Contest.task_id"`)}
-	}
-	if _, ok := cc.mutation.ClarificationID(); !ok {
-		return &ValidationError{Name: "clarification_id", err: errors.New(`ent: missing required field "Contest.clarification_id"`)}
 	}
 	if _, ok := cc.mutation.StartAt(); !ok {
 		return &ValidationError{Name: "start_at", err: errors.New(`ent: missing required field "Contest.start_at"`)}
@@ -205,14 +187,6 @@ func (cc *ContestCreate) createSpec() (*Contest, *sqlgraph.CreateSpec) {
 		_spec.SetField(contest.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := cc.mutation.TaskID(); ok {
-		_spec.SetField(contest.FieldTaskID, field.TypeInt, value)
-		_node.TaskID = value
-	}
-	if value, ok := cc.mutation.ClarificationID(); ok {
-		_spec.SetField(contest.FieldClarificationID, field.TypeInt, value)
-		_node.ClarificationID = value
-	}
 	if value, ok := cc.mutation.StartAt(); ok {
 		_spec.SetField(contest.FieldStartAt, field.TypeTime, value)
 		_node.StartAt = value
@@ -255,13 +229,13 @@ func (cc *ContestCreate) createSpec() (*Contest, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.ContestUsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
 			Table:   contest.ContestUsersTable,
-			Columns: contest.ContestUsersPrimaryKey,
+			Columns: []string{contest.ContestUsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(contestusers.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -342,42 +316,6 @@ func (u *ContestUpsert) SetDescription(v string) *ContestUpsert {
 // UpdateDescription sets the "description" field to the value that was provided on create.
 func (u *ContestUpsert) UpdateDescription() *ContestUpsert {
 	u.SetExcluded(contest.FieldDescription)
-	return u
-}
-
-// SetTaskID sets the "task_id" field.
-func (u *ContestUpsert) SetTaskID(v int) *ContestUpsert {
-	u.Set(contest.FieldTaskID, v)
-	return u
-}
-
-// UpdateTaskID sets the "task_id" field to the value that was provided on create.
-func (u *ContestUpsert) UpdateTaskID() *ContestUpsert {
-	u.SetExcluded(contest.FieldTaskID)
-	return u
-}
-
-// AddTaskID adds v to the "task_id" field.
-func (u *ContestUpsert) AddTaskID(v int) *ContestUpsert {
-	u.Add(contest.FieldTaskID, v)
-	return u
-}
-
-// SetClarificationID sets the "clarification_id" field.
-func (u *ContestUpsert) SetClarificationID(v int) *ContestUpsert {
-	u.Set(contest.FieldClarificationID, v)
-	return u
-}
-
-// UpdateClarificationID sets the "clarification_id" field to the value that was provided on create.
-func (u *ContestUpsert) UpdateClarificationID() *ContestUpsert {
-	u.SetExcluded(contest.FieldClarificationID)
-	return u
-}
-
-// AddClarificationID adds v to the "clarification_id" field.
-func (u *ContestUpsert) AddClarificationID(v int) *ContestUpsert {
-	u.Add(contest.FieldClarificationID, v)
 	return u
 }
 
@@ -478,48 +416,6 @@ func (u *ContestUpsertOne) SetDescription(v string) *ContestUpsertOne {
 func (u *ContestUpsertOne) UpdateDescription() *ContestUpsertOne {
 	return u.Update(func(s *ContestUpsert) {
 		s.UpdateDescription()
-	})
-}
-
-// SetTaskID sets the "task_id" field.
-func (u *ContestUpsertOne) SetTaskID(v int) *ContestUpsertOne {
-	return u.Update(func(s *ContestUpsert) {
-		s.SetTaskID(v)
-	})
-}
-
-// AddTaskID adds v to the "task_id" field.
-func (u *ContestUpsertOne) AddTaskID(v int) *ContestUpsertOne {
-	return u.Update(func(s *ContestUpsert) {
-		s.AddTaskID(v)
-	})
-}
-
-// UpdateTaskID sets the "task_id" field to the value that was provided on create.
-func (u *ContestUpsertOne) UpdateTaskID() *ContestUpsertOne {
-	return u.Update(func(s *ContestUpsert) {
-		s.UpdateTaskID()
-	})
-}
-
-// SetClarificationID sets the "clarification_id" field.
-func (u *ContestUpsertOne) SetClarificationID(v int) *ContestUpsertOne {
-	return u.Update(func(s *ContestUpsert) {
-		s.SetClarificationID(v)
-	})
-}
-
-// AddClarificationID adds v to the "clarification_id" field.
-func (u *ContestUpsertOne) AddClarificationID(v int) *ContestUpsertOne {
-	return u.Update(func(s *ContestUpsert) {
-		s.AddClarificationID(v)
-	})
-}
-
-// UpdateClarificationID sets the "clarification_id" field to the value that was provided on create.
-func (u *ContestUpsertOne) UpdateClarificationID() *ContestUpsertOne {
-	return u.Update(func(s *ContestUpsert) {
-		s.UpdateClarificationID()
 	})
 }
 
@@ -785,48 +681,6 @@ func (u *ContestUpsertBulk) SetDescription(v string) *ContestUpsertBulk {
 func (u *ContestUpsertBulk) UpdateDescription() *ContestUpsertBulk {
 	return u.Update(func(s *ContestUpsert) {
 		s.UpdateDescription()
-	})
-}
-
-// SetTaskID sets the "task_id" field.
-func (u *ContestUpsertBulk) SetTaskID(v int) *ContestUpsertBulk {
-	return u.Update(func(s *ContestUpsert) {
-		s.SetTaskID(v)
-	})
-}
-
-// AddTaskID adds v to the "task_id" field.
-func (u *ContestUpsertBulk) AddTaskID(v int) *ContestUpsertBulk {
-	return u.Update(func(s *ContestUpsert) {
-		s.AddTaskID(v)
-	})
-}
-
-// UpdateTaskID sets the "task_id" field to the value that was provided on create.
-func (u *ContestUpsertBulk) UpdateTaskID() *ContestUpsertBulk {
-	return u.Update(func(s *ContestUpsert) {
-		s.UpdateTaskID()
-	})
-}
-
-// SetClarificationID sets the "clarification_id" field.
-func (u *ContestUpsertBulk) SetClarificationID(v int) *ContestUpsertBulk {
-	return u.Update(func(s *ContestUpsert) {
-		s.SetClarificationID(v)
-	})
-}
-
-// AddClarificationID adds v to the "clarification_id" field.
-func (u *ContestUpsertBulk) AddClarificationID(v int) *ContestUpsertBulk {
-	return u.Update(func(s *ContestUpsert) {
-		s.AddClarificationID(v)
-	})
-}
-
-// UpdateClarificationID sets the "clarification_id" field to the value that was provided on create.
-func (u *ContestUpsertBulk) UpdateClarificationID() *ContestUpsertBulk {
-	return u.Update(func(s *ContestUpsert) {
-		s.UpdateClarificationID()
 	})
 }
 

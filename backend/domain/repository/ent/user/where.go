@@ -410,29 +410,6 @@ func UpdatedAtNotNil() predicate.User {
 	return predicate.User(sql.FieldNotNull(FieldUpdatedAt))
 }
 
-// HasContests applies the HasEdge predicate on the "contests" edge.
-func HasContests() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ContestsTable, ContestsPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasContestsWith applies the HasEdge predicate on the "contests" edge with a given conditions (other predicates).
-func HasContestsWith(preds ...predicate.Contest) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newContestsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasTasks applies the HasEdge predicate on the "tasks" edge.
 func HasTasks() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -471,6 +448,29 @@ func HasSubmits() predicate.User {
 func HasSubmitsWith(preds ...predicate.Submit) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newSubmitsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasContestUsers applies the HasEdge predicate on the "contest_users" edge.
+func HasContestUsers() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, ContestUsersTable, ContestUsersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasContestUsersWith applies the HasEdge predicate on the "contest_users" edge with a given conditions (other predicates).
+func HasContestUsersWith(preds ...predicate.ContestUsers) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newContestUsersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

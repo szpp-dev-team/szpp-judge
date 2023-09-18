@@ -15,10 +15,8 @@ type Contest struct {
 func (Contest) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
-		field.String("slug"),
+		field.String("slug").Unique(),
 		field.String("description"),
-		field.Int("task_id"),
-		field.Int("clarification_id"),
 		field.Time("start_at"),
 		field.Time("end_at"),
 	}
@@ -29,6 +27,6 @@ func (Contest) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("tasks", Task.Type),
 		edge.To("submits", Submit.Type),
-		edge.From("contest_users", User.Type).Ref("contests"),
+		edge.To("contest_users", ContestUsers.Type),
 	}
 }

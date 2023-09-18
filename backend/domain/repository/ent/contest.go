@@ -21,10 +21,6 @@ type Contest struct {
 	Slug string `json:"slug,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
-	// TaskID holds the value of the "task_id" field.
-	TaskID int `json:"task_id,omitempty"`
-	// ClarificationID holds the value of the "clarification_id" field.
-	ClarificationID int `json:"clarification_id,omitempty"`
 	// StartAt holds the value of the "start_at" field.
 	StartAt time.Time `json:"start_at,omitempty"`
 	// EndAt holds the value of the "end_at" field.
@@ -42,7 +38,7 @@ type ContestEdges struct {
 	// Submits holds the value of the submits edge.
 	Submits []*Submit `json:"submits,omitempty"`
 	// ContestUsers holds the value of the contest_users edge.
-	ContestUsers []*User `json:"contest_users,omitempty"`
+	ContestUsers []*ContestUsers `json:"contest_users,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -68,7 +64,7 @@ func (e ContestEdges) SubmitsOrErr() ([]*Submit, error) {
 
 // ContestUsersOrErr returns the ContestUsers value or an error if the edge
 // was not loaded in eager-loading.
-func (e ContestEdges) ContestUsersOrErr() ([]*User, error) {
+func (e ContestEdges) ContestUsersOrErr() ([]*ContestUsers, error) {
 	if e.loadedTypes[2] {
 		return e.ContestUsers, nil
 	}
@@ -80,7 +76,7 @@ func (*Contest) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case contest.FieldID, contest.FieldTaskID, contest.FieldClarificationID:
+		case contest.FieldID:
 			values[i] = new(sql.NullInt64)
 		case contest.FieldSlug, contest.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -119,18 +115,6 @@ func (c *Contest) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Description = value.String
 			}
-		case contest.FieldTaskID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field task_id", values[i])
-			} else if value.Valid {
-				c.TaskID = int(value.Int64)
-			}
-		case contest.FieldClarificationID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field clarification_id", values[i])
-			} else if value.Valid {
-				c.ClarificationID = int(value.Int64)
-			}
 		case contest.FieldStartAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field start_at", values[i])
@@ -167,7 +151,7 @@ func (c *Contest) QuerySubmits() *SubmitQuery {
 }
 
 // QueryContestUsers queries the "contest_users" edge of the Contest entity.
-func (c *Contest) QueryContestUsers() *UserQuery {
+func (c *Contest) QueryContestUsers() *ContestUsersQuery {
 	return NewContestClient(c.config).QueryContestUsers(c)
 }
 
@@ -199,12 +183,6 @@ func (c *Contest) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)
-	builder.WriteString(", ")
-	builder.WriteString("task_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.TaskID))
-	builder.WriteString(", ")
-	builder.WriteString("clarification_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.ClarificationID))
 	builder.WriteString(", ")
 	builder.WriteString("start_at=")
 	builder.WriteString(c.StartAt.Format(time.ANSIC))

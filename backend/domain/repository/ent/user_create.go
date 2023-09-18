@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
@@ -75,21 +75,6 @@ func (uc *UserCreate) SetID(i int) *UserCreate {
 	return uc
 }
 
-// AddContestIDs adds the "contests" edge to the Contest entity by IDs.
-func (uc *UserCreate) AddContestIDs(ids ...int) *UserCreate {
-	uc.mutation.AddContestIDs(ids...)
-	return uc
-}
-
-// AddContests adds the "contests" edges to the Contest entity.
-func (uc *UserCreate) AddContests(c ...*Contest) *UserCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return uc.AddContestIDs(ids...)
-}
-
 // AddTaskIDs adds the "tasks" edge to the Task entity by IDs.
 func (uc *UserCreate) AddTaskIDs(ids ...int) *UserCreate {
 	uc.mutation.AddTaskIDs(ids...)
@@ -118,6 +103,21 @@ func (uc *UserCreate) AddSubmits(s ...*Submit) *UserCreate {
 		ids[i] = s[i].ID
 	}
 	return uc.AddSubmitIDs(ids...)
+}
+
+// AddContestUserIDs adds the "contest_users" edge to the ContestUsers entity by IDs.
+func (uc *UserCreate) AddContestUserIDs(ids ...int) *UserCreate {
+	uc.mutation.AddContestUserIDs(ids...)
+	return uc
+}
+
+// AddContestUsers adds the "contest_users" edges to the ContestUsers entity.
+func (uc *UserCreate) AddContestUsers(c ...*ContestUsers) *UserCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddContestUserIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -226,22 +226,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if nodes := uc.mutation.ContestsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.ContestsTable,
-			Columns: user.ContestsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := uc.mutation.TasksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -267,6 +251,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.ContestUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ContestUsersTable,
+			Columns: []string{user.ContestUsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contestusers.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

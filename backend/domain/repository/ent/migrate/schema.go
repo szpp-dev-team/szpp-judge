@@ -11,10 +11,8 @@ var (
 	// ContestsColumns holds the columns for the "contests" table.
 	ContestsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "slug", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "description", Type: field.TypeString},
-		{Name: "task_id", Type: field.TypeInt},
-		{Name: "clarification_id", Type: field.TypeInt},
 		{Name: "start_at", Type: field.TypeTime},
 		{Name: "end_at", Type: field.TypeTime},
 	}
@@ -23,6 +21,33 @@ var (
 		Name:       "contests",
 		Columns:    ContestsColumns,
 		PrimaryKey: []*schema.Column{ContestsColumns[0]},
+	}
+	// ContestUsersColumns holds the columns for the "contest_users" table.
+	ContestUsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "role", Type: field.TypeString},
+		{Name: "contest_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt},
+	}
+	// ContestUsersTable holds the schema information for the "contest_users" table.
+	ContestUsersTable = &schema.Table{
+		Name:       "contest_users",
+		Columns:    ContestUsersColumns,
+		PrimaryKey: []*schema.Column{ContestUsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "contest_users_contests_contest_users",
+				Columns:    []*schema.Column{ContestUsersColumns[2]},
+				RefColumns: []*schema.Column{ContestsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "contest_users_users_users",
+				Columns:    []*schema.Column{ContestUsersColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// LanguagesColumns holds the columns for the "languages" table.
 	LanguagesColumns = []*schema.Column{
@@ -251,34 +276,10 @@ var (
 			},
 		},
 	}
-	// UserContestsColumns holds the columns for the "user_contests" table.
-	UserContestsColumns = []*schema.Column{
-		{Name: "user_id", Type: field.TypeInt},
-		{Name: "contest_id", Type: field.TypeInt},
-	}
-	// UserContestsTable holds the schema information for the "user_contests" table.
-	UserContestsTable = &schema.Table{
-		Name:       "user_contests",
-		Columns:    UserContestsColumns,
-		PrimaryKey: []*schema.Column{UserContestsColumns[0], UserContestsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "user_contests_user_id",
-				Columns:    []*schema.Column{UserContestsColumns[0]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "user_contests_contest_id",
-				Columns:    []*schema.Column{UserContestsColumns[1]},
-				RefColumns: []*schema.Column{ContestsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ContestsTable,
+		ContestUsersTable,
 		LanguagesTable,
 		SubmitsTable,
 		TasksTable,
@@ -287,11 +288,12 @@ var (
 		TestcaseSetsTable,
 		UsersTable,
 		TestcaseSetTestcasesTable,
-		UserContestsTable,
 	}
 )
 
 func init() {
+	ContestUsersTable.ForeignKeys[0].RefTable = ContestsTable
+	ContestUsersTable.ForeignKeys[1].RefTable = UsersTable
 	SubmitsTable.ForeignKeys[0].RefTable = ContestsTable
 	SubmitsTable.ForeignKeys[1].RefTable = LanguagesTable
 	SubmitsTable.ForeignKeys[2].RefTable = TasksTable
@@ -304,6 +306,4 @@ func init() {
 	TestcaseSetsTable.ForeignKeys[0].RefTable = TasksTable
 	TestcaseSetTestcasesTable.ForeignKeys[0].RefTable = TestcaseSetsTable
 	TestcaseSetTestcasesTable.ForeignKeys[1].RefTable = TestcasesTable
-	UserContestsTable.ForeignKeys[0].RefTable = UsersTable
-	UserContestsTable.ForeignKeys[1].RefTable = ContestsTable
 }

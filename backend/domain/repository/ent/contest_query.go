@@ -12,10 +12,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestusers"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
 // ContestQuery is the builder for querying Contest entities.
@@ -27,7 +27,7 @@ type ContestQuery struct {
 	predicates       []predicate.Contest
 	withTasks        *TaskQuery
 	withSubmits      *SubmitQuery
-	withContestUsers *UserQuery
+	withContestUsers *ContestUsersQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -109,8 +109,8 @@ func (cq *ContestQuery) QuerySubmits() *SubmitQuery {
 }
 
 // QueryContestUsers chains the current query on the "contest_users" edge.
-func (cq *ContestQuery) QueryContestUsers() *UserQuery {
-	query := (&UserClient{config: cq.config}).Query()
+func (cq *ContestQuery) QueryContestUsers() *ContestUsersQuery {
+	query := (&ContestUsersClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -121,8 +121,8 @@ func (cq *ContestQuery) QueryContestUsers() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(contest.Table, contest.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, contest.ContestUsersTable, contest.ContestUsersPrimaryKey...),
+			sqlgraph.To(contestusers.Table, contestusers.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestUsersTable, contest.ContestUsersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -355,8 +355,8 @@ func (cq *ContestQuery) WithSubmits(opts ...func(*SubmitQuery)) *ContestQuery {
 
 // WithContestUsers tells the query-builder to eager-load the nodes that are connected to
 // the "contest_users" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ContestQuery) WithContestUsers(opts ...func(*UserQuery)) *ContestQuery {
-	query := (&UserClient{config: cq.config}).Query()
+func (cq *ContestQuery) WithContestUsers(opts ...func(*ContestUsersQuery)) *ContestQuery {
+	query := (&ContestUsersClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -482,8 +482,8 @@ func (cq *ContestQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	}
 	if query := cq.withContestUsers; query != nil {
 		if err := cq.loadContestUsers(ctx, query, nodes,
-			func(n *Contest) { n.Edges.ContestUsers = []*User{} },
-			func(n *Contest, e *User) { n.Edges.ContestUsers = append(n.Edges.ContestUsers, e) }); err != nil {
+			func(n *Contest) { n.Edges.ContestUsers = []*ContestUsers{} },
+			func(n *Contest, e *ContestUsers) { n.Edges.ContestUsers = append(n.Edges.ContestUsers, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -552,64 +552,33 @@ func (cq *ContestQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nod
 	}
 	return nil
 }
-func (cq *ContestQuery) loadContestUsers(ctx context.Context, query *UserQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *User)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Contest)
-	nids := make(map[int]map[*Contest]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
+func (cq *ContestQuery) loadContestUsers(ctx context.Context, query *ContestUsersQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *ContestUsers)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contest)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 		if init != nil {
-			init(node)
+			init(nodes[i])
 		}
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(contest.ContestUsersTable)
-		s.Join(joinT).On(s.C(user.FieldID), joinT.C(contest.ContestUsersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(contest.ContestUsersPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(contest.ContestUsersPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(contestusers.FieldContestID)
 	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Contest]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	query.Where(predicate.ContestUsers(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contest.ContestUsersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		fk := n.ContestID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected "contest_users" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "contest_id" returned %v for node %v`, fk, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
+		assign(node, n)
 	}
 	return nil
 }

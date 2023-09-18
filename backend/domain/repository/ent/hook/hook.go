@@ -21,6 +21,18 @@ func (f ContestFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ContestMutation", m)
 }
 
+// The ContestUsersFunc type is an adapter to allow the use of ordinary
+// function as ContestUsers mutator.
+type ContestUsersFunc func(context.Context, *ent.ContestUsersMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ContestUsersFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ContestUsersMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ContestUsersMutation", m)
+}
+
 // The LanguageFunc type is an adapter to allow the use of ordinary
 // function as Language mutator.
 type LanguageFunc func(context.Context, *ent.LanguageMutation) (ent.Value, error)

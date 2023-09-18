@@ -37,30 +37,21 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Contests holds the value of the contests edge.
-	Contests []*Contest `json:"contests,omitempty"`
 	// Tasks holds the value of the tasks edge.
 	Tasks []*Task `json:"tasks,omitempty"`
 	// Submits holds the value of the submits edge.
 	Submits []*Submit `json:"submits,omitempty"`
+	// ContestUsers holds the value of the contest_users edge.
+	ContestUsers []*ContestUsers `json:"contest_users,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
 }
 
-// ContestsOrErr returns the Contests value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) ContestsOrErr() ([]*Contest, error) {
-	if e.loadedTypes[0] {
-		return e.Contests, nil
-	}
-	return nil, &NotLoadedError{edge: "contests"}
-}
-
 // TasksOrErr returns the Tasks value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) TasksOrErr() ([]*Task, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Tasks, nil
 	}
 	return nil, &NotLoadedError{edge: "tasks"}
@@ -69,10 +60,19 @@ func (e UserEdges) TasksOrErr() ([]*Task, error) {
 // SubmitsOrErr returns the Submits value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) SubmitsOrErr() ([]*Submit, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		return e.Submits, nil
 	}
 	return nil, &NotLoadedError{edge: "submits"}
+}
+
+// ContestUsersOrErr returns the ContestUsers value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ContestUsersOrErr() ([]*ContestUsers, error) {
+	if e.loadedTypes[2] {
+		return e.ContestUsers, nil
+	}
+	return nil, &NotLoadedError{edge: "contest_users"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -158,11 +158,6 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryContests queries the "contests" edge of the User entity.
-func (u *User) QueryContests() *ContestQuery {
-	return NewUserClient(u.config).QueryContests(u)
-}
-
 // QueryTasks queries the "tasks" edge of the User entity.
 func (u *User) QueryTasks() *TaskQuery {
 	return NewUserClient(u.config).QueryTasks(u)
@@ -171,6 +166,11 @@ func (u *User) QueryTasks() *TaskQuery {
 // QuerySubmits queries the "submits" edge of the User entity.
 func (u *User) QuerySubmits() *SubmitQuery {
 	return NewUserClient(u.config).QuerySubmits(u)
+}
+
+// QueryContestUsers queries the "contest_users" edge of the User entity.
+func (u *User) QueryContestUsers() *ContestUsersQuery {
+	return NewUserClient(u.config).QueryContestUsers(u)
 }
 
 // Update returns a builder for updating this User.

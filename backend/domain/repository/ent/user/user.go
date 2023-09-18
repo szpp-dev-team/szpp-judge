@@ -24,19 +24,14 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeContests holds the string denoting the contests edge name in mutations.
-	EdgeContests = "contests"
 	// EdgeTasks holds the string denoting the tasks edge name in mutations.
 	EdgeTasks = "tasks"
 	// EdgeSubmits holds the string denoting the submits edge name in mutations.
 	EdgeSubmits = "submits"
+	// EdgeContestUsers holds the string denoting the contest_users edge name in mutations.
+	EdgeContestUsers = "contest_users"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// ContestsTable is the table that holds the contests relation/edge. The primary key declared below.
-	ContestsTable = "user_contests"
-	// ContestsInverseTable is the table name for the Contest entity.
-	// It exists in this package in order to avoid circular dependency with the "contest" package.
-	ContestsInverseTable = "contests"
 	// TasksTable is the table that holds the tasks relation/edge.
 	TasksTable = "tasks"
 	// TasksInverseTable is the table name for the Task entity.
@@ -51,6 +46,13 @@ const (
 	SubmitsInverseTable = "submits"
 	// SubmitsColumn is the table column denoting the submits relation/edge.
 	SubmitsColumn = "user_submits"
+	// ContestUsersTable is the table that holds the contest_users relation/edge.
+	ContestUsersTable = "contest_users"
+	// ContestUsersInverseTable is the table name for the ContestUsers entity.
+	// It exists in this package in order to avoid circular dependency with the "contestusers" package.
+	ContestUsersInverseTable = "contest_users"
+	// ContestUsersColumn is the table column denoting the contest_users relation/edge.
+	ContestUsersColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -63,12 +65,6 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
-
-var (
-	// ContestsPrimaryKey and ContestsColumn2 are the table columns denoting the
-	// primary key for the contests relation (M2M).
-	ContestsPrimaryKey = []string{"user_id", "contest_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -113,20 +109,6 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByContestsCount orders the results by contests count.
-func ByContestsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newContestsStep(), opts...)
-	}
-}
-
-// ByContests orders the results by contests terms.
-func ByContests(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newContestsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByTasksCount orders the results by tasks count.
 func ByTasksCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -154,12 +136,19 @@ func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSubmitsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newContestsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ContestsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ContestsTable, ContestsPrimaryKey...),
-	)
+
+// ByContestUsersCount orders the results by contest_users count.
+func ByContestUsersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newContestUsersStep(), opts...)
+	}
+}
+
+// ByContestUsers orders the results by contest_users terms.
+func ByContestUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newContestUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
 }
 func newTasksStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
@@ -173,5 +162,12 @@ func newSubmitsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubmitsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
+	)
+}
+func newContestUsersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ContestUsersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, ContestUsersTable, ContestUsersColumn),
 	)
 }

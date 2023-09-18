@@ -16,10 +16,6 @@ const (
 	FieldSlug = "slug"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// FieldTaskID holds the string denoting the task_id field in the database.
-	FieldTaskID = "task_id"
-	// FieldClarificationID holds the string denoting the clarification_id field in the database.
-	FieldClarificationID = "clarification_id"
 	// FieldStartAt holds the string denoting the start_at field in the database.
 	FieldStartAt = "start_at"
 	// FieldEndAt holds the string denoting the end_at field in the database.
@@ -46,11 +42,13 @@ const (
 	SubmitsInverseTable = "submits"
 	// SubmitsColumn is the table column denoting the submits relation/edge.
 	SubmitsColumn = "contest_submits"
-	// ContestUsersTable is the table that holds the contest_users relation/edge. The primary key declared below.
-	ContestUsersTable = "user_contests"
-	// ContestUsersInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	ContestUsersInverseTable = "users"
+	// ContestUsersTable is the table that holds the contest_users relation/edge.
+	ContestUsersTable = "contest_users"
+	// ContestUsersInverseTable is the table name for the ContestUsers entity.
+	// It exists in this package in order to avoid circular dependency with the "contestusers" package.
+	ContestUsersInverseTable = "contest_users"
+	// ContestUsersColumn is the table column denoting the contest_users relation/edge.
+	ContestUsersColumn = "contest_id"
 )
 
 // Columns holds all SQL columns for contest fields.
@@ -58,17 +56,9 @@ var Columns = []string{
 	FieldID,
 	FieldSlug,
 	FieldDescription,
-	FieldTaskID,
-	FieldClarificationID,
 	FieldStartAt,
 	FieldEndAt,
 }
-
-var (
-	// ContestUsersPrimaryKey and ContestUsersColumn2 are the table columns denoting the
-	// primary key for the contest_users relation (M2M).
-	ContestUsersPrimaryKey = []string{"user_id", "contest_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -96,16 +86,6 @@ func BySlug(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
-}
-
-// ByTaskID orders the results by the task_id field.
-func ByTaskID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTaskID, opts...).ToFunc()
-}
-
-// ByClarificationID orders the results by the clarification_id field.
-func ByClarificationID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldClarificationID, opts...).ToFunc()
 }
 
 // ByStartAt orders the results by the start_at field.
@@ -177,6 +157,6 @@ func newContestUsersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ContestUsersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ContestUsersTable, ContestUsersPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, ContestUsersTable, ContestUsersColumn),
 	)
 }

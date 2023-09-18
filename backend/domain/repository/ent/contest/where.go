@@ -65,16 +65,6 @@ func Description(v string) predicate.Contest {
 	return predicate.Contest(sql.FieldEQ(FieldDescription, v))
 }
 
-// TaskID applies equality check predicate on the "task_id" field. It's identical to TaskIDEQ.
-func TaskID(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldEQ(FieldTaskID, v))
-}
-
-// ClarificationID applies equality check predicate on the "clarification_id" field. It's identical to ClarificationIDEQ.
-func ClarificationID(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldEQ(FieldClarificationID, v))
-}
-
 // StartAt applies equality check predicate on the "start_at" field. It's identical to StartAtEQ.
 func StartAt(v time.Time) predicate.Contest {
 	return predicate.Contest(sql.FieldEQ(FieldStartAt, v))
@@ -215,86 +205,6 @@ func DescriptionContainsFold(v string) predicate.Contest {
 	return predicate.Contest(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// TaskIDEQ applies the EQ predicate on the "task_id" field.
-func TaskIDEQ(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldEQ(FieldTaskID, v))
-}
-
-// TaskIDNEQ applies the NEQ predicate on the "task_id" field.
-func TaskIDNEQ(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldNEQ(FieldTaskID, v))
-}
-
-// TaskIDIn applies the In predicate on the "task_id" field.
-func TaskIDIn(vs ...int) predicate.Contest {
-	return predicate.Contest(sql.FieldIn(FieldTaskID, vs...))
-}
-
-// TaskIDNotIn applies the NotIn predicate on the "task_id" field.
-func TaskIDNotIn(vs ...int) predicate.Contest {
-	return predicate.Contest(sql.FieldNotIn(FieldTaskID, vs...))
-}
-
-// TaskIDGT applies the GT predicate on the "task_id" field.
-func TaskIDGT(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldGT(FieldTaskID, v))
-}
-
-// TaskIDGTE applies the GTE predicate on the "task_id" field.
-func TaskIDGTE(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldGTE(FieldTaskID, v))
-}
-
-// TaskIDLT applies the LT predicate on the "task_id" field.
-func TaskIDLT(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldLT(FieldTaskID, v))
-}
-
-// TaskIDLTE applies the LTE predicate on the "task_id" field.
-func TaskIDLTE(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldLTE(FieldTaskID, v))
-}
-
-// ClarificationIDEQ applies the EQ predicate on the "clarification_id" field.
-func ClarificationIDEQ(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldEQ(FieldClarificationID, v))
-}
-
-// ClarificationIDNEQ applies the NEQ predicate on the "clarification_id" field.
-func ClarificationIDNEQ(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldNEQ(FieldClarificationID, v))
-}
-
-// ClarificationIDIn applies the In predicate on the "clarification_id" field.
-func ClarificationIDIn(vs ...int) predicate.Contest {
-	return predicate.Contest(sql.FieldIn(FieldClarificationID, vs...))
-}
-
-// ClarificationIDNotIn applies the NotIn predicate on the "clarification_id" field.
-func ClarificationIDNotIn(vs ...int) predicate.Contest {
-	return predicate.Contest(sql.FieldNotIn(FieldClarificationID, vs...))
-}
-
-// ClarificationIDGT applies the GT predicate on the "clarification_id" field.
-func ClarificationIDGT(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldGT(FieldClarificationID, v))
-}
-
-// ClarificationIDGTE applies the GTE predicate on the "clarification_id" field.
-func ClarificationIDGTE(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldGTE(FieldClarificationID, v))
-}
-
-// ClarificationIDLT applies the LT predicate on the "clarification_id" field.
-func ClarificationIDLT(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldLT(FieldClarificationID, v))
-}
-
-// ClarificationIDLTE applies the LTE predicate on the "clarification_id" field.
-func ClarificationIDLTE(v int) predicate.Contest {
-	return predicate.Contest(sql.FieldLTE(FieldClarificationID, v))
-}
-
 // StartAtEQ applies the EQ predicate on the "start_at" field.
 func StartAtEQ(v time.Time) predicate.Contest {
 	return predicate.Contest(sql.FieldEQ(FieldStartAt, v))
@@ -426,14 +336,14 @@ func HasContestUsers() predicate.Contest {
 	return predicate.Contest(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ContestUsersTable, ContestUsersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, ContestUsersTable, ContestUsersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
 // HasContestUsersWith applies the HasEdge predicate on the "contest_users" edge with a given conditions (other predicates).
-func HasContestUsersWith(preds ...predicate.User) predicate.Contest {
+func HasContestUsersWith(preds ...predicate.ContestUsers) predicate.Contest {
 	return predicate.Contest(func(s *sql.Selector) {
 		step := newContestUsersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
