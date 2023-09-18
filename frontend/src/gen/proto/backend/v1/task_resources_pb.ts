@@ -249,17 +249,12 @@ export class Task extends Message<Task> {
   difficulty = Difficulty.DIFFICULTY_UNSPECIFIED;
 
   /**
-   * @generated from field: int32 score = 9;
-   */
-  score = 0;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 10;
+   * @generated from field: google.protobuf.Timestamp created_at = 9;
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp updated_at = 11;
+   * @generated from field: optional google.protobuf.Timestamp updated_at = 10;
    */
   updatedAt?: Timestamp;
 
@@ -279,9 +274,8 @@ export class Task extends Message<Task> {
     { no: 6, name: "contest_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
     { no: 7, name: "judge_type", kind: "message", T: JudgeType },
     { no: 8, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
-    { no: 9, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 10, name: "created_at", kind: "message", T: Timestamp },
-    { no: 11, name: "updated_at", kind: "message", T: Timestamp, opt: true },
+    { no: 9, name: "created_at", kind: "message", T: Timestamp },
+    { no: 10, name: "updated_at", kind: "message", T: Timestamp, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Task {
@@ -352,6 +346,11 @@ export class MutationTask extends Message<MutationTask> {
    */
   difficulty = Difficulty.DIFFICULTY_UNSPECIFIED;
 
+  /**
+   * @generated from field: bool is_public = 8;
+   */
+  isPublic = false;
+
   constructor(data?: PartialMessage<MutationTask>) {
     super();
     proto3.util.initPartial(data, this);
@@ -367,6 +366,7 @@ export class MutationTask extends Message<MutationTask> {
     { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 6, name: "judge_type", kind: "message", T: JudgeType },
     { no: 7, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
+    { no: 8, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationTask {
