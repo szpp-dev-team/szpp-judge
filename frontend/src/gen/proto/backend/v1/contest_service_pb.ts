@@ -471,3 +471,73 @@ export class GetStandingsResponse extends Message<GetStandingsResponse> {
   }
 }
 
+/**
+ * コンテストに参加登録するときのリクエスト
+ *
+ * @generated from message backend.v1.RegisterMeRequest
+ */
+export class RegisterMeRequest extends Message<RegisterMeRequest> {
+  /**
+   * @generated from field: string contest_slug = 1;
+   */
+  contestSlug = "";
+
+  constructor(data?: PartialMessage<RegisterMeRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.RegisterMeRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterMeRequest {
+    return new RegisterMeRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterMeRequest {
+    return new RegisterMeRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterMeRequest {
+    return new RegisterMeRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterMeRequest | PlainMessage<RegisterMeRequest> | undefined, b: RegisterMeRequest | PlainMessage<RegisterMeRequest> | undefined): boolean {
+    return proto3.util.equals(RegisterMeRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.RegisterMeResponse
+ */
+export class RegisterMeResponse extends Message<RegisterMeResponse> {
+  constructor(data?: PartialMessage<RegisterMeResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.RegisterMeResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterMeResponse {
+    return new RegisterMeResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterMeResponse {
+    return new RegisterMeResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterMeResponse {
+    return new RegisterMeResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterMeResponse | PlainMessage<RegisterMeResponse> | undefined, b: RegisterMeResponse | PlainMessage<RegisterMeResponse> | undefined): boolean {
+    return proto3.util.equals(RegisterMeResponse, a, b);
+  }
+}
+

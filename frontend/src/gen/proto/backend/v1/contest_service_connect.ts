@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateContestRequest, CreateContestResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse } from "./contest_service_pb";
+import { CreateContestRequest, CreateContestResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse } from "./contest_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -68,6 +68,17 @@ export const ContestService = {
       name: "GetStandings",
       I: GetStandingsRequest,
       O: GetStandingsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 参加登録
+     *
+     * @generated from rpc backend.v1.ContestService.RegisterMe
+     */
+    registerMe: {
+      name: "RegisterMe",
+      I: RegisterMeRequest,
+      O: RegisterMeResponse,
       kind: MethodKind.Unary,
     },
   }

@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package backend.v1;
 
-import "google/protobuf/timestamp.proto";
 import "backend/v1/contest_resources.proto";
+import "google/protobuf/timestamp.proto";
 
 service ContestService {
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
@@ -14,6 +14,8 @@ service ContestService {
   rpc GetMySubmissionStatuses(GetMySubmissionStatusesRequest) returns (GetMySubmissionStatusesResponse);
   // 順位表取得
   rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
+  // 参加登録
+  rpc RegisterMe(RegisterMeRequest) returns (RegisterMeResponse);
 }
 
 message CreateContestRequest {
@@ -65,3 +67,10 @@ message GetStandingsRequest {
 message GetStandingsResponse {
   repeated StandingsElement standings_list = 1;
 }
+
+// コンテストに参加登録するときのリクエスト
+message RegisterMeRequest {
+  string contest_slug = 1;
+}
+
+message RegisterMeResponse {}

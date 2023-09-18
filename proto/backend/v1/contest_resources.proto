@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package backend.v1;
 
-import "google/protobuf/timestamp.proto";
 import "backend/v1/task_resources.proto";
+import "google/protobuf/timestamp.proto";
 
 message ContestTask {
   int32 id = 1;

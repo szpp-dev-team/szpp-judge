@@ -25,6 +25,7 @@ const (
 	ContestService_ListContestTasks_FullMethodName        = "/backend.v1.ContestService/ListContestTasks"
 	ContestService_GetMySubmissionStatuses_FullMethodName = "/backend.v1.ContestService/GetMySubmissionStatuses"
 	ContestService_GetStandings_FullMethodName            = "/backend.v1.ContestService/GetStandings"
+	ContestService_RegisterMe_FullMethodName              = "/backend.v1.ContestService/RegisterMe"
 )
 
 // ContestServiceClient is the client API for ContestService service.
@@ -39,6 +40,8 @@ type ContestServiceClient interface {
 	GetMySubmissionStatuses(ctx context.Context, in *GetMySubmissionStatusesRequest, opts ...grpc.CallOption) (*GetMySubmissionStatusesResponse, error)
 	// 順位表取得
 	GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error)
+	// 参加登録
+	RegisterMe(ctx context.Context, in *RegisterMeRequest, opts ...grpc.CallOption) (*RegisterMeResponse, error)
 }
 
 type contestServiceClient struct {
@@ -103,6 +106,15 @@ func (c *contestServiceClient) GetStandings(ctx context.Context, in *GetStanding
 	return out, nil
 }
 
+func (c *contestServiceClient) RegisterMe(ctx context.Context, in *RegisterMeRequest, opts ...grpc.CallOption) (*RegisterMeResponse, error) {
+	out := new(RegisterMeResponse)
+	err := c.cc.Invoke(ctx, ContestService_RegisterMe_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ContestServiceServer is the server API for ContestService service.
 // All implementations should embed UnimplementedContestServiceServer
 // for forward compatibility
@@ -115,6 +127,8 @@ type ContestServiceServer interface {
 	GetMySubmissionStatuses(context.Context, *GetMySubmissionStatusesRequest) (*GetMySubmissionStatusesResponse, error)
 	// 順位表取得
 	GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error)
+	// 参加登録
+	RegisterMe(context.Context, *RegisterMeRequest) (*RegisterMeResponse, error)
 }
 
 // UnimplementedContestServiceServer should be embedded to have forward compatible implementations.
@@ -138,6 +152,9 @@ func (UnimplementedContestServiceServer) GetMySubmissionStatuses(context.Context
 }
 func (UnimplementedContestServiceServer) GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStandings not implemented")
+}
+func (UnimplementedContestServiceServer) RegisterMe(context.Context, *RegisterMeRequest) (*RegisterMeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterMe not implemented")
 }
 
 // UnsafeContestServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -259,6 +276,24 @@ func _ContestService_GetStandings_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContestService_RegisterMe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterMeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).RegisterMe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_RegisterMe_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).RegisterMe(ctx, req.(*RegisterMeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ContestService_ServiceDesc is the grpc.ServiceDesc for ContestService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -289,6 +324,10 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetStandings",
 			Handler:    _ContestService_GetStandings_Handler,
+		},
+		{
+			MethodName: "RegisterMe",
+			Handler:    _ContestService_RegisterMe_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

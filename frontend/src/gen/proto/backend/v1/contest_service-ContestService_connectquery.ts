@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateContestRequest, CreateContestResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse } from "./contest_service_pb";
+import { CreateContestRequest, CreateContestResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse } from "./contest_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 import { createQueryService } from "@connectrpc/connect-query";
 
@@ -73,6 +73,17 @@ export const ContestService = {
       O: GetStandingsResponse,
       kind: MethodKind.Unary,
     },
+    /**
+     * 参加登録
+     *
+     * @generated from rpc backend.v1.ContestService.RegisterMe
+     */
+    registerMe: {
+      name: "RegisterMe",
+      I: RegisterMeRequest,
+      O: RegisterMeResponse,
+      kind: MethodKind.Unary,
+    },
   }
 } as const;
 
@@ -121,3 +132,12 @@ export const getMySubmissionStatuses = createQueryService({
 export const getStandings = createQueryService({
   service: ContestService,
 }).getStandings;
+
+/**
+ * 参加登録
+ *
+ * @generated from rpc backend.v1.ContestService.RegisterMe
+ */
+export const registerMe = createQueryService({
+  service: ContestService,
+}).registerMe;
