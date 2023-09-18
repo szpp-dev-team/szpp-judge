@@ -8,7 +8,7 @@ interface ICredential {
   refreshToken: string;
 }
 
-const credential = atomWithStorage<ICredential>("szp_tkn", { accessToken: "", refreshToken: "" });
+const credential = atomWithStorage<Readonly<ICredential>>("szp_tkn", { accessToken: "", refreshToken: "" });
 
 const authUser = atom<Readonly<AuthUser> | null>((get) => {
   const jwt = get(credential).accessToken;
