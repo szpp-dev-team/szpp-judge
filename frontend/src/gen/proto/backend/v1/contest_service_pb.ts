@@ -4,37 +4,17 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Contest, ContestTask, StandingsElement, SubmissionStatus } from "./contest_resources_pb";
+import { Message, proto3 } from "@bufbuild/protobuf";
+import { Contest, ContestTask, MutationContest, StandingsElement, SubmissionStatus } from "./contest_resources_pb";
 
 /**
  * @generated from message backend.v1.CreateContestRequest
  */
 export class CreateContestRequest extends Message<CreateContestRequest> {
   /**
-   * @generated from field: string name = 1;
+   * @generated from field: backend.v1.MutationContest contest = 1;
    */
-  name = "";
-
-  /**
-   * @generated from field: string slug = 2;
-   */
-  slug = "";
-
-  /**
-   * @generated from field: string description = 3;
-   */
-  description = "";
-
-  /**
-   * @generated from field: google.protobuf.Timestamp start_at = 4;
-   */
-  startAt?: Timestamp;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp end_at = 5;
-   */
-  endAt?: Timestamp;
+  contest?: MutationContest;
 
   constructor(data?: PartialMessage<CreateContestRequest>) {
     super();
@@ -44,11 +24,7 @@ export class CreateContestRequest extends Message<CreateContestRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.CreateContestRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "start_at", kind: "message", T: Timestamp },
-    { no: 5, name: "end_at", kind: "message", T: Timestamp },
+    { no: 1, name: "contest", kind: "message", T: MutationContest },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateContestRequest {
@@ -176,6 +152,86 @@ export class GetContestResponse extends Message<GetContestResponse> {
 
   static equals(a: GetContestResponse | PlainMessage<GetContestResponse> | undefined, b: GetContestResponse | PlainMessage<GetContestResponse> | undefined): boolean {
     return proto3.util.equals(GetContestResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.UpdateContestRequest
+ */
+export class UpdateContestRequest extends Message<UpdateContestRequest> {
+  /**
+   * @generated from field: int32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: backend.v1.MutationContest contest = 2;
+   */
+  contest?: MutationContest;
+
+  constructor(data?: PartialMessage<UpdateContestRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.UpdateContestRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "contest", kind: "message", T: MutationContest },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateContestRequest {
+    return new UpdateContestRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateContestRequest {
+    return new UpdateContestRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateContestRequest {
+    return new UpdateContestRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateContestRequest | PlainMessage<UpdateContestRequest> | undefined, b: UpdateContestRequest | PlainMessage<UpdateContestRequest> | undefined): boolean {
+    return proto3.util.equals(UpdateContestRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.UpdateContestResponse
+ */
+export class UpdateContestResponse extends Message<UpdateContestResponse> {
+  /**
+   * @generated from field: backend.v1.Contest contest = 1;
+   */
+  contest?: Contest;
+
+  constructor(data?: PartialMessage<UpdateContestResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.UpdateContestResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest", kind: "message", T: Contest },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateContestResponse {
+    return new UpdateContestResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateContestResponse {
+    return new UpdateContestResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateContestResponse {
+    return new UpdateContestResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateContestResponse | PlainMessage<UpdateContestResponse> | undefined, b: UpdateContestResponse | PlainMessage<UpdateContestResponse> | undefined): boolean {
+    return proto3.util.equals(UpdateContestResponse, a, b);
   }
 }
 

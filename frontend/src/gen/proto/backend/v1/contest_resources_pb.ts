@@ -148,6 +148,73 @@ export class Contest extends Message<Contest> {
 }
 
 /**
+ * @generated from message backend.v1.MutationContest
+ */
+export class MutationContest extends Message<MutationContest> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string slug = 2;
+   */
+  slug = "";
+
+  /**
+   * @generated from field: string description = 3;
+   */
+  description = "";
+
+  /**
+   * @generated from field: google.protobuf.Timestamp start_at = 4;
+   */
+  startAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp end_at = 5;
+   */
+  endAt?: Timestamp;
+
+  /**
+   * @generated from field: bool is_public = 6;
+   */
+  isPublic = false;
+
+  constructor(data?: PartialMessage<MutationContest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.MutationContest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "start_at", kind: "message", T: Timestamp },
+    { no: 5, name: "end_at", kind: "message", T: Timestamp },
+    { no: 6, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationContest {
+    return new MutationContest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MutationContest {
+    return new MutationContest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MutationContest {
+    return new MutationContest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MutationContest | PlainMessage<MutationContest> | undefined, b: MutationContest | PlainMessage<MutationContest> | undefined): boolean {
+    return proto3.util.equals(MutationContest, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.StandingsElement
  */
 export class StandingsElement extends Message<StandingsElement> {

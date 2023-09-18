@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateContestRequest, CreateContestResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse } from "./contest_service_pb";
+import { CreateContestRequest, CreateContestResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 import { createQueryService } from "@connectrpc/connect-query";
 
@@ -31,6 +31,15 @@ export const ContestService = {
       name: "GetContest",
       I: GetContestRequest,
       O: GetContestResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc backend.v1.ContestService.UpdateContest
+     */
+    updateContest: {
+      name: "UpdateContest",
+      I: UpdateContestRequest,
+      O: UpdateContestResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -100,6 +109,13 @@ export const createContest = createQueryService({
 export const getContest = createQueryService({
   service: ContestService,
 }).getContest;
+
+/**
+ * @generated from rpc backend.v1.ContestService.UpdateContest
+ */
+export const updateContest = createQueryService({
+  service: ContestService,
+}).updateContest;
 
 /**
  * @generated from rpc backend.v1.ContestService.ListContests

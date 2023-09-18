@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	ContestService_CreateContest_FullMethodName           = "/backend.v1.ContestService/CreateContest"
 	ContestService_GetContest_FullMethodName              = "/backend.v1.ContestService/GetContest"
+	ContestService_UpdateContest_FullMethodName           = "/backend.v1.ContestService/UpdateContest"
 	ContestService_ListContests_FullMethodName            = "/backend.v1.ContestService/ListContests"
 	ContestService_ListContestTasks_FullMethodName        = "/backend.v1.ContestService/ListContestTasks"
 	ContestService_GetMySubmissionStatuses_FullMethodName = "/backend.v1.ContestService/GetMySubmissionStatuses"
@@ -34,6 +35,7 @@ const (
 type ContestServiceClient interface {
 	CreateContest(ctx context.Context, in *CreateContestRequest, opts ...grpc.CallOption) (*CreateContestResponse, error)
 	GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error)
+	UpdateContest(ctx context.Context, in *UpdateContestRequest, opts ...grpc.CallOption) (*UpdateContestResponse, error)
 	ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error)
 	ListContestTasks(ctx context.Context, in *ListContestTasksRequest, opts ...grpc.CallOption) (*ListContestTasksResponse, error)
 	// 自分の問題ごとの結果情報を返す
@@ -64,6 +66,15 @@ func (c *contestServiceClient) CreateContest(ctx context.Context, in *CreateCont
 func (c *contestServiceClient) GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error) {
 	out := new(GetContestResponse)
 	err := c.cc.Invoke(ctx, ContestService_GetContest_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) UpdateContest(ctx context.Context, in *UpdateContestRequest, opts ...grpc.CallOption) (*UpdateContestResponse, error) {
+	out := new(UpdateContestResponse)
+	err := c.cc.Invoke(ctx, ContestService_UpdateContest_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +132,7 @@ func (c *contestServiceClient) RegisterMe(ctx context.Context, in *RegisterMeReq
 type ContestServiceServer interface {
 	CreateContest(context.Context, *CreateContestRequest) (*CreateContestResponse, error)
 	GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error)
+	UpdateContest(context.Context, *UpdateContestRequest) (*UpdateContestResponse, error)
 	ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error)
 	ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error)
 	// 自分の問題ごとの結果情報を返す
@@ -140,6 +152,9 @@ func (UnimplementedContestServiceServer) CreateContest(context.Context, *CreateC
 }
 func (UnimplementedContestServiceServer) GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContest not implemented")
+}
+func (UnimplementedContestServiceServer) UpdateContest(context.Context, *UpdateContestRequest) (*UpdateContestResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateContest not implemented")
 }
 func (UnimplementedContestServiceServer) ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListContests not implemented")
@@ -200,6 +215,24 @@ func _ContestService_GetContest_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContestServiceServer).GetContest(ctx, req.(*GetContestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_UpdateContest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateContestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).UpdateContest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_UpdateContest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).UpdateContest(ctx, req.(*UpdateContestRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -308,6 +341,10 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetContest",
 			Handler:    _ContestService_GetContest_Handler,
+		},
+		{
+			MethodName: "UpdateContest",
+			Handler:    _ContestService_UpdateContest_Handler,
 		},
 		{
 			MethodName: "ListContests",
