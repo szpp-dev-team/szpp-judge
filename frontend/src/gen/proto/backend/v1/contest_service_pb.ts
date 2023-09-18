@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { Contest, ContestTask, MutationContest, StandingsElement, SubmissionStatus } from "./contest_resources_pb";
+import { Contest, ContestTask, MutationContest, StandingsRecord, SubmissionStatus } from "./contest_resources_pb";
 
 /**
  * @generated from message backend.v1.CreateContestRequest
@@ -495,9 +495,9 @@ export class GetStandingsRequest extends Message<GetStandingsRequest> {
  */
 export class GetStandingsResponse extends Message<GetStandingsResponse> {
   /**
-   * @generated from field: repeated backend.v1.StandingsElement standings_list = 1;
+   * @generated from field: repeated backend.v1.StandingsRecord standings_list = 1;
    */
-  standingsList: StandingsElement[] = [];
+  standingsList: StandingsRecord[] = [];
 
   constructor(data?: PartialMessage<GetStandingsResponse>) {
     super();
@@ -507,7 +507,7 @@ export class GetStandingsResponse extends Message<GetStandingsResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.GetStandingsResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "standings_list", kind: "message", T: StandingsElement, repeated: true },
+    { no: 1, name: "standings_list", kind: "message", T: StandingsRecord, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetStandingsResponse {
