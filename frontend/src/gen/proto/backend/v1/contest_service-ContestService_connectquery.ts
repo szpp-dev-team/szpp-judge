@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateContestRequest, CreateContestResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 import { createQueryService } from "@connectrpc/connect-query";
 
@@ -93,6 +93,105 @@ export const ContestService = {
       O: RegisterMeResponse,
       kind: MethodKind.Unary,
     },
+    /**
+     * Clarification を作成する
+     *
+     * @generated from rpc backend.v1.ContestService.CreateClarification
+     */
+    createClarification: {
+      name: "CreateClarification",
+      I: CreateClarificationRequest,
+      O: CreateClarificationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 指定された Clarification を取得する
+     *
+     * @generated from rpc backend.v1.ContestService.GetClarification
+     */
+    getClarification: {
+      name: "GetClarification",
+      I: GetClarificationRequest,
+      O: GetClarificationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ClarificationListを取得する
+     *
+     * @generated from rpc backend.v1.ContestService.ListClarifications
+     */
+    listClarifications: {
+      name: "ListClarifications",
+      I: ListClarificationsRequest,
+      O: ListClarificationsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Clarification を更新する
+     *
+     * @generated from rpc backend.v1.ContestService.UpdateClarification
+     */
+    updateClarification: {
+      name: "UpdateClarification",
+      I: UpdateClarificationRequest,
+      O: UpdateClarificationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Clarification を削除する
+     *
+     * @generated from rpc backend.v1.ContestService.DeleteClarification
+     */
+    deleteClarification: {
+      name: "DeleteClarification",
+      I: DeleteClarificationRequest,
+      O: DeleteClarificationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Answerを追加する
+     *
+     * @generated from rpc backend.v1.ContestService.CreateAnswer
+     */
+    createAnswer: {
+      name: "CreateAnswer",
+      I: CreateAnswerRequest,
+      O: CreateAnswerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Answerを取得する
+     *
+     * @generated from rpc backend.v1.ContestService.GetAnswer
+     */
+    getAnswer: {
+      name: "GetAnswer",
+      I: GetAnswerRequest,
+      O: GetAnswerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Answerを更新する
+     *
+     * @generated from rpc backend.v1.ContestService.UpdateAnswer
+     */
+    updateAnswer: {
+      name: "UpdateAnswer",
+      I: UpdateAnswerRequest,
+      O: UpdateAnswerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Answerを削除する
+     *
+     * @generated from rpc backend.v1.ContestService.DeleteAnswer
+     */
+    deleteAnswer: {
+      name: "DeleteAnswer",
+      I: DeleteAnswerRequest,
+      O: DeleteAnswerResponse,
+      kind: MethodKind.Unary,
+    },
   }
 } as const;
 
@@ -157,3 +256,84 @@ export const getStandings = createQueryService({
 export const registerMe = createQueryService({
   service: ContestService,
 }).registerMe;
+
+/**
+ * Clarification を作成する
+ *
+ * @generated from rpc backend.v1.ContestService.CreateClarification
+ */
+export const createClarification = createQueryService({
+  service: ContestService,
+}).createClarification;
+
+/**
+ * 指定された Clarification を取得する
+ *
+ * @generated from rpc backend.v1.ContestService.GetClarification
+ */
+export const getClarification = createQueryService({
+  service: ContestService,
+}).getClarification;
+
+/**
+ * ClarificationListを取得する
+ *
+ * @generated from rpc backend.v1.ContestService.ListClarifications
+ */
+export const listClarifications = createQueryService({
+  service: ContestService,
+}).listClarifications;
+
+/**
+ * Clarification を更新する
+ *
+ * @generated from rpc backend.v1.ContestService.UpdateClarification
+ */
+export const updateClarification = createQueryService({
+  service: ContestService,
+}).updateClarification;
+
+/**
+ * Clarification を削除する
+ *
+ * @generated from rpc backend.v1.ContestService.DeleteClarification
+ */
+export const deleteClarification = createQueryService({
+  service: ContestService,
+}).deleteClarification;
+
+/**
+ * Answerを追加する
+ *
+ * @generated from rpc backend.v1.ContestService.CreateAnswer
+ */
+export const createAnswer = createQueryService({
+  service: ContestService,
+}).createAnswer;
+
+/**
+ * Answerを取得する
+ *
+ * @generated from rpc backend.v1.ContestService.GetAnswer
+ */
+export const getAnswer = createQueryService({
+  service: ContestService,
+}).getAnswer;
+
+/**
+ * Answerを更新する
+ *
+ * @generated from rpc backend.v1.ContestService.UpdateAnswer
+ */
+export const updateAnswer = createQueryService({
+  service: ContestService,
+}).updateAnswer;
+
+/**
+ * Answerを削除する
+ *
+ * @generated from rpc backend.v1.ContestService.DeleteAnswer
+ */
+export const deleteAnswer = createQueryService({
+  service: ContestService,
+}).deleteAnswer;

@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateTaskRequest, CreateTaskResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetAnswerRequest, GetAnswerResponse, GetClarificationRequest, GetClarificationResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetSubmissionDetailRequest, GetSubmissionDetailResponse, GetTaskRequest, GetTaskResponse, GetTestcaseSetsRequest, GetTestcaseSetsResponse, ListClarificationsRequest, ListClarificationsResponse, ListSubmissionsRequest, ListSubmissionsResponse, SubmitRequest, SubmitResponse, SyncTestcaseSetsRequest, SyncTestcaseSetsResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateClarificationRequest, UpdateClarificationResponse, UpdateTaskRequest, UpdateTaskResponse } from "./task_service_pb";
+import { CreateTaskRequest, CreateTaskResponse, GetJudgeProgressRequest, GetJudgeProgressResponse, GetSubmissionDetailRequest, GetSubmissionDetailResponse, GetTaskRequest, GetTaskResponse, GetTestcaseSetsRequest, GetTestcaseSetsResponse, ListSubmissionsRequest, ListSubmissionsResponse, SubmitRequest, SubmitResponse, SyncTestcaseSetsRequest, SyncTestcaseSetsResponse, UpdateTaskRequest, UpdateTaskResponse } from "./task_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -110,105 +110,6 @@ export const TaskService = {
       name: "GetJudgeProgress",
       I: GetJudgeProgressRequest,
       O: GetJudgeProgressResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Clarification を作成する
-     *
-     * @generated from rpc backend.v1.TaskService.CreateClarification
-     */
-    createClarification: {
-      name: "CreateClarification",
-      I: CreateClarificationRequest,
-      O: CreateClarificationResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * 指定された Clarification を取得する
-     *
-     * @generated from rpc backend.v1.TaskService.GetClarification
-     */
-    getClarification: {
-      name: "GetClarification",
-      I: GetClarificationRequest,
-      O: GetClarificationResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * ClarificationListを取得する
-     *
-     * @generated from rpc backend.v1.TaskService.ListClarifications
-     */
-    listClarifications: {
-      name: "ListClarifications",
-      I: ListClarificationsRequest,
-      O: ListClarificationsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Clarification を更新する
-     *
-     * @generated from rpc backend.v1.TaskService.UpdateClarification
-     */
-    updateClarification: {
-      name: "UpdateClarification",
-      I: UpdateClarificationRequest,
-      O: UpdateClarificationResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Clarification を削除する
-     *
-     * @generated from rpc backend.v1.TaskService.DeleteClarification
-     */
-    deleteClarification: {
-      name: "DeleteClarification",
-      I: DeleteClarificationRequest,
-      O: DeleteClarificationResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Answerを追加する
-     *
-     * @generated from rpc backend.v1.TaskService.CreateAnswer
-     */
-    createAnswer: {
-      name: "CreateAnswer",
-      I: CreateAnswerRequest,
-      O: CreateAnswerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Answerを取得する
-     *
-     * @generated from rpc backend.v1.TaskService.GetAnswer
-     */
-    getAnswer: {
-      name: "GetAnswer",
-      I: GetAnswerRequest,
-      O: GetAnswerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Answerを更新する
-     *
-     * @generated from rpc backend.v1.TaskService.UpdateAnswer
-     */
-    updateAnswer: {
-      name: "UpdateAnswer",
-      I: UpdateAnswerRequest,
-      O: UpdateAnswerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Answerを削除する
-     *
-     * @generated from rpc backend.v1.TaskService.DeleteAnswer
-     */
-    deleteAnswer: {
-      name: "DeleteAnswer",
-      I: DeleteAnswerRequest,
-      O: DeleteAnswerResponse,
       kind: MethodKind.Unary,
     },
   }
