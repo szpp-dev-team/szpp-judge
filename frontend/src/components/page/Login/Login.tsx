@@ -1,7 +1,5 @@
-import { LoginRequest } from "@/src/gen/proto/backend/v1/messages_pb";
-import { authRepo } from "@/src/repository/auth";
+import { useLogin } from "@/src/usecases/auth";
 import { userLoginSchema } from "@/src/zschema/user";
-import { Code, ConnectError } from "@bufbuild/connect";
 import { Button, Card, CardBody, CardFooter, CardHeader, Container, Heading, Input, useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
@@ -23,40 +21,36 @@ export const Login = () => {
     register,
     handleSubmit,
     setError: setFormError,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormFields>({
     mode: "onChange",
     resolver: zodResolver(userLoginSchema),
   });
 
-  const onSubmit = handleSubmit(async (values) => {
-    console.log("onSubmit(): values=", values);
-    try {
-      const resp = await authRepo.login(new LoginRequest(values));
-      console.log("onSubmit(): resp=", resp);
-      toast({
-        title: `${resp.username} にログインしました`,
-        status: "success",
-      });
-      router.push("/");
-    } catch (e) {
-      toast({
-        title: "ログインに失敗しました",
-        status: "error",
-      });
-      console.error(typeof e, e);
+  const onUnauthenticatedError = () => {
+    toast({
+      title: "ログインに失敗しました",
+      status: "error",
+    });
+    const err = { type: "custom", message: "ユーザ名またはパスワードが間違っています" } as const;
+    setFormError("username", err);
+    setFormError("password", err);
+  };
 
-      if (e instanceof ConnectError && e.code === Code.Unauthenticated) {
-        console.log("e.code:", e.code);
-        console.log("e.name:", e.name);
-        console.log("e.message:", e.message);
-        console.log("e.details:", e.details);
-        console.log("e.metadata:", e.metadata);
-        const err = { type: "custom", message: "ユーザ名またはパスワードが間違っています" } as const;
-        setFormError("username", err);
-        setFormError("password", err);
-      }
-    }
+  const { isLoading, mutate } = useLogin(onUnauthenticatedError);
+
+  const onSubmit = handleSubmit((values) => {
+    console.log("onSubmit(): values=", values);
+    mutate(values, {
+      onSuccess: (data) => {
+        console.log("[LoginComponent] onSuccess");
+        toast({
+          title: `${data.user!.username} にログインしました`,
+          status: "success",
+        });
+        router.push("/");
+      },
+    });
   });
 
   const formId = "login-form";
@@ -94,7 +88,7 @@ export const Login = () => {
           </form>
         </CardBody>
         <CardFooter flexDirection="column" alignItems="center" gap={2}>
-          <Button type="submit" form={formId} size="lg" colorScheme="teal" isLoading={isSubmitting}>
+          <Button type="submit" form={formId} size="lg" colorScheme="teal" isLoading={isLoading}>
             ログイン
           </Button>
         </CardFooter>

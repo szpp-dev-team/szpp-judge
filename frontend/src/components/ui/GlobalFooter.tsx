@@ -1,10 +1,9 @@
 import { Flex, Text } from "@chakra-ui/react";
 import type { BoxProps } from "@chakra-ui/react";
-import type { FC } from "react";
 
 export type GlobalFooterProps = Omit<BoxProps, "children">;
 
-export const GlobalFooter: FC<GlobalFooterProps> = ({ ...props }) => {
+export const GlobalFooter = ({ ...props }: GlobalFooterProps) => {
   return (
     <Flex
       as="footer"

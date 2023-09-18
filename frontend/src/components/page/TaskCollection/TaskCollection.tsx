@@ -1,6 +1,7 @@
 import { JudgeStatusBadge } from "@/src/components/model/judge/JudgeStatusBadge";
-import { DifficultyBadge } from "@/src/components/model/task/DifficultyBadge";
-import { TaskWithMySubmissionSummary } from "@/src/model/task";
+// import { DifficultyBadge } from "@/src/components/model/task/DifficultyBadge";
+// import { Difficulty } from "@/src/model/task";
+import { useListContestTasks } from "@/src/usecases/contest";
 import { QuestionIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -19,20 +20,17 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { FC } from "react";
 import { Link } from "../../ui/Link";
 
-export type TaskCollectionProps = {
-  tasks: TaskWithMySubmissionSummary[];
-};
-
-export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
-  const { query } = useRouter();
-  const { contest_slug } = query;
+export const TaskCollection = () => {
+  const { query: { contest_slug } } = useRouter();
+  const { contestTasksQuery } = useListContestTasks({
+    contestSlug: contest_slug as string, // `pages/[contest_slug]/tasks` なので必ず string
+  });
 
   return (
-    <Box px={16} h="inherit">
-      <Card px={3} py={4} h="100%">
+    <Box px={16} h="100%">
+      <Card px={3} py={4} h="100%" borderRadius={0}>
         <CardHeader>
           <Heading as="h1">問題一覧 / 得点状況</Heading>
         </CardHeader>
@@ -57,22 +55,26 @@ export const TaskCollection: FC<TaskCollectionProps> = ({ tasks }) => {
                 </Tr>
               </Thead>
               <Tbody>
-                {tasks.map(t => (
+                {contestTasksQuery.data?.tasks.map((t, seq) => (
                   <Tr key={t.id}>
                     <Td textAlign="center">
-                      <Link href={`/contests/${contest_slug}/tasks/${t.slug}`}>{t.id}</Link>
+                      <Link href={`/contests/${contest_slug}/tasks/${seq + 1}`}>{seq + 1}</Link>
                     </Td>
                     <Td textAlign="center">
-                      <DifficultyBadge dif={t.difficulty} />
+                      {/* FIXME: convert Difficulty Enum to DifficultyBadge.dif */}
+                      {/*<DifficultyBadge dif={t.difficulty} />*/}
+                      FIXME: Difficulty {t.difficulty}
                     </Td>
-                    <Td textAlign="center">{t.haiten}</Td>
+                    <Td textAlign="center">{t.score}</Td>
                     <Td textAlign="left" whiteSpace="normal" minW={56}>
-                      <Link href={`/contests/${contest_slug}/tasks/${t.slug}`}>{t.title}</Link>
+                      <Link href={`/contests/${contest_slug}/tasks/${seq + 1}`}>{t.title}</Link>
                     </Td>
                     <Td textAlign="center">
-                      {t?.status ? <JudgeStatusBadge status={t.status} progress={t?.progress} /> : "-"}
+                      {/* TODO: get judge status (or progress) from server */}
+                      {<JudgeStatusBadge status={"WJ"} />}
                     </Td>
-                    <Td textAlign="center">{t?.score ?? "-"}</Td>
+                    {/* TODO: get submission score from server */}
+                    <Td textAlign="center">{999999999 ?? "-"}</Td>
                   </Tr>
                 ))}
               </Tbody>
