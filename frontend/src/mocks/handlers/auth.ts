@@ -1,5 +1,5 @@
-import { LoginRequest, LoginResponse } from "@/src/gen/proto/backend/v1/auth_service_pb";
 import { AuthService } from "@/src/gen/proto/backend/v1/auth_service-AuthService_connectquery";
+import { LoginRequest, LoginResponse } from "@/src/gen/proto/backend/v1/auth_service_pb";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";

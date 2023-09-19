@@ -1,7 +1,7 @@
-import { ListContestTasksRequest, ListContestTasksResponse } from "@/src/gen/proto/backend/v1/contest_service_pb";
 import { ContestTask } from "@/src/gen/proto/backend/v1/contest_resources_pb";
-import { Difficulty } from "@/src/gen/proto/backend/v1/task_resources_pb";
 import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
+import { ListContestTasksRequest, ListContestTasksResponse } from "@/src/gen/proto/backend/v1/contest_service_pb";
+import { Difficulty } from "@/src/gen/proto/backend/v1/task_resources_pb";
 import { PlainMessage } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
