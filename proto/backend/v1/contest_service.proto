@@ -3,7 +3,6 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/contest_resources.proto";
-import "google/protobuf/timestamp.proto";
 
 service ContestService {
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
