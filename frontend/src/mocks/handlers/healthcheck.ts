@@ -1,5 +1,5 @@
-import { PingRequest, PingResponse } from "@/src/gen/proto/backend/v1/messages_pb";
-import { HealthcheckService } from "@/src/gen/proto/backend/v1/services_connect";
+import { PingRequest, PingResponse } from "@/src/gen/proto/backend/v1/healthcheck_service_pb";
+import { HealthcheckService } from "@/src/gen/proto/backend/v1/healthcheck_service-HealthcheckService_connectquery";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
 
