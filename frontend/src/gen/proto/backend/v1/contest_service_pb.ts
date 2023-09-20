@@ -764,6 +764,11 @@ export class CreateClarificationResponse extends Message<CreateClarificationResp
  * @generated from message backend.v1.ListClarificationsRequest
  */
 export class ListClarificationsRequest extends Message<ListClarificationsRequest> {
+  /**
+   * @generated from field: string contest_slug = 1;
+   */
+  contestSlug = "";
+
   constructor(data?: PartialMessage<ListClarificationsRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -772,6 +777,7 @@ export class ListClarificationsRequest extends Message<ListClarificationsRequest
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.ListClarificationsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListClarificationsRequest {
