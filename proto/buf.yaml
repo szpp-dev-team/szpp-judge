@@ -5,6 +5,7 @@ breaking:
 lint:
   use:
     - DEFAULT
+    - BASIC
   ignore_only:
     ENUM_VALUE_PREFIX:
       - judge/v1/resources.proto
