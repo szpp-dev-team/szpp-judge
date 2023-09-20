@@ -1,0 +1,45 @@
+name: backend-deploy-test
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - backend/**
+      - proto-gen/go/**
+      - .github/workflows/backend.yml
+jobs:
+  deploy-cloud-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+          service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '^1.21'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      - name: 'Deploy handle-judge-task'
+        working-directory: ./backend/cloud-functions/hanmdle-judge-task
+        run: |
+          go mod vendor
+          gcloud functions deploy handle-judge-task-test \
+            --gen2 \
+            --runtime=go121 \
+            --region=asia-northeast1 \
+            --source=. \
+            --entry-point=HandleJudgeTask \
+            --trigger-http \
+            --no-allow-unauthenticated
+          
