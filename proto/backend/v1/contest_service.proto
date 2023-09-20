@@ -5,16 +5,23 @@ package backend.v1;
 import "backend/v1/contest_resources.proto";
 
 service ContestService {
+  // コンテストを作成する
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
+  // コンテスト情報を取得する
   rpc GetContest(GetContestRequest) returns (GetContestResponse);
+  // コンテスト情報を更新する
   rpc UpdateContest(UpdateContestRequest) returns (UpdateContestResponse);
+  // コンテストの一覧を取得する
   rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
+  // コンテストに紐づく問題の一覧を取得する
   rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
-  // 自分の問題ごとの結果情報を返す
+  // 問題をコンテストに紐づかせる
+  rpc RegisterTask(RegisterTaskRequest) returns (RegisterTaskResponse);
+  // 自分の問題ごとの結果情報を取得する
   rpc GetMySubmissionStatuses(GetMySubmissionStatusesRequest) returns (GetMySubmissionStatusesResponse);
-  // 順位表取得
+  // 順位表を取得する
   rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
-  // 参加登録
+  // 参加登録をする
   rpc RegisterMe(RegisterMeRequest) returns (RegisterMeResponse);
   // Clarification を作成する
   rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
@@ -67,6 +74,14 @@ message ListContestTasksRequest {
 
 message ListContestTasksResponse {
   repeated ContestTask tasks = 1; // 問題の並び順
+}
+
+message RegisterTaskRequest {
+  int32 task_id = 1;
+}
+
+message RegisterTaskResponse {
+  repeated Task tasks = 1; // コンテストに紐づく問題一覧
 }
 
 message GetMySubmissionStatusesRequest {
