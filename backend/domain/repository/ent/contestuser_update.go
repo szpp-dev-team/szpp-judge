@@ -130,7 +130,7 @@ func (cuu *ContestUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cuu.mutation.ContestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contestuser.ContestTable,
 			Columns: []string{contestuser.ContestColumn},
 			Bidi:    false,
@@ -143,7 +143,7 @@ func (cuu *ContestUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := cuu.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contestuser.ContestTable,
 			Columns: []string{contestuser.ContestColumn},
 			Bidi:    false,
@@ -336,7 +336,7 @@ func (cuuo *ContestUserUpdateOne) sqlSave(ctx context.Context) (_node *ContestUs
 	if cuuo.mutation.ContestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contestuser.ContestTable,
 			Columns: []string{contestuser.ContestColumn},
 			Bidi:    false,
@@ -349,7 +349,7 @@ func (cuuo *ContestUserUpdateOne) sqlSave(ctx context.Context) (_node *ContestUs
 	if nodes := cuuo.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contestuser.ContestTable,
 			Columns: []string{contestuser.ContestColumn},
 			Bidi:    false,

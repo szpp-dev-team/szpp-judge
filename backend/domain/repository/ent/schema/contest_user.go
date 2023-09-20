@@ -21,7 +21,13 @@ func (ContestUser) Fields() []ent.Field {
 
 func (ContestUser) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("contest", Contest.Type).Ref("contest_user").Field("contest_id").Unique().Required(),
-		edge.To("user", User.Type).Field("user_id").Unique().Required(),
+		edge.To("contest", Contest.Type).
+			Field("contest_id").
+			Unique().
+			Required(),
+		edge.To("user", User.Type).
+			Field("user_id").
+			Unique().
+			Required(),
 	}
 }

@@ -178,7 +178,7 @@ func HasContest() predicate.ContestUser {
 	return predicate.ContestUser(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ContestTable, ContestColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, ContestTable, ContestColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

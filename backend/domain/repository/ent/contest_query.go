@@ -16,6 +16,8 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 )
 
 // ContestQuery is the builder for querying Contest entities.
@@ -26,6 +28,8 @@ type ContestQuery struct {
 	inters          []Interceptor
 	predicates      []predicate.Contest
 	withSubmits     *SubmitQuery
+	withUsers       *UserQuery
+	withTasks       *TaskQuery
 	withContestUser *ContestUserQuery
 	withContestTask *ContestTaskQuery
 	// intermediate query (i.e. traversal path).
@@ -86,6 +90,50 @@ func (cq *ContestQuery) QuerySubmits() *SubmitQuery {
 	return query
 }
 
+// QueryUsers chains the current query on the "users" edge.
+func (cq *ContestQuery) QueryUsers() *UserQuery {
+	query := (&UserClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contest.Table, contest.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, contest.UsersTable, contest.UsersPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTasks chains the current query on the "tasks" edge.
+func (cq *ContestQuery) QueryTasks() *TaskQuery {
+	query := (&TaskClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contest.Table, contest.FieldID, selector),
+			sqlgraph.To(task.Table, task.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, contest.TasksTable, contest.TasksPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryContestUser chains the current query on the "contest_user" edge.
 func (cq *ContestQuery) QueryContestUser() *ContestUserQuery {
 	query := (&ContestUserClient{config: cq.config}).Query()
@@ -100,7 +148,7 @@ func (cq *ContestQuery) QueryContestUser() *ContestUserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(contest.Table, contest.FieldID, selector),
 			sqlgraph.To(contestuser.Table, contestuser.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestUserTable, contest.ContestUserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, contest.ContestUserTable, contest.ContestUserColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -122,7 +170,7 @@ func (cq *ContestQuery) QueryContestTask() *ContestTaskQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(contest.Table, contest.FieldID, selector),
 			sqlgraph.To(contesttask.Table, contesttask.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, contest.ContestTaskTable, contest.ContestTaskColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, contest.ContestTaskTable, contest.ContestTaskColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -323,6 +371,8 @@ func (cq *ContestQuery) Clone() *ContestQuery {
 		inters:          append([]Interceptor{}, cq.inters...),
 		predicates:      append([]predicate.Contest{}, cq.predicates...),
 		withSubmits:     cq.withSubmits.Clone(),
+		withUsers:       cq.withUsers.Clone(),
+		withTasks:       cq.withTasks.Clone(),
 		withContestUser: cq.withContestUser.Clone(),
 		withContestTask: cq.withContestTask.Clone(),
 		// clone intermediate query.
@@ -339,6 +389,28 @@ func (cq *ContestQuery) WithSubmits(opts ...func(*SubmitQuery)) *ContestQuery {
 		opt(query)
 	}
 	cq.withSubmits = query
+	return cq
+}
+
+// WithUsers tells the query-builder to eager-load the nodes that are connected to
+// the "users" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ContestQuery) WithUsers(opts ...func(*UserQuery)) *ContestQuery {
+	query := (&UserClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withUsers = query
+	return cq
+}
+
+// WithTasks tells the query-builder to eager-load the nodes that are connected to
+// the "tasks" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ContestQuery) WithTasks(opts ...func(*TaskQuery)) *ContestQuery {
+	query := (&TaskClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withTasks = query
 	return cq
 }
 
@@ -442,8 +514,10 @@ func (cq *ContestQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	var (
 		nodes       = []*Contest{}
 		_spec       = cq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [5]bool{
 			cq.withSubmits != nil,
+			cq.withUsers != nil,
+			cq.withTasks != nil,
 			cq.withContestUser != nil,
 			cq.withContestTask != nil,
 		}
@@ -470,6 +544,20 @@ func (cq *ContestQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 		if err := cq.loadSubmits(ctx, query, nodes,
 			func(n *Contest) { n.Edges.Submits = []*Submit{} },
 			func(n *Contest, e *Submit) { n.Edges.Submits = append(n.Edges.Submits, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withUsers; query != nil {
+		if err := cq.loadUsers(ctx, query, nodes,
+			func(n *Contest) { n.Edges.Users = []*User{} },
+			func(n *Contest, e *User) { n.Edges.Users = append(n.Edges.Users, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withTasks; query != nil {
+		if err := cq.loadTasks(ctx, query, nodes,
+			func(n *Contest) { n.Edges.Tasks = []*Task{} },
+			func(n *Contest, e *Task) { n.Edges.Tasks = append(n.Edges.Tasks, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -518,6 +606,128 @@ func (cq *ContestQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nod
 			return fmt.Errorf(`unexpected referenced foreign-key "contest_submits" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (cq *ContestQuery) loadUsers(ctx context.Context, query *UserQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Contest)
+	nids := make(map[int]map[*Contest]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(contest.UsersTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(contest.UsersPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(contest.UsersPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(contest.UsersPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Contest]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "users" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (cq *ContestQuery) loadTasks(ctx context.Context, query *TaskQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *Task)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Contest)
+	nids := make(map[int]map[*Contest]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(contest.TasksTable)
+		s.Join(joinT).On(s.C(task.FieldID), joinT.C(contest.TasksPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(contest.TasksPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(contest.TasksPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Contest]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Task](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "tasks" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

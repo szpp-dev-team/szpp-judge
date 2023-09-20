@@ -48,37 +48,9 @@ func (ctu *ContestTaskUpdate) SetContestID(i int) *ContestTaskUpdate {
 	return ctu
 }
 
-// SetNillableContestID sets the "contest_id" field if the given value is not nil.
-func (ctu *ContestTaskUpdate) SetNillableContestID(i *int) *ContestTaskUpdate {
-	if i != nil {
-		ctu.SetContestID(*i)
-	}
-	return ctu
-}
-
-// ClearContestID clears the value of the "contest_id" field.
-func (ctu *ContestTaskUpdate) ClearContestID() *ContestTaskUpdate {
-	ctu.mutation.ClearContestID()
-	return ctu
-}
-
 // SetTaskID sets the "task_id" field.
 func (ctu *ContestTaskUpdate) SetTaskID(i int) *ContestTaskUpdate {
 	ctu.mutation.SetTaskID(i)
-	return ctu
-}
-
-// SetNillableTaskID sets the "task_id" field if the given value is not nil.
-func (ctu *ContestTaskUpdate) SetNillableTaskID(i *int) *ContestTaskUpdate {
-	if i != nil {
-		ctu.SetTaskID(*i)
-	}
-	return ctu
-}
-
-// ClearTaskID clears the value of the "task_id" field.
-func (ctu *ContestTaskUpdate) ClearTaskID() *ContestTaskUpdate {
-	ctu.mutation.ClearTaskID()
 	return ctu
 }
 
@@ -136,7 +108,21 @@ func (ctu *ContestTaskUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ctu *ContestTaskUpdate) check() error {
+	if _, ok := ctu.mutation.ContestID(); ctu.mutation.ContestCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ContestTask.contest"`)
+	}
+	if _, ok := ctu.mutation.TaskID(); ctu.mutation.TaskCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ContestTask.task"`)
+	}
+	return nil
+}
+
 func (ctu *ContestTaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := ctu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(contesttask.Table, contesttask.Columns, sqlgraph.NewFieldSpec(contesttask.FieldID, field.TypeInt))
 	if ps := ctu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -154,7 +140,7 @@ func (ctu *ContestTaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ctu.mutation.ContestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contesttask.ContestTable,
 			Columns: []string{contesttask.ContestColumn},
 			Bidi:    false,
@@ -167,7 +153,7 @@ func (ctu *ContestTaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ctu.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contesttask.ContestTable,
 			Columns: []string{contesttask.ContestColumn},
 			Bidi:    false,
@@ -248,37 +234,9 @@ func (ctuo *ContestTaskUpdateOne) SetContestID(i int) *ContestTaskUpdateOne {
 	return ctuo
 }
 
-// SetNillableContestID sets the "contest_id" field if the given value is not nil.
-func (ctuo *ContestTaskUpdateOne) SetNillableContestID(i *int) *ContestTaskUpdateOne {
-	if i != nil {
-		ctuo.SetContestID(*i)
-	}
-	return ctuo
-}
-
-// ClearContestID clears the value of the "contest_id" field.
-func (ctuo *ContestTaskUpdateOne) ClearContestID() *ContestTaskUpdateOne {
-	ctuo.mutation.ClearContestID()
-	return ctuo
-}
-
 // SetTaskID sets the "task_id" field.
 func (ctuo *ContestTaskUpdateOne) SetTaskID(i int) *ContestTaskUpdateOne {
 	ctuo.mutation.SetTaskID(i)
-	return ctuo
-}
-
-// SetNillableTaskID sets the "task_id" field if the given value is not nil.
-func (ctuo *ContestTaskUpdateOne) SetNillableTaskID(i *int) *ContestTaskUpdateOne {
-	if i != nil {
-		ctuo.SetTaskID(*i)
-	}
-	return ctuo
-}
-
-// ClearTaskID clears the value of the "task_id" field.
-func (ctuo *ContestTaskUpdateOne) ClearTaskID() *ContestTaskUpdateOne {
-	ctuo.mutation.ClearTaskID()
 	return ctuo
 }
 
@@ -349,7 +307,21 @@ func (ctuo *ContestTaskUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ctuo *ContestTaskUpdateOne) check() error {
+	if _, ok := ctuo.mutation.ContestID(); ctuo.mutation.ContestCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ContestTask.contest"`)
+	}
+	if _, ok := ctuo.mutation.TaskID(); ctuo.mutation.TaskCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ContestTask.task"`)
+	}
+	return nil
+}
+
 func (ctuo *ContestTaskUpdateOne) sqlSave(ctx context.Context) (_node *ContestTask, err error) {
+	if err := ctuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(contesttask.Table, contesttask.Columns, sqlgraph.NewFieldSpec(contesttask.FieldID, field.TypeInt))
 	id, ok := ctuo.mutation.ID()
 	if !ok {
@@ -384,7 +356,7 @@ func (ctuo *ContestTaskUpdateOne) sqlSave(ctx context.Context) (_node *ContestTa
 	if ctuo.mutation.ContestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contesttask.ContestTable,
 			Columns: []string{contesttask.ContestColumn},
 			Bidi:    false,
@@ -397,7 +369,7 @@ func (ctuo *ContestTaskUpdateOne) sqlSave(ctx context.Context) (_node *ContestTa
 	if nodes := ctuo.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contesttask.ContestTable,
 			Columns: []string{contesttask.ContestColumn},
 			Bidi:    false,

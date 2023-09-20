@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
@@ -27,6 +28,7 @@ type UserQuery struct {
 	predicates      []predicate.User
 	withTasks       *TaskQuery
 	withSubmits     *SubmitQuery
+	withContests    *ContestQuery
 	withContestUser *ContestUserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -101,6 +103,28 @@ func (uq *UserQuery) QuerySubmits() *SubmitQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(submit.Table, submit.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.SubmitsTable, user.SubmitsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryContests chains the current query on the "contests" edge.
+func (uq *UserQuery) QueryContests() *ContestQuery {
+	query := (&ContestClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(contest.Table, contest.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, user.ContestsTable, user.ContestsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -324,6 +348,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		predicates:      append([]predicate.User{}, uq.predicates...),
 		withTasks:       uq.withTasks.Clone(),
 		withSubmits:     uq.withSubmits.Clone(),
+		withContests:    uq.withContests.Clone(),
 		withContestUser: uq.withContestUser.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
@@ -350,6 +375,17 @@ func (uq *UserQuery) WithSubmits(opts ...func(*SubmitQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withSubmits = query
+	return uq
+}
+
+// WithContests tells the query-builder to eager-load the nodes that are connected to
+// the "contests" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithContests(opts ...func(*ContestQuery)) *UserQuery {
+	query := (&ContestClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withContests = query
 	return uq
 }
 
@@ -442,9 +478,10 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			uq.withTasks != nil,
 			uq.withSubmits != nil,
+			uq.withContests != nil,
 			uq.withContestUser != nil,
 		}
 	)
@@ -477,6 +514,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadSubmits(ctx, query, nodes,
 			func(n *User) { n.Edges.Submits = []*Submit{} },
 			func(n *User, e *Submit) { n.Edges.Submits = append(n.Edges.Submits, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withContests; query != nil {
+		if err := uq.loadContests(ctx, query, nodes,
+			func(n *User) { n.Edges.Contests = []*Contest{} },
+			func(n *User, e *Contest) { n.Edges.Contests = append(n.Edges.Contests, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -549,6 +593,67 @@ func (uq *UserQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nodes 
 			return fmt.Errorf(`unexpected referenced foreign-key "user_submits" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadContests(ctx context.Context, query *ContestQuery, nodes []*User, init func(*User), assign func(*User, *Contest)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.ContestsTable)
+		s.Join(joinT).On(s.C(contest.FieldID), joinT.C(user.ContestsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(user.ContestsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.ContestsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Contest](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "contests" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

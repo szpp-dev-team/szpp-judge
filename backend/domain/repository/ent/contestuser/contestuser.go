@@ -98,7 +98,7 @@ func newContestStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ContestInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ContestTable, ContestColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, ContestTable, ContestColumn),
 	)
 }
 func newUserStep() *sqlgraph.Step {

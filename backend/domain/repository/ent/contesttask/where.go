@@ -128,16 +128,6 @@ func ContestIDNotIn(vs ...int) predicate.ContestTask {
 	return predicate.ContestTask(sql.FieldNotIn(FieldContestID, vs...))
 }
 
-// ContestIDIsNil applies the IsNil predicate on the "contest_id" field.
-func ContestIDIsNil() predicate.ContestTask {
-	return predicate.ContestTask(sql.FieldIsNull(FieldContestID))
-}
-
-// ContestIDNotNil applies the NotNil predicate on the "contest_id" field.
-func ContestIDNotNil() predicate.ContestTask {
-	return predicate.ContestTask(sql.FieldNotNull(FieldContestID))
-}
-
 // TaskIDEQ applies the EQ predicate on the "task_id" field.
 func TaskIDEQ(v int) predicate.ContestTask {
 	return predicate.ContestTask(sql.FieldEQ(FieldTaskID, v))
@@ -158,22 +148,12 @@ func TaskIDNotIn(vs ...int) predicate.ContestTask {
 	return predicate.ContestTask(sql.FieldNotIn(FieldTaskID, vs...))
 }
 
-// TaskIDIsNil applies the IsNil predicate on the "task_id" field.
-func TaskIDIsNil() predicate.ContestTask {
-	return predicate.ContestTask(sql.FieldIsNull(FieldTaskID))
-}
-
-// TaskIDNotNil applies the NotNil predicate on the "task_id" field.
-func TaskIDNotNil() predicate.ContestTask {
-	return predicate.ContestTask(sql.FieldNotNull(FieldTaskID))
-}
-
 // HasContest applies the HasEdge predicate on the "contest" edge.
 func HasContest() predicate.ContestTask {
 	return predicate.ContestTask(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ContestTable, ContestColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, ContestTable, ContestColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

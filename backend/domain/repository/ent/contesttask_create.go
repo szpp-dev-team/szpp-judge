@@ -35,25 +35,9 @@ func (ctc *ContestTaskCreate) SetContestID(i int) *ContestTaskCreate {
 	return ctc
 }
 
-// SetNillableContestID sets the "contest_id" field if the given value is not nil.
-func (ctc *ContestTaskCreate) SetNillableContestID(i *int) *ContestTaskCreate {
-	if i != nil {
-		ctc.SetContestID(*i)
-	}
-	return ctc
-}
-
 // SetTaskID sets the "task_id" field.
 func (ctc *ContestTaskCreate) SetTaskID(i int) *ContestTaskCreate {
 	ctc.mutation.SetTaskID(i)
-	return ctc
-}
-
-// SetNillableTaskID sets the "task_id" field if the given value is not nil.
-func (ctc *ContestTaskCreate) SetNillableTaskID(i *int) *ContestTaskCreate {
-	if i != nil {
-		ctc.SetTaskID(*i)
-	}
 	return ctc
 }
 
@@ -110,6 +94,18 @@ func (ctc *ContestTaskCreate) check() error {
 	if _, ok := ctc.mutation.Score(); !ok {
 		return &ValidationError{Name: "score", err: errors.New(`ent: missing required field "ContestTask.score"`)}
 	}
+	if _, ok := ctc.mutation.ContestID(); !ok {
+		return &ValidationError{Name: "contest_id", err: errors.New(`ent: missing required field "ContestTask.contest_id"`)}
+	}
+	if _, ok := ctc.mutation.TaskID(); !ok {
+		return &ValidationError{Name: "task_id", err: errors.New(`ent: missing required field "ContestTask.task_id"`)}
+	}
+	if _, ok := ctc.mutation.ContestID(); !ok {
+		return &ValidationError{Name: "contest", err: errors.New(`ent: missing required edge "ContestTask.contest"`)}
+	}
+	if _, ok := ctc.mutation.TaskID(); !ok {
+		return &ValidationError{Name: "task", err: errors.New(`ent: missing required edge "ContestTask.task"`)}
+	}
 	return nil
 }
 
@@ -150,7 +146,7 @@ func (ctc *ContestTaskCreate) createSpec() (*ContestTask, *sqlgraph.CreateSpec) 
 	if nodes := ctc.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contesttask.ContestTable,
 			Columns: []string{contesttask.ContestColumn},
 			Bidi:    false,
@@ -263,12 +259,6 @@ func (u *ContestTaskUpsert) UpdateContestID() *ContestTaskUpsert {
 	return u
 }
 
-// ClearContestID clears the value of the "contest_id" field.
-func (u *ContestTaskUpsert) ClearContestID() *ContestTaskUpsert {
-	u.SetNull(contesttask.FieldContestID)
-	return u
-}
-
 // SetTaskID sets the "task_id" field.
 func (u *ContestTaskUpsert) SetTaskID(v int) *ContestTaskUpsert {
 	u.Set(contesttask.FieldTaskID, v)
@@ -278,12 +268,6 @@ func (u *ContestTaskUpsert) SetTaskID(v int) *ContestTaskUpsert {
 // UpdateTaskID sets the "task_id" field to the value that was provided on create.
 func (u *ContestTaskUpsert) UpdateTaskID() *ContestTaskUpsert {
 	u.SetExcluded(contesttask.FieldTaskID)
-	return u
-}
-
-// ClearTaskID clears the value of the "task_id" field.
-func (u *ContestTaskUpsert) ClearTaskID() *ContestTaskUpsert {
-	u.SetNull(contesttask.FieldTaskID)
 	return u
 }
 
@@ -370,13 +354,6 @@ func (u *ContestTaskUpsertOne) UpdateContestID() *ContestTaskUpsertOne {
 	})
 }
 
-// ClearContestID clears the value of the "contest_id" field.
-func (u *ContestTaskUpsertOne) ClearContestID() *ContestTaskUpsertOne {
-	return u.Update(func(s *ContestTaskUpsert) {
-		s.ClearContestID()
-	})
-}
-
 // SetTaskID sets the "task_id" field.
 func (u *ContestTaskUpsertOne) SetTaskID(v int) *ContestTaskUpsertOne {
 	return u.Update(func(s *ContestTaskUpsert) {
@@ -388,13 +365,6 @@ func (u *ContestTaskUpsertOne) SetTaskID(v int) *ContestTaskUpsertOne {
 func (u *ContestTaskUpsertOne) UpdateTaskID() *ContestTaskUpsertOne {
 	return u.Update(func(s *ContestTaskUpsert) {
 		s.UpdateTaskID()
-	})
-}
-
-// ClearTaskID clears the value of the "task_id" field.
-func (u *ContestTaskUpsertOne) ClearTaskID() *ContestTaskUpsertOne {
-	return u.Update(func(s *ContestTaskUpsert) {
-		s.ClearTaskID()
 	})
 }
 
@@ -642,13 +612,6 @@ func (u *ContestTaskUpsertBulk) UpdateContestID() *ContestTaskUpsertBulk {
 	})
 }
 
-// ClearContestID clears the value of the "contest_id" field.
-func (u *ContestTaskUpsertBulk) ClearContestID() *ContestTaskUpsertBulk {
-	return u.Update(func(s *ContestTaskUpsert) {
-		s.ClearContestID()
-	})
-}
-
 // SetTaskID sets the "task_id" field.
 func (u *ContestTaskUpsertBulk) SetTaskID(v int) *ContestTaskUpsertBulk {
 	return u.Update(func(s *ContestTaskUpsert) {
@@ -660,13 +623,6 @@ func (u *ContestTaskUpsertBulk) SetTaskID(v int) *ContestTaskUpsertBulk {
 func (u *ContestTaskUpsertBulk) UpdateTaskID() *ContestTaskUpsertBulk {
 	return u.Update(func(s *ContestTaskUpsert) {
 		s.UpdateTaskID()
-	})
-}
-
-// ClearTaskID clears the value of the "task_id" field.
-func (u *ContestTaskUpsertBulk) ClearTaskID() *ContestTaskUpsertBulk {
-	return u.Update(func(s *ContestTaskUpsert) {
-		s.ClearTaskID()
 	})
 }
 

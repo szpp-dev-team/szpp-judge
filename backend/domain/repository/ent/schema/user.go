@@ -29,6 +29,6 @@ func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("tasks", Task.Type),
 		edge.To("submits", Submit.Type),
-		edge.From("contest_user", ContestUser.Type).Ref("user"),
+		edge.From("contests", Contest.Type).Ref("users").Through("contest_user", ContestUser.Type),
 	}
 }

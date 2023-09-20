@@ -146,7 +146,7 @@ func (cuc *ContestUserCreate) createSpec() (*ContestUser, *sqlgraph.CreateSpec) 
 	if nodes := cuc.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   contestuser.ContestTable,
 			Columns: []string{contestuser.ContestColumn},
 			Bidi:    false,

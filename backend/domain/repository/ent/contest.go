@@ -35,13 +35,17 @@ type Contest struct {
 type ContestEdges struct {
 	// Submits holds the value of the submits edge.
 	Submits []*Submit `json:"submits,omitempty"`
+	// Users holds the value of the users edge.
+	Users []*User `json:"users,omitempty"`
+	// Tasks holds the value of the tasks edge.
+	Tasks []*Task `json:"tasks,omitempty"`
 	// ContestUser holds the value of the contest_user edge.
 	ContestUser []*ContestUser `json:"contest_user,omitempty"`
 	// ContestTask holds the value of the contest_task edge.
 	ContestTask []*ContestTask `json:"contest_task,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
 }
 
 // SubmitsOrErr returns the Submits value or an error if the edge
@@ -53,10 +57,28 @@ func (e ContestEdges) SubmitsOrErr() ([]*Submit, error) {
 	return nil, &NotLoadedError{edge: "submits"}
 }
 
+// UsersOrErr returns the Users value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContestEdges) UsersOrErr() ([]*User, error) {
+	if e.loadedTypes[1] {
+		return e.Users, nil
+	}
+	return nil, &NotLoadedError{edge: "users"}
+}
+
+// TasksOrErr returns the Tasks value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContestEdges) TasksOrErr() ([]*Task, error) {
+	if e.loadedTypes[2] {
+		return e.Tasks, nil
+	}
+	return nil, &NotLoadedError{edge: "tasks"}
+}
+
 // ContestUserOrErr returns the ContestUser value or an error if the edge
 // was not loaded in eager-loading.
 func (e ContestEdges) ContestUserOrErr() ([]*ContestUser, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[3] {
 		return e.ContestUser, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_user"}
@@ -65,7 +87,7 @@ func (e ContestEdges) ContestUserOrErr() ([]*ContestUser, error) {
 // ContestTaskOrErr returns the ContestTask value or an error if the edge
 // was not loaded in eager-loading.
 func (e ContestEdges) ContestTaskOrErr() ([]*ContestTask, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[4] {
 		return e.ContestTask, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_task"}
@@ -143,6 +165,16 @@ func (c *Contest) Value(name string) (ent.Value, error) {
 // QuerySubmits queries the "submits" edge of the Contest entity.
 func (c *Contest) QuerySubmits() *SubmitQuery {
 	return NewContestClient(c.config).QuerySubmits(c)
+}
+
+// QueryUsers queries the "users" edge of the Contest entity.
+func (c *Contest) QueryUsers() *UserQuery {
+	return NewContestClient(c.config).QueryUsers(c)
+}
+
+// QueryTasks queries the "tasks" edge of the Contest entity.
+func (c *Contest) QueryTasks() *TaskQuery {
+	return NewContestClient(c.config).QueryTasks(c)
 }
 
 // QueryContestUser queries the "contest_user" edge of the Contest entity.

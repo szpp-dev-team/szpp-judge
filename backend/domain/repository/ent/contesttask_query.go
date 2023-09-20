@@ -75,7 +75,7 @@ func (ctq *ContestTaskQuery) QueryContest() *ContestQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(contesttask.Table, contesttask.FieldID, selector),
 			sqlgraph.To(contest.Table, contest.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, contesttask.ContestTable, contesttask.ContestColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, contesttask.ContestTable, contesttask.ContestColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ctq.driver.Dialect(), step)
 		return fromU, nil

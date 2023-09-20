@@ -75,7 +75,7 @@ func (cuq *ContestUserQuery) QueryContest() *ContestQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(contestuser.Table, contestuser.FieldID, selector),
 			sqlgraph.To(contest.Table, contest.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, contestuser.ContestTable, contestuser.ContestColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, contestuser.ContestTable, contestuser.ContestColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cuq.driver.Dialect(), step)
 		return fromU, nil

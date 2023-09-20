@@ -26,8 +26,8 @@ var (
 	ContestTasksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "score", Type: field.TypeInt},
-		{Name: "contest_id", Type: field.TypeInt, Nullable: true},
-		{Name: "task_id", Type: field.TypeInt, Nullable: true},
+		{Name: "contest_id", Type: field.TypeInt},
+		{Name: "task_id", Type: field.TypeInt},
 	}
 	// ContestTasksTable holds the schema information for the "contest_tasks" table.
 	ContestTasksTable = &schema.Table{
@@ -36,16 +36,23 @@ var (
 		PrimaryKey: []*schema.Column{ContestTasksColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "contest_tasks_contests_contest_task",
+				Symbol:     "contest_tasks_contests_contest",
 				Columns:    []*schema.Column{ContestTasksColumns[2]},
 				RefColumns: []*schema.Column{ContestsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "contest_tasks_tasks_task",
 				Columns:    []*schema.Column{ContestTasksColumns[3]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "contesttask_contest_id_task_id",
+				Unique:  true,
+				Columns: []*schema.Column{ContestTasksColumns[2], ContestTasksColumns[3]},
 			},
 		},
 	}
@@ -63,7 +70,7 @@ var (
 		PrimaryKey: []*schema.Column{ContestUsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "contest_users_contests_contest_user",
+				Symbol:     "contest_users_contests_contest",
 				Columns:    []*schema.Column{ContestUsersColumns[2]},
 				RefColumns: []*schema.Column{ContestsColumns[0]},
 				OnDelete:   schema.NoAction,
@@ -73,6 +80,13 @@ var (
 				Columns:    []*schema.Column{ContestUsersColumns[3]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "contestuser_contest_id_user_id",
+				Unique:  true,
+				Columns: []*schema.Column{ContestUsersColumns[2], ContestUsersColumns[3]},
 			},
 		},
 	}

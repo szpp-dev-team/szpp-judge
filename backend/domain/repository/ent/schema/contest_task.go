@@ -14,14 +14,20 @@ func (ContestTask) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.Int("score"),
-		field.Int("contest_id").Optional(),
-		field.Int("task_id").Optional(),
+		field.Int("contest_id"),
+		field.Int("task_id"),
 	}
 }
 
 func (ContestTask) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("contest", Contest.Type).Ref("contest_task").Field("contest_id").Unique(),
-		edge.To("task", Task.Type).Field("task_id").Unique(),
+		edge.To("contest", Contest.Type).
+			Field("contest_id").
+			Unique().
+			Required(),
+		edge.To("task", Task.Type).
+			Field("task_id").
+			Unique().
+			Required(),
 	}
 }
