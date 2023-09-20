@@ -1,5 +1,5 @@
 import type { ScoreStatus } from "@/src/model/task";
-import { genNthTaskSeq } from "@/src/usecase/contest";
+import { calcNthTaskSeq } from "@/src/usecases/contest";
 import { Duration, fmtDatetime } from "@/src/util/time";
 import { Box, FormControl, FormLabel, Icon, Link, Switch, Text } from "@chakra-ui/react";
 import type { BoxProps, LinkProps } from "@chakra-ui/react";
@@ -172,7 +172,7 @@ const SidebarMainPane = ({
                     leftElem={
                       <>
                         <ScoreStatusIcon status={t.scoreStatus} mr={1} />
-                        <TaskSeqBadge seq={genNthTaskSeq(i, tasks.length)} />
+                        <TaskSeqBadge seq={calcNthTaskSeq(i, tasks.length)} />
                       </>
                     }
                     key={t.id}
