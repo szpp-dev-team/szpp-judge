@@ -1,4 +1,4 @@
-module handle-judge-task
+module github.com/szpp-dev-team/szpp-judge/backend/cloud-functions/handle-judge-task
 
 go 1.21.1
 
