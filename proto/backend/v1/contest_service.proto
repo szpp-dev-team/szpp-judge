@@ -118,7 +118,9 @@ message CreateClarificationResponse {
   Clarification clarification = 1;
 }
 
-message ListClarificationsRequest {}
+message ListClarificationsRequest {
+  string contest_slug = 1;
+}
 
 message ListClarificationsResponse {
   repeated Clarification clarifications = 1;
