@@ -183,9 +183,9 @@ export class ListSubmissionsRequest extends Message<ListSubmissionsRequest> {
   contestId?: number;
 
   /**
-   * @generated from field: optional int32 user_id = 2;
+   * @generated from field: optional string username = 2;
    */
-  userId?: number;
+  username?: string;
 
   constructor(data?: PartialMessage<ListSubmissionsRequest>) {
     super();
@@ -196,7 +196,7 @@ export class ListSubmissionsRequest extends Message<ListSubmissionsRequest> {
   static readonly typeName = "backend.v1.ListSubmissionsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
-    { no: 2, name: "user_id", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSubmissionsRequest {
