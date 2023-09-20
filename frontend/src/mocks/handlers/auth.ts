@@ -1,5 +1,5 @@
-import { LoginRequest, LoginResponse } from "@/src/gen/proto/backend/v1/messages_pb";
-import { AuthService } from "@/src/gen/proto/backend/v1/services_connect";
+import { AuthService } from "@/src/gen/proto/backend/v1/auth_service-AuthService_connectquery";
+import { LoginRequest, LoginResponse } from "@/src/gen/proto/backend/v1/auth_service_pb";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
@@ -14,6 +14,7 @@ export const authHandlers: RequestHandler[] = [
         ctx.status(401), // 401 Unauthorized
       );
     }
+
     return res(
       ctx.delay(500),
       encodeResp(
@@ -24,6 +25,8 @@ export const authHandlers: RequestHandler[] = [
             isAdmin: username === "admin",
             createdAt: Timestamp.now(),
           },
+          accessToken: "eyJ..." + Date.now(), // 適当
+          refreshToken: "refreeeeesh" + Date.now(), // 適当
         }),
       ),
     );

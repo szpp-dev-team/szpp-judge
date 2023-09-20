@@ -1,5 +1,4 @@
-import { CreateUserRequest } from "@/src/gen/proto/backend/v1/messages_pb";
-import { userRepo } from "@/src/repository/user";
+import { useRegister } from "@/src/usecases/user";
 import { userRegistrationSchema } from "@/src/zschema/user";
 import {
   Button,
@@ -33,29 +32,32 @@ export const Register = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormFields>({
     mode: "onChange",
     resolver: zodResolver(userRegistrationSchema),
   });
 
+  const { isLoading, mutate } = useRegister();
+
   const onSubmit = handleSubmit(async (values) => {
     console.log("onSubmit(): values=", values);
-    try {
-      const resp = await userRepo.register(new CreateUserRequest(values));
-      console.log("onSubmit(): resp=", resp);
-      toast({
-        title: `${resp.username} で登録しました`,
-        status: "success",
-      });
-      router.push("/");
-    } catch (e) {
-      toast({
-        title: "登録に失敗しました",
-        status: "error",
-      });
-      console.error(typeof e, e);
-    }
+    mutate(values, {
+      onSuccess: (data) => {
+        console.log("onSubmit(): user=", data.user);
+        toast({
+          title: `${data.user!.username} で登録しました`,
+          status: "success",
+        });
+        router.push("/");
+      },
+      onError: () => {
+        toast({
+          title: "登録に失敗しました",
+          status: "error",
+        });
+      },
+    });
   });
 
   const formId = "register-form";
@@ -119,7 +121,7 @@ export const Register = () => {
             form={formId}
             size="lg"
             colorScheme={policyAgreed ? "teal" : "blackAlpha"}
-            isLoading={isSubmitting}
+            isLoading={isLoading}
           >
             登録
           </Button>
