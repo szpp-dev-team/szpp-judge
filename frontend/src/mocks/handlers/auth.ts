@@ -9,7 +9,7 @@ const REFRESH_TOKEN_PREFIX = "refreeeeesh";
 
 type Credential = Pick<LoginResponse, "accessToken" | "refreshToken">;
 
-export const generateMockAccessToken = (user: AuthUser, now: Date): string => {
+const generateMockAccessToken = (user: AuthUser, now: Date): string => {
   const payloadObj = {
     ...user,
     sub: "1234567890",
@@ -21,12 +21,12 @@ export const generateMockAccessToken = (user: AuthUser, now: Date): string => {
   return `${header}.${payload}.${hash}`;
 };
 
-export const generateMockRefreshToken = (now: Date): string => {
+const generateMockRefreshToken = (now: Date): string => {
   // sv-SE ローケルでのフォーマットは `YYYY-mm-dd HH:MM:SS`
   return `${REFRESH_TOKEN_PREFIX}/${now.toLocaleString("sv-SE")}`;
 };
 
-export const generateMockCredential = (user: AuthUser): Credential => {
+const generateMockCredential = (user: AuthUser): Credential => {
   const now = new Date();
   const accessToken = generateMockAccessToken(user, now);
   const refreshToken = generateMockRefreshToken(now);
