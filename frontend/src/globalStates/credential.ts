@@ -16,7 +16,7 @@ const authUser = atom<Readonly<AuthUser> | null>((get) => {
     return null;
   }
   try {
-    return decodeJwtPayload(jwt) as AuthUser;
+    return decodeJwtPayload(jwt) as Readonly<AuthUser>;
   } catch (e) {
     console.error(e);
     return null;
@@ -26,7 +26,7 @@ const authUser = atom<Readonly<AuthUser> | null>((get) => {
 export const useCredentialValue = () => useAtomValue(credential);
 export const useCredentialSetter = () => useSetAtom(credential);
 
-export const useCredentialValueAndEraser = (): [ICredential, () => void] => {
+export const useCredentialValueAndEraser = (): [Readonly<ICredential>, () => void] => {
   const [cred, setCred] = useAtom(credential);
   return [cred, () => setCred(RESET)];
 };
