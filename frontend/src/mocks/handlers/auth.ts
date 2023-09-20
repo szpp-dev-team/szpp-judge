@@ -1,5 +1,5 @@
-import { LoginResponse } from "@/src/gen/proto/backend/v1/messages_pb";
-import { AuthService } from "@/src/gen/proto/backend/v1/services-AuthService_connectquery";
+import { AuthService } from "@/src/gen/proto/backend/v1/auth_service-AuthService_connectquery";
+import type { LoginResponse } from "@/src/gen/proto/backend/v1/auth_service_pb";
 import type { AuthUser } from "@/src/model/user";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";

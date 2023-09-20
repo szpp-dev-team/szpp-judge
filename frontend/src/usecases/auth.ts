@@ -1,6 +1,6 @@
 import { Code, ConnectError } from "@bufbuild/connect";
 import { useMutation } from "@tanstack/react-query";
-import { login, logout } from "../gen/proto/backend/v1/services-AuthService_connectquery";
+import { login, logout } from "../gen/proto/backend/v1/auth_service-AuthService_connectquery";
 import { useCredentialSetter, useCredentialValueAndEraser } from "../globalStates/credential";
 
 /**

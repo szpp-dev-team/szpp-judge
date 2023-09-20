@@ -1,4 +1,4 @@
-import { UserService } from "@/src/gen/proto/backend/v1/services-UserService_connectquery";
+import { UserService } from "@/src/gen/proto/backend/v1/user_service-UserService_connectquery";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
