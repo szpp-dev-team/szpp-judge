@@ -89,31 +89,24 @@ export class Task extends Message<Task> {
   execMemoryLimit = 0;
 
   /**
-   * 属するコンテストの ID
-   *
-   * @generated from field: repeated int32 contest_ids = 6;
-   */
-  contestIds: number[] = [];
-
-  /**
    * Judge の type(完全一致、誤差など)
    *
-   * @generated from field: judge.v1.JudgeType judge_type = 7;
+   * @generated from field: judge.v1.JudgeType judge_type = 6;
    */
   judgeType?: JudgeType;
 
   /**
-   * @generated from field: backend.v1.Difficulty difficulty = 8;
+   * @generated from field: backend.v1.Difficulty difficulty = 7;
    */
   difficulty = Difficulty.DIFFICULTY_UNSPECIFIED;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 9;
+   * @generated from field: google.protobuf.Timestamp created_at = 8;
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp updated_at = 10;
+   * @generated from field: optional google.protobuf.Timestamp updated_at = 9;
    */
   updatedAt?: Timestamp;
 
@@ -130,11 +123,10 @@ export class Task extends Message<Task> {
     { no: 3, name: "statement", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "exec_time_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "exec_memory_limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 6, name: "contest_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
-    { no: 7, name: "judge_type", kind: "message", T: JudgeType },
-    { no: 8, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
-    { no: 9, name: "created_at", kind: "message", T: Timestamp },
-    { no: 10, name: "updated_at", kind: "message", T: Timestamp, opt: true },
+    { no: 6, name: "judge_type", kind: "message", T: JudgeType },
+    { no: 7, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
+    { no: 8, name: "created_at", kind: "message", T: Timestamp },
+    { no: 9, name: "updated_at", kind: "message", T: Timestamp, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Task {
