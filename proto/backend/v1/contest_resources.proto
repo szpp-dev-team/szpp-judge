@@ -3,8 +3,8 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/task_resources.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/duration.proto"; 
 
 message ContestTask {
   int32 id = 1;
@@ -68,7 +68,7 @@ message Clarification {
   message Answer {
     int32 id = 1;
     string content = 2;
-    bool is_mine = 3; // 自分が回答したものかどうか 
+    bool is_mine = 3; // 自分が回答したものかどうか
     google.protobuf.Timestamp created_at = 4;
     google.protobuf.Timestamp updated_at = 5;
   }
