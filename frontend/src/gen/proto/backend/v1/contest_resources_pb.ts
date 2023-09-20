@@ -477,7 +477,7 @@ export class Clarification_Answer extends Message<Clarification_Answer> {
   content = "";
 
   /**
-   * 自分が回答したものかどうか 
+   * 自分が回答したものかどうか
    *
    * @generated from field: bool is_mine = 3;
    */
