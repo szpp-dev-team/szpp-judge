@@ -8,6 +8,32 @@ import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Difficulty } from "./task_resources_pb";
 
 /**
+ * @generated from enum backend.v1.ContestType
+ */
+export enum ContestType {
+  /**
+   * @generated from enum value: CONTEST_TYPE_UNSPECIFIED = 0;
+   */
+  CONTEST_TYPE_UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: OFFICIAL = 1;
+   */
+  OFFICIAL = 1,
+
+  /**
+   * @generated from enum value: VIRTUAL = 2;
+   */
+  VIRTUAL = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ContestType)
+proto3.util.setEnumType(ContestType, "backend.v1.ContestType", [
+  { no: 0, name: "CONTEST_TYPE_UNSPECIFIED" },
+  { no: 1, name: "OFFICIAL" },
+  { no: 2, name: "VIRTUAL" },
+]);
+
+/**
  * @generated from message backend.v1.ContestTask
  */
 export class ContestTask extends Message<ContestTask> {
@@ -104,14 +130,24 @@ export class Contest extends Message<Contest> {
   taskIds: number[] = [];
 
   /**
-   * @generated from field: google.protobuf.Timestamp start_at = 6;
+   * @generated from field: int32 penalty_seconds = 6;
+   */
+  penaltySeconds = 0;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp start_at = 7;
    */
   startAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp end_at = 7;
+   * @generated from field: google.protobuf.Timestamp end_at = 8;
    */
   endAt?: Timestamp;
+
+  /**
+   * @generated from field: backend.v1.ContestType contest_type = 9;
+   */
+  contestType = ContestType.CONTEST_TYPE_UNSPECIFIED;
 
   constructor(data?: PartialMessage<Contest>) {
     super();
@@ -126,8 +162,10 @@ export class Contest extends Message<Contest> {
     { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "task_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
-    { no: 6, name: "start_at", kind: "message", T: Timestamp },
-    { no: 7, name: "end_at", kind: "message", T: Timestamp },
+    { no: 6, name: "penalty_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 7, name: "start_at", kind: "message", T: Timestamp },
+    { no: 8, name: "end_at", kind: "message", T: Timestamp },
+    { no: 9, name: "contest_type", kind: "enum", T: proto3.getEnumType(ContestType) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Contest {
@@ -167,19 +205,29 @@ export class MutationContest extends Message<MutationContest> {
   description = "";
 
   /**
-   * @generated from field: google.protobuf.Timestamp start_at = 4;
+   * @generated from field: int32 penalty_seconds = 4;
+   */
+  penaltySeconds = 0;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp start_at = 5;
    */
   startAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp end_at = 5;
+   * @generated from field: google.protobuf.Timestamp end_at = 6;
    */
   endAt?: Timestamp;
 
   /**
-   * @generated from field: bool is_public = 6;
+   * @generated from field: bool is_public = 7;
    */
   isPublic = false;
+
+  /**
+   * @generated from field: backend.v1.ContestType contest_type = 8;
+   */
+  contestType = ContestType.CONTEST_TYPE_UNSPECIFIED;
 
   constructor(data?: PartialMessage<MutationContest>) {
     super();
@@ -192,9 +240,11 @@ export class MutationContest extends Message<MutationContest> {
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "start_at", kind: "message", T: Timestamp },
-    { no: 5, name: "end_at", kind: "message", T: Timestamp },
-    { no: 6, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "penalty_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "start_at", kind: "message", T: Timestamp },
+    { no: 6, name: "end_at", kind: "message", T: Timestamp },
+    { no: 7, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "contest_type", kind: "enum", T: proto3.getEnumType(ContestType) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationContest {

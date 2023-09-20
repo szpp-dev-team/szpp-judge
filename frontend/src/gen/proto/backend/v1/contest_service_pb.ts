@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { Clarification, Clarification_Answer, Contest, ContestTask, MutationContest, StandingsRecord, SubmissionStatus } from "./contest_resources_pb";
+import { Task } from "./task_resources_pb";
 
 /**
  * @generated from message backend.v1.CreateContestRequest
@@ -376,6 +377,82 @@ export class ListContestTasksResponse extends Message<ListContestTasksResponse> 
 
   static equals(a: ListContestTasksResponse | PlainMessage<ListContestTasksResponse> | undefined, b: ListContestTasksResponse | PlainMessage<ListContestTasksResponse> | undefined): boolean {
     return proto3.util.equals(ListContestTasksResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.RegisterTaskRequest
+ */
+export class RegisterTaskRequest extends Message<RegisterTaskRequest> {
+  /**
+   * @generated from field: int32 task_id = 1;
+   */
+  taskId = 0;
+
+  constructor(data?: PartialMessage<RegisterTaskRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.RegisterTaskRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterTaskRequest {
+    return new RegisterTaskRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterTaskRequest {
+    return new RegisterTaskRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterTaskRequest {
+    return new RegisterTaskRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterTaskRequest | PlainMessage<RegisterTaskRequest> | undefined, b: RegisterTaskRequest | PlainMessage<RegisterTaskRequest> | undefined): boolean {
+    return proto3.util.equals(RegisterTaskRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.RegisterTaskResponse
+ */
+export class RegisterTaskResponse extends Message<RegisterTaskResponse> {
+  /**
+   * コンテストに紐づく問題一覧
+   *
+   * @generated from field: repeated backend.v1.Task tasks = 1;
+   */
+  tasks: Task[] = [];
+
+  constructor(data?: PartialMessage<RegisterTaskResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.RegisterTaskResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "tasks", kind: "message", T: Task, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterTaskResponse {
+    return new RegisterTaskResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterTaskResponse {
+    return new RegisterTaskResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterTaskResponse {
+    return new RegisterTaskResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterTaskResponse | PlainMessage<RegisterTaskResponse> | undefined, b: RegisterTaskResponse | PlainMessage<RegisterTaskResponse> | undefined): boolean {
+    return proto3.util.equals(RegisterTaskResponse, a, b);
   }
 }
 

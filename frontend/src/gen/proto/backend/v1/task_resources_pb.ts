@@ -256,27 +256,34 @@ export class TestcaseSet extends Message<TestcaseSet> {
   slug = "";
 
   /**
-   * @generated from field: int32 score = 3;
+   * 得点比率(%)。TestcaseSet.score_ratio の総和が100になるように設定する。
+   *
+   * @generated from field: int32 score_ratio = 3;
    */
-  score = 0;
+  scoreRatio = 0;
 
   /**
-   * @generated from field: repeated string testcase_slugs = 4;
+   * @generated from field: bool is_sample = 4;
+   */
+  isSample = false;
+
+  /**
+   * @generated from field: repeated string testcase_slugs = 5;
    */
   testcaseSlugs: string[] = [];
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 5;
+   * @generated from field: google.protobuf.Timestamp created_at = 6;
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp updated_at = 6;
+   * @generated from field: optional google.protobuf.Timestamp updated_at = 7;
    */
   updatedAt?: Timestamp;
 
   /**
-   * @generated from field: int32 task_id = 7;
+   * @generated from field: int32 task_id = 8;
    */
   taskId = 0;
 
@@ -290,11 +297,12 @@ export class TestcaseSet extends Message<TestcaseSet> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: "testcase_slugs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "created_at", kind: "message", T: Timestamp },
-    { no: 6, name: "updated_at", kind: "message", T: Timestamp, opt: true },
-    { no: 7, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "score_ratio", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "is_sample", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "testcase_slugs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "created_at", kind: "message", T: Timestamp },
+    { no: 7, name: "updated_at", kind: "message", T: Timestamp, opt: true },
+    { no: 8, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TestcaseSet {
@@ -326,12 +334,17 @@ export class MutationTestcaseSet extends Message<MutationTestcaseSet> {
   slug = "";
 
   /**
-   * @generated from field: int32 score = 2;
+   * @generated from field: int32 score_ratio = 2;
    */
-  score = 0;
+  scoreRatio = 0;
 
   /**
-   * @generated from field: repeated string testcase_slugs = 3;
+   * @generated from field: bool is_sample = 3;
+   */
+  isSample = false;
+
+  /**
+   * @generated from field: repeated string testcase_slugs = 4;
    */
   testcaseSlugs: string[] = [];
 
@@ -344,8 +357,9 @@ export class MutationTestcaseSet extends Message<MutationTestcaseSet> {
   static readonly typeName = "backend.v1.MutationTestcaseSet";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "testcase_slugs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "score_ratio", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "is_sample", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "testcase_slugs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationTestcaseSet {

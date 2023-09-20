@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, RegisterTaskRequest, RegisterTaskResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 import { createQueryService } from "@connectrpc/connect-query";
 
@@ -16,6 +16,8 @@ export const ContestService = {
   typeName: "backend.v1.ContestService",
   methods: {
     /**
+     * コンテストを作成する
+     *
      * @generated from rpc backend.v1.ContestService.CreateContest
      */
     createContest: {
@@ -25,6 +27,8 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
+     * コンテスト情報を取得する
+     *
      * @generated from rpc backend.v1.ContestService.GetContest
      */
     getContest: {
@@ -34,6 +38,8 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
+     * コンテスト情報を更新する
+     *
      * @generated from rpc backend.v1.ContestService.UpdateContest
      */
     updateContest: {
@@ -43,6 +49,8 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
+     * コンテストの一覧を取得する
+     *
      * @generated from rpc backend.v1.ContestService.ListContests
      */
     listContests: {
@@ -52,6 +60,8 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
+     * コンテストに紐づく問題の一覧を取得する
+     *
      * @generated from rpc backend.v1.ContestService.ListContestTasks
      */
     listContestTasks: {
@@ -61,7 +71,18 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
-     * 自分の問題ごとの結果情報を返す
+     * 問題をコンテストに紐づかせる
+     *
+     * @generated from rpc backend.v1.ContestService.RegisterTask
+     */
+    registerTask: {
+      name: "RegisterTask",
+      I: RegisterTaskRequest,
+      O: RegisterTaskResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 自分の問題ごとの結果情報を取得する
      *
      * @generated from rpc backend.v1.ContestService.GetMySubmissionStatuses
      */
@@ -72,7 +93,7 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
-     * 順位表取得
+     * 順位表を取得する
      *
      * @generated from rpc backend.v1.ContestService.GetStandings
      */
@@ -83,7 +104,7 @@ export const ContestService = {
       kind: MethodKind.Unary,
     },
     /**
-     * 参加登録
+     * 参加登録をする
      *
      * @generated from rpc backend.v1.ContestService.RegisterMe
      */
@@ -163,6 +184,8 @@ export const ContestService = {
 } as const;
 
 /**
+ * コンテストを作成する
+ *
  * @generated from rpc backend.v1.ContestService.CreateContest
  */
 export const createContest = createQueryService({
@@ -170,6 +193,8 @@ export const createContest = createQueryService({
 }).createContest;
 
 /**
+ * コンテスト情報を取得する
+ *
  * @generated from rpc backend.v1.ContestService.GetContest
  */
 export const getContest = createQueryService({
@@ -177,6 +202,8 @@ export const getContest = createQueryService({
 }).getContest;
 
 /**
+ * コンテスト情報を更新する
+ *
  * @generated from rpc backend.v1.ContestService.UpdateContest
  */
 export const updateContest = createQueryService({
@@ -184,6 +211,8 @@ export const updateContest = createQueryService({
 }).updateContest;
 
 /**
+ * コンテストの一覧を取得する
+ *
  * @generated from rpc backend.v1.ContestService.ListContests
  */
 export const listContests = createQueryService({
@@ -191,6 +220,8 @@ export const listContests = createQueryService({
 }).listContests;
 
 /**
+ * コンテストに紐づく問題の一覧を取得する
+ *
  * @generated from rpc backend.v1.ContestService.ListContestTasks
  */
 export const listContestTasks = createQueryService({
@@ -198,7 +229,16 @@ export const listContestTasks = createQueryService({
 }).listContestTasks;
 
 /**
- * 自分の問題ごとの結果情報を返す
+ * 問題をコンテストに紐づかせる
+ *
+ * @generated from rpc backend.v1.ContestService.RegisterTask
+ */
+export const registerTask = createQueryService({
+  service: ContestService,
+}).registerTask;
+
+/**
+ * 自分の問題ごとの結果情報を取得する
  *
  * @generated from rpc backend.v1.ContestService.GetMySubmissionStatuses
  */
@@ -207,7 +247,7 @@ export const getMySubmissionStatuses = createQueryService({
 }).getMySubmissionStatuses;
 
 /**
- * 順位表取得
+ * 順位表を取得する
  *
  * @generated from rpc backend.v1.ContestService.GetStandings
  */
@@ -216,7 +256,7 @@ export const getStandings = createQueryService({
 }).getStandings;
 
 /**
- * 参加登録
+ * 参加登録をする
  *
  * @generated from rpc backend.v1.ContestService.RegisterMe
  */
