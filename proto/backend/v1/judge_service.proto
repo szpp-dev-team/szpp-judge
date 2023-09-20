@@ -36,7 +36,7 @@ message GetSubmissionDetailResponse {
 
 message ListSubmissionsRequest {
   optional int32 contest_id = 1;
-  optional int32 user_id = 2;
+  optional string username = 2;
 }
 
 message ListSubmissionsResponse {
