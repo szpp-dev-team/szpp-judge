@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,13 +13,9 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/restapi_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
-	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"golang.org/x/exp/slog"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -59,31 +54,14 @@ func main() {
 		log.Fatal(err)
 	}
 	defer cloudtasksClient.Close()
-	judgeConn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer judgeConn.Close()
-	judgeClient := judgev1.NewJudgeServiceClient(judgeConn)
 
 	// logger
 	logger := slog.Default()
 
-	httpSrv := &http.Server{
-		Handler: restapi_server.New(api.WithLogger(logger), api.WithEntClient(entClient), api.WithJudgeClient(judgeClient)),
-		Addr:    ":" + config.HttpPort,
-	}
-	go func() {
-		logger.Info("http server launched")
-		if err := httpSrv.ListenAndServe(); err != nil {
-			log.Fatal(err)
-		}
-	}()
 	grpcSrv := grpc_server.New(
 		api.WithLogger(logger),
 		api.WithEntClient(entClient),
 		api.WithReflection(config.ModeDev),
-		api.WithJudgeClient(judgeClient),
 		api.WithCloudtasksClient(cloudtasksClient),
 	)
 	lsnr, err := net.Listen("tcp", ":"+config.GrpcPort)
@@ -102,9 +80,4 @@ func main() {
 	<-sigCh
 	logger.Info("servers are being stopped")
 	grpcSrv.GracefulStop()
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := httpSrv.Shutdown(shutdownCtx); err != nil {
-		log.Fatal(err)
-	}
 }
