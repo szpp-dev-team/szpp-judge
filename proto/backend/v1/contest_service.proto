@@ -3,6 +3,7 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/contest_resources.proto";
+import "backend/v1/task_resources.proto";
 
 service ContestService {
   // コンテストを作成する
