@@ -21,17 +21,27 @@ message Contest {
   string slug = 3;
   string description = 4;
   repeated int32 task_ids = 5;
-  google.protobuf.Timestamp start_at = 6;
-  google.protobuf.Timestamp end_at = 7;
+  int32 penalty_seconds = 6;
+  google.protobuf.Timestamp start_at = 7;
+  google.protobuf.Timestamp end_at = 8;
+  ContestType contest_type = 9;
 }
 
 message MutationContest {
   string name = 1;
   string slug = 2;
   string description = 3;
-  google.protobuf.Timestamp start_at = 4;
-  google.protobuf.Timestamp end_at = 5;
-  bool is_public = 6;
+  int32 penalty_seconds = 4;
+  google.protobuf.Timestamp start_at = 5;
+  google.protobuf.Timestamp end_at = 6;
+  bool is_public = 7;
+  ContestType contest_type = 8;
+}
+
+enum ContestType {
+  CONTEST_TYPE_UNSPECIFIED = 0;
+  OFFICIAL = 1;
+  VIRTUAL = 2;
 }
 
 message StandingsRecord {
