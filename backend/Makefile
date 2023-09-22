@@ -7,6 +7,9 @@ tbls/generate:
 	@rm -rf ./docs \
 	&& tbls doc
 
+MYSQL_DATABASE=szpp-judge-test-db
+MYSQL_ROOT_PASSWORD=root
+
 .PHONY: mysql/start
 mysql/start:
 ifeq ($(CI),true)

@@ -42,3 +42,21 @@ func NewTestClient(t *testing.T) *ent.Client {
 	}
 	return client
 }
+
+func TruncateDB(t *testing.T, client *ent.Client) {
+	t.Helper()
+	ctx := context.Background()
+
+	rows, err := client.QueryContext(ctx, "SHOW TABLES")
+	require.NoError(t, err)
+	defer rows.Close()
+	for rows.Next() {
+		var table string
+		require.NoError(t, rows.Scan(&table))
+		_, err := client.ExecContext(ctx, "SET foreign_key_checks = 0")
+		require.NoError(t, err)
+		defer client.ExecContext(ctx, "SET foreign_key_checks = 1")
+		_, err = client.ExecContext(ctx, "TRUNCATE TABLE "+table)
+		require.NoError(t, err)
+	}
+}

@@ -1,0 +1,202 @@
+syntax = "proto3";
+
+package backend.v1;
+
+import "backend/v1/task_resources.proto";
+
+service TaskService {
+  // Task を作成する
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  // 指定された Task を取得する
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  // Task を更新する
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+
+  // TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+  // contestant によるリクエストの場合は sample のみ取得する。
+  rpc GetTestcaseSets(GetTestcaseSetsRequest) returns (GetTestcaseSetsResponse);
+  // TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+  rpc SyncTestcaseSets(SyncTestcaseSetsRequest) returns (SyncTestcaseSetsResponse);
+
+  // 提出する
+  rpc Submit(SubmitRequest) returns (SubmitResponse);
+  // 提出の詳細を取得
+  rpc GetSubmissionDetail(GetSubmissionDetailRequest) returns (GetSubmissionDetailResponse);
+  // 提出一覧を取得
+  rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse);
+  // ジャッジの進捗を取得
+  rpc GetJudgeProgress(GetJudgeProgressRequest) returns (GetJudgeProgressResponse);
+  // Clarification を作成する
+  rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
+  // 指定された Clarification を取得する
+  rpc GetClarification(GetClarificationRequest) returns (GetClarificationResponse);
+  // ClarificationListを取得する
+  rpc ListClarifications(ListClarificationsRequest) returns (ListClarificationsResponse);
+  // Clarification を更新する
+  rpc UpdateClarification(UpdateClarificationRequest) returns (UpdateClarificationResponse);
+  // Clarification を削除する
+  rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
+
+  // Answerを追加する
+  rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
+  // Answerを取得する
+  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
+  // Answerを更新する
+  rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
+  // Answerを削除する
+  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
+}
+
+message CreateTaskRequest {
+  MutationTask task = 1;
+}
+
+message CreateTaskResponse {
+  Task task = 1;
+}
+
+message GetTaskRequest {
+  int32 task_id = 1;
+}
+
+message GetTaskResponse {
+  Task task = 1;
+}
+
+message UpdateTaskRequest {
+  int32 task_id = 1;
+  MutationTask task = 2;
+}
+
+message UpdateTaskResponse {
+  Task task = 1;
+}
+
+message GetTestcaseSetsRequest {
+  int32 task_id = 1;
+}
+
+message GetTestcaseSetsResponse {
+  repeated TestcaseSet testcase_sets = 1;
+  repeated Testcase testcases = 2;
+}
+
+message SyncTestcaseSetsRequest {
+  int32 task_id = 1;
+  repeated MutationTestcaseSet testcase_sets = 2;
+  repeated MutationTestcase testcases = 3;
+}
+
+message SyncTestcaseSetsResponse {
+  repeated TestcaseSet testcase_sets = 1;
+  repeated Testcase testcases = 2;
+}
+
+message SubmitRequest {
+  optional int32 contest_id = 1;
+  int32 task_id = 2;
+  string lang_id = 3;
+  string source_code = 4;
+}
+
+message SubmitResponse {
+  int32 submission_id = 1;
+}
+
+message GetSubmissionDetailRequest {
+  int32 id = 1;
+}
+
+message GetSubmissionDetailResponse {
+  SubmissionDetail submission_detail = 1;
+}
+
+message ListSubmissionsRequest {
+  optional int32 contest_id = 1;
+  optional int32 user_id = 2;
+}
+
+message ListSubmissionsResponse {
+  repeated SubmissionSummary submissions = 1;
+}
+
+message GetJudgeProgressRequest {
+  int32 submission_id = 1;
+}
+
+message GetJudgeProgressResponse {
+  JudgeProgress judge_progress = 1;
+}
+
+message CreateClarificationRequest {
+  int32 user_id = 1;
+  string content = 2;
+  bool is_public = 3;
+}
+
+message CreateClarificationResponse {
+  Clarification clarification = 1;
+}
+
+message GetClarificationRequest {
+  int32 id = 1;
+}
+
+message GetClarificationResponse {
+  Clarification clarification = 1;
+}
+
+message ListClarificationsRequest {}
+
+message ListClarificationsResponse {
+  repeated Clarification clarifications = 1;
+}
+
+message UpdateClarificationRequest {
+  int32 id = 1;
+  string content = 2;
+  bool is_public = 3;
+}
+
+message UpdateClarificationResponse {
+  Clarification clarification = 1;
+}
+
+message DeleteClarificationRequest {
+  int32 id = 1;
+}
+
+message DeleteClarificationResponse {}
+
+message CreateAnswerRequest {
+  int32 clarification_id = 1;
+  int32 user_id = 2;
+  string content = 3;
+}
+
+message CreateAnswerResponse {
+  Clarification.Answer answer = 1;
+}
+
+message GetAnswerRequest {
+  int32 answer_id = 1;
+}
+
+message GetAnswerResponse {
+  Clarification.Answer answer = 1;
+}
+
+message UpdateAnswerRequest {
+  int32 answer_id = 1;
+  string content = 2;
+}
+
+message UpdateAnswerResponse {
+  Clarification.Answer answer = 1;
+}
+
+message DeleteAnswerRequest {
+  int32 answer_id = 1;
+}
+
+message DeleteAnswerResponse {}

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package backend.v1;
+
+import "backend/v1/user_resources.proto";
+
+service AuthService {
+  // ログイン
+  rpc Login(LoginRequest) returns (LoginResponse);
+  // ログアウト
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  // refresh token を使って access token を更新する
+  rpc RefreshAccessToken(RefreshAccessTokenRequest) returns (RefreshAccessTokenResponse);
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  User user = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message LogoutResponse {}
+
+message RefreshAccessTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshAccessTokenResponse {
+  string access_token = 1;
+}
