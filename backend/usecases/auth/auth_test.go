@@ -115,6 +115,7 @@ func Test_RefreshAccessToken(t *testing.T) {
 					SetCreatedAt(timejst.Now()).
 					SetUpdatedAt(timejst.Now())
 				_, err := q.Save(context.Background())
+				require.NoError(t, err)
 				ctx := context.Background()
 				ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: username})
 				loginReq := &backendv1.LoginRequest{
@@ -145,6 +146,7 @@ func Test_RefreshAccessToken(t *testing.T) {
 					SetCreatedAt(timejst.Now()).
 					SetUpdatedAt(timejst.Now())
 				_, err := q.Save(context.Background())
+				require.NoError(t, err)
 				ctx := context.Background()
 				ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: username})
 				loginReq := &backendv1.LoginRequest{
