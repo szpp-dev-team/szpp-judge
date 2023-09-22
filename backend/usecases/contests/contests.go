@@ -95,6 +95,26 @@ func (i *Interactor) ListContests(ctx context.Context, req *backendv1.ListContes
 	}, nil
 }
 
+func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListContestTasksRequest) (*backendv1.ListContestTasksResponse, error) {
+	contest, err := i.entClient.Contest.Query().
+		WithContestTask(func(ctq *ent.ContestTaskQuery) {
+			ctq.WithTask()
+		}).
+		Where(ent_contest.Slug(req.ContestSlug)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Error(codes.NotFound, "the contest was not found")
+		}
+		return nil, status.Error(codes.Internal, "failed to get contest")
+	}
+	return &backendv1.ListContestTasksResponse{
+		Tasks: lo.Map(contest.Edges.ContestTask, func(t *ent.ContestTask, _ int) *backendv1.ContestTask {
+			return toPbContestTask(t)
+		}),
+	}, nil
+}
+
 func toPbContest(contest *ent.Contest) *backendv1.Contest {
 	return &backendv1.Contest{
 		Id:             int32(contest.ID),
@@ -105,5 +125,16 @@ func toPbContest(contest *ent.Contest) *backendv1.Contest {
 		ContestType:    backendv1.ContestType(backendv1.ContestType_value[contest.ContestType]),
 		StartAt:        timestamppb.New(contest.StartAt),
 		EndAt:          timestamppb.New(contest.EndAt),
+	}
+}
+
+func toPbContestTask(ct *ent.ContestTask) *backendv1.ContestTask {
+	return &backendv1.ContestTask{
+		Id:              int32(ct.ID),
+		Title:           ct.Edges.Task.Title,
+		ExecTimeLimit:   int32(ct.Edges.Task.ExecTimeLimit),
+		ExecMemoryLimit: int32(ct.Edges.Task.ExecMemoryLimit),
+		Difficulty:      backendv1.Difficulty(backendv1.Difficulty_value[ct.Edges.Task.Difficulty]),
+		Score:           int32(ct.Score),
 	}
 }
