@@ -3,6 +3,7 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/task_resources.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 message ContestTask {
@@ -20,28 +21,65 @@ message Contest {
   string slug = 3;
   string description = 4;
   repeated int32 task_ids = 5;
-  google.protobuf.Timestamp start_at = 6;
-  google.protobuf.Timestamp end_at = 7;
+  int32 penalty_seconds = 6;
+  google.protobuf.Timestamp start_at = 7;
+  google.protobuf.Timestamp end_at = 8;
+  ContestType contest_type = 9;
 }
 
-message StandingsElement {
+message MutationContest {
+  string name = 1;
+  string slug = 2;
+  string description = 3;
+  int32 penalty_seconds = 4;
+  google.protobuf.Timestamp start_at = 5;
+  google.protobuf.Timestamp end_at = 6;
+  bool is_public = 7;
+  ContestType contest_type = 8;
+}
+
+enum ContestType {
+  CONTEST_TYPE_UNSPECIFIED = 0;
+  OFFICIAL = 1;
+  VIRTUAL = 2;
+}
+
+message StandingsRecord {
   message TaskDetail {
     int32 task_id = 1;
-    int32 penalty_count = 2;
-    int32 ac_submit_id = 3;
-    google.protobuf.Timestamp ac_elapsed = 4;
+    int32 score = 2;
+    int32 penalty_count = 3;
+    optional int32 ac_submit_id = 4;
+    optional google.protobuf.Duration until_ac = 5; // コンテスト開始からの経過時間
   }
 
   int32 rank = 1;
-  int32 user_id = 2;
-  string user_name = 3;
-  int32 total_score = 4;
-  int32 total_penalty_count = 5;
-  google.protobuf.Timestamp latest_ac_at = 6;
-  repeated TaskDetail task_detail_list = 7;
+  string username = 2;
+  int32 total_score = 3;
+  int32 total_penalty_count = 4;
+  optional google.protobuf.Timestamp latest_ac_at = 5;
+  repeated TaskDetail task_detail_list = 6;
 }
 
 message SubmissionStatus {
   int32 task_id = 1;
   optional int32 score = 2;
+}
+
+message Clarification {
+  int32 id = 1;
+  string content = 2;
+  bool is_public = 3;
+  bool is_mine = 4; // 自分が質問したものかどうか
+  optional Answer answer = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+
+  message Answer {
+    int32 id = 1;
+    string content = 2;
+    bool is_mine = 3; // 自分が回答したものかどうか
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+  }
 }

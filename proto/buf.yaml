@@ -9,5 +9,6 @@ lint:
     ENUM_VALUE_PREFIX:
       - judge/v1/resources.proto
       - backend/v1/task_resources.proto
+      - backend/v1/contest_resources.proto
 deps:
   - buf.build/googleapis/googleapis
