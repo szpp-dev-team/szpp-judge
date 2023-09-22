@@ -42,6 +42,19 @@ func (ctu *ContestTaskUpdate) AddScore(i int) *ContestTaskUpdate {
 	return ctu
 }
 
+// SetOrder sets the "order" field.
+func (ctu *ContestTaskUpdate) SetOrder(i int) *ContestTaskUpdate {
+	ctu.mutation.ResetOrder()
+	ctu.mutation.SetOrder(i)
+	return ctu
+}
+
+// AddOrder adds i to the "order" field.
+func (ctu *ContestTaskUpdate) AddOrder(i int) *ContestTaskUpdate {
+	ctu.mutation.AddOrder(i)
+	return ctu
+}
+
 // SetContestID sets the "contest_id" field.
 func (ctu *ContestTaskUpdate) SetContestID(i int) *ContestTaskUpdate {
 	ctu.mutation.SetContestID(i)
@@ -137,6 +150,12 @@ func (ctu *ContestTaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ctu.mutation.AddedScore(); ok {
 		_spec.AddField(contesttask.FieldScore, field.TypeInt, value)
 	}
+	if value, ok := ctu.mutation.Order(); ok {
+		_spec.SetField(contesttask.FieldOrder, field.TypeInt, value)
+	}
+	if value, ok := ctu.mutation.AddedOrder(); ok {
+		_spec.AddField(contesttask.FieldOrder, field.TypeInt, value)
+	}
 	if ctu.mutation.ContestCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -225,6 +244,19 @@ func (ctuo *ContestTaskUpdateOne) SetScore(i int) *ContestTaskUpdateOne {
 // AddScore adds i to the "score" field.
 func (ctuo *ContestTaskUpdateOne) AddScore(i int) *ContestTaskUpdateOne {
 	ctuo.mutation.AddScore(i)
+	return ctuo
+}
+
+// SetOrder sets the "order" field.
+func (ctuo *ContestTaskUpdateOne) SetOrder(i int) *ContestTaskUpdateOne {
+	ctuo.mutation.ResetOrder()
+	ctuo.mutation.SetOrder(i)
+	return ctuo
+}
+
+// AddOrder adds i to the "order" field.
+func (ctuo *ContestTaskUpdateOne) AddOrder(i int) *ContestTaskUpdateOne {
+	ctuo.mutation.AddOrder(i)
 	return ctuo
 }
 
@@ -352,6 +384,12 @@ func (ctuo *ContestTaskUpdateOne) sqlSave(ctx context.Context) (_node *ContestTa
 	}
 	if value, ok := ctuo.mutation.AddedScore(); ok {
 		_spec.AddField(contesttask.FieldScore, field.TypeInt, value)
+	}
+	if value, ok := ctuo.mutation.Order(); ok {
+		_spec.SetField(contesttask.FieldOrder, field.TypeInt, value)
+	}
+	if value, ok := ctuo.mutation.AddedOrder(); ok {
+		_spec.AddField(contesttask.FieldOrder, field.TypeInt, value)
 	}
 	if ctuo.mutation.ContestCleared() {
 		edge := &sqlgraph.EdgeSpec{

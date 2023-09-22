@@ -14,6 +14,8 @@ const (
 	FieldID = "id"
 	// FieldScore holds the string denoting the score field in the database.
 	FieldScore = "score"
+	// FieldOrder holds the string denoting the order field in the database.
+	FieldOrder = "order"
 	// FieldContestID holds the string denoting the contest_id field in the database.
 	FieldContestID = "contest_id"
 	// FieldTaskID holds the string denoting the task_id field in the database.
@@ -44,6 +46,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldScore,
+	FieldOrder,
 	FieldContestID,
 	FieldTaskID,
 }
@@ -69,6 +72,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByScore orders the results by the score field.
 func ByScore(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScore, opts...).ToFunc()
+}
+
+// ByOrder orders the results by the order field.
+func ByOrder(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrder, opts...).ToFunc()
 }
 
 // ByContestID orders the results by the contest_id field.

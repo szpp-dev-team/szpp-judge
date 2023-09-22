@@ -1224,6 +1224,8 @@ type ContestTaskMutation struct {
 	id             *int
 	score          *int
 	addscore       *int
+	_order         *int
+	add_order      *int
 	clearedFields  map[string]struct{}
 	contest        *int
 	clearedcontest bool
@@ -1394,6 +1396,62 @@ func (m *ContestTaskMutation) ResetScore() {
 	m.addscore = nil
 }
 
+// SetOrder sets the "order" field.
+func (m *ContestTaskMutation) SetOrder(i int) {
+	m._order = &i
+	m.add_order = nil
+}
+
+// Order returns the value of the "order" field in the mutation.
+func (m *ContestTaskMutation) Order() (r int, exists bool) {
+	v := m._order
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOrder returns the old "order" field's value of the ContestTask entity.
+// If the ContestTask object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContestTaskMutation) OldOrder(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOrder is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOrder requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOrder: %w", err)
+	}
+	return oldValue.Order, nil
+}
+
+// AddOrder adds i to the "order" field.
+func (m *ContestTaskMutation) AddOrder(i int) {
+	if m.add_order != nil {
+		*m.add_order += i
+	} else {
+		m.add_order = &i
+	}
+}
+
+// AddedOrder returns the value that was added to the "order" field in this mutation.
+func (m *ContestTaskMutation) AddedOrder() (r int, exists bool) {
+	v := m.add_order
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetOrder resets all changes to the "order" field.
+func (m *ContestTaskMutation) ResetOrder() {
+	m._order = nil
+	m.add_order = nil
+}
+
 // SetContestID sets the "contest_id" field.
 func (m *ContestTaskMutation) SetContestID(i int) {
 	m.contest = &i
@@ -1552,9 +1610,12 @@ func (m *ContestTaskMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ContestTaskMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.score != nil {
 		fields = append(fields, contesttask.FieldScore)
+	}
+	if m._order != nil {
+		fields = append(fields, contesttask.FieldOrder)
 	}
 	if m.contest != nil {
 		fields = append(fields, contesttask.FieldContestID)
@@ -1572,6 +1633,8 @@ func (m *ContestTaskMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case contesttask.FieldScore:
 		return m.Score()
+	case contesttask.FieldOrder:
+		return m.Order()
 	case contesttask.FieldContestID:
 		return m.ContestID()
 	case contesttask.FieldTaskID:
@@ -1587,6 +1650,8 @@ func (m *ContestTaskMutation) OldField(ctx context.Context, name string) (ent.Va
 	switch name {
 	case contesttask.FieldScore:
 		return m.OldScore(ctx)
+	case contesttask.FieldOrder:
+		return m.OldOrder(ctx)
 	case contesttask.FieldContestID:
 		return m.OldContestID(ctx)
 	case contesttask.FieldTaskID:
@@ -1606,6 +1671,13 @@ func (m *ContestTaskMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetScore(v)
+		return nil
+	case contesttask.FieldOrder:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOrder(v)
 		return nil
 	case contesttask.FieldContestID:
 		v, ok := value.(int)
@@ -1632,6 +1704,9 @@ func (m *ContestTaskMutation) AddedFields() []string {
 	if m.addscore != nil {
 		fields = append(fields, contesttask.FieldScore)
 	}
+	if m.add_order != nil {
+		fields = append(fields, contesttask.FieldOrder)
+	}
 	return fields
 }
 
@@ -1642,6 +1717,8 @@ func (m *ContestTaskMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case contesttask.FieldScore:
 		return m.AddedScore()
+	case contesttask.FieldOrder:
+		return m.AddedOrder()
 	}
 	return nil, false
 }
@@ -1657,6 +1734,13 @@ func (m *ContestTaskMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddScore(v)
+		return nil
+	case contesttask.FieldOrder:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOrder(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ContestTask numeric field %s", name)
@@ -1687,6 +1771,9 @@ func (m *ContestTaskMutation) ResetField(name string) error {
 	switch name {
 	case contesttask.FieldScore:
 		m.ResetScore()
+		return nil
+	case contesttask.FieldOrder:
+		m.ResetOrder()
 		return nil
 	case contesttask.FieldContestID:
 		m.ResetContestID()

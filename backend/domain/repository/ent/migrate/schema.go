@@ -30,6 +30,7 @@ var (
 	ContestTasksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "score", Type: field.TypeInt},
+		{Name: "order", Type: field.TypeInt},
 		{Name: "contest_id", Type: field.TypeInt},
 		{Name: "task_id", Type: field.TypeInt},
 	}
@@ -41,13 +42,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "contest_tasks_contests_contest",
-				Columns:    []*schema.Column{ContestTasksColumns[2]},
+				Columns:    []*schema.Column{ContestTasksColumns[3]},
 				RefColumns: []*schema.Column{ContestsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "contest_tasks_tasks_task",
-				Columns:    []*schema.Column{ContestTasksColumns[3]},
+				Columns:    []*schema.Column{ContestTasksColumns[4]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -56,7 +57,7 @@ var (
 			{
 				Name:    "contesttask_contest_id_task_id",
 				Unique:  true,
-				Columns: []*schema.Column{ContestTasksColumns[2], ContestTasksColumns[3]},
+				Columns: []*schema.Column{ContestTasksColumns[3], ContestTasksColumns[4]},
 			},
 		},
 	}
