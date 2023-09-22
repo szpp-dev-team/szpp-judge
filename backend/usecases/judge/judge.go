@@ -12,6 +12,7 @@ import (
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
 	sources_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
+	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 )
 
@@ -165,13 +166,52 @@ func (i *Interactor) updateSubmitStatusIE(ctx context.Context, submitID int) err
 	return nil
 }
 
+func (i *Interactor) GetJudgeProgress(ctx context.Context, req *backendv1.GetJudgeProgressRequest) (*backendv1.GetJudgeProgressResponse, error) {
+	submit, err := i.entClient.Submit.Query().
+		WithTestcaseResults().
+		WithTask(func(tq *ent.TaskQuery) {
+			tq.WithTestcases()
+		}).
+		Where(ent_submit.ID(int(req.SubmissionId))).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fmt.Errorf("the submission was not found")
+		}
+		i.logger.Error("failed to get the submission", slog.Any("error", err))
+		return nil, err
+	}
+
+	var status judgev1.JudgeStatus
+	if submit.Status == nil {
+		status = judgev1.JudgeStatus_WJ
+	} else {
+		for _, tr := range submit.Edges.TestcaseResults {
+			judgeStatusPriority := priorityByJudgeStatus[status]
+			trStatusPriority := priorityByJudgeStatus[judgev1.JudgeStatus(judgev1.JudgeStatus_value[tr.Status])]
+			if judgeStatusPriority < trStatusPriority {
+				status = judgev1.JudgeStatus(judgev1.JudgeStatus_value[tr.Status])
+			}
+		}
+	}
+
+	return &backendv1.GetJudgeProgressResponse{
+		JudgeProgress: &backendv1.JudgeProgress{
+			Status:             judgev1.JudgeStatus(judgev1.JudgeStatus_value[status.String()]),
+			TotalTestcases:     int32(len(submit.Edges.Task.Edges.Testcases)),
+			CompletedTestcases: int32(len(submit.Edges.TestcaseResults)),
+		},
+	}, nil
+}
+
 var priorityByJudgeStatus = map[judgev1.JudgeStatus]int{
-	judgev1.JudgeStatus_AC:  0,
-	judgev1.JudgeStatus_TLE: 1,
-	judgev1.JudgeStatus_MLE: 2,
-	judgev1.JudgeStatus_OLE: 3,
-	judgev1.JudgeStatus_WA:  4,
-	judgev1.JudgeStatus_RE:  5,
-	judgev1.JudgeStatus_CE:  6,
-	judgev1.JudgeStatus_IE:  7,
+	judgev1.JudgeStatus_WJ:  0,
+	judgev1.JudgeStatus_AC:  1,
+	judgev1.JudgeStatus_TLE: 2,
+	judgev1.JudgeStatus_MLE: 3,
+	judgev1.JudgeStatus_OLE: 4,
+	judgev1.JudgeStatus_WA:  5,
+	judgev1.JudgeStatus_RE:  6,
+	judgev1.JudgeStatus_CE:  7,
+	judgev1.JudgeStatus_IE:  8,
 }

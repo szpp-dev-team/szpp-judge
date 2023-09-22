@@ -36,7 +36,7 @@ type JudgeServiceClient interface {
 	// 提出一覧を取得
 	ListSubmissions(ctx context.Context, in *ListSubmissionsRequest, opts ...grpc.CallOption) (*ListSubmissionsResponse, error)
 	// ジャッジの進捗を取得
-	GetJudgeProgress(ctx context.Context, in *GetJudgeProgressRequest, opts ...grpc.CallOption) (JudgeService_GetJudgeProgressClient, error)
+	GetJudgeProgress(ctx context.Context, in *GetJudgeProgressRequest, opts ...grpc.CallOption) (*GetJudgeProgressResponse, error)
 }
 
 type judgeServiceClient struct {
@@ -74,36 +74,13 @@ func (c *judgeServiceClient) ListSubmissions(ctx context.Context, in *ListSubmis
 	return out, nil
 }
 
-func (c *judgeServiceClient) GetJudgeProgress(ctx context.Context, in *GetJudgeProgressRequest, opts ...grpc.CallOption) (JudgeService_GetJudgeProgressClient, error) {
-	stream, err := c.cc.NewStream(ctx, &JudgeService_ServiceDesc.Streams[0], JudgeService_GetJudgeProgress_FullMethodName, opts...)
+func (c *judgeServiceClient) GetJudgeProgress(ctx context.Context, in *GetJudgeProgressRequest, opts ...grpc.CallOption) (*GetJudgeProgressResponse, error) {
+	out := new(GetJudgeProgressResponse)
+	err := c.cc.Invoke(ctx, JudgeService_GetJudgeProgress_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &judgeServiceGetJudgeProgressClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type JudgeService_GetJudgeProgressClient interface {
-	Recv() (*GetJudgeProgressResponse, error)
-	grpc.ClientStream
-}
-
-type judgeServiceGetJudgeProgressClient struct {
-	grpc.ClientStream
-}
-
-func (x *judgeServiceGetJudgeProgressClient) Recv() (*GetJudgeProgressResponse, error) {
-	m := new(GetJudgeProgressResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 // JudgeServiceServer is the server API for JudgeService service.
@@ -117,7 +94,7 @@ type JudgeServiceServer interface {
 	// 提出一覧を取得
 	ListSubmissions(context.Context, *ListSubmissionsRequest) (*ListSubmissionsResponse, error)
 	// ジャッジの進捗を取得
-	GetJudgeProgress(*GetJudgeProgressRequest, JudgeService_GetJudgeProgressServer) error
+	GetJudgeProgress(context.Context, *GetJudgeProgressRequest) (*GetJudgeProgressResponse, error)
 }
 
 // UnimplementedJudgeServiceServer should be embedded to have forward compatible implementations.
@@ -133,8 +110,8 @@ func (UnimplementedJudgeServiceServer) GetSubmissionDetail(context.Context, *Get
 func (UnimplementedJudgeServiceServer) ListSubmissions(context.Context, *ListSubmissionsRequest) (*ListSubmissionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSubmissions not implemented")
 }
-func (UnimplementedJudgeServiceServer) GetJudgeProgress(*GetJudgeProgressRequest, JudgeService_GetJudgeProgressServer) error {
-	return status.Errorf(codes.Unimplemented, "method GetJudgeProgress not implemented")
+func (UnimplementedJudgeServiceServer) GetJudgeProgress(context.Context, *GetJudgeProgressRequest) (*GetJudgeProgressResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetJudgeProgress not implemented")
 }
 
 // UnsafeJudgeServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -202,25 +179,22 @@ func _JudgeService_ListSubmissions_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _JudgeService_GetJudgeProgress_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(GetJudgeProgressRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _JudgeService_GetJudgeProgress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetJudgeProgressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(JudgeServiceServer).GetJudgeProgress(m, &judgeServiceGetJudgeProgressServer{stream})
-}
-
-type JudgeService_GetJudgeProgressServer interface {
-	Send(*GetJudgeProgressResponse) error
-	grpc.ServerStream
-}
-
-type judgeServiceGetJudgeProgressServer struct {
-	grpc.ServerStream
-}
-
-func (x *judgeServiceGetJudgeProgressServer) Send(m *GetJudgeProgressResponse) error {
-	return x.ServerStream.SendMsg(m)
+	if interceptor == nil {
+		return srv.(JudgeServiceServer).GetJudgeProgress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JudgeService_GetJudgeProgress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JudgeServiceServer).GetJudgeProgress(ctx, req.(*GetJudgeProgressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // JudgeService_ServiceDesc is the grpc.ServiceDesc for JudgeService service.
@@ -242,13 +216,11 @@ var JudgeService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ListSubmissions",
 			Handler:    _JudgeService_ListSubmissions_Handler,
 		},
-	},
-	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "GetJudgeProgress",
-			Handler:       _JudgeService_GetJudgeProgress_Handler,
-			ServerStreams: true,
+			MethodName: "GetJudgeProgress",
+			Handler:    _JudgeService_GetJudgeProgress_Handler,
 		},
 	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "backend/v1/judge_service.proto",
 }
