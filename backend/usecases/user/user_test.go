@@ -30,7 +30,7 @@ func Test_GetUser(t *testing.T) {
 					SetUsername("hogege").
 					SetHashedPassword(HashPassword("fugafuga")).
 					SetEmail("szppi1@szpp.com").
-					SetRole("ADMIN").
+					SetRole(pb.Role_name[int32(pb.Role_ADMIN)]).
 					SetCreatedAt(now).
 					SetUpdatedAt(now)
 				_, err := q.Save(context.Background())
@@ -126,7 +126,7 @@ func Test_ExistsUsername(t *testing.T) {
 					SetUsername(req.Username).
 					SetHashedPassword(HashPassword("fugafuga")).
 					SetEmail("szppi2@szpp.com").
-					SetRole("ADMIN").
+					SetRole(pb.Role_name[int32(pb.Role_ADMIN)]).
 					SetCreatedAt(timejst.Now()).
 					SetUpdatedAt(timejst.Now())
 				_, err := q.Save(context.Background())

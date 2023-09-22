@@ -43,7 +43,7 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 		SetUsername(req.Username).
 		SetHashedPassword(HashPassword(req.Password)).
 		SetEmail(req.Email).
-		SetRole("USER").
+		SetRole(pb.Role_name[int32(pb.Role_USER)]).
 		SetCreatedAt(now).
 		SetUpdatedAt(now)
 	user, err := q.Save(ctx)
