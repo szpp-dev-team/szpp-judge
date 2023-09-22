@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
@@ -18,6 +19,7 @@ type RefreshTokenCreate struct {
 	config
 	mutation *RefreshTokenMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetToken sets the "token" field.
@@ -107,6 +109,7 @@ func (rtc *RefreshTokenCreate) createSpec() (*RefreshToken, *sqlgraph.CreateSpec
 		_node = &RefreshToken{config: rtc.config}
 		_spec = sqlgraph.NewCreateSpec(refreshtoken.Table, sqlgraph.NewFieldSpec(refreshtoken.FieldID, field.TypeInt))
 	)
+	_spec.OnConflict = rtc.conflict
 	if value, ok := rtc.mutation.Token(); ok {
 		_spec.SetField(refreshtoken.FieldToken, field.TypeString, value)
 		_node.Token = value
@@ -122,10 +125,211 @@ func (rtc *RefreshTokenCreate) createSpec() (*RefreshToken, *sqlgraph.CreateSpec
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.RefreshToken.Create().
+//		SetToken(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.RefreshTokenUpsert) {
+//			SetToken(v+v).
+//		}).
+//		Exec(ctx)
+func (rtc *RefreshTokenCreate) OnConflict(opts ...sql.ConflictOption) *RefreshTokenUpsertOne {
+	rtc.conflict = opts
+	return &RefreshTokenUpsertOne{
+		create: rtc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.RefreshToken.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (rtc *RefreshTokenCreate) OnConflictColumns(columns ...string) *RefreshTokenUpsertOne {
+	rtc.conflict = append(rtc.conflict, sql.ConflictColumns(columns...))
+	return &RefreshTokenUpsertOne{
+		create: rtc,
+	}
+}
+
+type (
+	// RefreshTokenUpsertOne is the builder for "upsert"-ing
+	//  one RefreshToken node.
+	RefreshTokenUpsertOne struct {
+		create *RefreshTokenCreate
+	}
+
+	// RefreshTokenUpsert is the "OnConflict" setter.
+	RefreshTokenUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetToken sets the "token" field.
+func (u *RefreshTokenUpsert) SetToken(v string) *RefreshTokenUpsert {
+	u.Set(refreshtoken.FieldToken, v)
+	return u
+}
+
+// UpdateToken sets the "token" field to the value that was provided on create.
+func (u *RefreshTokenUpsert) UpdateToken() *RefreshTokenUpsert {
+	u.SetExcluded(refreshtoken.FieldToken)
+	return u
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *RefreshTokenUpsert) SetExpiresAt(v time.Time) *RefreshTokenUpsert {
+	u.Set(refreshtoken.FieldExpiresAt, v)
+	return u
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *RefreshTokenUpsert) UpdateExpiresAt() *RefreshTokenUpsert {
+	u.SetExcluded(refreshtoken.FieldExpiresAt)
+	return u
+}
+
+// SetIsDead sets the "is_dead" field.
+func (u *RefreshTokenUpsert) SetIsDead(v bool) *RefreshTokenUpsert {
+	u.Set(refreshtoken.FieldIsDead, v)
+	return u
+}
+
+// UpdateIsDead sets the "is_dead" field to the value that was provided on create.
+func (u *RefreshTokenUpsert) UpdateIsDead() *RefreshTokenUpsert {
+	u.SetExcluded(refreshtoken.FieldIsDead)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.RefreshToken.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *RefreshTokenUpsertOne) UpdateNewValues() *RefreshTokenUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.RefreshToken.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *RefreshTokenUpsertOne) Ignore() *RefreshTokenUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *RefreshTokenUpsertOne) DoNothing() *RefreshTokenUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the RefreshTokenCreate.OnConflict
+// documentation for more info.
+func (u *RefreshTokenUpsertOne) Update(set func(*RefreshTokenUpsert)) *RefreshTokenUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&RefreshTokenUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetToken sets the "token" field.
+func (u *RefreshTokenUpsertOne) SetToken(v string) *RefreshTokenUpsertOne {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.SetToken(v)
+	})
+}
+
+// UpdateToken sets the "token" field to the value that was provided on create.
+func (u *RefreshTokenUpsertOne) UpdateToken() *RefreshTokenUpsertOne {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.UpdateToken()
+	})
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *RefreshTokenUpsertOne) SetExpiresAt(v time.Time) *RefreshTokenUpsertOne {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.SetExpiresAt(v)
+	})
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *RefreshTokenUpsertOne) UpdateExpiresAt() *RefreshTokenUpsertOne {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.UpdateExpiresAt()
+	})
+}
+
+// SetIsDead sets the "is_dead" field.
+func (u *RefreshTokenUpsertOne) SetIsDead(v bool) *RefreshTokenUpsertOne {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.SetIsDead(v)
+	})
+}
+
+// UpdateIsDead sets the "is_dead" field to the value that was provided on create.
+func (u *RefreshTokenUpsertOne) UpdateIsDead() *RefreshTokenUpsertOne {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.UpdateIsDead()
+	})
+}
+
+// Exec executes the query.
+func (u *RefreshTokenUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for RefreshTokenCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *RefreshTokenUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *RefreshTokenUpsertOne) ID(ctx context.Context) (id int, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *RefreshTokenUpsertOne) IDX(ctx context.Context) int {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // RefreshTokenCreateBulk is the builder for creating many RefreshToken entities in bulk.
 type RefreshTokenCreateBulk struct {
 	config
 	builders []*RefreshTokenCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the RefreshToken entities in the database.
@@ -151,6 +355,7 @@ func (rtcb *RefreshTokenCreateBulk) Save(ctx context.Context) ([]*RefreshToken, 
 					_, err = mutators[i+1].Mutate(root, rtcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = rtcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, rtcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -201,6 +406,149 @@ func (rtcb *RefreshTokenCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (rtcb *RefreshTokenCreateBulk) ExecX(ctx context.Context) {
 	if err := rtcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.RefreshToken.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.RefreshTokenUpsert) {
+//			SetToken(v+v).
+//		}).
+//		Exec(ctx)
+func (rtcb *RefreshTokenCreateBulk) OnConflict(opts ...sql.ConflictOption) *RefreshTokenUpsertBulk {
+	rtcb.conflict = opts
+	return &RefreshTokenUpsertBulk{
+		create: rtcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.RefreshToken.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (rtcb *RefreshTokenCreateBulk) OnConflictColumns(columns ...string) *RefreshTokenUpsertBulk {
+	rtcb.conflict = append(rtcb.conflict, sql.ConflictColumns(columns...))
+	return &RefreshTokenUpsertBulk{
+		create: rtcb,
+	}
+}
+
+// RefreshTokenUpsertBulk is the builder for "upsert"-ing
+// a bulk of RefreshToken nodes.
+type RefreshTokenUpsertBulk struct {
+	create *RefreshTokenCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.RefreshToken.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *RefreshTokenUpsertBulk) UpdateNewValues() *RefreshTokenUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.RefreshToken.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *RefreshTokenUpsertBulk) Ignore() *RefreshTokenUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *RefreshTokenUpsertBulk) DoNothing() *RefreshTokenUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the RefreshTokenCreateBulk.OnConflict
+// documentation for more info.
+func (u *RefreshTokenUpsertBulk) Update(set func(*RefreshTokenUpsert)) *RefreshTokenUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&RefreshTokenUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetToken sets the "token" field.
+func (u *RefreshTokenUpsertBulk) SetToken(v string) *RefreshTokenUpsertBulk {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.SetToken(v)
+	})
+}
+
+// UpdateToken sets the "token" field to the value that was provided on create.
+func (u *RefreshTokenUpsertBulk) UpdateToken() *RefreshTokenUpsertBulk {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.UpdateToken()
+	})
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *RefreshTokenUpsertBulk) SetExpiresAt(v time.Time) *RefreshTokenUpsertBulk {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.SetExpiresAt(v)
+	})
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *RefreshTokenUpsertBulk) UpdateExpiresAt() *RefreshTokenUpsertBulk {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.UpdateExpiresAt()
+	})
+}
+
+// SetIsDead sets the "is_dead" field.
+func (u *RefreshTokenUpsertBulk) SetIsDead(v bool) *RefreshTokenUpsertBulk {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.SetIsDead(v)
+	})
+}
+
+// UpdateIsDead sets the "is_dead" field to the value that was provided on create.
+func (u *RefreshTokenUpsertBulk) UpdateIsDead() *RefreshTokenUpsertBulk {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.UpdateIsDead()
+	})
+}
+
+// Exec executes the query.
+func (u *RefreshTokenUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the RefreshTokenCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for RefreshTokenCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *RefreshTokenUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
