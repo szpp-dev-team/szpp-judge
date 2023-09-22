@@ -54,7 +54,7 @@ export const JudgeService = {
       name: "GetJudgeProgress",
       I: GetJudgeProgressRequest,
       O: GetJudgeProgressResponse,
-      kind: MethodKind.Unary,
+      kind: MethodKind.ServerStreaming,
     },
   }
 } as const;

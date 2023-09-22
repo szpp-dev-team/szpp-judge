@@ -57,7 +57,7 @@ export const JudgeService = {
       name: "GetJudgeProgress",
       I: GetJudgeProgressRequest,
       O: GetJudgeProgressResponse,
-      kind: MethodKind.Unary,
+      kind: MethodKind.ServerStreaming,
     },
   }
 } as const;
@@ -88,12 +88,3 @@ export const getSubmissionDetail = createQueryService({
 export const listSubmissions = createQueryService({
   service: JudgeService,
 }).listSubmissions;
-
-/**
- * ジャッジの進捗を取得
- *
- * @generated from rpc backend.v1.JudgeService.GetJudgeProgress
- */
-export const getJudgeProgress = createQueryService({
-  service: JudgeService,
-}).getJudgeProgress;
