@@ -1,4 +1,4 @@
-name: backend-deploy-test
+name: backend-deploy
 on:
   pull_request:
     branches:
@@ -31,10 +31,10 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
       - name: 'Deploy handle-judge-task'
-        working-directory: ./backend/cloud-functions/hanmdle-judge-task
+        working-directory: ./backend/cloud-functions/handle-judge-task
         run: |
           go mod vendor
-          gcloud functions deploy handle-judge-task-test \
+          gcloud functions deploy handle-judge-task \
             --gen2 \
             --runtime=go121 \
             --region=asia-northeast1 \
