@@ -9,8 +9,9 @@ import (
 	"github.com/stretchr/testify/require"
 	intercepter "github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
+	enttoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"github.com/szpp-dev-team/szpp-judge/backend/test/utils"
-	user "github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
+	"github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 )
 
@@ -93,5 +94,100 @@ func Test_Logout(t *testing.T) {
 }
 
 func Test_RefreshAccessToken(t *testing.T) {
+	entClient := utils.NewTestClient(t)
+	defer entClient.Close()
+	secret := "JWT_SECRET"
+	interactor := NewInteractor(entClient, secret)
+	tests := map[string]struct {
+		prepare func(t *testing.T) string
+		wantErr bool
+		assert  func(ctx context.Context, t *testing.T, req *backendv1.RefreshAccessTokenRequest, resp *backendv1.RefreshAccessTokenResponse)
+	}{
+		"success": {
+			// refreshTokenの期限が有効であるときに正しくaccessTokenが発行される
+			prepare: func(t *testing.T) string {
+				username := "tokenTestUser0"
+				q := entClient.User.Create().
+					SetUsername(username).
+					SetHashedPassword(user.HashPassword("tooreeee")).
+					SetEmail("tokenTestUser0.szpp.com").
+					SetRole("USER").
+					SetCreatedAt(timejst.Now()).
+					SetUpdatedAt(timejst.Now())
+				_, err := q.Save(context.Background())
+				ctx := context.Background()
+				ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: username})
+				loginReq := &backendv1.LoginRequest{
+					Username: username,
+					Password: "tooreeee",
+				}
+				loginResp, err := interactor.Login(ctx, loginReq, secret)
+				refreshToken := loginResp.RefreshToken
+				require.NoError(t, err)
+				return refreshToken
+			},
+			wantErr: false,
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.RefreshAccessTokenRequest, resp *backendv1.RefreshAccessTokenResponse) {
+				token, err := entClient.RefreshToken.Query().Where(enttoken.Token(req.RefreshToken)).Only(ctx)
+				require.NoError(t, err)
+				assert.False(t, token.IsDead)
+			},
+		},
+		"invalid refresh token": {
+			// refreshTokenが死んでいるときにエラーが返る killRefreshToken()のテスト
+			prepare: func(t *testing.T) string {
+				username := "tokenTestUser1"
+				q := entClient.User.Create().
+					SetUsername(username).
+					SetHashedPassword(user.HashPassword("tooreeee")).
+					SetEmail("tokenTestUser1.szpp.com").
+					SetRole("USER").
+					SetCreatedAt(timejst.Now()).
+					SetUpdatedAt(timejst.Now())
+				_, err := q.Save(context.Background())
+				ctx := context.Background()
+				ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: username})
+				loginReq := &backendv1.LoginRequest{
+					Username: username,
+					Password: "tooreeee",
+				}
+				loginResp, err := interactor.Login(ctx, loginReq, secret)
+				refreshToken := loginResp.RefreshToken
+				killRefreshToken(ctx, entClient, refreshToken)
+				require.NoError(t, err)
+				return refreshToken
+			},
+			wantErr: true,
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.RefreshAccessTokenRequest, resp *backendv1.RefreshAccessTokenResponse) {
+				token, err := entClient.RefreshToken.Query().Where(enttoken.Token(req.RefreshToken)).Only(ctx)
+				require.NoError(t, err)
+				assert.True(t, token.IsDead)
+			},
+		},
+	}
 
+	i := 0
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: fmt.Sprintf("authTestUser%d", i)})
+
+			refreshToken := ""
+			if test.prepare != nil {
+				refreshToken = test.prepare(t)
+			}
+			req := &backendv1.RefreshAccessTokenRequest{
+				RefreshToken: refreshToken,
+			}
+			resp, err := interactor.RefreshAccessToken(ctx, req)
+			if test.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			if test.assert != nil {
+				test.assert(ctx, t, req, resp)
+			}
+		})
+	}
 }
