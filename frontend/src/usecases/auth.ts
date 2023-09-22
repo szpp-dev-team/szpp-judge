@@ -1,8 +1,7 @@
 import { Code, ConnectError } from "@bufbuild/connect";
 import { useMutation } from "@tanstack/react-query";
-import { login } from "../gen/proto/backend/v1/services-AuthService_connectquery";
-import { useCredentialSetter } from "../globalStates/credential";
-import { useUserSetter } from "../globalStates/user";
+import { login, logout } from "../gen/proto/backend/v1/auth_service-AuthService_connectquery";
+import { useCredentialSetter, useCredentialValueAndEraser } from "../globalStates/credential";
 
 /**
  * ログイン用カスタムフック
@@ -26,8 +25,6 @@ export const useLogin = (onUnauthenticatedError?: () => void) => {
   };
 
   const setCredential = useCredentialSetter();
-  const setUser = useUserSetter();
-
   const { data, error, isLoading, mutate } = useMutation({
     ...login.useMutation({ onError: onConnectError }),
     onSuccess: (data) => {
@@ -37,13 +34,25 @@ export const useLogin = (onUnauthenticatedError?: () => void) => {
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
       });
-      setUser({
-        id: data.user!.id,
-        username: data.user!.username,
-        isAdmin: data.user!.isAdmin,
-      });
     },
   });
 
   return { data, error, isLoading, mutate };
+};
+
+export const useLogout = () => {
+  const [cred, eraseCred] = useCredentialValueAndEraser();
+
+  const { isLoading, mutate: mutateImpl } = useMutation({
+    ...logout.useMutation(),
+    onSettled: () => {
+      eraseCred();
+    },
+  });
+
+  const mutate = (options?: Parameters<typeof mutateImpl>[1]) => {
+    return mutateImpl({ refreshToken: cred.refreshToken }, options);
+  };
+
+  return { isLoading, mutate };
 };

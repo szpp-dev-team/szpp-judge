@@ -1,7 +1,7 @@
-import { ListContestTasksRequest, ListContestTasksResponse } from "@/src/gen/proto/backend/v1/messages_pb";
-import { ContestTask, Difficulty } from "@/src/gen/proto/backend/v1/resources_pb";
-import { ContestService } from "@/src/gen/proto/backend/v1/services-ContestService_connectquery";
-import { PlainMessage } from "@bufbuild/protobuf";
+import type { ContestTask } from "@/src/gen/proto/backend/v1/contest_resources_pb";
+import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
+import { Difficulty } from "@/src/gen/proto/backend/v1/task_resources_pb";
+import type { PlainMessage } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";
 
@@ -18,7 +18,7 @@ const contestTasks: PlainMessage<ContestTask>[] = /* dprint-ignore */ [
 
 export const contestHandlers: RequestHandler[] = [
   grpcMock(ContestService, "listContestTasks", async (ctx, res, decodeReq, encodeResp) => {
-    const { contestSlug } = await decodeReq() as ListContestTasksRequest;
+    const { contestSlug } = await decodeReq();
     const found = contestSlug === "sbc001";
     if (!found) {
       return res(
@@ -28,11 +28,9 @@ export const contestHandlers: RequestHandler[] = [
     }
     return res(
       ctx.delay(500),
-      encodeResp(
-        new ListContestTasksResponse({
-          tasks: contestTasks,
-        }),
-      ),
+      encodeResp({
+        tasks: contestTasks,
+      }),
     );
   }),
 ];
