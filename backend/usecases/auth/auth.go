@@ -6,12 +6,11 @@ import (
 	intercepter "github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
-	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	u_user "github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
+	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Interactor struct {
@@ -48,7 +47,7 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest, secret str
 	}
 
 	return &pb.LoginResponse{
-		User:         toPbUser(user),
+		User:         u_user.ToPbUser(user),
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 	}, nil
@@ -75,15 +74,5 @@ func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAcce
 		return &pb.RefreshAccessTokenResponse{
 			AccessToken: accessToken,
 		}, nil
-	}
-}
-
-func toPbUser(t *ent.User) *pb.User {
-	return &pb.User{
-		Id:        int32(t.ID),
-		Username:  t.Username,
-		IsAdmin:   pb.Role_value[t.Role] == pb.Role_value["ADMIN"],
-		CreatedAt: timestamppb.New(t.CreatedAt),
-		UpdatedAt: timestamppb.New(t.UpdatedAt),
 	}
 }
