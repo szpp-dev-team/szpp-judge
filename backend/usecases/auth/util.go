@@ -85,11 +85,11 @@ func verifyRefreshToken(ctx context.Context, entClient *ent.Client, token string
 		Where(enttoken.Token(token)).
 		Where(enttoken.IsDead(false)).
 		Where(enttoken.ExpiresAtGT(now))
-	count, err := q.Count(ctx)
+	exist, err := q.Exist(ctx)
 	if err != nil {
 		return false, status.Error(codes.Internal, err.Error())
 	}
-	return count == 1, nil
+	return exist, nil
 }
 
 func MakeRandomStr(digit uint32) (string, error) {
