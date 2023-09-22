@@ -7,6 +7,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
+	u_user "github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
 	"golang.org/x/exp/slog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -36,7 +37,7 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest, secret str
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = VerifyPassword(user.HashedPassword, req.Password)
+	err = u_user.VerifyPassword(user.HashedPassword, req.Password)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
