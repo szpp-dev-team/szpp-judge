@@ -12,7 +12,7 @@ service JudgeService {
   // 提出一覧を取得
   rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse);
   // ジャッジの進捗を取得
-  rpc GetJudgeProgress(GetJudgeProgressRequest) returns (GetJudgeProgressResponse);
+  rpc GetJudgeProgress(GetJudgeProgressRequest) returns (stream GetJudgeProgressResponse);
 }
 
 message SubmitRequest {
