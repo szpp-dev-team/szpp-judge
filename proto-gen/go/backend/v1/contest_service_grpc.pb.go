@@ -21,27 +21,58 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	ContestService_CreateContest_FullMethodName           = "/backend.v1.ContestService/CreateContest"
 	ContestService_GetContest_FullMethodName              = "/backend.v1.ContestService/GetContest"
+	ContestService_UpdateContest_FullMethodName           = "/backend.v1.ContestService/UpdateContest"
 	ContestService_ListContests_FullMethodName            = "/backend.v1.ContestService/ListContests"
 	ContestService_ListContestTasks_FullMethodName        = "/backend.v1.ContestService/ListContestTasks"
+	ContestService_GetContestTask_FullMethodName          = "/backend.v1.ContestService/GetContestTask"
+	ContestService_SyncContestTasks_FullMethodName        = "/backend.v1.ContestService/SyncContestTasks"
 	ContestService_GetMySubmissionStatuses_FullMethodName = "/backend.v1.ContestService/GetMySubmissionStatuses"
 	ContestService_GetStandings_FullMethodName            = "/backend.v1.ContestService/GetStandings"
 	ContestService_RegisterMe_FullMethodName              = "/backend.v1.ContestService/RegisterMe"
+	ContestService_CreateClarification_FullMethodName     = "/backend.v1.ContestService/CreateClarification"
+	ContestService_ListClarifications_FullMethodName      = "/backend.v1.ContestService/ListClarifications"
+	ContestService_DeleteClarification_FullMethodName     = "/backend.v1.ContestService/DeleteClarification"
+	ContestService_CreateAnswer_FullMethodName            = "/backend.v1.ContestService/CreateAnswer"
+	ContestService_UpdateAnswer_FullMethodName            = "/backend.v1.ContestService/UpdateAnswer"
+	ContestService_DeleteAnswer_FullMethodName            = "/backend.v1.ContestService/DeleteAnswer"
 )
 
 // ContestServiceClient is the client API for ContestService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ContestServiceClient interface {
+	// コンテストを作成する
 	CreateContest(ctx context.Context, in *CreateContestRequest, opts ...grpc.CallOption) (*CreateContestResponse, error)
+	// コンテスト情報を取得する
 	GetContest(ctx context.Context, in *GetContestRequest, opts ...grpc.CallOption) (*GetContestResponse, error)
+	// コンテスト情報を更新する
+	UpdateContest(ctx context.Context, in *UpdateContestRequest, opts ...grpc.CallOption) (*UpdateContestResponse, error)
+	// コンテストの一覧を取得する
 	ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error)
+	// コンテストに紐づく問題の一覧を取得する
 	ListContestTasks(ctx context.Context, in *ListContestTasksRequest, opts ...grpc.CallOption) (*ListContestTasksResponse, error)
-	// 自分の問題ごとの結果情報を返す
+	// コンテストに紐づく問題を取得する
+	GetContestTask(ctx context.Context, in *GetContestTaskRequest, opts ...grpc.CallOption) (*GetContestTaskResponse, error)
+	// 問題をコンテストに紐づかせる
+	SyncContestTasks(ctx context.Context, in *SyncContestTasksRequest, opts ...grpc.CallOption) (*SyncContestTasksResponse, error)
+	// 自分の問題ごとの結果情報を取得する
 	GetMySubmissionStatuses(ctx context.Context, in *GetMySubmissionStatusesRequest, opts ...grpc.CallOption) (*GetMySubmissionStatusesResponse, error)
-	// 順位表取得
+	// 順位表を取得する
 	GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error)
-	// 参加登録
+	// 参加登録をする
 	RegisterMe(ctx context.Context, in *RegisterMeRequest, opts ...grpc.CallOption) (*RegisterMeResponse, error)
+	// Clarification を作成する
+	CreateClarification(ctx context.Context, in *CreateClarificationRequest, opts ...grpc.CallOption) (*CreateClarificationResponse, error)
+	// ClarificationListを取得する
+	ListClarifications(ctx context.Context, in *ListClarificationsRequest, opts ...grpc.CallOption) (*ListClarificationsResponse, error)
+	// Clarification を削除する
+	DeleteClarification(ctx context.Context, in *DeleteClarificationRequest, opts ...grpc.CallOption) (*DeleteClarificationResponse, error)
+	// Answerを追加する
+	CreateAnswer(ctx context.Context, in *CreateAnswerRequest, opts ...grpc.CallOption) (*CreateAnswerResponse, error)
+	// Answerを更新する
+	UpdateAnswer(ctx context.Context, in *UpdateAnswerRequest, opts ...grpc.CallOption) (*UpdateAnswerResponse, error)
+	// Answerを削除する
+	DeleteAnswer(ctx context.Context, in *DeleteAnswerRequest, opts ...grpc.CallOption) (*DeleteAnswerResponse, error)
 }
 
 type contestServiceClient struct {
@@ -70,6 +101,15 @@ func (c *contestServiceClient) GetContest(ctx context.Context, in *GetContestReq
 	return out, nil
 }
 
+func (c *contestServiceClient) UpdateContest(ctx context.Context, in *UpdateContestRequest, opts ...grpc.CallOption) (*UpdateContestResponse, error) {
+	out := new(UpdateContestResponse)
+	err := c.cc.Invoke(ctx, ContestService_UpdateContest_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contestServiceClient) ListContests(ctx context.Context, in *ListContestsRequest, opts ...grpc.CallOption) (*ListContestsResponse, error) {
 	out := new(ListContestsResponse)
 	err := c.cc.Invoke(ctx, ContestService_ListContests_FullMethodName, in, out, opts...)
@@ -82,6 +122,24 @@ func (c *contestServiceClient) ListContests(ctx context.Context, in *ListContest
 func (c *contestServiceClient) ListContestTasks(ctx context.Context, in *ListContestTasksRequest, opts ...grpc.CallOption) (*ListContestTasksResponse, error) {
 	out := new(ListContestTasksResponse)
 	err := c.cc.Invoke(ctx, ContestService_ListContestTasks_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) GetContestTask(ctx context.Context, in *GetContestTaskRequest, opts ...grpc.CallOption) (*GetContestTaskResponse, error) {
+	out := new(GetContestTaskResponse)
+	err := c.cc.Invoke(ctx, ContestService_GetContestTask_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) SyncContestTasks(ctx context.Context, in *SyncContestTasksRequest, opts ...grpc.CallOption) (*SyncContestTasksResponse, error) {
+	out := new(SyncContestTasksResponse)
+	err := c.cc.Invoke(ctx, ContestService_SyncContestTasks_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -115,20 +173,96 @@ func (c *contestServiceClient) RegisterMe(ctx context.Context, in *RegisterMeReq
 	return out, nil
 }
 
+func (c *contestServiceClient) CreateClarification(ctx context.Context, in *CreateClarificationRequest, opts ...grpc.CallOption) (*CreateClarificationResponse, error) {
+	out := new(CreateClarificationResponse)
+	err := c.cc.Invoke(ctx, ContestService_CreateClarification_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) ListClarifications(ctx context.Context, in *ListClarificationsRequest, opts ...grpc.CallOption) (*ListClarificationsResponse, error) {
+	out := new(ListClarificationsResponse)
+	err := c.cc.Invoke(ctx, ContestService_ListClarifications_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) DeleteClarification(ctx context.Context, in *DeleteClarificationRequest, opts ...grpc.CallOption) (*DeleteClarificationResponse, error) {
+	out := new(DeleteClarificationResponse)
+	err := c.cc.Invoke(ctx, ContestService_DeleteClarification_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) CreateAnswer(ctx context.Context, in *CreateAnswerRequest, opts ...grpc.CallOption) (*CreateAnswerResponse, error) {
+	out := new(CreateAnswerResponse)
+	err := c.cc.Invoke(ctx, ContestService_CreateAnswer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) UpdateAnswer(ctx context.Context, in *UpdateAnswerRequest, opts ...grpc.CallOption) (*UpdateAnswerResponse, error) {
+	out := new(UpdateAnswerResponse)
+	err := c.cc.Invoke(ctx, ContestService_UpdateAnswer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contestServiceClient) DeleteAnswer(ctx context.Context, in *DeleteAnswerRequest, opts ...grpc.CallOption) (*DeleteAnswerResponse, error) {
+	out := new(DeleteAnswerResponse)
+	err := c.cc.Invoke(ctx, ContestService_DeleteAnswer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ContestServiceServer is the server API for ContestService service.
 // All implementations should embed UnimplementedContestServiceServer
 // for forward compatibility
 type ContestServiceServer interface {
+	// コンテストを作成する
 	CreateContest(context.Context, *CreateContestRequest) (*CreateContestResponse, error)
+	// コンテスト情報を取得する
 	GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error)
+	// コンテスト情報を更新する
+	UpdateContest(context.Context, *UpdateContestRequest) (*UpdateContestResponse, error)
+	// コンテストの一覧を取得する
 	ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error)
+	// コンテストに紐づく問題の一覧を取得する
 	ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error)
-	// 自分の問題ごとの結果情報を返す
+	// コンテストに紐づく問題を取得する
+	GetContestTask(context.Context, *GetContestTaskRequest) (*GetContestTaskResponse, error)
+	// 問題をコンテストに紐づかせる
+	SyncContestTasks(context.Context, *SyncContestTasksRequest) (*SyncContestTasksResponse, error)
+	// 自分の問題ごとの結果情報を取得する
 	GetMySubmissionStatuses(context.Context, *GetMySubmissionStatusesRequest) (*GetMySubmissionStatusesResponse, error)
-	// 順位表取得
+	// 順位表を取得する
 	GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error)
-	// 参加登録
+	// 参加登録をする
 	RegisterMe(context.Context, *RegisterMeRequest) (*RegisterMeResponse, error)
+	// Clarification を作成する
+	CreateClarification(context.Context, *CreateClarificationRequest) (*CreateClarificationResponse, error)
+	// ClarificationListを取得する
+	ListClarifications(context.Context, *ListClarificationsRequest) (*ListClarificationsResponse, error)
+	// Clarification を削除する
+	DeleteClarification(context.Context, *DeleteClarificationRequest) (*DeleteClarificationResponse, error)
+	// Answerを追加する
+	CreateAnswer(context.Context, *CreateAnswerRequest) (*CreateAnswerResponse, error)
+	// Answerを更新する
+	UpdateAnswer(context.Context, *UpdateAnswerRequest) (*UpdateAnswerResponse, error)
+	// Answerを削除する
+	DeleteAnswer(context.Context, *DeleteAnswerRequest) (*DeleteAnswerResponse, error)
 }
 
 // UnimplementedContestServiceServer should be embedded to have forward compatible implementations.
@@ -141,11 +275,20 @@ func (UnimplementedContestServiceServer) CreateContest(context.Context, *CreateC
 func (UnimplementedContestServiceServer) GetContest(context.Context, *GetContestRequest) (*GetContestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContest not implemented")
 }
+func (UnimplementedContestServiceServer) UpdateContest(context.Context, *UpdateContestRequest) (*UpdateContestResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateContest not implemented")
+}
 func (UnimplementedContestServiceServer) ListContests(context.Context, *ListContestsRequest) (*ListContestsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListContests not implemented")
 }
 func (UnimplementedContestServiceServer) ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListContestTasks not implemented")
+}
+func (UnimplementedContestServiceServer) GetContestTask(context.Context, *GetContestTaskRequest) (*GetContestTaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetContestTask not implemented")
+}
+func (UnimplementedContestServiceServer) SyncContestTasks(context.Context, *SyncContestTasksRequest) (*SyncContestTasksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncContestTasks not implemented")
 }
 func (UnimplementedContestServiceServer) GetMySubmissionStatuses(context.Context, *GetMySubmissionStatusesRequest) (*GetMySubmissionStatusesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMySubmissionStatuses not implemented")
@@ -155,6 +298,24 @@ func (UnimplementedContestServiceServer) GetStandings(context.Context, *GetStand
 }
 func (UnimplementedContestServiceServer) RegisterMe(context.Context, *RegisterMeRequest) (*RegisterMeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterMe not implemented")
+}
+func (UnimplementedContestServiceServer) CreateClarification(context.Context, *CreateClarificationRequest) (*CreateClarificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateClarification not implemented")
+}
+func (UnimplementedContestServiceServer) ListClarifications(context.Context, *ListClarificationsRequest) (*ListClarificationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListClarifications not implemented")
+}
+func (UnimplementedContestServiceServer) DeleteClarification(context.Context, *DeleteClarificationRequest) (*DeleteClarificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteClarification not implemented")
+}
+func (UnimplementedContestServiceServer) CreateAnswer(context.Context, *CreateAnswerRequest) (*CreateAnswerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAnswer not implemented")
+}
+func (UnimplementedContestServiceServer) UpdateAnswer(context.Context, *UpdateAnswerRequest) (*UpdateAnswerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAnswer not implemented")
+}
+func (UnimplementedContestServiceServer) DeleteAnswer(context.Context, *DeleteAnswerRequest) (*DeleteAnswerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAnswer not implemented")
 }
 
 // UnsafeContestServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -204,6 +365,24 @@ func _ContestService_GetContest_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContestService_UpdateContest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateContestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).UpdateContest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_UpdateContest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).UpdateContest(ctx, req.(*UpdateContestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContestService_ListContests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListContestsRequest)
 	if err := dec(in); err != nil {
@@ -236,6 +415,42 @@ func _ContestService_ListContestTasks_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContestServiceServer).ListContestTasks(ctx, req.(*ListContestTasksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_GetContestTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetContestTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).GetContestTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_GetContestTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).GetContestTask(ctx, req.(*GetContestTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_SyncContestTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncContestTasksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).SyncContestTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_SyncContestTasks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).SyncContestTasks(ctx, req.(*SyncContestTasksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -294,6 +509,114 @@ func _ContestService_RegisterMe_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContestService_CreateClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateClarificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).CreateClarification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_CreateClarification_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).CreateClarification(ctx, req.(*CreateClarificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_ListClarifications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListClarificationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).ListClarifications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_ListClarifications_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).ListClarifications(ctx, req.(*ListClarificationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_DeleteClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteClarificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).DeleteClarification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_DeleteClarification_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).DeleteClarification(ctx, req.(*DeleteClarificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_CreateAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAnswerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).CreateAnswer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_CreateAnswer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).CreateAnswer(ctx, req.(*CreateAnswerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_UpdateAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAnswerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).UpdateAnswer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_UpdateAnswer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).UpdateAnswer(ctx, req.(*UpdateAnswerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContestService_DeleteAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAnswerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).DeleteAnswer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_DeleteAnswer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).DeleteAnswer(ctx, req.(*DeleteAnswerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ContestService_ServiceDesc is the grpc.ServiceDesc for ContestService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -310,12 +633,24 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContestService_GetContest_Handler,
 		},
 		{
+			MethodName: "UpdateContest",
+			Handler:    _ContestService_UpdateContest_Handler,
+		},
+		{
 			MethodName: "ListContests",
 			Handler:    _ContestService_ListContests_Handler,
 		},
 		{
 			MethodName: "ListContestTasks",
 			Handler:    _ContestService_ListContestTasks_Handler,
+		},
+		{
+			MethodName: "GetContestTask",
+			Handler:    _ContestService_GetContestTask_Handler,
+		},
+		{
+			MethodName: "SyncContestTasks",
+			Handler:    _ContestService_SyncContestTasks_Handler,
 		},
 		{
 			MethodName: "GetMySubmissionStatuses",
@@ -328,6 +663,30 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterMe",
 			Handler:    _ContestService_RegisterMe_Handler,
+		},
+		{
+			MethodName: "CreateClarification",
+			Handler:    _ContestService_CreateClarification_Handler,
+		},
+		{
+			MethodName: "ListClarifications",
+			Handler:    _ContestService_ListClarifications_Handler,
+		},
+		{
+			MethodName: "DeleteClarification",
+			Handler:    _ContestService_DeleteClarification_Handler,
+		},
+		{
+			MethodName: "CreateAnswer",
+			Handler:    _ContestService_CreateAnswer_Handler,
+		},
+		{
+			MethodName: "UpdateAnswer",
+			Handler:    _ContestService_UpdateAnswer_Handler,
+		},
+		{
+			MethodName: "DeleteAnswer",
+			Handler:    _ContestService_DeleteAnswer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

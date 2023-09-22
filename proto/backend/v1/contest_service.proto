@@ -3,27 +3,45 @@ syntax = "proto3";
 package backend.v1;
 
 import "backend/v1/contest_resources.proto";
-import "google/protobuf/timestamp.proto";
+import "backend/v1/task_resources.proto";
 
 service ContestService {
+  // コンテストを作成する
   rpc CreateContest(CreateContestRequest) returns (CreateContestResponse);
+  // コンテスト情報を取得する
   rpc GetContest(GetContestRequest) returns (GetContestResponse);
+  // コンテスト情報を更新する
+  rpc UpdateContest(UpdateContestRequest) returns (UpdateContestResponse);
+  // コンテストの一覧を取得する
   rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
+  // コンテストに紐づく問題の一覧を取得する
   rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
-  // 自分の問題ごとの結果情報を返す
+  // コンテストに紐づく問題を取得する
+  rpc GetContestTask(GetContestTaskRequest) returns (GetContestTaskResponse);
+  // 問題をコンテストに紐づかせる
+  rpc SyncContestTasks(SyncContestTasksRequest) returns (SyncContestTasksResponse);
+  // 自分の問題ごとの結果情報を取得する
   rpc GetMySubmissionStatuses(GetMySubmissionStatusesRequest) returns (GetMySubmissionStatusesResponse);
-  // 順位表取得
+  // 順位表を取得する
   rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
-  // 参加登録
+  // 参加登録をする
   rpc RegisterMe(RegisterMeRequest) returns (RegisterMeResponse);
+  // Clarification を作成する
+  rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
+  // ClarificationListを取得する
+  rpc ListClarifications(ListClarificationsRequest) returns (ListClarificationsResponse);
+  // Clarification を削除する
+  rpc DeleteClarification(DeleteClarificationRequest) returns (DeleteClarificationResponse);
+  // Answerを追加する
+  rpc CreateAnswer(CreateAnswerRequest) returns (CreateAnswerResponse);
+  // Answerを更新する
+  rpc UpdateAnswer(UpdateAnswerRequest) returns (UpdateAnswerResponse);
+  // Answerを削除する
+  rpc DeleteAnswer(DeleteAnswerRequest) returns (DeleteAnswerResponse);
 }
 
 message CreateContestRequest {
-  string name = 1;
-  string slug = 2;
-  string description = 3;
-  google.protobuf.Timestamp start_at = 4;
-  google.protobuf.Timestamp end_at = 5;
+  MutationContest contest = 1;
 }
 
 message CreateContestResponse {
@@ -35,6 +53,15 @@ message GetContestRequest {
 }
 
 message GetContestResponse {
+  Contest contest = 1;
+}
+
+message UpdateContestRequest {
+  int32 id = 1;
+  MutationContest contest = 2;
+}
+
+message UpdateContestResponse {
   Contest contest = 1;
 }
 
@@ -52,6 +79,29 @@ message ListContestTasksResponse {
   repeated ContestTask tasks = 1; // 問題の並び順
 }
 
+message GetContestTaskRequest {
+  string contest_slug = 1;
+  int32 task_id = 2;
+}
+
+message GetContestTaskResponse {
+  Task task = 1;
+}
+
+message SyncContestTasksRequest {
+  string contest_slug = 1;
+  repeated Task tasks = 2;  // コンテスト内での出題順は配列の要素の順番になる
+
+  message Task {
+    int32 id = 1;
+    int32 score = 2;
+  }
+}
+
+message SyncContestTasksResponse {
+  repeated Task tasks = 1; // コンテストに紐づく問題一覧
+}
+
 message GetMySubmissionStatusesRequest {
   string contest_slug = 1;
 }
@@ -65,7 +115,7 @@ message GetStandingsRequest {
 }
 
 message GetStandingsResponse {
-  repeated StandingsElement standings_list = 1;
+  repeated StandingsRecord standings_list = 1;
 }
 
 // コンテストに参加登録するときのリクエスト
@@ -74,3 +124,53 @@ message RegisterMeRequest {
 }
 
 message RegisterMeResponse {}
+
+message CreateClarificationRequest {
+  string content = 1;
+  string contest_slug = 2;
+  optional int32 task_id = 3;
+}
+
+message CreateClarificationResponse {
+  Clarification clarification = 1;
+}
+
+message ListClarificationsRequest {
+  string contest_slug = 1;
+}
+
+message ListClarificationsResponse {
+  repeated Clarification clarifications = 1;
+}
+
+message DeleteClarificationRequest {
+  int32 id = 1;
+}
+
+message DeleteClarificationResponse {}
+
+message CreateAnswerRequest {
+  int32 clarification_id = 1;
+  string content = 2;
+  bool is_public = 3;
+}
+
+message CreateAnswerResponse {
+  Clarification.Answer answer = 1;
+}
+
+message UpdateAnswerRequest {
+  int32 answer_id = 1;
+  string content = 2;
+  bool is_public = 3;
+}
+
+message UpdateAnswerResponse {
+  Clarification.Answer answer = 1;
+}
+
+message DeleteAnswerRequest {
+  int32 answer_id = 1;
+}
+
+message DeleteAnswerResponse {}
