@@ -90,7 +90,7 @@ message GetContestTaskResponse {
 
 message SyncContestTasksRequest {
   string contest_slug = 1;
-  repeated Task tasks = 2;  // コンテスト内での出題順は配列の要素の順番になる
+  repeated Task tasks = 2; // コンテスト内での出題順は配列の要素の順番になる
 
   message Task {
     int32 id = 1;
