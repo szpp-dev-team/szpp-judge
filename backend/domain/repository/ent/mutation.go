@@ -2016,8 +2016,8 @@ type TestcaseSetMutation struct {
 	typ              string
 	id               *int
 	name             *string
-	score            *int
-	addscore         *int
+	score_ratio      *int
+	addscore_ratio   *int
 	is_sample        *bool
 	created_at       *time.Time
 	updated_at       *time.Time
@@ -2172,60 +2172,60 @@ func (m *TestcaseSetMutation) ResetName() {
 	m.name = nil
 }
 
-// SetScore sets the "score" field.
-func (m *TestcaseSetMutation) SetScore(i int) {
-	m.score = &i
-	m.addscore = nil
+// SetScoreRatio sets the "score_ratio" field.
+func (m *TestcaseSetMutation) SetScoreRatio(i int) {
+	m.score_ratio = &i
+	m.addscore_ratio = nil
 }
 
-// Score returns the value of the "score" field in the mutation.
-func (m *TestcaseSetMutation) Score() (r int, exists bool) {
-	v := m.score
+// ScoreRatio returns the value of the "score_ratio" field in the mutation.
+func (m *TestcaseSetMutation) ScoreRatio() (r int, exists bool) {
+	v := m.score_ratio
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldScore returns the old "score" field's value of the TestcaseSet entity.
+// OldScoreRatio returns the old "score_ratio" field's value of the TestcaseSet entity.
 // If the TestcaseSet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TestcaseSetMutation) OldScore(ctx context.Context) (v int, err error) {
+func (m *TestcaseSetMutation) OldScoreRatio(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldScore is only allowed on UpdateOne operations")
+		return v, errors.New("OldScoreRatio is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldScore requires an ID field in the mutation")
+		return v, errors.New("OldScoreRatio requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldScore: %w", err)
+		return v, fmt.Errorf("querying old value for OldScoreRatio: %w", err)
 	}
-	return oldValue.Score, nil
+	return oldValue.ScoreRatio, nil
 }
 
-// AddScore adds i to the "score" field.
-func (m *TestcaseSetMutation) AddScore(i int) {
-	if m.addscore != nil {
-		*m.addscore += i
+// AddScoreRatio adds i to the "score_ratio" field.
+func (m *TestcaseSetMutation) AddScoreRatio(i int) {
+	if m.addscore_ratio != nil {
+		*m.addscore_ratio += i
 	} else {
-		m.addscore = &i
+		m.addscore_ratio = &i
 	}
 }
 
-// AddedScore returns the value that was added to the "score" field in this mutation.
-func (m *TestcaseSetMutation) AddedScore() (r int, exists bool) {
-	v := m.addscore
+// AddedScoreRatio returns the value that was added to the "score_ratio" field in this mutation.
+func (m *TestcaseSetMutation) AddedScoreRatio() (r int, exists bool) {
+	v := m.addscore_ratio
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetScore resets all changes to the "score" field.
-func (m *TestcaseSetMutation) ResetScore() {
-	m.score = nil
-	m.addscore = nil
+// ResetScoreRatio resets all changes to the "score_ratio" field.
+func (m *TestcaseSetMutation) ResetScoreRatio() {
+	m.score_ratio = nil
+	m.addscore_ratio = nil
 }
 
 // SetIsSample sets the "is_sample" field.
@@ -2480,8 +2480,8 @@ func (m *TestcaseSetMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, testcaseset.FieldName)
 	}
-	if m.score != nil {
-		fields = append(fields, testcaseset.FieldScore)
+	if m.score_ratio != nil {
+		fields = append(fields, testcaseset.FieldScoreRatio)
 	}
 	if m.is_sample != nil {
 		fields = append(fields, testcaseset.FieldIsSample)
@@ -2502,8 +2502,8 @@ func (m *TestcaseSetMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case testcaseset.FieldName:
 		return m.Name()
-	case testcaseset.FieldScore:
-		return m.Score()
+	case testcaseset.FieldScoreRatio:
+		return m.ScoreRatio()
 	case testcaseset.FieldIsSample:
 		return m.IsSample()
 	case testcaseset.FieldCreatedAt:
@@ -2521,8 +2521,8 @@ func (m *TestcaseSetMutation) OldField(ctx context.Context, name string) (ent.Va
 	switch name {
 	case testcaseset.FieldName:
 		return m.OldName(ctx)
-	case testcaseset.FieldScore:
-		return m.OldScore(ctx)
+	case testcaseset.FieldScoreRatio:
+		return m.OldScoreRatio(ctx)
 	case testcaseset.FieldIsSample:
 		return m.OldIsSample(ctx)
 	case testcaseset.FieldCreatedAt:
@@ -2545,12 +2545,12 @@ func (m *TestcaseSetMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case testcaseset.FieldScore:
+	case testcaseset.FieldScoreRatio:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetScore(v)
+		m.SetScoreRatio(v)
 		return nil
 	case testcaseset.FieldIsSample:
 		v, ok := value.(bool)
@@ -2581,8 +2581,8 @@ func (m *TestcaseSetMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *TestcaseSetMutation) AddedFields() []string {
 	var fields []string
-	if m.addscore != nil {
-		fields = append(fields, testcaseset.FieldScore)
+	if m.addscore_ratio != nil {
+		fields = append(fields, testcaseset.FieldScoreRatio)
 	}
 	return fields
 }
@@ -2592,8 +2592,8 @@ func (m *TestcaseSetMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *TestcaseSetMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case testcaseset.FieldScore:
-		return m.AddedScore()
+	case testcaseset.FieldScoreRatio:
+		return m.AddedScoreRatio()
 	}
 	return nil, false
 }
@@ -2603,12 +2603,12 @@ func (m *TestcaseSetMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TestcaseSetMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case testcaseset.FieldScore:
+	case testcaseset.FieldScoreRatio:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddScore(v)
+		m.AddScoreRatio(v)
 		return nil
 	}
 	return fmt.Errorf("unknown TestcaseSet numeric field %s", name)
@@ -2649,8 +2649,8 @@ func (m *TestcaseSetMutation) ResetField(name string) error {
 	case testcaseset.FieldName:
 		m.ResetName()
 		return nil
-	case testcaseset.FieldScore:
-		m.ResetScore()
+	case testcaseset.FieldScoreRatio:
+		m.ResetScoreRatio()
 		return nil
 	case testcaseset.FieldIsSample:
 		m.ResetIsSample()
