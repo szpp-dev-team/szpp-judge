@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
-	"github.com/google/uuid"
 	enttoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
