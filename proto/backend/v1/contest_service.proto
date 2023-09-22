@@ -85,7 +85,7 @@ message GetContestTaskRequest {
 }
 
 message GetContestTaskResponse {
-  ContestTask task = 1;
+  Task task = 1;
 }
 
 message SyncContestTasksRequest {
