@@ -17,10 +17,18 @@ type Contest struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// Slug holds the value of the "slug" field.
 	Slug string `json:"slug,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// PenaltySeconds holds the value of the "penalty_seconds" field.
+	PenaltySeconds int `json:"penalty_seconds,omitempty"`
+	// ContestType holds the value of the "contest_type" field.
+	ContestType string `json:"contest_type,omitempty"`
+	// IsPublic holds the value of the "is_public" field.
+	IsPublic bool `json:"is_public,omitempty"`
 	// StartAt holds the value of the "start_at" field.
 	StartAt time.Time `json:"start_at,omitempty"`
 	// EndAt holds the value of the "end_at" field.
@@ -98,9 +106,11 @@ func (*Contest) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case contest.FieldID:
+		case contest.FieldIsPublic:
+			values[i] = new(sql.NullBool)
+		case contest.FieldID, contest.FieldPenaltySeconds:
 			values[i] = new(sql.NullInt64)
-		case contest.FieldSlug, contest.FieldDescription:
+		case contest.FieldName, contest.FieldSlug, contest.FieldDescription, contest.FieldContestType:
 			values[i] = new(sql.NullString)
 		case contest.FieldStartAt, contest.FieldEndAt:
 			values[i] = new(sql.NullTime)
@@ -125,6 +135,12 @@ func (c *Contest) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int(value.Int64)
+		case contest.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				c.Name = value.String
+			}
 		case contest.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
@@ -136,6 +152,24 @@ func (c *Contest) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				c.Description = value.String
+			}
+		case contest.FieldPenaltySeconds:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field penalty_seconds", values[i])
+			} else if value.Valid {
+				c.PenaltySeconds = int(value.Int64)
+			}
+		case contest.FieldContestType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field contest_type", values[i])
+			} else if value.Valid {
+				c.ContestType = value.String
+			}
+		case contest.FieldIsPublic:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_public", values[i])
+			} else if value.Valid {
+				c.IsPublic = value.Bool
 			}
 		case contest.FieldStartAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -210,11 +244,23 @@ func (c *Contest) String() string {
 	var builder strings.Builder
 	builder.WriteString("Contest(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString("name=")
+	builder.WriteString(c.Name)
+	builder.WriteString(", ")
 	builder.WriteString("slug=")
 	builder.WriteString(c.Slug)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)
+	builder.WriteString(", ")
+	builder.WriteString("penalty_seconds=")
+	builder.WriteString(fmt.Sprintf("%v", c.PenaltySeconds))
+	builder.WriteString(", ")
+	builder.WriteString("contest_type=")
+	builder.WriteString(c.ContestType)
+	builder.WriteString(", ")
+	builder.WriteString("is_public=")
+	builder.WriteString(fmt.Sprintf("%v", c.IsPublic))
 	builder.WriteString(", ")
 	builder.WriteString("start_at=")
 	builder.WriteString(c.StartAt.Format(time.ANSIC))

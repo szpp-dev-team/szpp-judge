@@ -55,6 +55,11 @@ func IDLTE(id int) predicate.Contest {
 	return predicate.Contest(sql.FieldLTE(FieldID, id))
 }
 
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldEQ(FieldName, v))
+}
+
 // Slug applies equality check predicate on the "slug" field. It's identical to SlugEQ.
 func Slug(v string) predicate.Contest {
 	return predicate.Contest(sql.FieldEQ(FieldSlug, v))
@@ -65,6 +70,21 @@ func Description(v string) predicate.Contest {
 	return predicate.Contest(sql.FieldEQ(FieldDescription, v))
 }
 
+// PenaltySeconds applies equality check predicate on the "penalty_seconds" field. It's identical to PenaltySecondsEQ.
+func PenaltySeconds(v int) predicate.Contest {
+	return predicate.Contest(sql.FieldEQ(FieldPenaltySeconds, v))
+}
+
+// ContestType applies equality check predicate on the "contest_type" field. It's identical to ContestTypeEQ.
+func ContestType(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldEQ(FieldContestType, v))
+}
+
+// IsPublic applies equality check predicate on the "is_public" field. It's identical to IsPublicEQ.
+func IsPublic(v bool) predicate.Contest {
+	return predicate.Contest(sql.FieldEQ(FieldIsPublic, v))
+}
+
 // StartAt applies equality check predicate on the "start_at" field. It's identical to StartAtEQ.
 func StartAt(v time.Time) predicate.Contest {
 	return predicate.Contest(sql.FieldEQ(FieldStartAt, v))
@@ -73,6 +93,71 @@ func StartAt(v time.Time) predicate.Contest {
 // EndAt applies equality check predicate on the "end_at" field. It's identical to EndAtEQ.
 func EndAt(v time.Time) predicate.Contest {
 	return predicate.Contest(sql.FieldEQ(FieldEndAt, v))
+}
+
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldEQ(FieldName, v))
+}
+
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldNEQ(FieldName, v))
+}
+
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Contest {
+	return predicate.Contest(sql.FieldIn(FieldName, vs...))
+}
+
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Contest {
+	return predicate.Contest(sql.FieldNotIn(FieldName, vs...))
+}
+
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldGT(FieldName, v))
+}
+
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldGTE(FieldName, v))
+}
+
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldLT(FieldName, v))
+}
+
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldLTE(FieldName, v))
+}
+
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldContains(FieldName, v))
+}
+
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldHasPrefix(FieldName, v))
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldHasSuffix(FieldName, v))
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldEqualFold(FieldName, v))
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldContainsFold(FieldName, v))
 }
 
 // SlugEQ applies the EQ predicate on the "slug" field.
@@ -203,6 +288,121 @@ func DescriptionEqualFold(v string) predicate.Contest {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.Contest {
 	return predicate.Contest(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// PenaltySecondsEQ applies the EQ predicate on the "penalty_seconds" field.
+func PenaltySecondsEQ(v int) predicate.Contest {
+	return predicate.Contest(sql.FieldEQ(FieldPenaltySeconds, v))
+}
+
+// PenaltySecondsNEQ applies the NEQ predicate on the "penalty_seconds" field.
+func PenaltySecondsNEQ(v int) predicate.Contest {
+	return predicate.Contest(sql.FieldNEQ(FieldPenaltySeconds, v))
+}
+
+// PenaltySecondsIn applies the In predicate on the "penalty_seconds" field.
+func PenaltySecondsIn(vs ...int) predicate.Contest {
+	return predicate.Contest(sql.FieldIn(FieldPenaltySeconds, vs...))
+}
+
+// PenaltySecondsNotIn applies the NotIn predicate on the "penalty_seconds" field.
+func PenaltySecondsNotIn(vs ...int) predicate.Contest {
+	return predicate.Contest(sql.FieldNotIn(FieldPenaltySeconds, vs...))
+}
+
+// PenaltySecondsGT applies the GT predicate on the "penalty_seconds" field.
+func PenaltySecondsGT(v int) predicate.Contest {
+	return predicate.Contest(sql.FieldGT(FieldPenaltySeconds, v))
+}
+
+// PenaltySecondsGTE applies the GTE predicate on the "penalty_seconds" field.
+func PenaltySecondsGTE(v int) predicate.Contest {
+	return predicate.Contest(sql.FieldGTE(FieldPenaltySeconds, v))
+}
+
+// PenaltySecondsLT applies the LT predicate on the "penalty_seconds" field.
+func PenaltySecondsLT(v int) predicate.Contest {
+	return predicate.Contest(sql.FieldLT(FieldPenaltySeconds, v))
+}
+
+// PenaltySecondsLTE applies the LTE predicate on the "penalty_seconds" field.
+func PenaltySecondsLTE(v int) predicate.Contest {
+	return predicate.Contest(sql.FieldLTE(FieldPenaltySeconds, v))
+}
+
+// ContestTypeEQ applies the EQ predicate on the "contest_type" field.
+func ContestTypeEQ(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldEQ(FieldContestType, v))
+}
+
+// ContestTypeNEQ applies the NEQ predicate on the "contest_type" field.
+func ContestTypeNEQ(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldNEQ(FieldContestType, v))
+}
+
+// ContestTypeIn applies the In predicate on the "contest_type" field.
+func ContestTypeIn(vs ...string) predicate.Contest {
+	return predicate.Contest(sql.FieldIn(FieldContestType, vs...))
+}
+
+// ContestTypeNotIn applies the NotIn predicate on the "contest_type" field.
+func ContestTypeNotIn(vs ...string) predicate.Contest {
+	return predicate.Contest(sql.FieldNotIn(FieldContestType, vs...))
+}
+
+// ContestTypeGT applies the GT predicate on the "contest_type" field.
+func ContestTypeGT(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldGT(FieldContestType, v))
+}
+
+// ContestTypeGTE applies the GTE predicate on the "contest_type" field.
+func ContestTypeGTE(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldGTE(FieldContestType, v))
+}
+
+// ContestTypeLT applies the LT predicate on the "contest_type" field.
+func ContestTypeLT(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldLT(FieldContestType, v))
+}
+
+// ContestTypeLTE applies the LTE predicate on the "contest_type" field.
+func ContestTypeLTE(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldLTE(FieldContestType, v))
+}
+
+// ContestTypeContains applies the Contains predicate on the "contest_type" field.
+func ContestTypeContains(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldContains(FieldContestType, v))
+}
+
+// ContestTypeHasPrefix applies the HasPrefix predicate on the "contest_type" field.
+func ContestTypeHasPrefix(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldHasPrefix(FieldContestType, v))
+}
+
+// ContestTypeHasSuffix applies the HasSuffix predicate on the "contest_type" field.
+func ContestTypeHasSuffix(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldHasSuffix(FieldContestType, v))
+}
+
+// ContestTypeEqualFold applies the EqualFold predicate on the "contest_type" field.
+func ContestTypeEqualFold(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldEqualFold(FieldContestType, v))
+}
+
+// ContestTypeContainsFold applies the ContainsFold predicate on the "contest_type" field.
+func ContestTypeContainsFold(v string) predicate.Contest {
+	return predicate.Contest(sql.FieldContainsFold(FieldContestType, v))
+}
+
+// IsPublicEQ applies the EQ predicate on the "is_public" field.
+func IsPublicEQ(v bool) predicate.Contest {
+	return predicate.Contest(sql.FieldEQ(FieldIsPublic, v))
+}
+
+// IsPublicNEQ applies the NEQ predicate on the "is_public" field.
+func IsPublicNEQ(v bool) predicate.Contest {
+	return predicate.Contest(sql.FieldNEQ(FieldIsPublic, v))
 }
 
 // StartAtEQ applies the EQ predicate on the "start_at" field.

@@ -27,6 +27,12 @@ type ContestCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetName sets the "name" field.
+func (cc *ContestCreate) SetName(s string) *ContestCreate {
+	cc.mutation.SetName(s)
+	return cc
+}
+
 // SetSlug sets the "slug" field.
 func (cc *ContestCreate) SetSlug(s string) *ContestCreate {
 	cc.mutation.SetSlug(s)
@@ -36,6 +42,24 @@ func (cc *ContestCreate) SetSlug(s string) *ContestCreate {
 // SetDescription sets the "description" field.
 func (cc *ContestCreate) SetDescription(s string) *ContestCreate {
 	cc.mutation.SetDescription(s)
+	return cc
+}
+
+// SetPenaltySeconds sets the "penalty_seconds" field.
+func (cc *ContestCreate) SetPenaltySeconds(i int) *ContestCreate {
+	cc.mutation.SetPenaltySeconds(i)
+	return cc
+}
+
+// SetContestType sets the "contest_type" field.
+func (cc *ContestCreate) SetContestType(s string) *ContestCreate {
+	cc.mutation.SetContestType(s)
+	return cc
+}
+
+// SetIsPublic sets the "is_public" field.
+func (cc *ContestCreate) SetIsPublic(b bool) *ContestCreate {
+	cc.mutation.SetIsPublic(b)
 	return cc
 }
 
@@ -166,11 +190,23 @@ func (cc *ContestCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *ContestCreate) check() error {
+	if _, ok := cc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Contest.name"`)}
+	}
 	if _, ok := cc.mutation.Slug(); !ok {
 		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Contest.slug"`)}
 	}
 	if _, ok := cc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Contest.description"`)}
+	}
+	if _, ok := cc.mutation.PenaltySeconds(); !ok {
+		return &ValidationError{Name: "penalty_seconds", err: errors.New(`ent: missing required field "Contest.penalty_seconds"`)}
+	}
+	if _, ok := cc.mutation.ContestType(); !ok {
+		return &ValidationError{Name: "contest_type", err: errors.New(`ent: missing required field "Contest.contest_type"`)}
+	}
+	if _, ok := cc.mutation.IsPublic(); !ok {
+		return &ValidationError{Name: "is_public", err: errors.New(`ent: missing required field "Contest.is_public"`)}
 	}
 	if _, ok := cc.mutation.StartAt(); !ok {
 		return &ValidationError{Name: "start_at", err: errors.New(`ent: missing required field "Contest.start_at"`)}
@@ -211,6 +247,10 @@ func (cc *ContestCreate) createSpec() (*Contest, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := cc.mutation.Name(); ok {
+		_spec.SetField(contest.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
 	if value, ok := cc.mutation.Slug(); ok {
 		_spec.SetField(contest.FieldSlug, field.TypeString, value)
 		_node.Slug = value
@@ -218,6 +258,18 @@ func (cc *ContestCreate) createSpec() (*Contest, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(contest.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := cc.mutation.PenaltySeconds(); ok {
+		_spec.SetField(contest.FieldPenaltySeconds, field.TypeInt, value)
+		_node.PenaltySeconds = value
+	}
+	if value, ok := cc.mutation.ContestType(); ok {
+		_spec.SetField(contest.FieldContestType, field.TypeString, value)
+		_node.ContestType = value
+	}
+	if value, ok := cc.mutation.IsPublic(); ok {
+		_spec.SetField(contest.FieldIsPublic, field.TypeBool, value)
+		_node.IsPublic = value
 	}
 	if value, ok := cc.mutation.StartAt(); ok {
 		_spec.SetField(contest.FieldStartAt, field.TypeTime, value)
@@ -314,7 +366,7 @@ func (cc *ContestCreate) createSpec() (*Contest, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Contest.Create().
-//		SetSlug(v).
+//		SetName(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -323,7 +375,7 @@ func (cc *ContestCreate) createSpec() (*Contest, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.ContestUpsert) {
-//			SetSlug(v+v).
+//			SetName(v+v).
 //		}).
 //		Exec(ctx)
 func (cc *ContestCreate) OnConflict(opts ...sql.ConflictOption) *ContestUpsertOne {
@@ -359,6 +411,18 @@ type (
 	}
 )
 
+// SetName sets the "name" field.
+func (u *ContestUpsert) SetName(v string) *ContestUpsert {
+	u.Set(contest.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ContestUpsert) UpdateName() *ContestUpsert {
+	u.SetExcluded(contest.FieldName)
+	return u
+}
+
 // SetSlug sets the "slug" field.
 func (u *ContestUpsert) SetSlug(v string) *ContestUpsert {
 	u.Set(contest.FieldSlug, v)
@@ -380,6 +444,48 @@ func (u *ContestUpsert) SetDescription(v string) *ContestUpsert {
 // UpdateDescription sets the "description" field to the value that was provided on create.
 func (u *ContestUpsert) UpdateDescription() *ContestUpsert {
 	u.SetExcluded(contest.FieldDescription)
+	return u
+}
+
+// SetPenaltySeconds sets the "penalty_seconds" field.
+func (u *ContestUpsert) SetPenaltySeconds(v int) *ContestUpsert {
+	u.Set(contest.FieldPenaltySeconds, v)
+	return u
+}
+
+// UpdatePenaltySeconds sets the "penalty_seconds" field to the value that was provided on create.
+func (u *ContestUpsert) UpdatePenaltySeconds() *ContestUpsert {
+	u.SetExcluded(contest.FieldPenaltySeconds)
+	return u
+}
+
+// AddPenaltySeconds adds v to the "penalty_seconds" field.
+func (u *ContestUpsert) AddPenaltySeconds(v int) *ContestUpsert {
+	u.Add(contest.FieldPenaltySeconds, v)
+	return u
+}
+
+// SetContestType sets the "contest_type" field.
+func (u *ContestUpsert) SetContestType(v string) *ContestUpsert {
+	u.Set(contest.FieldContestType, v)
+	return u
+}
+
+// UpdateContestType sets the "contest_type" field to the value that was provided on create.
+func (u *ContestUpsert) UpdateContestType() *ContestUpsert {
+	u.SetExcluded(contest.FieldContestType)
+	return u
+}
+
+// SetIsPublic sets the "is_public" field.
+func (u *ContestUpsert) SetIsPublic(v bool) *ContestUpsert {
+	u.Set(contest.FieldIsPublic, v)
+	return u
+}
+
+// UpdateIsPublic sets the "is_public" field to the value that was provided on create.
+func (u *ContestUpsert) UpdateIsPublic() *ContestUpsert {
+	u.SetExcluded(contest.FieldIsPublic)
 	return u
 }
 
@@ -455,6 +561,20 @@ func (u *ContestUpsertOne) Update(set func(*ContestUpsert)) *ContestUpsertOne {
 	return u
 }
 
+// SetName sets the "name" field.
+func (u *ContestUpsertOne) SetName(v string) *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ContestUpsertOne) UpdateName() *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.UpdateName()
+	})
+}
+
 // SetSlug sets the "slug" field.
 func (u *ContestUpsertOne) SetSlug(v string) *ContestUpsertOne {
 	return u.Update(func(s *ContestUpsert) {
@@ -480,6 +600,55 @@ func (u *ContestUpsertOne) SetDescription(v string) *ContestUpsertOne {
 func (u *ContestUpsertOne) UpdateDescription() *ContestUpsertOne {
 	return u.Update(func(s *ContestUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetPenaltySeconds sets the "penalty_seconds" field.
+func (u *ContestUpsertOne) SetPenaltySeconds(v int) *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.SetPenaltySeconds(v)
+	})
+}
+
+// AddPenaltySeconds adds v to the "penalty_seconds" field.
+func (u *ContestUpsertOne) AddPenaltySeconds(v int) *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.AddPenaltySeconds(v)
+	})
+}
+
+// UpdatePenaltySeconds sets the "penalty_seconds" field to the value that was provided on create.
+func (u *ContestUpsertOne) UpdatePenaltySeconds() *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.UpdatePenaltySeconds()
+	})
+}
+
+// SetContestType sets the "contest_type" field.
+func (u *ContestUpsertOne) SetContestType(v string) *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.SetContestType(v)
+	})
+}
+
+// UpdateContestType sets the "contest_type" field to the value that was provided on create.
+func (u *ContestUpsertOne) UpdateContestType() *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.UpdateContestType()
+	})
+}
+
+// SetIsPublic sets the "is_public" field.
+func (u *ContestUpsertOne) SetIsPublic(v bool) *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.SetIsPublic(v)
+	})
+}
+
+// UpdateIsPublic sets the "is_public" field to the value that was provided on create.
+func (u *ContestUpsertOne) UpdateIsPublic() *ContestUpsertOne {
+	return u.Update(func(s *ContestUpsert) {
+		s.UpdateIsPublic()
 	})
 }
 
@@ -641,7 +810,7 @@ func (ccb *ContestCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.ContestUpsert) {
-//			SetSlug(v+v).
+//			SetName(v+v).
 //		}).
 //		Exec(ctx)
 func (ccb *ContestCreateBulk) OnConflict(opts ...sql.ConflictOption) *ContestUpsertBulk {
@@ -720,6 +889,20 @@ func (u *ContestUpsertBulk) Update(set func(*ContestUpsert)) *ContestUpsertBulk 
 	return u
 }
 
+// SetName sets the "name" field.
+func (u *ContestUpsertBulk) SetName(v string) *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ContestUpsertBulk) UpdateName() *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.UpdateName()
+	})
+}
+
 // SetSlug sets the "slug" field.
 func (u *ContestUpsertBulk) SetSlug(v string) *ContestUpsertBulk {
 	return u.Update(func(s *ContestUpsert) {
@@ -745,6 +928,55 @@ func (u *ContestUpsertBulk) SetDescription(v string) *ContestUpsertBulk {
 func (u *ContestUpsertBulk) UpdateDescription() *ContestUpsertBulk {
 	return u.Update(func(s *ContestUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetPenaltySeconds sets the "penalty_seconds" field.
+func (u *ContestUpsertBulk) SetPenaltySeconds(v int) *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.SetPenaltySeconds(v)
+	})
+}
+
+// AddPenaltySeconds adds v to the "penalty_seconds" field.
+func (u *ContestUpsertBulk) AddPenaltySeconds(v int) *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.AddPenaltySeconds(v)
+	})
+}
+
+// UpdatePenaltySeconds sets the "penalty_seconds" field to the value that was provided on create.
+func (u *ContestUpsertBulk) UpdatePenaltySeconds() *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.UpdatePenaltySeconds()
+	})
+}
+
+// SetContestType sets the "contest_type" field.
+func (u *ContestUpsertBulk) SetContestType(v string) *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.SetContestType(v)
+	})
+}
+
+// UpdateContestType sets the "contest_type" field to the value that was provided on create.
+func (u *ContestUpsertBulk) UpdateContestType() *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.UpdateContestType()
+	})
+}
+
+// SetIsPublic sets the "is_public" field.
+func (u *ContestUpsertBulk) SetIsPublic(v bool) *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.SetIsPublic(v)
+	})
+}
+
+// UpdateIsPublic sets the "is_public" field to the value that was provided on create.
+func (u *ContestUpsertBulk) UpdateIsPublic() *ContestUpsertBulk {
+	return u.Update(func(s *ContestUpsert) {
+		s.UpdateIsPublic()
 	})
 }
 

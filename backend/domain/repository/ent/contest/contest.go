@@ -12,10 +12,18 @@ const (
 	Label = "contest"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// FieldSlug holds the string denoting the slug field in the database.
 	FieldSlug = "slug"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldPenaltySeconds holds the string denoting the penalty_seconds field in the database.
+	FieldPenaltySeconds = "penalty_seconds"
+	// FieldContestType holds the string denoting the contest_type field in the database.
+	FieldContestType = "contest_type"
+	// FieldIsPublic holds the string denoting the is_public field in the database.
+	FieldIsPublic = "is_public"
 	// FieldStartAt holds the string denoting the start_at field in the database.
 	FieldStartAt = "start_at"
 	// FieldEndAt holds the string denoting the end_at field in the database.
@@ -68,8 +76,12 @@ const (
 // Columns holds all SQL columns for contest fields.
 var Columns = []string{
 	FieldID,
+	FieldName,
 	FieldSlug,
 	FieldDescription,
+	FieldPenaltySeconds,
+	FieldContestType,
+	FieldIsPublic,
 	FieldStartAt,
 	FieldEndAt,
 }
@@ -101,6 +113,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
 // BySlug orders the results by the slug field.
 func BySlug(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSlug, opts...).ToFunc()
@@ -109,6 +126,21 @@ func BySlug(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByPenaltySeconds orders the results by the penalty_seconds field.
+func ByPenaltySeconds(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPenaltySeconds, opts...).ToFunc()
+}
+
+// ByContestType orders the results by the contest_type field.
+func ByContestType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldContestType, opts...).ToFunc()
+}
+
+// ByIsPublic orders the results by the is_public field.
+func ByIsPublic(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsPublic, opts...).ToFunc()
 }
 
 // ByStartAt orders the results by the start_at field.

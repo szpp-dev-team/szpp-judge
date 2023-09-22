@@ -15,8 +15,12 @@ type Contest struct {
 func (Contest) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
+		field.String("name"),
 		field.String("slug").Unique(),
 		field.String("description"),
+		field.Int("penalty_seconds"),
+		field.String("contest_type"),
+		field.Bool("is_public"),
 		field.Time("start_at"),
 		field.Time("end_at"),
 	}

@@ -51,8 +51,13 @@ type ContestMutation struct {
 	op                  Op
 	typ                 string
 	id                  *int
+	name                *string
 	slug                *string
 	description         *string
+	penalty_seconds     *int
+	addpenalty_seconds  *int
+	contest_type        *string
+	is_public           *bool
 	start_at            *time.Time
 	end_at              *time.Time
 	clearedFields       map[string]struct{}
@@ -180,6 +185,42 @@ func (m *ContestMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
+// SetName sets the "name" field.
+func (m *ContestMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ContestMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Contest entity.
+// If the Contest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContestMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ContestMutation) ResetName() {
+	m.name = nil
+}
+
 // SetSlug sets the "slug" field.
 func (m *ContestMutation) SetSlug(s string) {
 	m.slug = &s
@@ -250,6 +291,134 @@ func (m *ContestMutation) OldDescription(ctx context.Context) (v string, err err
 // ResetDescription resets all changes to the "description" field.
 func (m *ContestMutation) ResetDescription() {
 	m.description = nil
+}
+
+// SetPenaltySeconds sets the "penalty_seconds" field.
+func (m *ContestMutation) SetPenaltySeconds(i int) {
+	m.penalty_seconds = &i
+	m.addpenalty_seconds = nil
+}
+
+// PenaltySeconds returns the value of the "penalty_seconds" field in the mutation.
+func (m *ContestMutation) PenaltySeconds() (r int, exists bool) {
+	v := m.penalty_seconds
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPenaltySeconds returns the old "penalty_seconds" field's value of the Contest entity.
+// If the Contest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContestMutation) OldPenaltySeconds(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPenaltySeconds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPenaltySeconds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPenaltySeconds: %w", err)
+	}
+	return oldValue.PenaltySeconds, nil
+}
+
+// AddPenaltySeconds adds i to the "penalty_seconds" field.
+func (m *ContestMutation) AddPenaltySeconds(i int) {
+	if m.addpenalty_seconds != nil {
+		*m.addpenalty_seconds += i
+	} else {
+		m.addpenalty_seconds = &i
+	}
+}
+
+// AddedPenaltySeconds returns the value that was added to the "penalty_seconds" field in this mutation.
+func (m *ContestMutation) AddedPenaltySeconds() (r int, exists bool) {
+	v := m.addpenalty_seconds
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPenaltySeconds resets all changes to the "penalty_seconds" field.
+func (m *ContestMutation) ResetPenaltySeconds() {
+	m.penalty_seconds = nil
+	m.addpenalty_seconds = nil
+}
+
+// SetContestType sets the "contest_type" field.
+func (m *ContestMutation) SetContestType(s string) {
+	m.contest_type = &s
+}
+
+// ContestType returns the value of the "contest_type" field in the mutation.
+func (m *ContestMutation) ContestType() (r string, exists bool) {
+	v := m.contest_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContestType returns the old "contest_type" field's value of the Contest entity.
+// If the Contest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContestMutation) OldContestType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContestType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContestType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContestType: %w", err)
+	}
+	return oldValue.ContestType, nil
+}
+
+// ResetContestType resets all changes to the "contest_type" field.
+func (m *ContestMutation) ResetContestType() {
+	m.contest_type = nil
+}
+
+// SetIsPublic sets the "is_public" field.
+func (m *ContestMutation) SetIsPublic(b bool) {
+	m.is_public = &b
+}
+
+// IsPublic returns the value of the "is_public" field in the mutation.
+func (m *ContestMutation) IsPublic() (r bool, exists bool) {
+	v := m.is_public
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsPublic returns the old "is_public" field's value of the Contest entity.
+// If the Contest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContestMutation) OldIsPublic(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsPublic is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsPublic requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsPublic: %w", err)
+	}
+	return oldValue.IsPublic, nil
+}
+
+// ResetIsPublic resets all changes to the "is_public" field.
+func (m *ContestMutation) ResetIsPublic() {
+	m.is_public = nil
 }
 
 // SetStartAt sets the "start_at" field.
@@ -628,12 +797,24 @@ func (m *ContestMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ContestMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 8)
+	if m.name != nil {
+		fields = append(fields, contest.FieldName)
+	}
 	if m.slug != nil {
 		fields = append(fields, contest.FieldSlug)
 	}
 	if m.description != nil {
 		fields = append(fields, contest.FieldDescription)
+	}
+	if m.penalty_seconds != nil {
+		fields = append(fields, contest.FieldPenaltySeconds)
+	}
+	if m.contest_type != nil {
+		fields = append(fields, contest.FieldContestType)
+	}
+	if m.is_public != nil {
+		fields = append(fields, contest.FieldIsPublic)
 	}
 	if m.start_at != nil {
 		fields = append(fields, contest.FieldStartAt)
@@ -649,10 +830,18 @@ func (m *ContestMutation) Fields() []string {
 // schema.
 func (m *ContestMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case contest.FieldName:
+		return m.Name()
 	case contest.FieldSlug:
 		return m.Slug()
 	case contest.FieldDescription:
 		return m.Description()
+	case contest.FieldPenaltySeconds:
+		return m.PenaltySeconds()
+	case contest.FieldContestType:
+		return m.ContestType()
+	case contest.FieldIsPublic:
+		return m.IsPublic()
 	case contest.FieldStartAt:
 		return m.StartAt()
 	case contest.FieldEndAt:
@@ -666,10 +855,18 @@ func (m *ContestMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ContestMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case contest.FieldName:
+		return m.OldName(ctx)
 	case contest.FieldSlug:
 		return m.OldSlug(ctx)
 	case contest.FieldDescription:
 		return m.OldDescription(ctx)
+	case contest.FieldPenaltySeconds:
+		return m.OldPenaltySeconds(ctx)
+	case contest.FieldContestType:
+		return m.OldContestType(ctx)
+	case contest.FieldIsPublic:
+		return m.OldIsPublic(ctx)
 	case contest.FieldStartAt:
 		return m.OldStartAt(ctx)
 	case contest.FieldEndAt:
@@ -683,6 +880,13 @@ func (m *ContestMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *ContestMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case contest.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
 	case contest.FieldSlug:
 		v, ok := value.(string)
 		if !ok {
@@ -696,6 +900,27 @@ func (m *ContestMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case contest.FieldPenaltySeconds:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPenaltySeconds(v)
+		return nil
+	case contest.FieldContestType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContestType(v)
+		return nil
+	case contest.FieldIsPublic:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsPublic(v)
 		return nil
 	case contest.FieldStartAt:
 		v, ok := value.(time.Time)
@@ -718,13 +943,21 @@ func (m *ContestMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ContestMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addpenalty_seconds != nil {
+		fields = append(fields, contest.FieldPenaltySeconds)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ContestMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case contest.FieldPenaltySeconds:
+		return m.AddedPenaltySeconds()
+	}
 	return nil, false
 }
 
@@ -733,6 +966,13 @@ func (m *ContestMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ContestMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case contest.FieldPenaltySeconds:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPenaltySeconds(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Contest numeric field %s", name)
 }
@@ -760,11 +1000,23 @@ func (m *ContestMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ContestMutation) ResetField(name string) error {
 	switch name {
+	case contest.FieldName:
+		m.ResetName()
+		return nil
 	case contest.FieldSlug:
 		m.ResetSlug()
 		return nil
 	case contest.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case contest.FieldPenaltySeconds:
+		m.ResetPenaltySeconds()
+		return nil
+	case contest.FieldContestType:
+		m.ResetContestType()
+		return nil
+	case contest.FieldIsPublic:
+		m.ResetIsPublic()
 		return nil
 	case contest.FieldStartAt:
 		m.ResetStartAt()

@@ -33,6 +33,12 @@ func (cu *ContestUpdate) Where(ps ...predicate.Contest) *ContestUpdate {
 	return cu
 }
 
+// SetName sets the "name" field.
+func (cu *ContestUpdate) SetName(s string) *ContestUpdate {
+	cu.mutation.SetName(s)
+	return cu
+}
+
 // SetSlug sets the "slug" field.
 func (cu *ContestUpdate) SetSlug(s string) *ContestUpdate {
 	cu.mutation.SetSlug(s)
@@ -42,6 +48,31 @@ func (cu *ContestUpdate) SetSlug(s string) *ContestUpdate {
 // SetDescription sets the "description" field.
 func (cu *ContestUpdate) SetDescription(s string) *ContestUpdate {
 	cu.mutation.SetDescription(s)
+	return cu
+}
+
+// SetPenaltySeconds sets the "penalty_seconds" field.
+func (cu *ContestUpdate) SetPenaltySeconds(i int) *ContestUpdate {
+	cu.mutation.ResetPenaltySeconds()
+	cu.mutation.SetPenaltySeconds(i)
+	return cu
+}
+
+// AddPenaltySeconds adds i to the "penalty_seconds" field.
+func (cu *ContestUpdate) AddPenaltySeconds(i int) *ContestUpdate {
+	cu.mutation.AddPenaltySeconds(i)
+	return cu
+}
+
+// SetContestType sets the "contest_type" field.
+func (cu *ContestUpdate) SetContestType(s string) *ContestUpdate {
+	cu.mutation.SetContestType(s)
+	return cu
+}
+
+// SetIsPublic sets the "is_public" field.
+func (cu *ContestUpdate) SetIsPublic(b bool) *ContestUpdate {
+	cu.mutation.SetIsPublic(b)
 	return cu
 }
 
@@ -278,11 +309,26 @@ func (cu *ContestUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := cu.mutation.Name(); ok {
+		_spec.SetField(contest.FieldName, field.TypeString, value)
+	}
 	if value, ok := cu.mutation.Slug(); ok {
 		_spec.SetField(contest.FieldSlug, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(contest.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.PenaltySeconds(); ok {
+		_spec.SetField(contest.FieldPenaltySeconds, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.AddedPenaltySeconds(); ok {
+		_spec.AddField(contest.FieldPenaltySeconds, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.ContestType(); ok {
+		_spec.SetField(contest.FieldContestType, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.IsPublic(); ok {
+		_spec.SetField(contest.FieldIsPublic, field.TypeBool, value)
 	}
 	if value, ok := cu.mutation.StartAt(); ok {
 		_spec.SetField(contest.FieldStartAt, field.TypeTime, value)
@@ -535,6 +581,12 @@ type ContestUpdateOne struct {
 	mutation *ContestMutation
 }
 
+// SetName sets the "name" field.
+func (cuo *ContestUpdateOne) SetName(s string) *ContestUpdateOne {
+	cuo.mutation.SetName(s)
+	return cuo
+}
+
 // SetSlug sets the "slug" field.
 func (cuo *ContestUpdateOne) SetSlug(s string) *ContestUpdateOne {
 	cuo.mutation.SetSlug(s)
@@ -544,6 +596,31 @@ func (cuo *ContestUpdateOne) SetSlug(s string) *ContestUpdateOne {
 // SetDescription sets the "description" field.
 func (cuo *ContestUpdateOne) SetDescription(s string) *ContestUpdateOne {
 	cuo.mutation.SetDescription(s)
+	return cuo
+}
+
+// SetPenaltySeconds sets the "penalty_seconds" field.
+func (cuo *ContestUpdateOne) SetPenaltySeconds(i int) *ContestUpdateOne {
+	cuo.mutation.ResetPenaltySeconds()
+	cuo.mutation.SetPenaltySeconds(i)
+	return cuo
+}
+
+// AddPenaltySeconds adds i to the "penalty_seconds" field.
+func (cuo *ContestUpdateOne) AddPenaltySeconds(i int) *ContestUpdateOne {
+	cuo.mutation.AddPenaltySeconds(i)
+	return cuo
+}
+
+// SetContestType sets the "contest_type" field.
+func (cuo *ContestUpdateOne) SetContestType(s string) *ContestUpdateOne {
+	cuo.mutation.SetContestType(s)
+	return cuo
+}
+
+// SetIsPublic sets the "is_public" field.
+func (cuo *ContestUpdateOne) SetIsPublic(b bool) *ContestUpdateOne {
+	cuo.mutation.SetIsPublic(b)
 	return cuo
 }
 
@@ -810,11 +887,26 @@ func (cuo *ContestUpdateOne) sqlSave(ctx context.Context) (_node *Contest, err e
 			}
 		}
 	}
+	if value, ok := cuo.mutation.Name(); ok {
+		_spec.SetField(contest.FieldName, field.TypeString, value)
+	}
 	if value, ok := cuo.mutation.Slug(); ok {
 		_spec.SetField(contest.FieldSlug, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(contest.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.PenaltySeconds(); ok {
+		_spec.SetField(contest.FieldPenaltySeconds, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.AddedPenaltySeconds(); ok {
+		_spec.AddField(contest.FieldPenaltySeconds, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.ContestType(); ok {
+		_spec.SetField(contest.FieldContestType, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.IsPublic(); ok {
+		_spec.SetField(contest.FieldIsPublic, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.StartAt(); ok {
 		_spec.SetField(contest.FieldStartAt, field.TypeTime, value)

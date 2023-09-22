@@ -442,12 +442,12 @@ func (cq *ContestQuery) WithContestTask(opts ...func(*ContestTaskQuery)) *Contes
 // Example:
 //
 //	var v []struct {
-//		Slug string `json:"slug,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Contest.Query().
-//		GroupBy(contest.FieldSlug).
+//		GroupBy(contest.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *ContestQuery) GroupBy(field string, fields ...string) *ContestGroupBy {
@@ -465,11 +465,11 @@ func (cq *ContestQuery) GroupBy(field string, fields ...string) *ContestGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Slug string `json:"slug,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Contest.Query().
-//		Select(contest.FieldSlug).
+//		Select(contest.FieldName).
 //		Scan(ctx, &v)
 func (cq *ContestQuery) Select(fields ...string) *ContestSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
