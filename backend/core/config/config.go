@@ -10,7 +10,7 @@ type Config struct {
 	GrpcPort  string `envconfig:"BACKEND_GRPC_PORT" default:"50051"`
 	HttpPort  string `envconfig:"BACKEND_HTTP_PORT" default:"8080"`
 	ModeDev   bool   `envconfig:"MODE_DEV" default:"true"`
-	JudgeAddr string `envconfig:"JUDGE_ADDR" required:"true"`
+	JudgeAddr string `envconfig:"BACKEND_JUDGE_ADDR" required:"true"`
 }
 
 func New() (*Config, error) {
