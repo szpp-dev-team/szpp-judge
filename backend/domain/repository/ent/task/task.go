@@ -42,6 +42,8 @@ const (
 	EdgeTestcases = "testcases"
 	// EdgeSubmits holds the string denoting the submits edge name in mutations.
 	EdgeSubmits = "submits"
+	// EdgeClarifications holds the string denoting the clarifications edge name in mutations.
+	EdgeClarifications = "clarifications"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// EdgeContests holds the string denoting the contests edge name in mutations.
@@ -71,6 +73,11 @@ const (
 	SubmitsInverseTable = "submits"
 	// SubmitsColumn is the table column denoting the submits relation/edge.
 	SubmitsColumn = "task_submits"
+	// ClarificationsTable is the table that holds the clarifications relation/edge. The primary key declared below.
+	ClarificationsTable = "task_clarifications"
+	// ClarificationsInverseTable is the table name for the ContestClarification entity.
+	// It exists in this package in order to avoid circular dependency with the "contestclarification" package.
+	ClarificationsInverseTable = "contest_clarifications"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "tasks"
 	// UserInverseTable is the table name for the User entity.
@@ -115,6 +122,9 @@ var ForeignKeys = []string{
 }
 
 var (
+	// ClarificationsPrimaryKey and ClarificationsColumn2 are the table columns denoting the
+	// primary key for the clarifications relation (M2M).
+	ClarificationsPrimaryKey = []string{"task_id", "contest_clarification_id"}
 	// ContestsPrimaryKey and ContestsColumn2 are the table columns denoting the
 	// primary key for the contests relation (M2M).
 	ContestsPrimaryKey = []string{"contest_id", "task_id"}
@@ -265,6 +275,20 @@ func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByClarificationsCount orders the results by clarifications count.
+func ByClarificationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newClarificationsStep(), opts...)
+	}
+}
+
+// ByClarifications orders the results by clarifications terms.
+func ByClarifications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClarificationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByUserField orders the results by user field.
 func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -318,6 +342,13 @@ func newSubmitsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubmitsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
+	)
+}
+func newClarificationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClarificationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, ClarificationsTable, ClarificationsPrimaryKey...),
 	)
 }
 func newUserStep() *sqlgraph.Step {

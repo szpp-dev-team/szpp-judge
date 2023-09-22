@@ -456,6 +456,52 @@ func HasSubmitsWith(preds ...predicate.Submit) predicate.User {
 	})
 }
 
+// HasClarifications applies the HasEdge predicate on the "clarifications" edge.
+func HasClarifications() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, ClarificationsTable, ClarificationsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClarificationsWith applies the HasEdge predicate on the "clarifications" edge with a given conditions (other predicates).
+func HasClarificationsWith(preds ...predicate.ContestClarification) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newClarificationsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAnsweredClarifications applies the HasEdge predicate on the "answered_clarifications" edge.
+func HasAnsweredClarifications() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, AnsweredClarificationsTable, AnsweredClarificationsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAnsweredClarificationsWith applies the HasEdge predicate on the "answered_clarifications" edge with a given conditions (other predicates).
+func HasAnsweredClarificationsWith(preds ...predicate.ContestClarification) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newAnsweredClarificationsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasContests applies the HasEdge predicate on the "contests" edge.
 func HasContests() predicate.User {
 	return predicate.User(func(s *sql.Selector) {

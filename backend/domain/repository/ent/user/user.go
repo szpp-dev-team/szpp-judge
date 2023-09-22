@@ -28,6 +28,10 @@ const (
 	EdgeTasks = "tasks"
 	// EdgeSubmits holds the string denoting the submits edge name in mutations.
 	EdgeSubmits = "submits"
+	// EdgeClarifications holds the string denoting the clarifications edge name in mutations.
+	EdgeClarifications = "clarifications"
+	// EdgeAnsweredClarifications holds the string denoting the answered_clarifications edge name in mutations.
+	EdgeAnsweredClarifications = "answered_clarifications"
 	// EdgeContests holds the string denoting the contests edge name in mutations.
 	EdgeContests = "contests"
 	// EdgeContestUser holds the string denoting the contest_user edge name in mutations.
@@ -48,6 +52,16 @@ const (
 	SubmitsInverseTable = "submits"
 	// SubmitsColumn is the table column denoting the submits relation/edge.
 	SubmitsColumn = "user_submits"
+	// ClarificationsTable is the table that holds the clarifications relation/edge. The primary key declared below.
+	ClarificationsTable = "user_clarifications"
+	// ClarificationsInverseTable is the table name for the ContestClarification entity.
+	// It exists in this package in order to avoid circular dependency with the "contestclarification" package.
+	ClarificationsInverseTable = "contest_clarifications"
+	// AnsweredClarificationsTable is the table that holds the answered_clarifications relation/edge. The primary key declared below.
+	AnsweredClarificationsTable = "user_answered_clarifications"
+	// AnsweredClarificationsInverseTable is the table name for the ContestClarification entity.
+	// It exists in this package in order to avoid circular dependency with the "contestclarification" package.
+	AnsweredClarificationsInverseTable = "contest_clarifications"
 	// ContestsTable is the table that holds the contests relation/edge. The primary key declared below.
 	ContestsTable = "contest_users"
 	// ContestsInverseTable is the table name for the Contest entity.
@@ -74,6 +88,12 @@ var Columns = []string{
 }
 
 var (
+	// ClarificationsPrimaryKey and ClarificationsColumn2 are the table columns denoting the
+	// primary key for the clarifications relation (M2M).
+	ClarificationsPrimaryKey = []string{"user_id", "contest_clarification_id"}
+	// AnsweredClarificationsPrimaryKey and AnsweredClarificationsColumn2 are the table columns denoting the
+	// primary key for the answered_clarifications relation (M2M).
+	AnsweredClarificationsPrimaryKey = []string{"user_id", "contest_clarification_id"}
 	// ContestsPrimaryKey and ContestsColumn2 are the table columns denoting the
 	// primary key for the contests relation (M2M).
 	ContestsPrimaryKey = []string{"contest_id", "user_id"}
@@ -150,6 +170,34 @@ func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByClarificationsCount orders the results by clarifications count.
+func ByClarificationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newClarificationsStep(), opts...)
+	}
+}
+
+// ByClarifications orders the results by clarifications terms.
+func ByClarifications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClarificationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAnsweredClarificationsCount orders the results by answered_clarifications count.
+func ByAnsweredClarificationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAnsweredClarificationsStep(), opts...)
+	}
+}
+
+// ByAnsweredClarifications orders the results by answered_clarifications terms.
+func ByAnsweredClarifications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAnsweredClarificationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByContestsCount orders the results by contests count.
 func ByContestsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -189,6 +237,20 @@ func newSubmitsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubmitsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
+	)
+}
+func newClarificationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClarificationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, ClarificationsTable, ClarificationsPrimaryKey...),
+	)
+}
+func newAnsweredClarificationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AnsweredClarificationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, AnsweredClarificationsTable, AnsweredClarificationsPrimaryKey...),
 	)
 }
 func newContestsStep() *sqlgraph.Step {

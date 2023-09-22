@@ -15,6 +15,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestclarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
@@ -35,6 +36,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Contest is the client for interacting with the Contest builders.
 	Contest *ContestClient
+	// ContestClarification is the client for interacting with the ContestClarification builders.
+	ContestClarification *ContestClarificationClient
 	// ContestTask is the client for interacting with the ContestTask builders.
 	ContestTask *ContestTaskClient
 	// ContestUser is the client for interacting with the ContestUser builders.
@@ -67,6 +70,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Contest = NewContestClient(c.config)
+	c.ContestClarification = NewContestClarificationClient(c.config)
 	c.ContestTask = NewContestTaskClient(c.config)
 	c.ContestUser = NewContestUserClient(c.config)
 	c.Language = NewLanguageClient(c.config)
@@ -156,18 +160,19 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:            ctx,
-		config:         cfg,
-		Contest:        NewContestClient(cfg),
-		ContestTask:    NewContestTaskClient(cfg),
-		ContestUser:    NewContestUserClient(cfg),
-		Language:       NewLanguageClient(cfg),
-		Submit:         NewSubmitClient(cfg),
-		Task:           NewTaskClient(cfg),
-		Testcase:       NewTestcaseClient(cfg),
-		TestcaseResult: NewTestcaseResultClient(cfg),
-		TestcaseSet:    NewTestcaseSetClient(cfg),
-		User:           NewUserClient(cfg),
+		ctx:                  ctx,
+		config:               cfg,
+		Contest:              NewContestClient(cfg),
+		ContestClarification: NewContestClarificationClient(cfg),
+		ContestTask:          NewContestTaskClient(cfg),
+		ContestUser:          NewContestUserClient(cfg),
+		Language:             NewLanguageClient(cfg),
+		Submit:               NewSubmitClient(cfg),
+		Task:                 NewTaskClient(cfg),
+		Testcase:             NewTestcaseClient(cfg),
+		TestcaseResult:       NewTestcaseResultClient(cfg),
+		TestcaseSet:          NewTestcaseSetClient(cfg),
+		User:                 NewUserClient(cfg),
 	}, nil
 }
 
@@ -185,18 +190,19 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:            ctx,
-		config:         cfg,
-		Contest:        NewContestClient(cfg),
-		ContestTask:    NewContestTaskClient(cfg),
-		ContestUser:    NewContestUserClient(cfg),
-		Language:       NewLanguageClient(cfg),
-		Submit:         NewSubmitClient(cfg),
-		Task:           NewTaskClient(cfg),
-		Testcase:       NewTestcaseClient(cfg),
-		TestcaseResult: NewTestcaseResultClient(cfg),
-		TestcaseSet:    NewTestcaseSetClient(cfg),
-		User:           NewUserClient(cfg),
+		ctx:                  ctx,
+		config:               cfg,
+		Contest:              NewContestClient(cfg),
+		ContestClarification: NewContestClarificationClient(cfg),
+		ContestTask:          NewContestTaskClient(cfg),
+		ContestUser:          NewContestUserClient(cfg),
+		Language:             NewLanguageClient(cfg),
+		Submit:               NewSubmitClient(cfg),
+		Task:                 NewTaskClient(cfg),
+		Testcase:             NewTestcaseClient(cfg),
+		TestcaseResult:       NewTestcaseResultClient(cfg),
+		TestcaseSet:          NewTestcaseSetClient(cfg),
+		User:                 NewUserClient(cfg),
 	}, nil
 }
 
@@ -226,8 +232,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Contest, c.ContestTask, c.ContestUser, c.Language, c.Submit, c.Task,
-		c.Testcase, c.TestcaseResult, c.TestcaseSet, c.User,
+		c.Contest, c.ContestClarification, c.ContestTask, c.ContestUser, c.Language,
+		c.Submit, c.Task, c.Testcase, c.TestcaseResult, c.TestcaseSet, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -237,8 +243,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Contest, c.ContestTask, c.ContestUser, c.Language, c.Submit, c.Task,
-		c.Testcase, c.TestcaseResult, c.TestcaseSet, c.User,
+		c.Contest, c.ContestClarification, c.ContestTask, c.ContestUser, c.Language,
+		c.Submit, c.Task, c.Testcase, c.TestcaseResult, c.TestcaseSet, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -249,6 +255,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *ContestMutation:
 		return c.Contest.mutate(ctx, m)
+	case *ContestClarificationMutation:
+		return c.ContestClarification.mutate(ctx, m)
 	case *ContestTaskMutation:
 		return c.ContestTask.mutate(ctx, m)
 	case *ContestUserMutation:
@@ -413,6 +421,22 @@ func (c *ContestClient) QueryTasks(co *Contest) *TaskQuery {
 	return query
 }
 
+// QueryClarifications queries the clarifications edge of a Contest.
+func (c *ContestClient) QueryClarifications(co *Contest) *ContestClarificationQuery {
+	query := (&ContestClarificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contest.Table, contest.FieldID, id),
+			sqlgraph.To(contestclarification.Table, contestclarification.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, contest.ClarificationsTable, contest.ClarificationsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryContestUser queries the contest_user edge of a Contest.
 func (c *ContestClient) QueryContestUser(co *Contest) *ContestUserQuery {
 	query := (&ContestUserClient{config: c.config}).Query()
@@ -467,6 +491,188 @@ func (c *ContestClient) mutate(ctx context.Context, m *ContestMutation) (Value, 
 		return (&ContestDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Contest mutation op: %q", m.Op())
+	}
+}
+
+// ContestClarificationClient is a client for the ContestClarification schema.
+type ContestClarificationClient struct {
+	config
+}
+
+// NewContestClarificationClient returns a client for the ContestClarification from the given config.
+func NewContestClarificationClient(c config) *ContestClarificationClient {
+	return &ContestClarificationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `contestclarification.Hooks(f(g(h())))`.
+func (c *ContestClarificationClient) Use(hooks ...Hook) {
+	c.hooks.ContestClarification = append(c.hooks.ContestClarification, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `contestclarification.Intercept(f(g(h())))`.
+func (c *ContestClarificationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ContestClarification = append(c.inters.ContestClarification, interceptors...)
+}
+
+// Create returns a builder for creating a ContestClarification entity.
+func (c *ContestClarificationClient) Create() *ContestClarificationCreate {
+	mutation := newContestClarificationMutation(c.config, OpCreate)
+	return &ContestClarificationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ContestClarification entities.
+func (c *ContestClarificationClient) CreateBulk(builders ...*ContestClarificationCreate) *ContestClarificationCreateBulk {
+	return &ContestClarificationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ContestClarification.
+func (c *ContestClarificationClient) Update() *ContestClarificationUpdate {
+	mutation := newContestClarificationMutation(c.config, OpUpdate)
+	return &ContestClarificationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ContestClarificationClient) UpdateOne(cc *ContestClarification) *ContestClarificationUpdateOne {
+	mutation := newContestClarificationMutation(c.config, OpUpdateOne, withContestClarification(cc))
+	return &ContestClarificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ContestClarificationClient) UpdateOneID(id int) *ContestClarificationUpdateOne {
+	mutation := newContestClarificationMutation(c.config, OpUpdateOne, withContestClarificationID(id))
+	return &ContestClarificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ContestClarification.
+func (c *ContestClarificationClient) Delete() *ContestClarificationDelete {
+	mutation := newContestClarificationMutation(c.config, OpDelete)
+	return &ContestClarificationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ContestClarificationClient) DeleteOne(cc *ContestClarification) *ContestClarificationDeleteOne {
+	return c.DeleteOneID(cc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ContestClarificationClient) DeleteOneID(id int) *ContestClarificationDeleteOne {
+	builder := c.Delete().Where(contestclarification.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ContestClarificationDeleteOne{builder}
+}
+
+// Query returns a query builder for ContestClarification.
+func (c *ContestClarificationClient) Query() *ContestClarificationQuery {
+	return &ContestClarificationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeContestClarification},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ContestClarification entity by its id.
+func (c *ContestClarificationClient) Get(ctx context.Context, id int) (*ContestClarification, error) {
+	return c.Query().Where(contestclarification.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ContestClarificationClient) GetX(ctx context.Context, id int) *ContestClarification {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryContest queries the contest edge of a ContestClarification.
+func (c *ContestClarificationClient) QueryContest(cc *ContestClarification) *ContestQuery {
+	query := (&ContestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contestclarification.Table, contestclarification.FieldID, id),
+			sqlgraph.To(contest.Table, contest.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, contestclarification.ContestTable, contestclarification.ContestPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTask queries the task edge of a ContestClarification.
+func (c *ContestClarificationClient) QueryTask(cc *ContestClarification) *TaskQuery {
+	query := (&TaskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contestclarification.Table, contestclarification.FieldID, id),
+			sqlgraph.To(task.Table, task.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, contestclarification.TaskTable, contestclarification.TaskPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a ContestClarification.
+func (c *ContestClarificationClient) QueryUser(cc *ContestClarification) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contestclarification.Table, contestclarification.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, contestclarification.UserTable, contestclarification.UserPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAnswerUser queries the answer_user edge of a ContestClarification.
+func (c *ContestClarificationClient) QueryAnswerUser(cc *ContestClarification) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contestclarification.Table, contestclarification.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, contestclarification.AnswerUserTable, contestclarification.AnswerUserPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ContestClarificationClient) Hooks() []Hook {
+	return c.hooks.ContestClarification
+}
+
+// Interceptors returns the client interceptors.
+func (c *ContestClarificationClient) Interceptors() []Interceptor {
+	return c.inters.ContestClarification
+}
+
+func (c *ContestClarificationClient) mutate(ctx context.Context, m *ContestClarificationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ContestClarificationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ContestClarificationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ContestClarificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ContestClarificationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ContestClarification mutation op: %q", m.Op())
 	}
 }
 
@@ -1227,6 +1433,22 @@ func (c *TaskClient) QuerySubmits(t *Task) *SubmitQuery {
 	return query
 }
 
+// QueryClarifications queries the clarifications edge of a Task.
+func (c *TaskClient) QueryClarifications(t *Task) *ContestClarificationQuery {
+	query := (&ContestClarificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, id),
+			sqlgraph.To(contestclarification.Table, contestclarification.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, task.ClarificationsTable, task.ClarificationsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryUser queries the user edge of a Task.
 func (c *TaskClient) QueryUser(t *Task) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
@@ -1875,6 +2097,38 @@ func (c *UserClient) QuerySubmits(u *User) *SubmitQuery {
 	return query
 }
 
+// QueryClarifications queries the clarifications edge of a User.
+func (c *UserClient) QueryClarifications(u *User) *ContestClarificationQuery {
+	query := (&ContestClarificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(contestclarification.Table, contestclarification.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.ClarificationsTable, user.ClarificationsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAnsweredClarifications queries the answered_clarifications edge of a User.
+func (c *UserClient) QueryAnsweredClarifications(u *User) *ContestClarificationQuery {
+	query := (&ContestClarificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(contestclarification.Table, contestclarification.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.AnsweredClarificationsTable, user.AnsweredClarificationsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryContests queries the contests edge of a User.
 func (c *UserClient) QueryContests(u *User) *ContestQuery {
 	query := (&ContestClient{config: c.config}).Query()
@@ -1935,12 +2189,12 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Contest, ContestTask, ContestUser, Language, Submit, Task, Testcase,
-		TestcaseResult, TestcaseSet, User []ent.Hook
+		Contest, ContestClarification, ContestTask, ContestUser, Language, Submit, Task,
+		Testcase, TestcaseResult, TestcaseSet, User []ent.Hook
 	}
 	inters struct {
-		Contest, ContestTask, ContestUser, Language, Submit, Task, Testcase,
-		TestcaseResult, TestcaseSet, User []ent.Interceptor
+		Contest, ContestClarification, ContestTask, ContestUser, Language, Submit, Task,
+		Testcase, TestcaseResult, TestcaseSet, User []ent.Interceptor
 	}
 )
 

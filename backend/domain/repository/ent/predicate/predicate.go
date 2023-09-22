@@ -9,6 +9,9 @@ import (
 // Contest is the predicate function for contest builders.
 type Contest func(*sql.Selector)
 
+// ContestClarification is the predicate function for contestclarification builders.
+type ContestClarification func(*sql.Selector)
+
 // ContestTask is the predicate function for contesttask builders.
 type ContestTask func(*sql.Selector)
 

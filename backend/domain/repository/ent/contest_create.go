@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestclarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
@@ -124,6 +125,21 @@ func (cc *ContestCreate) AddTasks(t ...*Task) *ContestCreate {
 		ids[i] = t[i].ID
 	}
 	return cc.AddTaskIDs(ids...)
+}
+
+// AddClarificationIDs adds the "clarifications" edge to the ContestClarification entity by IDs.
+func (cc *ContestCreate) AddClarificationIDs(ids ...int) *ContestCreate {
+	cc.mutation.AddClarificationIDs(ids...)
+	return cc
+}
+
+// AddClarifications adds the "clarifications" edges to the ContestClarification entity.
+func (cc *ContestCreate) AddClarifications(c ...*ContestClarification) *ContestCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddClarificationIDs(ids...)
 }
 
 // AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by IDs.
@@ -320,6 +336,22 @@ func (cc *ContestCreate) createSpec() (*Contest, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ClarificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   contest.ClarificationsTable,
+			Columns: contest.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contestclarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
