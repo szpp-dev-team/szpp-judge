@@ -43,6 +43,7 @@ func (i *Interactor) CreateContest(ctx context.Context, req *backendv1.CreateCon
 		if ent.IsConstraintError(err) {
 			return nil, status.Error(codes.AlreadyExists, "the contest has already existed")
 		}
+		i.logger.Error("failed to create contest", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, "failed to create contest")
 	}
 	return &backendv1.CreateContestResponse{
@@ -56,6 +57,7 @@ func (i *Interactor) GetContest(ctx context.Context, req *backendv1.GetContestRe
 		if ent.IsNotFound(err) {
 			return nil, status.Error(codes.NotFound, "the contest was not found")
 		}
+		i.logger.Error("failed to get contest", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, "failed to get contest")
 	}
 	return &backendv1.GetContestResponse{
@@ -78,6 +80,7 @@ func (i *Interactor) UpdateContest(ctx context.Context, req *backendv1.UpdateCon
 		if ent.IsConstraintError(err) {
 			return nil, status.Error(codes.AlreadyExists, "the slug has been already used")
 		}
+		i.logger.Error("failed to update contest", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, "failed to update contest")
 	}
 	return &backendv1.UpdateContestResponse{
@@ -91,6 +94,7 @@ func (i *Interactor) ListContests(ctx context.Context, req *backendv1.ListContes
 		if ent.IsNotFound(err) {
 			return nil, status.Error(codes.NotFound, "the contest was not found")
 		}
+		i.logger.Error("failed to get contest", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, "failed to get contest")
 	}
 	return &backendv1.ListContestsResponse{
@@ -111,6 +115,7 @@ func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListCo
 		if ent.IsNotFound(err) {
 			return nil, status.Error(codes.NotFound, "the contest was not found")
 		}
+		i.logger.Error("failed to get contest", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, "failed to get contest")
 	}
 	return &backendv1.ListContestTasksResponse{
@@ -131,6 +136,7 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 		if ent.IsNotFound(err) {
 			return nil, status.Error(codes.NotFound, "the contest was not found")
 		}
+		i.logger.Error("failed to get contest", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, "failed to get contest")
 	}
 	return &backendv1.GetContestTaskResponse{
@@ -156,14 +162,15 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 			return status.Error(codes.Internal, err.Error())
 		}
 
-		for i, task := range req.Tasks {
+		for order, task := range req.Tasks {
 			contestTask, err := tx.ContestTask.Create().
 				SetContest(contest).
 				SetTaskID(int(task.Id)).
 				SetScore(int(task.Score)).
-				SetOrder(i + 1).
+				SetOrder(order + 1).
 				Save(ctx)
 			if err != nil {
+				i.logger.Error("failed to create contest task", slog.Any("error", err))
 				return status.Error(codes.Internal, "failed to create contest task")
 			}
 			contestTaskIDs = append(contestTaskIDs, contestTask.ID)
@@ -189,6 +196,35 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 			return tasks.ToPbTask(ct.Edges.Task)
 		}),
 	}, nil
+}
+
+func (i *Interactor) GetMySubmissionStatuses(ctx context.Context, req *backendv1.GetMySubmissionStatusesRequest) (*backendv1.GetMySubmissionStatusesResponse, error) {
+	panic("not implemented")
+}
+
+func (i *Interactor) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRequest) (*backendv1.RegisterMeResponse, error) {
+	contest, err := i.entClient.Contest.Query().Where(ent_contest.Slug(req.ContestSlug)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Error(codes.NotFound, "the contest was not found")
+		}
+		i.logger.Error("failed to get contest", slog.Any("error", err))
+		return nil, status.Error(codes.Internal, "failed to get contest")
+	}
+
+	if _, err := i.entClient.ContestUser.Create().
+		// SetRole().
+		SetContest(contest).
+		// SetUserID().
+		Save(ctx); err != nil {
+		if ent.IsConstraintError(err) {
+			return nil, status.Error(codes.AlreadyExists, "the user has already registered")
+		}
+		i.logger.Error("failed to register user", slog.Any("error", err))
+		return nil, status.Error(codes.Internal, "failed to register user")
+	}
+
+	return &backendv1.RegisterMeResponse{}, nil
 }
 
 func toPbContest(contest *ent.Contest) *backendv1.Contest {
