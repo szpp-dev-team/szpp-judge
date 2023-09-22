@@ -6,6 +6,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	grpc_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/grpc"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
+	"github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slog"
 	"google.golang.org/grpc"
@@ -31,6 +32,8 @@ func New(opts ...optionFunc) *grpc.Server {
 	}
 	healthcheckSrv := grpc_interfaces.NewHealthcheckServiceServer()
 	pb.RegisterHealthcheckServiceServer(srv, healthcheckSrv)
+	userSrv := grpc_interfaces.NewUserServiceServer(user.NewInteractor(opt.entClient))
+	pb.RegisterUserServiceServer(srv, userSrv)
 	taskInteractor := tasks.NewInteractor(opt.entClient, opt.testcasesRepository)
 	taskSrv := grpc_interfaces.NewTaskServiceServer(taskInteractor)
 	pb.RegisterTaskServiceServer(srv, taskSrv)
