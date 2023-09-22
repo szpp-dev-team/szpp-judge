@@ -96,7 +96,7 @@ func toPbUser(t *ent.User) *pb.User {
 	return &pb.User{
 		Id:        int32(t.ID),
 		Username:  t.Username,
-		IsAdmin:   pb.Role_value[t.Role] == pb.Role_value["ADMIN"],
+		IsAdmin:   pb.Role_value[t.Role] == int32(pb.Role_ADMIN),
 		CreatedAt: timestamppb.New(t.CreatedAt),
 		UpdatedAt: timestamppb.New(t.UpdatedAt),
 	}

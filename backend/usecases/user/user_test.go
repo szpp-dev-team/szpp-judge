@@ -82,6 +82,7 @@ func Test_CreateUser(t *testing.T) {
 				user, err := entClient.User.Query().Where(entuser.ID(int(resp.User.Id))).Only(ctx)
 				require.NoError(t, err)
 				assert.Equal(t, req.Username, user.Username)
+				assert.False(t, resp.User.IsAdmin)
 				err = VerifyPassword(user.HashedPassword, req.Password)
 				require.NoError(t, err)
 			},
