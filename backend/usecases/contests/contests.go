@@ -2,6 +2,7 @@ package contests
 
 import (
 	"context"
+	"log"
 	"log/slog"
 
 	"github.com/samber/lo"
@@ -13,6 +14,7 @@ import (
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
+	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -24,7 +26,7 @@ type Interactor struct {
 }
 
 func NewInteractor(entClient *ent.Client) *Interactor {
-	logger := slog.Default().With(slog.String("usecase", "tasks"))
+	logger := slog.Default().With(slog.String("usecase", "contests"))
 	return &Interactor{entClient, logger}
 }
 
@@ -146,7 +148,7 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 
 func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncContestTasksRequest) (*backendv1.SyncContestTasksResponse, error) {
 	contestTaskIDs := make([]int, 0, len(req.Tasks))
-	entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) error {
+	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) error {
 		contest, err := i.entClient.Contest.Query().
 			Where(ent_contest.Slug(req.ContestSlug)).
 			Only(ctx)
@@ -154,11 +156,11 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 			if ent.IsNotFound(err) {
 				return status.Error(codes.NotFound, err.Error())
 			}
-			i.logger.Error("failed to get contest", slog.Any("error", err))
+			i.logger.Error("failed to get contest", slog.Any("error", err), slog.String("slug", req.ContestSlug))
 			return status.Error(codes.Internal, err.Error())
 		}
-		if _, err := i.entClient.Contest.Update().ClearContestTask().Save(ctx); err != nil {
-			i.logger.Error("failed to clear contest tasks", slog.Any("error", err))
+		if _, err := i.entClient.Contest.UpdateOne(contest).ClearTasks().Save(ctx); err != nil {
+			i.logger.Error("failed to clear tasks which are related with the contest", slog.Any("error", err))
 			return status.Error(codes.Internal, err.Error())
 		}
 
@@ -176,7 +178,9 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 			contestTaskIDs = append(contestTaskIDs, contestTask.ID)
 		}
 		return nil
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	predicates := make([]predicate.ContestTask, 0, len(contestTaskIDs))
 	for _, id := range contestTaskIDs {
@@ -184,13 +188,17 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 	}
 	contestTasks, err := i.entClient.ContestTask.Query().
 		WithTask().
-		Where(predicates...).
+		Where(ent_contesttask.Or(predicates...)).
 		All(ctx)
 	if err != nil {
 		i.logger.Error("failed to get contest tasks", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, "failed to get contest tasks")
 	}
 
+	slices.SortFunc(contestTasks, func(a, b *ent.ContestTask) int {
+		return a.Order - b.Order
+	})
+	log.Println("result", contestTasks, contestTaskIDs)
 	return &backendv1.SyncContestTasksResponse{
 		Tasks: lo.Map(contestTasks, func(ct *ent.ContestTask, _ int) *backendv1.Task {
 			return tasks.ToPbTask(ct.Edges.Task)
