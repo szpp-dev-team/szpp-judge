@@ -13,8 +13,14 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
+
+	stdsql "database/sql"
 )
 
 // Client is the client that holds all ent builders.
@@ -24,6 +30,12 @@ type Client struct {
 	Schema *migrate.Schema
 	// RefreshToken is the client for interacting with the RefreshToken builders.
 	RefreshToken *RefreshTokenClient
+	// Task is the client for interacting with the Task builders.
+	Task *TaskClient
+	// Testcase is the client for interacting with the Testcase builders.
+	Testcase *TestcaseClient
+	// TestcaseSet is the client for interacting with the TestcaseSet builders.
+	TestcaseSet *TestcaseSetClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -40,6 +52,9 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.RefreshToken = NewRefreshTokenClient(c.config)
+	c.Task = NewTaskClient(c.config)
+	c.Testcase = NewTestcaseClient(c.config)
+	c.TestcaseSet = NewTestcaseSetClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -124,6 +139,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:          ctx,
 		config:       cfg,
 		RefreshToken: NewRefreshTokenClient(cfg),
+		Task:         NewTaskClient(cfg),
+		Testcase:     NewTestcaseClient(cfg),
+		TestcaseSet:  NewTestcaseSetClient(cfg),
 		User:         NewUserClient(cfg),
 	}, nil
 }
@@ -145,6 +163,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:          ctx,
 		config:       cfg,
 		RefreshToken: NewRefreshTokenClient(cfg),
+		Task:         NewTaskClient(cfg),
+		Testcase:     NewTestcaseClient(cfg),
+		TestcaseSet:  NewTestcaseSetClient(cfg),
 		User:         NewUserClient(cfg),
 	}, nil
 }
@@ -175,6 +196,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.RefreshToken.Use(hooks...)
+	c.Task.Use(hooks...)
+	c.Testcase.Use(hooks...)
+	c.TestcaseSet.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -182,6 +206,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.RefreshToken.Intercept(interceptors...)
+	c.Task.Intercept(interceptors...)
+	c.Testcase.Intercept(interceptors...)
+	c.TestcaseSet.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -190,6 +217,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *RefreshTokenMutation:
 		return c.RefreshToken.mutate(ctx, m)
+	case *TaskMutation:
+		return c.Task.mutate(ctx, m)
+	case *TestcaseMutation:
+		return c.Testcase.mutate(ctx, m)
+	case *TestcaseSetMutation:
+		return c.TestcaseSet.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -315,6 +348,472 @@ func (c *RefreshTokenClient) mutate(ctx context.Context, m *RefreshTokenMutation
 	}
 }
 
+// TaskClient is a client for the Task schema.
+type TaskClient struct {
+	config
+}
+
+// NewTaskClient returns a client for the Task from the given config.
+func NewTaskClient(c config) *TaskClient {
+	return &TaskClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `task.Hooks(f(g(h())))`.
+func (c *TaskClient) Use(hooks ...Hook) {
+	c.hooks.Task = append(c.hooks.Task, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `task.Intercept(f(g(h())))`.
+func (c *TaskClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Task = append(c.inters.Task, interceptors...)
+}
+
+// Create returns a builder for creating a Task entity.
+func (c *TaskClient) Create() *TaskCreate {
+	mutation := newTaskMutation(c.config, OpCreate)
+	return &TaskCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Task entities.
+func (c *TaskClient) CreateBulk(builders ...*TaskCreate) *TaskCreateBulk {
+	return &TaskCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Task.
+func (c *TaskClient) Update() *TaskUpdate {
+	mutation := newTaskMutation(c.config, OpUpdate)
+	return &TaskUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TaskClient) UpdateOne(t *Task) *TaskUpdateOne {
+	mutation := newTaskMutation(c.config, OpUpdateOne, withTask(t))
+	return &TaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TaskClient) UpdateOneID(id int) *TaskUpdateOne {
+	mutation := newTaskMutation(c.config, OpUpdateOne, withTaskID(id))
+	return &TaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Task.
+func (c *TaskClient) Delete() *TaskDelete {
+	mutation := newTaskMutation(c.config, OpDelete)
+	return &TaskDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TaskClient) DeleteOne(t *Task) *TaskDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TaskClient) DeleteOneID(id int) *TaskDeleteOne {
+	builder := c.Delete().Where(task.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TaskDeleteOne{builder}
+}
+
+// Query returns a query builder for Task.
+func (c *TaskClient) Query() *TaskQuery {
+	return &TaskQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTask},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Task entity by its id.
+func (c *TaskClient) Get(ctx context.Context, id int) (*Task, error) {
+	return c.Query().Where(task.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TaskClient) GetX(ctx context.Context, id int) *Task {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTestcaseSets queries the testcase_sets edge of a Task.
+func (c *TaskClient) QueryTestcaseSets(t *Task) *TestcaseSetQuery {
+	query := (&TestcaseSetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, id),
+			sqlgraph.To(testcaseset.Table, testcaseset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, task.TestcaseSetsTable, task.TestcaseSetsColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTestcases queries the testcases edge of a Task.
+func (c *TaskClient) QueryTestcases(t *Task) *TestcaseQuery {
+	query := (&TestcaseClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, id),
+			sqlgraph.To(testcase.Table, testcase.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, task.TestcasesTable, task.TestcasesColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a Task.
+func (c *TaskClient) QueryUser(t *Task) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, task.UserTable, task.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TaskClient) Hooks() []Hook {
+	return c.hooks.Task
+}
+
+// Interceptors returns the client interceptors.
+func (c *TaskClient) Interceptors() []Interceptor {
+	return c.inters.Task
+}
+
+func (c *TaskClient) mutate(ctx context.Context, m *TaskMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TaskCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TaskUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TaskDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Task mutation op: %q", m.Op())
+	}
+}
+
+// TestcaseClient is a client for the Testcase schema.
+type TestcaseClient struct {
+	config
+}
+
+// NewTestcaseClient returns a client for the Testcase from the given config.
+func NewTestcaseClient(c config) *TestcaseClient {
+	return &TestcaseClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `testcase.Hooks(f(g(h())))`.
+func (c *TestcaseClient) Use(hooks ...Hook) {
+	c.hooks.Testcase = append(c.hooks.Testcase, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `testcase.Intercept(f(g(h())))`.
+func (c *TestcaseClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Testcase = append(c.inters.Testcase, interceptors...)
+}
+
+// Create returns a builder for creating a Testcase entity.
+func (c *TestcaseClient) Create() *TestcaseCreate {
+	mutation := newTestcaseMutation(c.config, OpCreate)
+	return &TestcaseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Testcase entities.
+func (c *TestcaseClient) CreateBulk(builders ...*TestcaseCreate) *TestcaseCreateBulk {
+	return &TestcaseCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Testcase.
+func (c *TestcaseClient) Update() *TestcaseUpdate {
+	mutation := newTestcaseMutation(c.config, OpUpdate)
+	return &TestcaseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TestcaseClient) UpdateOne(t *Testcase) *TestcaseUpdateOne {
+	mutation := newTestcaseMutation(c.config, OpUpdateOne, withTestcase(t))
+	return &TestcaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TestcaseClient) UpdateOneID(id int) *TestcaseUpdateOne {
+	mutation := newTestcaseMutation(c.config, OpUpdateOne, withTestcaseID(id))
+	return &TestcaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Testcase.
+func (c *TestcaseClient) Delete() *TestcaseDelete {
+	mutation := newTestcaseMutation(c.config, OpDelete)
+	return &TestcaseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TestcaseClient) DeleteOne(t *Testcase) *TestcaseDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TestcaseClient) DeleteOneID(id int) *TestcaseDeleteOne {
+	builder := c.Delete().Where(testcase.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TestcaseDeleteOne{builder}
+}
+
+// Query returns a query builder for Testcase.
+func (c *TestcaseClient) Query() *TestcaseQuery {
+	return &TestcaseQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTestcase},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Testcase entity by its id.
+func (c *TestcaseClient) Get(ctx context.Context, id int) (*Testcase, error) {
+	return c.Query().Where(testcase.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TestcaseClient) GetX(ctx context.Context, id int) *Testcase {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTestcaseSets queries the testcase_sets edge of a Testcase.
+func (c *TestcaseClient) QueryTestcaseSets(t *Testcase) *TestcaseSetQuery {
+	query := (&TestcaseSetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(testcase.Table, testcase.FieldID, id),
+			sqlgraph.To(testcaseset.Table, testcaseset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, testcase.TestcaseSetsTable, testcase.TestcaseSetsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTask queries the task edge of a Testcase.
+func (c *TestcaseClient) QueryTask(t *Testcase) *TaskQuery {
+	query := (&TaskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(testcase.Table, testcase.FieldID, id),
+			sqlgraph.To(task.Table, task.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, testcase.TaskTable, testcase.TaskColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TestcaseClient) Hooks() []Hook {
+	return c.hooks.Testcase
+}
+
+// Interceptors returns the client interceptors.
+func (c *TestcaseClient) Interceptors() []Interceptor {
+	return c.inters.Testcase
+}
+
+func (c *TestcaseClient) mutate(ctx context.Context, m *TestcaseMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TestcaseCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TestcaseUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TestcaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TestcaseDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Testcase mutation op: %q", m.Op())
+	}
+}
+
+// TestcaseSetClient is a client for the TestcaseSet schema.
+type TestcaseSetClient struct {
+	config
+}
+
+// NewTestcaseSetClient returns a client for the TestcaseSet from the given config.
+func NewTestcaseSetClient(c config) *TestcaseSetClient {
+	return &TestcaseSetClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `testcaseset.Hooks(f(g(h())))`.
+func (c *TestcaseSetClient) Use(hooks ...Hook) {
+	c.hooks.TestcaseSet = append(c.hooks.TestcaseSet, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `testcaseset.Intercept(f(g(h())))`.
+func (c *TestcaseSetClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TestcaseSet = append(c.inters.TestcaseSet, interceptors...)
+}
+
+// Create returns a builder for creating a TestcaseSet entity.
+func (c *TestcaseSetClient) Create() *TestcaseSetCreate {
+	mutation := newTestcaseSetMutation(c.config, OpCreate)
+	return &TestcaseSetCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TestcaseSet entities.
+func (c *TestcaseSetClient) CreateBulk(builders ...*TestcaseSetCreate) *TestcaseSetCreateBulk {
+	return &TestcaseSetCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TestcaseSet.
+func (c *TestcaseSetClient) Update() *TestcaseSetUpdate {
+	mutation := newTestcaseSetMutation(c.config, OpUpdate)
+	return &TestcaseSetUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TestcaseSetClient) UpdateOne(ts *TestcaseSet) *TestcaseSetUpdateOne {
+	mutation := newTestcaseSetMutation(c.config, OpUpdateOne, withTestcaseSet(ts))
+	return &TestcaseSetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TestcaseSetClient) UpdateOneID(id int) *TestcaseSetUpdateOne {
+	mutation := newTestcaseSetMutation(c.config, OpUpdateOne, withTestcaseSetID(id))
+	return &TestcaseSetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TestcaseSet.
+func (c *TestcaseSetClient) Delete() *TestcaseSetDelete {
+	mutation := newTestcaseSetMutation(c.config, OpDelete)
+	return &TestcaseSetDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TestcaseSetClient) DeleteOne(ts *TestcaseSet) *TestcaseSetDeleteOne {
+	return c.DeleteOneID(ts.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TestcaseSetClient) DeleteOneID(id int) *TestcaseSetDeleteOne {
+	builder := c.Delete().Where(testcaseset.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TestcaseSetDeleteOne{builder}
+}
+
+// Query returns a query builder for TestcaseSet.
+func (c *TestcaseSetClient) Query() *TestcaseSetQuery {
+	return &TestcaseSetQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTestcaseSet},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TestcaseSet entity by its id.
+func (c *TestcaseSetClient) Get(ctx context.Context, id int) (*TestcaseSet, error) {
+	return c.Query().Where(testcaseset.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TestcaseSetClient) GetX(ctx context.Context, id int) *TestcaseSet {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTask queries the task edge of a TestcaseSet.
+func (c *TestcaseSetClient) QueryTask(ts *TestcaseSet) *TaskQuery {
+	query := (&TaskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ts.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(testcaseset.Table, testcaseset.FieldID, id),
+			sqlgraph.To(task.Table, task.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, testcaseset.TaskTable, testcaseset.TaskColumn),
+		)
+		fromV = sqlgraph.Neighbors(ts.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTestcases queries the testcases edge of a TestcaseSet.
+func (c *TestcaseSetClient) QueryTestcases(ts *TestcaseSet) *TestcaseQuery {
+	query := (&TestcaseClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ts.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(testcaseset.Table, testcaseset.FieldID, id),
+			sqlgraph.To(testcase.Table, testcase.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, testcaseset.TestcasesTable, testcaseset.TestcasesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ts.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TestcaseSetClient) Hooks() []Hook {
+	return c.hooks.TestcaseSet
+}
+
+// Interceptors returns the client interceptors.
+func (c *TestcaseSetClient) Interceptors() []Interceptor {
+	return c.inters.TestcaseSet
+}
+
+func (c *TestcaseSetClient) mutate(ctx context.Context, m *TestcaseSetMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TestcaseSetCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TestcaseSetUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TestcaseSetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TestcaseSetDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TestcaseSet mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -408,6 +907,22 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QueryTasks queries the tasks edge of a User.
+func (c *UserClient) QueryTasks(u *User) *TaskQuery {
+	query := (&TaskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(task.Table, task.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.TasksTable, user.TasksColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -436,9 +951,33 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		RefreshToken, User []ent.Hook
+		RefreshToken, Task, Testcase, TestcaseSet, User []ent.Hook
 	}
 	inters struct {
-		RefreshToken, User []ent.Interceptor
+		RefreshToken, Task, Testcase, TestcaseSet, User []ent.Interceptor
 	}
 )
+
+// ExecContext allows calling the underlying ExecContext method of the driver if it is supported by it.
+// See, database/sql#DB.ExecContext for more information.
+func (c *config) ExecContext(ctx context.Context, query string, args ...any) (stdsql.Result, error) {
+	ex, ok := c.driver.(interface {
+		ExecContext(context.Context, string, ...any) (stdsql.Result, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Driver.ExecContext is not supported")
+	}
+	return ex.ExecContext(ctx, query, args...)
+}
+
+// QueryContext allows calling the underlying QueryContext method of the driver if it is supported by it.
+// See, database/sql#DB.QueryContext for more information.
+func (c *config) QueryContext(ctx context.Context, query string, args ...any) (*stdsql.Rows, error) {
+	q, ok := c.driver.(interface {
+		QueryContext(context.Context, string, ...any) (*stdsql.Rows, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Driver.QueryContext is not supported")
+	}
+	return q.QueryContext(ctx, query, args...)
+}

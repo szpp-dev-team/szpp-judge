@@ -9,5 +9,14 @@ import (
 // RefreshToken is the predicate function for refreshtoken builders.
 type RefreshToken func(*sql.Selector)
 
+// Task is the predicate function for task builders.
+type Task func(*sql.Selector)
+
+// Testcase is the predicate function for testcase builders.
+type Testcase func(*sql.Selector)
+
+// TestcaseSet is the predicate function for testcaseset builders.
+type TestcaseSet func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
