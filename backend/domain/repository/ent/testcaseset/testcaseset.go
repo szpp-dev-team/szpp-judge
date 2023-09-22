@@ -14,8 +14,8 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldScore holds the string denoting the score field in the database.
-	FieldScore = "score"
+	// FieldScoreRatio holds the string denoting the score_ratio field in the database.
+	FieldScoreRatio = "score_ratio"
 	// FieldIsSample holds the string denoting the is_sample field in the database.
 	FieldIsSample = "is_sample"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -46,7 +46,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
-	FieldScore,
+	FieldScoreRatio,
 	FieldIsSample,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -92,9 +92,9 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByScore orders the results by the score field.
-func ByScore(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldScore, opts...).ToFunc()
+// ByScoreRatio orders the results by the score_ratio field.
+func ByScoreRatio(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScoreRatio, opts...).ToFunc()
 }
 
 // ByIsSample orders the results by the is_sample field.

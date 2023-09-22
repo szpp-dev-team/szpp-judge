@@ -20,8 +20,8 @@ type TestcaseSet struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Score holds the value of the "score" field.
-	Score int `json:"score,omitempty"`
+	// ScoreRatio holds the value of the "score_ratio" field.
+	ScoreRatio int `json:"score_ratio,omitempty"`
 	// IsSample holds the value of the "is_sample" field.
 	IsSample bool `json:"is_sample,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -75,7 +75,7 @@ func (*TestcaseSet) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case testcaseset.FieldIsSample:
 			values[i] = new(sql.NullBool)
-		case testcaseset.FieldID, testcaseset.FieldScore:
+		case testcaseset.FieldID, testcaseset.FieldScoreRatio:
 			values[i] = new(sql.NullInt64)
 		case testcaseset.FieldName:
 			values[i] = new(sql.NullString)
@@ -110,11 +110,11 @@ func (ts *TestcaseSet) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ts.Name = value.String
 			}
-		case testcaseset.FieldScore:
+		case testcaseset.FieldScoreRatio:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field score", values[i])
+				return fmt.Errorf("unexpected type %T for field score_ratio", values[i])
 			} else if value.Valid {
-				ts.Score = int(value.Int64)
+				ts.ScoreRatio = int(value.Int64)
 			}
 		case testcaseset.FieldIsSample:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -191,8 +191,8 @@ func (ts *TestcaseSet) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(ts.Name)
 	builder.WriteString(", ")
-	builder.WriteString("score=")
-	builder.WriteString(fmt.Sprintf("%v", ts.Score))
+	builder.WriteString("score_ratio=")
+	builder.WriteString(fmt.Sprintf("%v", ts.ScoreRatio))
 	builder.WriteString(", ")
 	builder.WriteString("is_sample=")
 	builder.WriteString(fmt.Sprintf("%v", ts.IsSample))
