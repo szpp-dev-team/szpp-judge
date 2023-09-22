@@ -60,9 +60,9 @@ func Name(v string) predicate.TestcaseSet {
 	return predicate.TestcaseSet(sql.FieldEQ(FieldName, v))
 }
 
-// Score applies equality check predicate on the "score" field. It's identical to ScoreEQ.
-func Score(v int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldEQ(FieldScore, v))
+// ScoreRatio applies equality check predicate on the "score_ratio" field. It's identical to ScoreRatioEQ.
+func ScoreRatio(v int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldEQ(FieldScoreRatio, v))
 }
 
 // IsSample applies equality check predicate on the "is_sample" field. It's identical to IsSampleEQ.
@@ -145,44 +145,44 @@ func NameContainsFold(v string) predicate.TestcaseSet {
 	return predicate.TestcaseSet(sql.FieldContainsFold(FieldName, v))
 }
 
-// ScoreEQ applies the EQ predicate on the "score" field.
-func ScoreEQ(v int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldEQ(FieldScore, v))
+// ScoreRatioEQ applies the EQ predicate on the "score_ratio" field.
+func ScoreRatioEQ(v int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldEQ(FieldScoreRatio, v))
 }
 
-// ScoreNEQ applies the NEQ predicate on the "score" field.
-func ScoreNEQ(v int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldNEQ(FieldScore, v))
+// ScoreRatioNEQ applies the NEQ predicate on the "score_ratio" field.
+func ScoreRatioNEQ(v int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldNEQ(FieldScoreRatio, v))
 }
 
-// ScoreIn applies the In predicate on the "score" field.
-func ScoreIn(vs ...int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldIn(FieldScore, vs...))
+// ScoreRatioIn applies the In predicate on the "score_ratio" field.
+func ScoreRatioIn(vs ...int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldIn(FieldScoreRatio, vs...))
 }
 
-// ScoreNotIn applies the NotIn predicate on the "score" field.
-func ScoreNotIn(vs ...int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldNotIn(FieldScore, vs...))
+// ScoreRatioNotIn applies the NotIn predicate on the "score_ratio" field.
+func ScoreRatioNotIn(vs ...int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldNotIn(FieldScoreRatio, vs...))
 }
 
-// ScoreGT applies the GT predicate on the "score" field.
-func ScoreGT(v int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldGT(FieldScore, v))
+// ScoreRatioGT applies the GT predicate on the "score_ratio" field.
+func ScoreRatioGT(v int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldGT(FieldScoreRatio, v))
 }
 
-// ScoreGTE applies the GTE predicate on the "score" field.
-func ScoreGTE(v int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldGTE(FieldScore, v))
+// ScoreRatioGTE applies the GTE predicate on the "score_ratio" field.
+func ScoreRatioGTE(v int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldGTE(FieldScoreRatio, v))
 }
 
-// ScoreLT applies the LT predicate on the "score" field.
-func ScoreLT(v int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldLT(FieldScore, v))
+// ScoreRatioLT applies the LT predicate on the "score_ratio" field.
+func ScoreRatioLT(v int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldLT(FieldScoreRatio, v))
 }
 
-// ScoreLTE applies the LTE predicate on the "score" field.
-func ScoreLTE(v int) predicate.TestcaseSet {
-	return predicate.TestcaseSet(sql.FieldLTE(FieldScore, v))
+// ScoreRatioLTE applies the LTE predicate on the "score_ratio" field.
+func ScoreRatioLTE(v int) predicate.TestcaseSet {
+	return predicate.TestcaseSet(sql.FieldLTE(FieldScoreRatio, v))
 }
 
 // IsSampleEQ applies the EQ predicate on the "is_sample" field.

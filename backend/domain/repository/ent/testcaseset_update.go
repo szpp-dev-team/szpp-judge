@@ -36,16 +36,16 @@ func (tsu *TestcaseSetUpdate) SetName(s string) *TestcaseSetUpdate {
 	return tsu
 }
 
-// SetScore sets the "score" field.
-func (tsu *TestcaseSetUpdate) SetScore(i int) *TestcaseSetUpdate {
-	tsu.mutation.ResetScore()
-	tsu.mutation.SetScore(i)
+// SetScoreRatio sets the "score_ratio" field.
+func (tsu *TestcaseSetUpdate) SetScoreRatio(i int) *TestcaseSetUpdate {
+	tsu.mutation.ResetScoreRatio()
+	tsu.mutation.SetScoreRatio(i)
 	return tsu
 }
 
-// AddScore adds i to the "score" field.
-func (tsu *TestcaseSetUpdate) AddScore(i int) *TestcaseSetUpdate {
-	tsu.mutation.AddScore(i)
+// AddScoreRatio adds i to the "score_ratio" field.
+func (tsu *TestcaseSetUpdate) AddScoreRatio(i int) *TestcaseSetUpdate {
+	tsu.mutation.AddScoreRatio(i)
 	return tsu
 }
 
@@ -189,11 +189,11 @@ func (tsu *TestcaseSetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tsu.mutation.Name(); ok {
 		_spec.SetField(testcaseset.FieldName, field.TypeString, value)
 	}
-	if value, ok := tsu.mutation.Score(); ok {
-		_spec.SetField(testcaseset.FieldScore, field.TypeInt, value)
+	if value, ok := tsu.mutation.ScoreRatio(); ok {
+		_spec.SetField(testcaseset.FieldScoreRatio, field.TypeInt, value)
 	}
-	if value, ok := tsu.mutation.AddedScore(); ok {
-		_spec.AddField(testcaseset.FieldScore, field.TypeInt, value)
+	if value, ok := tsu.mutation.AddedScoreRatio(); ok {
+		_spec.AddField(testcaseset.FieldScoreRatio, field.TypeInt, value)
 	}
 	if value, ok := tsu.mutation.IsSample(); ok {
 		_spec.SetField(testcaseset.FieldIsSample, field.TypeBool, value)
@@ -307,16 +307,16 @@ func (tsuo *TestcaseSetUpdateOne) SetName(s string) *TestcaseSetUpdateOne {
 	return tsuo
 }
 
-// SetScore sets the "score" field.
-func (tsuo *TestcaseSetUpdateOne) SetScore(i int) *TestcaseSetUpdateOne {
-	tsuo.mutation.ResetScore()
-	tsuo.mutation.SetScore(i)
+// SetScoreRatio sets the "score_ratio" field.
+func (tsuo *TestcaseSetUpdateOne) SetScoreRatio(i int) *TestcaseSetUpdateOne {
+	tsuo.mutation.ResetScoreRatio()
+	tsuo.mutation.SetScoreRatio(i)
 	return tsuo
 }
 
-// AddScore adds i to the "score" field.
-func (tsuo *TestcaseSetUpdateOne) AddScore(i int) *TestcaseSetUpdateOne {
-	tsuo.mutation.AddScore(i)
+// AddScoreRatio adds i to the "score_ratio" field.
+func (tsuo *TestcaseSetUpdateOne) AddScoreRatio(i int) *TestcaseSetUpdateOne {
+	tsuo.mutation.AddScoreRatio(i)
 	return tsuo
 }
 
@@ -490,11 +490,11 @@ func (tsuo *TestcaseSetUpdateOne) sqlSave(ctx context.Context) (_node *TestcaseS
 	if value, ok := tsuo.mutation.Name(); ok {
 		_spec.SetField(testcaseset.FieldName, field.TypeString, value)
 	}
-	if value, ok := tsuo.mutation.Score(); ok {
-		_spec.SetField(testcaseset.FieldScore, field.TypeInt, value)
+	if value, ok := tsuo.mutation.ScoreRatio(); ok {
+		_spec.SetField(testcaseset.FieldScoreRatio, field.TypeInt, value)
 	}
-	if value, ok := tsuo.mutation.AddedScore(); ok {
-		_spec.AddField(testcaseset.FieldScore, field.TypeInt, value)
+	if value, ok := tsuo.mutation.AddedScoreRatio(); ok {
+		_spec.AddField(testcaseset.FieldScoreRatio, field.TypeInt, value)
 	}
 	if value, ok := tsuo.mutation.IsSample(); ok {
 		_spec.SetField(testcaseset.FieldIsSample, field.TypeBool, value)
