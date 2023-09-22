@@ -24,7 +24,7 @@ func NewInteractor(entClient *ent.Client, secret string) *Interactor {
 	return &Interactor{entClient, logger, secret}
 }
 
-func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest, secret string) (*pb.LoginResponse, error) {
+func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	username := intercepter.GetClaimsFromContext(ctx).Username
 
 	q := i.entClient.User.Query()
@@ -41,6 +41,7 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest, secret str
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
+	secret := i.Secret
 	tokens, err := GenerateTokens(ctx, i.entClient, []byte(secret), username)
 	if err != nil {
 		return nil, err

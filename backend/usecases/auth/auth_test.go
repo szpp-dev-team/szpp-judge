@@ -73,7 +73,7 @@ func Test_Login(t *testing.T) {
 			if test.prepare != nil {
 				test.prepare(t, req)
 			}
-			resp, err := interactor.Login(ctx, req, secret)
+			resp, err := interactor.Login(ctx, req)
 			if test.wantErr {
 				require.Error(t, err)
 				return
@@ -121,7 +121,7 @@ func Test_RefreshAccessToken(t *testing.T) {
 					Username: username,
 					Password: "tooreeee",
 				}
-				loginResp, err := interactor.Login(ctx, loginReq, secret)
+				loginResp, err := interactor.Login(ctx, loginReq)
 				refreshToken := loginResp.RefreshToken
 				require.NoError(t, err)
 				return refreshToken
@@ -151,7 +151,7 @@ func Test_RefreshAccessToken(t *testing.T) {
 					Username: username,
 					Password: "tooreeee",
 				}
-				loginResp, err := interactor.Login(ctx, loginReq, secret)
+				loginResp, err := interactor.Login(ctx, loginReq)
 				refreshToken := loginResp.RefreshToken
 				killRefreshToken(ctx, entClient, refreshToken)
 				require.NoError(t, err)
