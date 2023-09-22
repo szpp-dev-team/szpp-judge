@@ -14,10 +14,22 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Contest is the client for interacting with the Contest builders.
+	Contest *ContestClient
+	// ContestTask is the client for interacting with the ContestTask builders.
+	ContestTask *ContestTaskClient
+	// ContestUser is the client for interacting with the ContestUser builders.
+	ContestUser *ContestUserClient
+	// Language is the client for interacting with the Language builders.
+	Language *LanguageClient
+	// Submit is the client for interacting with the Submit builders.
+	Submit *SubmitClient
 	// Task is the client for interacting with the Task builders.
 	Task *TaskClient
 	// Testcase is the client for interacting with the Testcase builders.
 	Testcase *TestcaseClient
+	// TestcaseResult is the client for interacting with the TestcaseResult builders.
+	TestcaseResult *TestcaseResultClient
 	// TestcaseSet is the client for interacting with the TestcaseSet builders.
 	TestcaseSet *TestcaseSetClient
 	// User is the client for interacting with the User builders.
@@ -153,8 +165,14 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Contest = NewContestClient(tx.config)
+	tx.ContestTask = NewContestTaskClient(tx.config)
+	tx.ContestUser = NewContestUserClient(tx.config)
+	tx.Language = NewLanguageClient(tx.config)
+	tx.Submit = NewSubmitClient(tx.config)
 	tx.Task = NewTaskClient(tx.config)
 	tx.Testcase = NewTestcaseClient(tx.config)
+	tx.TestcaseResult = NewTestcaseResultClient(tx.config)
 	tx.TestcaseSet = NewTestcaseSetClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
@@ -166,7 +184,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Task.QueryXXX(), the query will be executed
+// applies a query, for example: Contest.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
