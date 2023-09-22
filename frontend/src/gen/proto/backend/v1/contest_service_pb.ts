@@ -428,9 +428,9 @@ export class GetContestTaskRequest extends Message<GetContestTaskRequest> {
  */
 export class GetContestTaskResponse extends Message<GetContestTaskResponse> {
   /**
-   * @generated from field: backend.v1.ContestTask task = 1;
+   * @generated from field: backend.v1.Task task = 1;
    */
-  task?: ContestTask;
+  task?: Task;
 
   constructor(data?: PartialMessage<GetContestTaskResponse>) {
     super();
@@ -440,7 +440,7 @@ export class GetContestTaskResponse extends Message<GetContestTaskResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.GetContestTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "task", kind: "message", T: ContestTask },
+    { no: 1, name: "task", kind: "message", T: Task },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetContestTaskResponse {
