@@ -331,7 +331,7 @@ func syncTestcaseSets(
 		newTestcaseIDs := lo.Map(testcaseSet.TestcaseSlugs, func(s string, _ int) int { return testcaseByName[s].ID })
 		testcaseSetID, err := tx.TestcaseSet.Create().
 			SetName(testcaseSet.Slug).
-			SetScore(int(testcaseSet.Score)).
+			SetScoreRatio(int(testcaseSet.ScoreRatio)).
 			SetIsSample(testcaseSet.IsSample).
 			SetTaskID(taskID).
 			AddTestcaseIDs(newTestcaseIDs...).
@@ -443,7 +443,7 @@ func toPbTestcaseSet(t *ent.TestcaseSet) *backendv1.TestcaseSet {
 	return &backendv1.TestcaseSet{
 		Id:            int32(t.ID),
 		Slug:          t.Name,
-		Score:         int32(t.Score),
+		ScoreRatio:    int32(t.ScoreRatio),
 		IsSample:      t.IsSample,
 		TestcaseSlugs: lo.Map(t.Edges.Testcases, func(t *ent.Testcase, _ int) string { return t.Name }),
 		CreatedAt:     timestamppb.New(t.CreatedAt),

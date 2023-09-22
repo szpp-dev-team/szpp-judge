@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package backend.v1;
+
+import "backend/v1/judge_resources.proto";
+
+service JudgeService {
+  // 提出する
+  rpc Submit(SubmitRequest) returns (SubmitResponse);
+  // 提出の詳細を取得
+  rpc GetSubmissionDetail(GetSubmissionDetailRequest) returns (GetSubmissionDetailResponse);
+  // 提出一覧を取得
+  rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse);
+  // ジャッジの進捗を取得
+  rpc GetJudgeProgress(GetJudgeProgressRequest) returns (GetJudgeProgressResponse);
+}
+
+message SubmitRequest {
+  optional int32 contest_id = 1;
+  int32 task_id = 2;
+  string lang_id = 3;
+  string source_code = 4;
+}
+
+message SubmitResponse {
+  int32 submission_id = 1;
+}
+
+message GetSubmissionDetailRequest {
+  int32 id = 1;
+}
+
+message GetSubmissionDetailResponse {
+  SubmissionDetail submission_detail = 1;
+}
+
+message ListSubmissionsRequest {
+  optional int32 contest_id = 1;
+  optional string username = 2;
+}
+
+message ListSubmissionsResponse {
+  repeated SubmissionSummary submissions = 1;
+}
+
+message GetJudgeProgressRequest {
+  int32 submission_id = 1;
+}
+
+message GetJudgeProgressResponse {
+  JudgeProgress judge_progress = 1;
+}

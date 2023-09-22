@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package backend.v1;
+
+import "backend/v1/task_resources.proto";
+
+service TaskService {
+  // Task を作成する
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  // 指定された Task を取得する
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  // Task を更新する
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+
+  // TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
+  // contestant によるリクエストの場合は sample のみ取得する。
+  rpc GetTestcaseSets(GetTestcaseSetsRequest) returns (GetTestcaseSetsResponse);
+  // TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
+  rpc SyncTestcaseSets(SyncTestcaseSetsRequest) returns (SyncTestcaseSetsResponse);
+}
+
+message CreateTaskRequest {
+  MutationTask task = 1;
+}
+
+message CreateTaskResponse {
+  Task task = 1;
+}
+
+message GetTaskRequest {
+  int32 task_id = 1;
+}
+
+message GetTaskResponse {
+  Task task = 1;
+}
+
+message UpdateTaskRequest {
+  int32 task_id = 1;
+  MutationTask task = 2;
+}
+
+message UpdateTaskResponse {
+  Task task = 1;
+}
+
+message GetTestcaseSetsRequest {
+  int32 task_id = 1;
+}
+
+message GetTestcaseSetsResponse {
+  repeated TestcaseSet testcase_sets = 1;
+  repeated Testcase testcases = 2;
+}
+
+message SyncTestcaseSetsRequest {
+  int32 task_id = 1;
+  repeated MutationTestcaseSet testcase_sets = 2;
+  repeated MutationTestcase testcases = 3;
+}
+
+message SyncTestcaseSetsResponse {
+  repeated TestcaseSet testcase_sets = 1;
+  repeated Testcase testcases = 2;
+}

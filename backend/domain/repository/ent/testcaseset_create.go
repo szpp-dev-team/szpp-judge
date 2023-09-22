@@ -30,9 +30,9 @@ func (tsc *TestcaseSetCreate) SetName(s string) *TestcaseSetCreate {
 	return tsc
 }
 
-// SetScore sets the "score" field.
-func (tsc *TestcaseSetCreate) SetScore(i int) *TestcaseSetCreate {
-	tsc.mutation.SetScore(i)
+// SetScoreRatio sets the "score_ratio" field.
+func (tsc *TestcaseSetCreate) SetScoreRatio(i int) *TestcaseSetCreate {
+	tsc.mutation.SetScoreRatio(i)
 	return tsc
 }
 
@@ -131,8 +131,8 @@ func (tsc *TestcaseSetCreate) check() error {
 	if _, ok := tsc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "TestcaseSet.name"`)}
 	}
-	if _, ok := tsc.mutation.Score(); !ok {
-		return &ValidationError{Name: "score", err: errors.New(`ent: missing required field "TestcaseSet.score"`)}
+	if _, ok := tsc.mutation.ScoreRatio(); !ok {
+		return &ValidationError{Name: "score_ratio", err: errors.New(`ent: missing required field "TestcaseSet.score_ratio"`)}
 	}
 	if _, ok := tsc.mutation.IsSample(); !ok {
 		return &ValidationError{Name: "is_sample", err: errors.New(`ent: missing required field "TestcaseSet.is_sample"`)}
@@ -180,9 +180,9 @@ func (tsc *TestcaseSetCreate) createSpec() (*TestcaseSet, *sqlgraph.CreateSpec) 
 		_spec.SetField(testcaseset.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := tsc.mutation.Score(); ok {
-		_spec.SetField(testcaseset.FieldScore, field.TypeInt, value)
-		_node.Score = value
+	if value, ok := tsc.mutation.ScoreRatio(); ok {
+		_spec.SetField(testcaseset.FieldScoreRatio, field.TypeInt, value)
+		_node.ScoreRatio = value
 	}
 	if value, ok := tsc.mutation.IsSample(); ok {
 		_spec.SetField(testcaseset.FieldIsSample, field.TypeBool, value)
@@ -293,21 +293,21 @@ func (u *TestcaseSetUpsert) UpdateName() *TestcaseSetUpsert {
 	return u
 }
 
-// SetScore sets the "score" field.
-func (u *TestcaseSetUpsert) SetScore(v int) *TestcaseSetUpsert {
-	u.Set(testcaseset.FieldScore, v)
+// SetScoreRatio sets the "score_ratio" field.
+func (u *TestcaseSetUpsert) SetScoreRatio(v int) *TestcaseSetUpsert {
+	u.Set(testcaseset.FieldScoreRatio, v)
 	return u
 }
 
-// UpdateScore sets the "score" field to the value that was provided on create.
-func (u *TestcaseSetUpsert) UpdateScore() *TestcaseSetUpsert {
-	u.SetExcluded(testcaseset.FieldScore)
+// UpdateScoreRatio sets the "score_ratio" field to the value that was provided on create.
+func (u *TestcaseSetUpsert) UpdateScoreRatio() *TestcaseSetUpsert {
+	u.SetExcluded(testcaseset.FieldScoreRatio)
 	return u
 }
 
-// AddScore adds v to the "score" field.
-func (u *TestcaseSetUpsert) AddScore(v int) *TestcaseSetUpsert {
-	u.Add(testcaseset.FieldScore, v)
+// AddScoreRatio adds v to the "score_ratio" field.
+func (u *TestcaseSetUpsert) AddScoreRatio(v int) *TestcaseSetUpsert {
+	u.Add(testcaseset.FieldScoreRatio, v)
 	return u
 }
 
@@ -415,24 +415,24 @@ func (u *TestcaseSetUpsertOne) UpdateName() *TestcaseSetUpsertOne {
 	})
 }
 
-// SetScore sets the "score" field.
-func (u *TestcaseSetUpsertOne) SetScore(v int) *TestcaseSetUpsertOne {
+// SetScoreRatio sets the "score_ratio" field.
+func (u *TestcaseSetUpsertOne) SetScoreRatio(v int) *TestcaseSetUpsertOne {
 	return u.Update(func(s *TestcaseSetUpsert) {
-		s.SetScore(v)
+		s.SetScoreRatio(v)
 	})
 }
 
-// AddScore adds v to the "score" field.
-func (u *TestcaseSetUpsertOne) AddScore(v int) *TestcaseSetUpsertOne {
+// AddScoreRatio adds v to the "score_ratio" field.
+func (u *TestcaseSetUpsertOne) AddScoreRatio(v int) *TestcaseSetUpsertOne {
 	return u.Update(func(s *TestcaseSetUpsert) {
-		s.AddScore(v)
+		s.AddScoreRatio(v)
 	})
 }
 
-// UpdateScore sets the "score" field to the value that was provided on create.
-func (u *TestcaseSetUpsertOne) UpdateScore() *TestcaseSetUpsertOne {
+// UpdateScoreRatio sets the "score_ratio" field to the value that was provided on create.
+func (u *TestcaseSetUpsertOne) UpdateScoreRatio() *TestcaseSetUpsertOne {
 	return u.Update(func(s *TestcaseSetUpsert) {
-		s.UpdateScore()
+		s.UpdateScoreRatio()
 	})
 }
 
@@ -708,24 +708,24 @@ func (u *TestcaseSetUpsertBulk) UpdateName() *TestcaseSetUpsertBulk {
 	})
 }
 
-// SetScore sets the "score" field.
-func (u *TestcaseSetUpsertBulk) SetScore(v int) *TestcaseSetUpsertBulk {
+// SetScoreRatio sets the "score_ratio" field.
+func (u *TestcaseSetUpsertBulk) SetScoreRatio(v int) *TestcaseSetUpsertBulk {
 	return u.Update(func(s *TestcaseSetUpsert) {
-		s.SetScore(v)
+		s.SetScoreRatio(v)
 	})
 }
 
-// AddScore adds v to the "score" field.
-func (u *TestcaseSetUpsertBulk) AddScore(v int) *TestcaseSetUpsertBulk {
+// AddScoreRatio adds v to the "score_ratio" field.
+func (u *TestcaseSetUpsertBulk) AddScoreRatio(v int) *TestcaseSetUpsertBulk {
 	return u.Update(func(s *TestcaseSetUpsert) {
-		s.AddScore(v)
+		s.AddScoreRatio(v)
 	})
 }
 
-// UpdateScore sets the "score" field to the value that was provided on create.
-func (u *TestcaseSetUpsertBulk) UpdateScore() *TestcaseSetUpsertBulk {
+// UpdateScoreRatio sets the "score_ratio" field to the value that was provided on create.
+func (u *TestcaseSetUpsertBulk) UpdateScoreRatio() *TestcaseSetUpsertBulk {
 	return u.Update(func(s *TestcaseSetUpsert) {
-		s.UpdateScore()
+		s.UpdateScoreRatio()
 	})
 }
 

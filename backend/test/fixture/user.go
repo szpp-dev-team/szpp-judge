@@ -76,7 +76,7 @@ func CreateTestcaseSet(t *testing.T, client *ent.Client, slug string, taskID int
 	t.Helper()
 	testcaseSet, err := client.TestcaseSet.Create().
 		SetName(slug).
-		SetScore(100).
+		SetScoreRatio(100).
 		SetIsSample(false).
 		SetTaskID(taskID).
 		AddTestcaseIDs(testcaseIDs...).

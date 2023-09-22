@@ -15,7 +15,7 @@ func (TestcaseSet) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.String("name"),
-		field.Int("score"),
+		field.Int("score_ratio"),
 		field.Bool("is_sample"),
 		field.Time("created_at"),
 		field.Time("updated_at").Optional().Nillable(),

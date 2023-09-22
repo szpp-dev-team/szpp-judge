@@ -292,13 +292,13 @@ func Test_SyncTestcaseSets(t *testing.T) {
 				testcaseSets := []*backendv1.MutationTestcaseSet{
 					{
 						Slug:          "sample",
-						Score:         0,
+						ScoreRatio:    0,
 						IsSample:      true,
 						TestcaseSlugs: []string{"example01", "example02", "example03"},
 					},
 					{
-						Slug:  "all",
-						Score: 100,
+						Slug:       "all",
+						ScoreRatio: 100,
 						TestcaseSlugs: []string{
 							"example01", "example02", "example03",
 							"random01", "random02", "random03", "killer01", "killer02", "killer03",
@@ -439,13 +439,13 @@ func seedMutationTestcasePairs() ([]*backendv1.MutationTestcaseSet, []*backendv1
 	testcaseSets := []*backendv1.MutationTestcaseSet{
 		{
 			Slug:          "sample",
-			Score:         0,
+			ScoreRatio:    0,
 			IsSample:      true,
 			TestcaseSlugs: []string{"example01", "example02", "example03"},
 		},
 		{
-			Slug:  "all",
-			Score: 100,
+			Slug:       "all",
+			ScoreRatio: 100,
 			TestcaseSlugs: []string{
 				"example01", "example02", "example03",
 				"random01", "random02", "random03", "random04", "random05",
