@@ -38,7 +38,7 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest, secret str
 
 	err = u_user.VerifyPassword(user.HashedPassword, req.Password)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
 	tokens, err := GenerateTokens(ctx, i.entClient, []byte(secret), username)
