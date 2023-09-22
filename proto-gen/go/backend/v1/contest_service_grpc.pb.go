@@ -24,7 +24,7 @@ const (
 	ContestService_UpdateContest_FullMethodName           = "/backend.v1.ContestService/UpdateContest"
 	ContestService_ListContests_FullMethodName            = "/backend.v1.ContestService/ListContests"
 	ContestService_ListContestTasks_FullMethodName        = "/backend.v1.ContestService/ListContestTasks"
-	ContestService_RegisterTask_FullMethodName            = "/backend.v1.ContestService/RegisterTask"
+	ContestService_SyncContestTasks_FullMethodName        = "/backend.v1.ContestService/SyncContestTasks"
 	ContestService_GetMySubmissionStatuses_FullMethodName = "/backend.v1.ContestService/GetMySubmissionStatuses"
 	ContestService_GetStandings_FullMethodName            = "/backend.v1.ContestService/GetStandings"
 	ContestService_RegisterMe_FullMethodName              = "/backend.v1.ContestService/RegisterMe"
@@ -51,7 +51,7 @@ type ContestServiceClient interface {
 	// コンテストに紐づく問題の一覧を取得する
 	ListContestTasks(ctx context.Context, in *ListContestTasksRequest, opts ...grpc.CallOption) (*ListContestTasksResponse, error)
 	// 問題をコンテストに紐づかせる
-	RegisterTask(ctx context.Context, in *RegisterTaskRequest, opts ...grpc.CallOption) (*RegisterTaskResponse, error)
+	SyncContestTasks(ctx context.Context, in *SyncContestTasksRequest, opts ...grpc.CallOption) (*SyncContestTasksResponse, error)
 	// 自分の問題ごとの結果情報を取得する
 	GetMySubmissionStatuses(ctx context.Context, in *GetMySubmissionStatusesRequest, opts ...grpc.CallOption) (*GetMySubmissionStatusesResponse, error)
 	// 順位表を取得する
@@ -125,9 +125,9 @@ func (c *contestServiceClient) ListContestTasks(ctx context.Context, in *ListCon
 	return out, nil
 }
 
-func (c *contestServiceClient) RegisterTask(ctx context.Context, in *RegisterTaskRequest, opts ...grpc.CallOption) (*RegisterTaskResponse, error) {
-	out := new(RegisterTaskResponse)
-	err := c.cc.Invoke(ctx, ContestService_RegisterTask_FullMethodName, in, out, opts...)
+func (c *contestServiceClient) SyncContestTasks(ctx context.Context, in *SyncContestTasksRequest, opts ...grpc.CallOption) (*SyncContestTasksResponse, error) {
+	out := new(SyncContestTasksResponse)
+	err := c.cc.Invoke(ctx, ContestService_SyncContestTasks_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ type ContestServiceServer interface {
 	// コンテストに紐づく問題の一覧を取得する
 	ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error)
 	// 問題をコンテストに紐づかせる
-	RegisterTask(context.Context, *RegisterTaskRequest) (*RegisterTaskResponse, error)
+	SyncContestTasks(context.Context, *SyncContestTasksRequest) (*SyncContestTasksResponse, error)
 	// 自分の問題ごとの結果情報を取得する
 	GetMySubmissionStatuses(context.Context, *GetMySubmissionStatusesRequest) (*GetMySubmissionStatusesResponse, error)
 	// 順位表を取得する
@@ -270,8 +270,8 @@ func (UnimplementedContestServiceServer) ListContests(context.Context, *ListCont
 func (UnimplementedContestServiceServer) ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListContestTasks not implemented")
 }
-func (UnimplementedContestServiceServer) RegisterTask(context.Context, *RegisterTaskRequest) (*RegisterTaskResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterTask not implemented")
+func (UnimplementedContestServiceServer) SyncContestTasks(context.Context, *SyncContestTasksRequest) (*SyncContestTasksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncContestTasks not implemented")
 }
 func (UnimplementedContestServiceServer) GetMySubmissionStatuses(context.Context, *GetMySubmissionStatusesRequest) (*GetMySubmissionStatusesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMySubmissionStatuses not implemented")
@@ -402,20 +402,20 @@ func _ContestService_ListContestTasks_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContestService_RegisterTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterTaskRequest)
+func _ContestService_SyncContestTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncContestTasksRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContestServiceServer).RegisterTask(ctx, in)
+		return srv.(ContestServiceServer).SyncContestTasks(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ContestService_RegisterTask_FullMethodName,
+		FullMethod: ContestService_SyncContestTasks_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContestServiceServer).RegisterTask(ctx, req.(*RegisterTaskRequest))
+		return srv.(ContestServiceServer).SyncContestTasks(ctx, req.(*SyncContestTasksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -610,8 +610,8 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContestService_ListContestTasks_Handler,
 		},
 		{
-			MethodName: "RegisterTask",
-			Handler:    _ContestService_RegisterTask_Handler,
+			MethodName: "SyncContestTasks",
+			Handler:    _ContestService_SyncContestTasks_Handler,
 		},
 		{
 			MethodName: "GetMySubmissionStatuses",

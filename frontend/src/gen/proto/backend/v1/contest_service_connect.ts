@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, RegisterTaskRequest, RegisterTaskResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetContestRequest, GetContestResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, SyncContestTasksRequest, SyncContestTasksResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -70,12 +70,12 @@ export const ContestService = {
     /**
      * 問題をコンテストに紐づかせる
      *
-     * @generated from rpc backend.v1.ContestService.RegisterTask
+     * @generated from rpc backend.v1.ContestService.SyncContestTasks
      */
-    registerTask: {
-      name: "RegisterTask",
-      I: RegisterTaskRequest,
-      O: RegisterTaskResponse,
+    syncContestTasks: {
+      name: "SyncContestTasks",
+      I: SyncContestTasksRequest,
+      O: SyncContestTasksResponse,
       kind: MethodKind.Unary,
     },
     /**
