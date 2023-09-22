@@ -48,6 +48,9 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 		SetUpdatedAt(now)
 	user, err := q.Save(ctx)
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			return nil, status.Error(codes.AlreadyExists, "username or email already exists")
+		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &pb.CreateUserResponse{
