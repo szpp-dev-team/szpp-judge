@@ -19,7 +19,7 @@ type Interactor struct {
 }
 
 func NewInteractor(entClient *ent.Client) *Interactor {
-	logger := slog.Default().With(slog.String("usecase", "tasks"))
+	logger := slog.Default().With(slog.String("usecase", "user"))
 	return &Interactor{entClient, logger}
 }
 
@@ -57,34 +57,36 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 
 func (i *Interactor) ExistsUsername(ctx context.Context, req *pb.ExistsUsernameRequest) (*pb.ExistsUsernameResponse, error) {
 	q := i.entClient.User.Query()
-	_, err := q.Where(entuser.Username(req.Username)).Only(ctx)
+	exist, err := q.Where(entuser.Username(req.Username)).Exist(ctx)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return &pb.ExistsUsernameResponse{
-				Exists: false,
-			}, nil
-		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &pb.ExistsUsernameResponse{
-		Exists: true,
-	}, nil
+	if exist {
+		return &pb.ExistsUsernameResponse{
+			Exists: true,
+		}, nil
+	} else {
+		return &pb.ExistsUsernameResponse{
+			Exists: false,
+		}, nil
+	}
 }
 
 func (i *Interactor) ExistsEmail(ctx context.Context, req *pb.ExistsEmailRequest) (*pb.ExistsEmailResponse, error) {
 	q := i.entClient.User.Query()
-	_, err := q.Where(entuser.Email(req.Email)).Only(ctx)
+	exist, err := q.Where(entuser.Email(req.Email)).Exist(ctx)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return &pb.ExistsEmailResponse{
-				Exists: false,
-			}, nil
-		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &pb.ExistsEmailResponse{
-		Exists: true,
-	}, nil
+	if exist {
+		return &pb.ExistsEmailResponse{
+			Exists: true,
+		}, nil
+	} else {
+		return &pb.ExistsEmailResponse{
+			Exists: false,
+		}, nil
+	}
 }
 
 func toPbUser(t *ent.User) *pb.User {
