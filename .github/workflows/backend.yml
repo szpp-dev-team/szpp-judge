@@ -56,7 +56,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "style(backend): [bot] apply code formatter changes"
-          ref: ${{ steps.upstreambranch.outputs.branch }}
   test:
     runs-on: ubuntu-latest
     services:

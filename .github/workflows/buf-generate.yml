@@ -27,4 +27,3 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore(proto-gen): [bot] generate code from proto-buf"
-          ref: ${{ steps.upstreambranch.outputs.branch }}
