@@ -45,10 +45,6 @@ func Auth(secret []byte) grpc.UnaryServerInterceptor {
 	})
 }
 
-func SetClaimsToContext(ctx context.Context, claims *Claims) context.Context {
-	return context.WithValue(ctx, claimsKey, claims)
-}
-
 func GetClaimsFromContext(ctx context.Context) *Claims {
 	claims, _ := ctx.Value(claimsKey).(*Claims)
 	return claims
