@@ -29,7 +29,7 @@ func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, u
 	if err != nil {
 		return Tokens{}, status.Error(codes.Internal, err.Error())
 	}
-	refreshToken, err := GenerateRefreshToken(ctx, entClient)
+	refreshToken, err := generateRefreshToken(ctx, entClient)
 	if err != nil {
 		return Tokens{}, status.Error(codes.Internal, err.Error())
 	}
@@ -50,7 +50,7 @@ func generateAccessToken(secret []byte, username string) (string, error) {
 	return accessToken.SignedString(secret)
 }
 
-func GenerateRefreshToken(ctx context.Context, entClient *ent.Client) (string, error) {
+func generateRefreshToken(ctx context.Context, entClient *ent.Client) (string, error) {
 	//todo: 重複の検証
 	token, _ := MakeRandomStr(32)
 	expiresAt := timejst.Now().Add(time.Hour * 24 * 30)
@@ -67,7 +67,7 @@ func GenerateRefreshToken(ctx context.Context, entClient *ent.Client) (string, e
 	return token, nil
 }
 
-func KillRefreshToken(ctx context.Context, entClient *ent.Client, token string) error {
+func killRefreshToken(ctx context.Context, entClient *ent.Client, token string) error {
 	q := entClient.RefreshToken.Update().
 		Where(enttoken.Token(token)).
 		SetIsDead(true)
@@ -78,7 +78,7 @@ func KillRefreshToken(ctx context.Context, entClient *ent.Client, token string) 
 	return nil
 }
 
-func VerifyRefreshToken(ctx context.Context, entClient *ent.Client, token string) (bool, error) {
+func verifyRefreshToken(ctx context.Context, entClient *ent.Client, token string) (bool, error) {
 	now := timejst.Now()
 	// isdeadではなく、有効期限が切れていないトークンであるかどうかを確認する
 	q := entClient.RefreshToken.Query().

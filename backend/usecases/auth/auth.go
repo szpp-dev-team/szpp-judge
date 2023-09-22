@@ -54,7 +54,7 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest, secret str
 }
 
 func (i *Interactor) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.LogoutResponse, error) {
-	err := KillRefreshToken(ctx, i.entClient, req.RefreshToken)
+	err := killRefreshToken(ctx, i.entClient, req.RefreshToken)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (i *Interactor) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.Log
 }
 
 func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAccessTokenRequest, secret string) (*pb.RefreshAccessTokenResponse, error) {
-	isTokenValid, err := VerifyRefreshToken(ctx, i.entClient, req.RefreshToken)
+	isTokenValid, err := verifyRefreshToken(ctx, i.entClient, req.RefreshToken)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAcce
 		return nil, status.Error(codes.Unauthenticated, "invalid refresh token")
 	} else {
 		username := intercepter.GetClaimsFromContext(ctx).Username
-		accessToken, _ := GenerateAccessToken([]byte(secret), username)
+		accessToken, _ := generateAccessToken([]byte(secret), username)
 		return &pb.RefreshAccessTokenResponse{
 			AccessToken: accessToken,
 		}, nil
