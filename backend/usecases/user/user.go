@@ -2,12 +2,12 @@ package user
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	"golang.org/x/exp/slog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
