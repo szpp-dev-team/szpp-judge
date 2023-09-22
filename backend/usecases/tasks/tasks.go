@@ -14,8 +14,6 @@ import (
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	ent_testcaseset "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
-	sources_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
@@ -27,19 +25,12 @@ import (
 type Interactor struct {
 	entClient     *ent.Client
 	testcasesRepo testcases_repo.Repository
-	sourcesRepo   sources_repo.Repository
-	judgeQueue    judge_queue.JudgeQueue
 	logger        *slog.Logger
 }
 
-func NewInteractor(
-	entClient *ent.Client,
-	testcasesRepo testcases_repo.Repository,
-	sourcesRepo sources_repo.Repository,
-	judgeQueue judge_queue.JudgeQueue,
-) *Interactor {
+func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repository) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "tasks"))
-	return &Interactor{entClient, testcasesRepo, sourcesRepo, judgeQueue, logger}
+	return &Interactor{entClient, testcasesRepo, logger}
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {

@@ -1,4 +1,4 @@
-package tasks
+package judge
 
 import (
 	"context"
@@ -149,8 +149,8 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 	if req.ContestId != nil {
 		// TODO: HasContest
 	}
-	if req.UserId != nil {
-		q = q.Where(ent_submit.HasUserWith(ent_user.ID(int(*req.UserId))))
+	if req.Username != nil {
+		q = q.Where(ent_submit.HasUserWith(ent_user.Username(*req.Username)))
 	}
 	submits, err := q.All(ctx)
 	if err != nil {

@@ -10,6 +10,8 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
+	sources_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 )
 
@@ -17,6 +19,8 @@ type Interactor struct {
 	logger      *slog.Logger
 	judgeClient judgev1.JudgeServiceClient
 	entClient   *ent.Client
+	sourcesRepo sources_repo.Repository
+	judgeQueue  judge_queue.JudgeQueue
 }
 
 func NewInteractor(judgeClient judgev1.JudgeServiceClient, entClient *ent.Client) *Interactor {
@@ -109,12 +113,12 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 	}
 
 	// 得点計算
-	score, err := i.calculateScore(ctx, submit.Edges.Task.Edges.TestcaseSets, testcaseResults)
+	ratioSum, err := i.calculateRatioSum(ctx, submit.Edges.Task.Edges.TestcaseSets, testcaseResults)
 	if err != nil {
 		i.logger.Error("[!!!inconsistency!!!]", slog.Int("submitID", submitID), slog.Int("taskID", submit.Edges.Task.ID), slog.Any("error", err))
 		return err
 	}
-	submit.Score = score
+	submit.Score = ratioSum // TODO: fix
 
 	submit.UpdatedAt = lo.ToPtr(timejst.Now())
 	if _, err := submit.Update().Save(ctx); err != nil {
@@ -124,14 +128,14 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 	return nil
 }
 
-// testcaseSets has edges to Testcase
-func (i *Interactor) calculateScore(ctx context.Context, testcaseSets []*ent.TestcaseSet, testcaseResults []*ent.TestcaseResult) (int, error) {
+// testcaseSets have to have edges to Testcase
+func (i *Interactor) calculateRatioSum(ctx context.Context, testcaseSets []*ent.TestcaseSet, testcaseResults []*ent.TestcaseResult) (int, error) {
 	isACByTestcaseName := make(map[string]bool)
 	for _, testcaseResult := range testcaseResults {
 		isACByTestcaseName[testcaseResult.Edges.Testcase.Name] = testcaseResult.Status == judgev1.JudgeStatus_AC.String()
 	}
 
-	score := 0
+	ratioSum := 0
 	for _, testcaseSet := range testcaseSets {
 		isAllAC := true
 		for _, testcase := range testcaseSet.Edges.Testcases {
@@ -145,11 +149,11 @@ func (i *Interactor) calculateScore(ctx context.Context, testcaseSets []*ent.Tes
 			}
 		}
 		if isAllAC {
-			score += testcaseSet.Score
+			ratioSum += testcaseSet.ScoreRatio
 		}
 	}
 
-	return score, nil
+	return ratioSum, nil
 }
 
 func (i *Interactor) updateSubmitStatusIE(ctx context.Context, submitID int) error {

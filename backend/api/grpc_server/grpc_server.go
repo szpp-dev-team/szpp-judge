@@ -32,7 +32,7 @@ func New(opts ...api.OptionFunc) *grpc.Server {
 	}
 	healthcheckSrv := grpc_interfaces.NewHealthcheckServiceServer()
 	pb.RegisterHealthcheckServiceServer(srv, healthcheckSrv)
-	taskInteractor := tasks.NewInteractor(opt.entClient, opt.testcasesRepository)
+	taskInteractor := tasks.NewInteractor(opt.EntClient, opt.TestcasesRepository)
 	taskSrv := grpc_interfaces.NewTaskServiceServer(taskInteractor)
 	pb.RegisterTaskServiceServer(srv, taskSrv)
 

@@ -3,14 +3,16 @@ package api
 import (
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	"golang.org/x/exp/slog"
 )
 
 type option struct {
-	Logger           *slog.Logger
-	EntClient        *ent.Client
-	CloudtasksClient *cloudtasks.Client
-	UseReflection    bool
+	Logger              *slog.Logger
+	EntClient           *ent.Client
+	CloudtasksClient    *cloudtasks.Client
+	UseReflection       bool
+	TestcasesRepository testcases.Repository
 }
 
 func DefaultOption() *option {
@@ -43,5 +45,11 @@ func WithEntClient(c *ent.Client) OptionFunc {
 func WithCloudtasksClient(c *cloudtasks.Client) OptionFunc {
 	return func(o *option) {
 		o.CloudtasksClient = c
+	}
+}
+
+func WithTestcasesRepository(r testcases.Repository) OptionFunc {
+	return func(o *option) {
+		o.TestcasesRepository = r
 	}
 }
