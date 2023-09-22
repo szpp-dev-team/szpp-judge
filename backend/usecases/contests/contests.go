@@ -35,7 +35,7 @@ func (i *Interactor) CreateContest(ctx context.Context, req *backendv1.CreateCon
 		Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, status.Error(codes.AlreadyExists, "the contest already exists")
+			return nil, status.Error(codes.AlreadyExists, "the contest has already existed")
 		}
 		return nil, status.Error(codes.Internal, "failed to create contest")
 	}
@@ -53,6 +53,28 @@ func (i *Interactor) GetContest(ctx context.Context, req *backendv1.GetContestRe
 		return nil, status.Error(codes.Internal, "failed to get contest")
 	}
 	return &backendv1.GetContestResponse{
+		Contest: toPbContest(contest),
+	}, nil
+}
+
+func (i *Interactor) UpdateContest(ctx context.Context, req *backendv1.UpdateContestRequest) (*backendv1.UpdateContestResponse, error) {
+	contest, err := i.entClient.Contest.UpdateOneID(int(req.Id)).
+		SetName(req.Contest.Name).
+		SetSlug(req.Contest.Slug).
+		SetDescription(req.Contest.Description).
+		SetPenaltySeconds(int(req.Contest.PenaltySeconds)).
+		SetContestType(req.Contest.ContestType.String()).
+		SetIsPublic(req.Contest.IsPublic).
+		SetStartAt(req.Contest.StartAt.AsTime()).
+		SetEndAt(req.Contest.EndAt.AsTime()).
+		Save(ctx)
+	if err != nil {
+		if ent.IsConstraintError(err) {
+			return nil, status.Error(codes.AlreadyExists, "the slug has been already used")
+		}
+		return nil, status.Error(codes.Internal, "failed to update contest")
+	}
+	return &backendv1.UpdateContestResponse{
 		Contest: toPbContest(contest),
 	}, nil
 }
