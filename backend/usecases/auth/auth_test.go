@@ -122,8 +122,8 @@ func Test_RefreshAccessToken(t *testing.T) {
 					Password: "tooreeee",
 				}
 				loginResp, err := interactor.Login(ctx, loginReq)
-				refreshToken := loginResp.RefreshToken
 				require.NoError(t, err)
+				refreshToken := loginResp.RefreshToken
 				return refreshToken
 			},
 			wantErr: false,
