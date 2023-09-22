@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,6 +40,19 @@ func (i *Interactor) CreateContest(ctx context.Context, req *backendv1.CreateCon
 		return nil, status.Error(codes.Internal, "failed to create contest")
 	}
 	return &backendv1.CreateContestResponse{
+		Contest: toPbContest(contest),
+	}, nil
+}
+
+func (i *Interactor) GetContest(ctx context.Context, req *backendv1.GetContestRequest) (*backendv1.GetContestResponse, error) {
+	contest, err := i.entClient.Contest.Query().Where(ent_contest.Slug(req.Slug)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Error(codes.NotFound, "the contest was not found")
+		}
+		return nil, status.Error(codes.Internal, "failed to get contest")
+	}
+	return &backendv1.GetContestResponse{
 		Contest: toPbContest(contest),
 	}, nil
 }
