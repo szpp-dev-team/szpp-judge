@@ -2,13 +2,13 @@ package auth
 
 import (
 	"context"
+	"log/slog"
 
 	intercepter "github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	u_user "github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	"golang.org/x/exp/slog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
