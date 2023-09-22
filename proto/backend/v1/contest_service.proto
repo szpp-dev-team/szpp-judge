@@ -16,6 +16,8 @@ service ContestService {
   rpc ListContests(ListContestsRequest) returns (ListContestsResponse);
   // コンテストに紐づく問題の一覧を取得する
   rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
+  // コンテストに紐づく問題を取得する
+  rpc GetContestTask(GetContestTaskRequest) returns (GetContestTaskResponse);
   // 問題をコンテストに紐づかせる
   rpc SyncContestTasks(SyncContestTasksRequest) returns (SyncContestTasksResponse);
   // 自分の問題ごとの結果情報を取得する
@@ -75,6 +77,15 @@ message ListContestTasksRequest {
 
 message ListContestTasksResponse {
   repeated ContestTask tasks = 1; // 問題の並び順
+}
+
+message GetContestTaskRequest {
+  string contest_slug = 1;
+  int32 task_id = 2;
+}
+
+message GetContestTaskResponse {
+  ContestTask task = 1;
 }
 
 message SyncContestTasksRequest {
