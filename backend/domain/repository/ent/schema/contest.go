@@ -32,5 +32,6 @@ func (Contest) Edges() []ent.Edge {
 		edge.To("submits", Submit.Type),
 		edge.To("users", User.Type).Through("contest_user", ContestUser.Type),
 		edge.To("tasks", Task.Type).Through("contest_task", ContestTask.Type),
+		edge.To("clarifications", ContestClarification.Type),
 	}
 }
