@@ -24,8 +24,8 @@ type Tokens struct {
 	RefreshToken string
 }
 
-func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, Username string) (Tokens, error) {
-	accessToken, err := GenerateAccessToken(secret, Username)
+func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, username string) (Tokens, error) {
+	accessToken, err := generateAccessToken(secret, username)
 	if err != nil {
 		return Tokens{}, status.Error(codes.Internal, err.Error())
 	}
@@ -40,9 +40,9 @@ func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, U
 	}, nil
 }
 
-func GenerateAccessToken(secret []byte, Username string) (string, error) {
+func generateAccessToken(secret []byte, username string) (string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
-		Username: Username,
+		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(timejst.Now().Add(time.Hour)),
 		},
@@ -53,11 +53,11 @@ func GenerateAccessToken(secret []byte, Username string) (string, error) {
 func GenerateRefreshToken(ctx context.Context, entClient *ent.Client) (string, error) {
 	//todo: 重複の検証
 	token, _ := MakeRandomStr(32)
-	expires_at := timejst.Now().Add(time.Hour * 24 * 30)
+	expiresAt := timejst.Now().Add(time.Hour * 24 * 30)
 
 	q := entClient.RefreshToken.Create().
 		SetToken(token).
-		SetExpiresAt(expires_at).
+		SetExpiresAt(expiresAt).
 		SetIsDead(false)
 	_, err := q.Save(ctx)
 	if err != nil {
