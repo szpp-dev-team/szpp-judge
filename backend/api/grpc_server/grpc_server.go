@@ -6,6 +6,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	grpc_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/grpc"
+	"github.com/szpp-dev-team/szpp-judge/backend/usecases/judge"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slog"
@@ -35,6 +36,9 @@ func New(opts ...api.OptionFunc) *grpc.Server {
 	taskInteractor := tasks.NewInteractor(opt.EntClient, opt.TestcasesRepository)
 	taskSrv := grpc_interfaces.NewTaskServiceServer(taskInteractor)
 	pb.RegisterTaskServiceServer(srv, taskSrv)
+	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient)
+	judgeSrv := grpc_interfaces.NewJudgeServiceServer(judgeInteractor)
+	pb.RegisterJudgeServiceServer(srv, judgeSrv)
 
 	return srv
 }

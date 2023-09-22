@@ -4,6 +4,7 @@ import (
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
+	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"golang.org/x/exp/slog"
 )
 
@@ -13,6 +14,7 @@ type option struct {
 	CloudtasksClient    *cloudtasks.Client
 	UseReflection       bool
 	TestcasesRepository testcases.Repository
+	JudgeClient         judgev1.JudgeServiceClient
 }
 
 func DefaultOption() *option {
@@ -51,5 +53,11 @@ func WithCloudtasksClient(c *cloudtasks.Client) OptionFunc {
 func WithTestcasesRepository(r testcases.Repository) OptionFunc {
 	return func(o *option) {
 		o.TestcasesRepository = r
+	}
+}
+
+func WithJudgeClient(c judgev1.JudgeServiceClient) OptionFunc {
+	return func(o *option) {
+		o.JudgeClient = c
 	}
 }

@@ -10,15 +10,21 @@ import (
 	"time"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
+	"cloud.google.com/go/storage"
 	"github.com/go-sql-driver/mysql"
 	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
+	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"golang.org/x/exp/slog"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
+	ctx := context.Background()
 	config, err := config.New()
 	if err != nil {
 		log.Fatal(err)
@@ -44,16 +50,28 @@ func main() {
 		log.Fatal(err)
 	}
 	defer entClient.Close()
-	if err := entClient.Schema.Create(context.Background()); err != nil {
+	if err := entClient.Schema.Create(ctx); err != nil {
 		log.Fatal(err)
 	}
 
 	// api clients
-	cloudtasksClient, err := cloudtasks.NewClient(context.Background())
+	cloudtasksClient, err := cloudtasks.NewClient(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer cloudtasksClient.Close()
+	storageClient, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer storageClient.Close()
+	testcasesRepository := testcases.NewRepository(storageClient)
+	conn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+	judgeClient := judgev1.NewJudgeServiceClient(conn)
 
 	// logger
 	logger := slog.Default()
@@ -63,6 +81,8 @@ func main() {
 		api.WithEntClient(entClient),
 		api.WithReflection(config.ModeDev),
 		api.WithCloudtasksClient(cloudtasksClient),
+		api.WithTestcasesRepository(testcasesRepository),
+		api.WithJudgeClient(judgeClient),
 	)
 	lsnr, err := net.Listen("tcp", ":"+config.GrpcPort)
 	if err != nil {
