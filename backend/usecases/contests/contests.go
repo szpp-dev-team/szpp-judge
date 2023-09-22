@@ -7,6 +7,8 @@ import (
 	"github.com/samber/lo"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -112,6 +114,24 @@ func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListCo
 		Tasks: lo.Map(contest.Edges.ContestTask, func(t *ent.ContestTask, _ int) *backendv1.ContestTask {
 			return toPbContestTask(t)
 		}),
+	}, nil
+}
+
+func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetContestTaskRequest) (*backendv1.GetContestTaskResponse, error) {
+	task, err := i.entClient.Task.Query().
+		Where(
+			ent_task.HasContestsWith(ent_contest.Slug(req.ContestSlug)),
+			ent_task.ID(int(req.TaskId)),
+		).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Error(codes.NotFound, "the contest was not found")
+		}
+		return nil, status.Error(codes.Internal, "failed to get contest")
+	}
+	return &backendv1.GetContestTaskResponse{
+		Task: tasks.ToPbTask(task),
 	}, nil
 }
 
