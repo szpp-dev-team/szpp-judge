@@ -2,13 +2,12 @@ package auth
 
 import (
 	"context"
-	"crypto/rand"
-	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	"github.com/google/uuid"
 	enttoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -51,8 +50,8 @@ func generateAccessToken(secret []byte, username string) (string, error) {
 }
 
 func generateRefreshToken(ctx context.Context, entClient *ent.Client) (string, error) {
-	//todo: 重複の検証
-	token, _ := MakeRandomStr(32)
+	uuidObj, _ := uuid.NewRandom()
+	token := uuidObj.String()
 	expiresAt := timejst.Now().Add(time.Hour * 24 * 30)
 
 	q := entClient.RefreshToken.Create().
@@ -90,19 +89,4 @@ func verifyRefreshToken(ctx context.Context, entClient *ent.Client, token string
 		return false, status.Error(codes.Internal, err.Error())
 	}
 	return exist, nil
-}
-
-func MakeRandomStr(digit uint32) (string, error) {
-	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-	b := make([]byte, digit)
-	if _, err := rand.Read(b); err != nil {
-		return "", errors.New("unexpected error")
-	}
-
-	var result string
-	for _, v := range b {
-		result += string(letters[int(v)%len(letters)])
-	}
-	return result, nil
 }
