@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/samber/lo"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
@@ -76,6 +77,21 @@ func (i *Interactor) UpdateContest(ctx context.Context, req *backendv1.UpdateCon
 	}
 	return &backendv1.UpdateContestResponse{
 		Contest: toPbContest(contest),
+	}, nil
+}
+
+func (i *Interactor) ListContests(ctx context.Context, req *backendv1.ListContestsRequest) (*backendv1.ListContestsResponse, error) {
+	contests, err := i.entClient.Contest.Query().All(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Error(codes.NotFound, "the contest was not found")
+		}
+		return nil, status.Error(codes.Internal, "failed to get contest")
+	}
+	return &backendv1.ListContestsResponse{
+		Contests: lo.Map(contests, func(c *ent.Contest, _ int) *backendv1.Contest {
+			return toPbContest(c)
+		}),
 	}, nil
 }
 
