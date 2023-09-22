@@ -1,11 +1,12 @@
 package api
 
 import (
+	"log/slog"
+
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
-	"golang.org/x/exp/slog"
 )
 
 type option struct {

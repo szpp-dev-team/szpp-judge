@@ -3,13 +3,14 @@ package grpc_server
 import (
 	"context"
 
+	"log/slog"
+
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	grpc_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/grpc"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/judge"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	"golang.org/x/exp/slog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

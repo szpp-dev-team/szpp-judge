@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"log/slog"
+
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/storage"
 	"github.com/go-sql-driver/mysql"
@@ -18,7 +20,6 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
-	"golang.org/x/exp/slog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
