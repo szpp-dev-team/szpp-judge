@@ -25,8 +25,14 @@ type Tokens struct {
 }
 
 func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, Username string) (Tokens, error) {
-	accessToken, _ := GenerateAccessToken(secret, Username)
-	refreshToken, _ := GenerateRefreshToken(ctx, entClient)
+	accessToken, err := GenerateAccessToken(secret, Username)
+	if err != nil {
+		return Tokens{}, status.Error(codes.Internal, err.Error())
+	}
+	refreshToken, err := GenerateRefreshToken(ctx, entClient)
+	if err != nil {
+		return Tokens{}, status.Error(codes.Internal, err.Error())
+	}
 
 	return Tokens{
 		AccessToken:  accessToken,
