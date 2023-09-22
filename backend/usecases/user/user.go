@@ -64,15 +64,9 @@ func (i *Interactor) ExistsUsername(ctx context.Context, req *pb.ExistsUsernameR
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	if exist {
-		return &pb.ExistsUsernameResponse{
-			Exists: true,
-		}, nil
-	} else {
-		return &pb.ExistsUsernameResponse{
-			Exists: false,
-		}, nil
-	}
+	return &pb.ExistsUsernameResponse{
+		Exists: exist,
+	}, nil
 }
 
 func (i *Interactor) ExistsEmail(ctx context.Context, req *pb.ExistsEmailRequest) (*pb.ExistsEmailResponse, error) {
@@ -81,15 +75,9 @@ func (i *Interactor) ExistsEmail(ctx context.Context, req *pb.ExistsEmailRequest
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	if exist {
-		return &pb.ExistsEmailResponse{
-			Exists: true,
-		}, nil
-	} else {
-		return &pb.ExistsEmailResponse{
-			Exists: false,
-		}, nil
-	}
+	return &pb.ExistsEmailResponse{
+		Exists: exist,
+	}, nil
 }
 
 func toPbUser(t *ent.User) *pb.User {
