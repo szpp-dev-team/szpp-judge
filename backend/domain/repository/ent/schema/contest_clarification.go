@@ -32,9 +32,9 @@ func (ContestClarification) Fields() []ent.Field {
 
 func (ContestClarification) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("contest", Contest.Type).// discuss: コンテストに対して、Clarificationは複数存在するので、Uniqueではない?
-			Ref("clarifications").
-			Required(),
+		edge.From("contest", Contest.Type). // discuss: コンテストに対して、Clarificationは複数存在するので、Uniqueではない?
+							Ref("clarifications").
+							Required(),
 		edge.From("task", Task.Type).
 			Ref("clarifications").
 			Required(),
