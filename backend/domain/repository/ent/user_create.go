@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestclarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -107,14 +107,14 @@ func (uc *UserCreate) AddSubmits(s ...*Submit) *UserCreate {
 	return uc.AddSubmitIDs(ids...)
 }
 
-// AddClarificationIDs adds the "clarifications" edge to the ContestClarification entity by IDs.
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by IDs.
 func (uc *UserCreate) AddClarificationIDs(ids ...int) *UserCreate {
 	uc.mutation.AddClarificationIDs(ids...)
 	return uc
 }
 
-// AddClarifications adds the "clarifications" edges to the ContestClarification entity.
-func (uc *UserCreate) AddClarifications(c ...*ContestClarification) *UserCreate {
+// AddClarifications adds the "clarifications" edges to the Clarification entity.
+func (uc *UserCreate) AddClarifications(c ...*Clarification) *UserCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -122,14 +122,14 @@ func (uc *UserCreate) AddClarifications(c ...*ContestClarification) *UserCreate 
 	return uc.AddClarificationIDs(ids...)
 }
 
-// AddAnsweredClarificationIDs adds the "answered_clarifications" edge to the ContestClarification entity by IDs.
+// AddAnsweredClarificationIDs adds the "answered_clarifications" edge to the Clarification entity by IDs.
 func (uc *UserCreate) AddAnsweredClarificationIDs(ids ...int) *UserCreate {
 	uc.mutation.AddAnsweredClarificationIDs(ids...)
 	return uc
 }
 
-// AddAnsweredClarifications adds the "answered_clarifications" edges to the ContestClarification entity.
-func (uc *UserCreate) AddAnsweredClarifications(c ...*ContestClarification) *UserCreate {
+// AddAnsweredClarifications adds the "answered_clarifications" edges to the Clarification entity.
+func (uc *UserCreate) AddAnsweredClarifications(c ...*Clarification) *UserCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -313,7 +313,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: user.ClarificationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(contestclarification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -329,7 +329,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: user.AnsweredClarificationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(contestclarification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

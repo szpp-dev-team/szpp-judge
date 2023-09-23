@@ -42,9 +42,9 @@ type UserEdges struct {
 	// Submits holds the value of the submits edge.
 	Submits []*Submit `json:"submits,omitempty"`
 	// Clarifications holds the value of the clarifications edge.
-	Clarifications []*ContestClarification `json:"clarifications,omitempty"`
+	Clarifications []*Clarification `json:"clarifications,omitempty"`
 	// AnsweredClarifications holds the value of the answered_clarifications edge.
-	AnsweredClarifications []*ContestClarification `json:"answered_clarifications,omitempty"`
+	AnsweredClarifications []*Clarification `json:"answered_clarifications,omitempty"`
 	// Contests holds the value of the contests edge.
 	Contests []*Contest `json:"contests,omitempty"`
 	// ContestUser holds the value of the contest_user edge.
@@ -74,7 +74,7 @@ func (e UserEdges) SubmitsOrErr() ([]*Submit, error) {
 
 // ClarificationsOrErr returns the Clarifications value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) ClarificationsOrErr() ([]*ContestClarification, error) {
+func (e UserEdges) ClarificationsOrErr() ([]*Clarification, error) {
 	if e.loadedTypes[2] {
 		return e.Clarifications, nil
 	}
@@ -83,7 +83,7 @@ func (e UserEdges) ClarificationsOrErr() ([]*ContestClarification, error) {
 
 // AnsweredClarificationsOrErr returns the AnsweredClarifications value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) AnsweredClarificationsOrErr() ([]*ContestClarification, error) {
+func (e UserEdges) AnsweredClarificationsOrErr() ([]*Clarification, error) {
 	if e.loadedTypes[3] {
 		return e.AnsweredClarifications, nil
 	}
@@ -202,12 +202,12 @@ func (u *User) QuerySubmits() *SubmitQuery {
 }
 
 // QueryClarifications queries the "clarifications" edge of the User entity.
-func (u *User) QueryClarifications() *ContestClarificationQuery {
+func (u *User) QueryClarifications() *ClarificationQuery {
 	return NewUserClient(u.config).QueryClarifications(u)
 }
 
 // QueryAnsweredClarifications queries the "answered_clarifications" edge of the User entity.
-func (u *User) QueryAnsweredClarifications() *ContestClarificationQuery {
+func (u *User) QueryAnsweredClarifications() *ClarificationQuery {
 	return NewUserClient(u.config).QueryAnsweredClarifications(u)
 }
 

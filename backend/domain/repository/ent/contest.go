@@ -48,7 +48,7 @@ type ContestEdges struct {
 	// Tasks holds the value of the tasks edge.
 	Tasks []*Task `json:"tasks,omitempty"`
 	// Clarifications holds the value of the clarifications edge.
-	Clarifications []*ContestClarification `json:"clarifications,omitempty"`
+	Clarifications []*Clarification `json:"clarifications,omitempty"`
 	// ContestUser holds the value of the contest_user edge.
 	ContestUser []*ContestUser `json:"contest_user,omitempty"`
 	// ContestTask holds the value of the contest_task edge.
@@ -87,7 +87,7 @@ func (e ContestEdges) TasksOrErr() ([]*Task, error) {
 
 // ClarificationsOrErr returns the Clarifications value or an error if the edge
 // was not loaded in eager-loading.
-func (e ContestEdges) ClarificationsOrErr() ([]*ContestClarification, error) {
+func (e ContestEdges) ClarificationsOrErr() ([]*Clarification, error) {
 	if e.loadedTypes[3] {
 		return e.Clarifications, nil
 	}
@@ -223,7 +223,7 @@ func (c *Contest) QueryTasks() *TaskQuery {
 }
 
 // QueryClarifications queries the "clarifications" edge of the Contest entity.
-func (c *Contest) QueryClarifications() *ContestClarificationQuery {
+func (c *Contest) QueryClarifications() *ClarificationQuery {
 	return NewContestClient(c.config).QueryClarifications(c)
 }
 

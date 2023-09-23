@@ -8,6 +8,23 @@ import (
 )
 
 var (
+	// ClarificationsColumns holds the columns for the "clarifications" table.
+	ClarificationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "content", Type: field.TypeString},
+		{Name: "is_public", Type: field.TypeBool},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "answer_content", Type: field.TypeString, Nullable: true},
+		{Name: "answer_created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "answer_updated_at", Type: field.TypeTime, Nullable: true},
+	}
+	// ClarificationsTable holds the schema information for the "clarifications" table.
+	ClarificationsTable = &schema.Table{
+		Name:       "clarifications",
+		Columns:    ClarificationsColumns,
+		PrimaryKey: []*schema.Column{ClarificationsColumns[0]},
+	}
 	// ContestsColumns holds the columns for the "contests" table.
 	ContestsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -25,23 +42,6 @@ var (
 		Name:       "contests",
 		Columns:    ContestsColumns,
 		PrimaryKey: []*schema.Column{ContestsColumns[0]},
-	}
-	// ContestClarificationsColumns holds the columns for the "contest_clarifications" table.
-	ContestClarificationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "content", Type: field.TypeString},
-		{Name: "is_public", Type: field.TypeBool},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "answer_content", Type: field.TypeString, Nullable: true},
-		{Name: "answer_created_at", Type: field.TypeTime, Nullable: true},
-		{Name: "answer_updated_at", Type: field.TypeTime, Nullable: true},
-	}
-	// ContestClarificationsTable holds the schema information for the "contest_clarifications" table.
-	ContestClarificationsTable = &schema.Table{
-		Name:       "contest_clarifications",
-		Columns:    ContestClarificationsColumns,
-		PrimaryKey: []*schema.Column{ContestClarificationsColumns[0]},
 	}
 	// ContestTasksColumns holds the columns for the "contest_tasks" table.
 	ContestTasksColumns = []*schema.Column{
@@ -309,7 +309,7 @@ var (
 	// ContestClarificationsColumns holds the columns for the "contest_clarifications" table.
 	ContestClarificationsColumns = []*schema.Column{
 		{Name: "contest_id", Type: field.TypeInt},
-		{Name: "contest_clarification_id", Type: field.TypeInt},
+		{Name: "clarification_id", Type: field.TypeInt},
 	}
 	// ContestClarificationsTable holds the schema information for the "contest_clarifications" table.
 	ContestClarificationsTable = &schema.Table{
@@ -324,9 +324,9 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "contest_clarifications_contest_clarification_id",
+				Symbol:     "contest_clarifications_clarification_id",
 				Columns:    []*schema.Column{ContestClarificationsColumns[1]},
-				RefColumns: []*schema.Column{ContestClarificationsColumns[0]},
+				RefColumns: []*schema.Column{ClarificationsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -334,7 +334,7 @@ var (
 	// TaskClarificationsColumns holds the columns for the "task_clarifications" table.
 	TaskClarificationsColumns = []*schema.Column{
 		{Name: "task_id", Type: field.TypeInt},
-		{Name: "contest_clarification_id", Type: field.TypeInt},
+		{Name: "clarification_id", Type: field.TypeInt},
 	}
 	// TaskClarificationsTable holds the schema information for the "task_clarifications" table.
 	TaskClarificationsTable = &schema.Table{
@@ -349,9 +349,9 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "task_clarifications_contest_clarification_id",
+				Symbol:     "task_clarifications_clarification_id",
 				Columns:    []*schema.Column{TaskClarificationsColumns[1]},
-				RefColumns: []*schema.Column{ContestClarificationsColumns[0]},
+				RefColumns: []*schema.Column{ClarificationsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -384,7 +384,7 @@ var (
 	// UserClarificationsColumns holds the columns for the "user_clarifications" table.
 	UserClarificationsColumns = []*schema.Column{
 		{Name: "user_id", Type: field.TypeInt},
-		{Name: "contest_clarification_id", Type: field.TypeInt},
+		{Name: "clarification_id", Type: field.TypeInt},
 	}
 	// UserClarificationsTable holds the schema information for the "user_clarifications" table.
 	UserClarificationsTable = &schema.Table{
@@ -399,9 +399,9 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "user_clarifications_contest_clarification_id",
+				Symbol:     "user_clarifications_clarification_id",
 				Columns:    []*schema.Column{UserClarificationsColumns[1]},
-				RefColumns: []*schema.Column{ContestClarificationsColumns[0]},
+				RefColumns: []*schema.Column{ClarificationsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -409,7 +409,7 @@ var (
 	// UserAnsweredClarificationsColumns holds the columns for the "user_answered_clarifications" table.
 	UserAnsweredClarificationsColumns = []*schema.Column{
 		{Name: "user_id", Type: field.TypeInt},
-		{Name: "contest_clarification_id", Type: field.TypeInt},
+		{Name: "clarification_id", Type: field.TypeInt},
 	}
 	// UserAnsweredClarificationsTable holds the schema information for the "user_answered_clarifications" table.
 	UserAnsweredClarificationsTable = &schema.Table{
@@ -424,17 +424,17 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "user_answered_clarifications_contest_clarification_id",
+				Symbol:     "user_answered_clarifications_clarification_id",
 				Columns:    []*schema.Column{UserAnsweredClarificationsColumns[1]},
-				RefColumns: []*schema.Column{ContestClarificationsColumns[0]},
+				RefColumns: []*schema.Column{ClarificationsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		ClarificationsTable,
 		ContestsTable,
-		ContestClarificationsTable,
 		ContestTasksTable,
 		ContestUsersTable,
 		LanguagesTable,
@@ -467,13 +467,13 @@ func init() {
 	TestcaseResultsTable.ForeignKeys[1].RefTable = TestcasesTable
 	TestcaseSetsTable.ForeignKeys[0].RefTable = TasksTable
 	ContestClarificationsTable.ForeignKeys[0].RefTable = ContestsTable
-	ContestClarificationsTable.ForeignKeys[1].RefTable = ContestClarificationsTable
+	ContestClarificationsTable.ForeignKeys[1].RefTable = ClarificationsTable
 	TaskClarificationsTable.ForeignKeys[0].RefTable = TasksTable
-	TaskClarificationsTable.ForeignKeys[1].RefTable = ContestClarificationsTable
+	TaskClarificationsTable.ForeignKeys[1].RefTable = ClarificationsTable
 	TestcaseSetTestcasesTable.ForeignKeys[0].RefTable = TestcaseSetsTable
 	TestcaseSetTestcasesTable.ForeignKeys[1].RefTable = TestcasesTable
 	UserClarificationsTable.ForeignKeys[0].RefTable = UsersTable
-	UserClarificationsTable.ForeignKeys[1].RefTable = ContestClarificationsTable
+	UserClarificationsTable.ForeignKeys[1].RefTable = ClarificationsTable
 	UserAnsweredClarificationsTable.ForeignKeys[0].RefTable = UsersTable
-	UserAnsweredClarificationsTable.ForeignKeys[1].RefTable = ContestClarificationsTable
+	UserAnsweredClarificationsTable.ForeignKeys[1].RefTable = ClarificationsTable
 }

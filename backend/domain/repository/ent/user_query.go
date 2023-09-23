@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestclarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
@@ -29,8 +29,8 @@ type UserQuery struct {
 	predicates                 []predicate.User
 	withTasks                  *TaskQuery
 	withSubmits                *SubmitQuery
-	withClarifications         *ContestClarificationQuery
-	withAnsweredClarifications *ContestClarificationQuery
+	withClarifications         *ClarificationQuery
+	withAnsweredClarifications *ClarificationQuery
 	withContests               *ContestQuery
 	withContestUser            *ContestUserQuery
 	// intermediate query (i.e. traversal path).
@@ -114,8 +114,8 @@ func (uq *UserQuery) QuerySubmits() *SubmitQuery {
 }
 
 // QueryClarifications chains the current query on the "clarifications" edge.
-func (uq *UserQuery) QueryClarifications() *ContestClarificationQuery {
-	query := (&ContestClarificationClient{config: uq.config}).Query()
+func (uq *UserQuery) QueryClarifications() *ClarificationQuery {
+	query := (&ClarificationClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -126,7 +126,7 @@ func (uq *UserQuery) QueryClarifications() *ContestClarificationQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(contestclarification.Table, contestclarification.FieldID),
+			sqlgraph.To(clarification.Table, clarification.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.ClarificationsTable, user.ClarificationsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
@@ -136,8 +136,8 @@ func (uq *UserQuery) QueryClarifications() *ContestClarificationQuery {
 }
 
 // QueryAnsweredClarifications chains the current query on the "answered_clarifications" edge.
-func (uq *UserQuery) QueryAnsweredClarifications() *ContestClarificationQuery {
-	query := (&ContestClarificationClient{config: uq.config}).Query()
+func (uq *UserQuery) QueryAnsweredClarifications() *ClarificationQuery {
+	query := (&ClarificationClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -148,7 +148,7 @@ func (uq *UserQuery) QueryAnsweredClarifications() *ContestClarificationQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(contestclarification.Table, contestclarification.FieldID),
+			sqlgraph.To(clarification.Table, clarification.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.AnsweredClarificationsTable, user.AnsweredClarificationsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
@@ -429,8 +429,8 @@ func (uq *UserQuery) WithSubmits(opts ...func(*SubmitQuery)) *UserQuery {
 
 // WithClarifications tells the query-builder to eager-load the nodes that are connected to
 // the "clarifications" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithClarifications(opts ...func(*ContestClarificationQuery)) *UserQuery {
-	query := (&ContestClarificationClient{config: uq.config}).Query()
+func (uq *UserQuery) WithClarifications(opts ...func(*ClarificationQuery)) *UserQuery {
+	query := (&ClarificationClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -440,8 +440,8 @@ func (uq *UserQuery) WithClarifications(opts ...func(*ContestClarificationQuery)
 
 // WithAnsweredClarifications tells the query-builder to eager-load the nodes that are connected to
 // the "answered_clarifications" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithAnsweredClarifications(opts ...func(*ContestClarificationQuery)) *UserQuery {
-	query := (&ContestClarificationClient{config: uq.config}).Query()
+func (uq *UserQuery) WithAnsweredClarifications(opts ...func(*ClarificationQuery)) *UserQuery {
+	query := (&ClarificationClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -592,15 +592,15 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	}
 	if query := uq.withClarifications; query != nil {
 		if err := uq.loadClarifications(ctx, query, nodes,
-			func(n *User) { n.Edges.Clarifications = []*ContestClarification{} },
-			func(n *User, e *ContestClarification) { n.Edges.Clarifications = append(n.Edges.Clarifications, e) }); err != nil {
+			func(n *User) { n.Edges.Clarifications = []*Clarification{} },
+			func(n *User, e *Clarification) { n.Edges.Clarifications = append(n.Edges.Clarifications, e) }); err != nil {
 			return nil, err
 		}
 	}
 	if query := uq.withAnsweredClarifications; query != nil {
 		if err := uq.loadAnsweredClarifications(ctx, query, nodes,
-			func(n *User) { n.Edges.AnsweredClarifications = []*ContestClarification{} },
-			func(n *User, e *ContestClarification) {
+			func(n *User) { n.Edges.AnsweredClarifications = []*Clarification{} },
+			func(n *User, e *Clarification) {
 				n.Edges.AnsweredClarifications = append(n.Edges.AnsweredClarifications, e)
 			}); err != nil {
 			return nil, err
@@ -685,7 +685,7 @@ func (uq *UserQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nodes 
 	}
 	return nil
 }
-func (uq *UserQuery) loadClarifications(ctx context.Context, query *ContestClarificationQuery, nodes []*User, init func(*User), assign func(*User, *ContestClarification)) error {
+func (uq *UserQuery) loadClarifications(ctx context.Context, query *ClarificationQuery, nodes []*User, init func(*User), assign func(*User, *Clarification)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*User)
 	nids := make(map[int]map[*User]struct{})
@@ -698,7 +698,7 @@ func (uq *UserQuery) loadClarifications(ctx context.Context, query *ContestClari
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(user.ClarificationsTable)
-		s.Join(joinT).On(s.C(contestclarification.FieldID), joinT.C(user.ClarificationsPrimaryKey[1]))
+		s.Join(joinT).On(s.C(clarification.FieldID), joinT.C(user.ClarificationsPrimaryKey[1]))
 		s.Where(sql.InValues(joinT.C(user.ClarificationsPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
 		s.Select(joinT.C(user.ClarificationsPrimaryKey[0]))
@@ -731,7 +731,7 @@ func (uq *UserQuery) loadClarifications(ctx context.Context, query *ContestClari
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*ContestClarification](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Clarification](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
@@ -746,7 +746,7 @@ func (uq *UserQuery) loadClarifications(ctx context.Context, query *ContestClari
 	}
 	return nil
 }
-func (uq *UserQuery) loadAnsweredClarifications(ctx context.Context, query *ContestClarificationQuery, nodes []*User, init func(*User), assign func(*User, *ContestClarification)) error {
+func (uq *UserQuery) loadAnsweredClarifications(ctx context.Context, query *ClarificationQuery, nodes []*User, init func(*User), assign func(*User, *Clarification)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*User)
 	nids := make(map[int]map[*User]struct{})
@@ -759,7 +759,7 @@ func (uq *UserQuery) loadAnsweredClarifications(ctx context.Context, query *Cont
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(user.AnsweredClarificationsTable)
-		s.Join(joinT).On(s.C(contestclarification.FieldID), joinT.C(user.AnsweredClarificationsPrimaryKey[1]))
+		s.Join(joinT).On(s.C(clarification.FieldID), joinT.C(user.AnsweredClarificationsPrimaryKey[1]))
 		s.Where(sql.InValues(joinT.C(user.AnsweredClarificationsPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
 		s.Select(joinT.C(user.AnsweredClarificationsPrimaryKey[0]))
@@ -792,7 +792,7 @@ func (uq *UserQuery) loadAnsweredClarifications(ctx context.Context, query *Cont
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*ContestClarification](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Clarification](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}

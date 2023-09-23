@@ -61,9 +61,9 @@ const (
 	TasksInverseTable = "tasks"
 	// ClarificationsTable is the table that holds the clarifications relation/edge. The primary key declared below.
 	ClarificationsTable = "contest_clarifications"
-	// ClarificationsInverseTable is the table name for the ContestClarification entity.
-	// It exists in this package in order to avoid circular dependency with the "contestclarification" package.
-	ClarificationsInverseTable = "contest_clarifications"
+	// ClarificationsInverseTable is the table name for the Clarification entity.
+	// It exists in this package in order to avoid circular dependency with the "clarification" package.
+	ClarificationsInverseTable = "clarifications"
 	// ContestUserTable is the table that holds the contest_user relation/edge.
 	ContestUserTable = "contest_users"
 	// ContestUserInverseTable is the table name for the ContestUser entity.
@@ -102,7 +102,7 @@ var (
 	TasksPrimaryKey = []string{"contest_id", "task_id"}
 	// ClarificationsPrimaryKey and ClarificationsColumn2 are the table columns denoting the
 	// primary key for the clarifications relation (M2M).
-	ClarificationsPrimaryKey = []string{"contest_id", "contest_clarification_id"}
+	ClarificationsPrimaryKey = []string{"contest_id", "clarification_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

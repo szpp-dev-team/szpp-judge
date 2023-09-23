@@ -468,7 +468,7 @@ func HasClarifications() predicate.User {
 }
 
 // HasClarificationsWith applies the HasEdge predicate on the "clarifications" edge with a given conditions (other predicates).
-func HasClarificationsWith(preds ...predicate.ContestClarification) predicate.User {
+func HasClarificationsWith(preds ...predicate.Clarification) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newClarificationsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -491,7 +491,7 @@ func HasAnsweredClarifications() predicate.User {
 }
 
 // HasAnsweredClarificationsWith applies the HasEdge predicate on the "answered_clarifications" edge with a given conditions (other predicates).
-func HasAnsweredClarificationsWith(preds ...predicate.ContestClarification) predicate.User {
+func HasAnsweredClarificationsWith(preds ...predicate.Clarification) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newAnsweredClarificationsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestclarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
@@ -32,7 +32,7 @@ type TaskQuery struct {
 	withTestcaseSets   *TestcaseSetQuery
 	withTestcases      *TestcaseQuery
 	withSubmits        *SubmitQuery
-	withClarifications *ContestClarificationQuery
+	withClarifications *ClarificationQuery
 	withUser           *UserQuery
 	withContests       *ContestQuery
 	withContestTask    *ContestTaskQuery
@@ -140,8 +140,8 @@ func (tq *TaskQuery) QuerySubmits() *SubmitQuery {
 }
 
 // QueryClarifications chains the current query on the "clarifications" edge.
-func (tq *TaskQuery) QueryClarifications() *ContestClarificationQuery {
-	query := (&ContestClarificationClient{config: tq.config}).Query()
+func (tq *TaskQuery) QueryClarifications() *ClarificationQuery {
+	query := (&ClarificationClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -152,7 +152,7 @@ func (tq *TaskQuery) QueryClarifications() *ContestClarificationQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(task.Table, task.FieldID, selector),
-			sqlgraph.To(contestclarification.Table, contestclarification.FieldID),
+			sqlgraph.To(clarification.Table, clarification.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, task.ClarificationsTable, task.ClarificationsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
@@ -467,8 +467,8 @@ func (tq *TaskQuery) WithSubmits(opts ...func(*SubmitQuery)) *TaskQuery {
 
 // WithClarifications tells the query-builder to eager-load the nodes that are connected to
 // the "clarifications" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TaskQuery) WithClarifications(opts ...func(*ContestClarificationQuery)) *TaskQuery {
-	query := (&ContestClarificationClient{config: tq.config}).Query()
+func (tq *TaskQuery) WithClarifications(opts ...func(*ClarificationQuery)) *TaskQuery {
+	query := (&ClarificationClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -645,8 +645,8 @@ func (tq *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 	}
 	if query := tq.withClarifications; query != nil {
 		if err := tq.loadClarifications(ctx, query, nodes,
-			func(n *Task) { n.Edges.Clarifications = []*ContestClarification{} },
-			func(n *Task, e *ContestClarification) { n.Edges.Clarifications = append(n.Edges.Clarifications, e) }); err != nil {
+			func(n *Task) { n.Edges.Clarifications = []*Clarification{} },
+			func(n *Task, e *Clarification) { n.Edges.Clarifications = append(n.Edges.Clarifications, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -766,7 +766,7 @@ func (tq *TaskQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nodes 
 	}
 	return nil
 }
-func (tq *TaskQuery) loadClarifications(ctx context.Context, query *ContestClarificationQuery, nodes []*Task, init func(*Task), assign func(*Task, *ContestClarification)) error {
+func (tq *TaskQuery) loadClarifications(ctx context.Context, query *ClarificationQuery, nodes []*Task, init func(*Task), assign func(*Task, *Clarification)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Task)
 	nids := make(map[int]map[*Task]struct{})
@@ -779,7 +779,7 @@ func (tq *TaskQuery) loadClarifications(ctx context.Context, query *ContestClari
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(task.ClarificationsTable)
-		s.Join(joinT).On(s.C(contestclarification.FieldID), joinT.C(task.ClarificationsPrimaryKey[1]))
+		s.Join(joinT).On(s.C(clarification.FieldID), joinT.C(task.ClarificationsPrimaryKey[1]))
 		s.Where(sql.InValues(joinT.C(task.ClarificationsPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
 		s.Select(joinT.C(task.ClarificationsPrimaryKey[0]))
@@ -812,7 +812,7 @@ func (tq *TaskQuery) loadClarifications(ctx context.Context, query *ContestClari
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*ContestClarification](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Clarification](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}

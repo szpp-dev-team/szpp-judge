@@ -11,8 +11,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestclarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
@@ -34,18 +34,1076 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeContest              = "Contest"
-	TypeContestClarification = "ContestClarification"
-	TypeContestTask          = "ContestTask"
-	TypeContestUser          = "ContestUser"
-	TypeLanguage             = "Language"
-	TypeSubmit               = "Submit"
-	TypeTask                 = "Task"
-	TypeTestcase             = "Testcase"
-	TypeTestcaseResult       = "TestcaseResult"
-	TypeTestcaseSet          = "TestcaseSet"
-	TypeUser                 = "User"
+	TypeClarification  = "Clarification"
+	TypeContest        = "Contest"
+	TypeContestTask    = "ContestTask"
+	TypeContestUser    = "ContestUser"
+	TypeLanguage       = "Language"
+	TypeSubmit         = "Submit"
+	TypeTask           = "Task"
+	TypeTestcase       = "Testcase"
+	TypeTestcaseResult = "TestcaseResult"
+	TypeTestcaseSet    = "TestcaseSet"
+	TypeUser           = "User"
 )
+
+// ClarificationMutation represents an operation that mutates the Clarification nodes in the graph.
+type ClarificationMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *int
+	content            *string
+	is_public          *bool
+	created_at         *time.Time
+	updated_at         *time.Time
+	answer_content     *string
+	answer_created_at  *time.Time
+	answer_updated_at  *time.Time
+	clearedFields      map[string]struct{}
+	contest            map[int]struct{}
+	removedcontest     map[int]struct{}
+	clearedcontest     bool
+	task               map[int]struct{}
+	removedtask        map[int]struct{}
+	clearedtask        bool
+	user               map[int]struct{}
+	removeduser        map[int]struct{}
+	cleareduser        bool
+	answer_user        map[int]struct{}
+	removedanswer_user map[int]struct{}
+	clearedanswer_user bool
+	done               bool
+	oldValue           func(context.Context) (*Clarification, error)
+	predicates         []predicate.Clarification
+}
+
+var _ ent.Mutation = (*ClarificationMutation)(nil)
+
+// clarificationOption allows management of the mutation configuration using functional options.
+type clarificationOption func(*ClarificationMutation)
+
+// newClarificationMutation creates new mutation for the Clarification entity.
+func newClarificationMutation(c config, op Op, opts ...clarificationOption) *ClarificationMutation {
+	m := &ClarificationMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeClarification,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withClarificationID sets the ID field of the mutation.
+func withClarificationID(id int) clarificationOption {
+	return func(m *ClarificationMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Clarification
+		)
+		m.oldValue = func(ctx context.Context) (*Clarification, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Clarification.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withClarification sets the old Clarification of the mutation.
+func withClarification(node *Clarification) clarificationOption {
+	return func(m *ClarificationMutation) {
+		m.oldValue = func(context.Context) (*Clarification, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ClarificationMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ClarificationMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Clarification entities.
+func (m *ClarificationMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ClarificationMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ClarificationMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Clarification.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetContent sets the "content" field.
+func (m *ClarificationMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *ClarificationMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the Clarification entity.
+// If the Clarification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClarificationMutation) OldContent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *ClarificationMutation) ResetContent() {
+	m.content = nil
+}
+
+// SetIsPublic sets the "is_public" field.
+func (m *ClarificationMutation) SetIsPublic(b bool) {
+	m.is_public = &b
+}
+
+// IsPublic returns the value of the "is_public" field in the mutation.
+func (m *ClarificationMutation) IsPublic() (r bool, exists bool) {
+	v := m.is_public
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsPublic returns the old "is_public" field's value of the Clarification entity.
+// If the Clarification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClarificationMutation) OldIsPublic(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsPublic is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsPublic requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsPublic: %w", err)
+	}
+	return oldValue.IsPublic, nil
+}
+
+// ResetIsPublic resets all changes to the "is_public" field.
+func (m *ClarificationMutation) ResetIsPublic() {
+	m.is_public = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ClarificationMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ClarificationMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Clarification entity.
+// If the Clarification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClarificationMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ClarificationMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ClarificationMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ClarificationMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Clarification entity.
+// If the Clarification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClarificationMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ClarificationMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetAnswerContent sets the "answer_content" field.
+func (m *ClarificationMutation) SetAnswerContent(s string) {
+	m.answer_content = &s
+}
+
+// AnswerContent returns the value of the "answer_content" field in the mutation.
+func (m *ClarificationMutation) AnswerContent() (r string, exists bool) {
+	v := m.answer_content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAnswerContent returns the old "answer_content" field's value of the Clarification entity.
+// If the Clarification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClarificationMutation) OldAnswerContent(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAnswerContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAnswerContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAnswerContent: %w", err)
+	}
+	return oldValue.AnswerContent, nil
+}
+
+// ClearAnswerContent clears the value of the "answer_content" field.
+func (m *ClarificationMutation) ClearAnswerContent() {
+	m.answer_content = nil
+	m.clearedFields[clarification.FieldAnswerContent] = struct{}{}
+}
+
+// AnswerContentCleared returns if the "answer_content" field was cleared in this mutation.
+func (m *ClarificationMutation) AnswerContentCleared() bool {
+	_, ok := m.clearedFields[clarification.FieldAnswerContent]
+	return ok
+}
+
+// ResetAnswerContent resets all changes to the "answer_content" field.
+func (m *ClarificationMutation) ResetAnswerContent() {
+	m.answer_content = nil
+	delete(m.clearedFields, clarification.FieldAnswerContent)
+}
+
+// SetAnswerCreatedAt sets the "answer_created_at" field.
+func (m *ClarificationMutation) SetAnswerCreatedAt(t time.Time) {
+	m.answer_created_at = &t
+}
+
+// AnswerCreatedAt returns the value of the "answer_created_at" field in the mutation.
+func (m *ClarificationMutation) AnswerCreatedAt() (r time.Time, exists bool) {
+	v := m.answer_created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAnswerCreatedAt returns the old "answer_created_at" field's value of the Clarification entity.
+// If the Clarification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClarificationMutation) OldAnswerCreatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAnswerCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAnswerCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAnswerCreatedAt: %w", err)
+	}
+	return oldValue.AnswerCreatedAt, nil
+}
+
+// ClearAnswerCreatedAt clears the value of the "answer_created_at" field.
+func (m *ClarificationMutation) ClearAnswerCreatedAt() {
+	m.answer_created_at = nil
+	m.clearedFields[clarification.FieldAnswerCreatedAt] = struct{}{}
+}
+
+// AnswerCreatedAtCleared returns if the "answer_created_at" field was cleared in this mutation.
+func (m *ClarificationMutation) AnswerCreatedAtCleared() bool {
+	_, ok := m.clearedFields[clarification.FieldAnswerCreatedAt]
+	return ok
+}
+
+// ResetAnswerCreatedAt resets all changes to the "answer_created_at" field.
+func (m *ClarificationMutation) ResetAnswerCreatedAt() {
+	m.answer_created_at = nil
+	delete(m.clearedFields, clarification.FieldAnswerCreatedAt)
+}
+
+// SetAnswerUpdatedAt sets the "answer_updated_at" field.
+func (m *ClarificationMutation) SetAnswerUpdatedAt(t time.Time) {
+	m.answer_updated_at = &t
+}
+
+// AnswerUpdatedAt returns the value of the "answer_updated_at" field in the mutation.
+func (m *ClarificationMutation) AnswerUpdatedAt() (r time.Time, exists bool) {
+	v := m.answer_updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAnswerUpdatedAt returns the old "answer_updated_at" field's value of the Clarification entity.
+// If the Clarification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClarificationMutation) OldAnswerUpdatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAnswerUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAnswerUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAnswerUpdatedAt: %w", err)
+	}
+	return oldValue.AnswerUpdatedAt, nil
+}
+
+// ClearAnswerUpdatedAt clears the value of the "answer_updated_at" field.
+func (m *ClarificationMutation) ClearAnswerUpdatedAt() {
+	m.answer_updated_at = nil
+	m.clearedFields[clarification.FieldAnswerUpdatedAt] = struct{}{}
+}
+
+// AnswerUpdatedAtCleared returns if the "answer_updated_at" field was cleared in this mutation.
+func (m *ClarificationMutation) AnswerUpdatedAtCleared() bool {
+	_, ok := m.clearedFields[clarification.FieldAnswerUpdatedAt]
+	return ok
+}
+
+// ResetAnswerUpdatedAt resets all changes to the "answer_updated_at" field.
+func (m *ClarificationMutation) ResetAnswerUpdatedAt() {
+	m.answer_updated_at = nil
+	delete(m.clearedFields, clarification.FieldAnswerUpdatedAt)
+}
+
+// AddContestIDs adds the "contest" edge to the Contest entity by ids.
+func (m *ClarificationMutation) AddContestIDs(ids ...int) {
+	if m.contest == nil {
+		m.contest = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.contest[ids[i]] = struct{}{}
+	}
+}
+
+// ClearContest clears the "contest" edge to the Contest entity.
+func (m *ClarificationMutation) ClearContest() {
+	m.clearedcontest = true
+}
+
+// ContestCleared reports if the "contest" edge to the Contest entity was cleared.
+func (m *ClarificationMutation) ContestCleared() bool {
+	return m.clearedcontest
+}
+
+// RemoveContestIDs removes the "contest" edge to the Contest entity by IDs.
+func (m *ClarificationMutation) RemoveContestIDs(ids ...int) {
+	if m.removedcontest == nil {
+		m.removedcontest = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.contest, ids[i])
+		m.removedcontest[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedContest returns the removed IDs of the "contest" edge to the Contest entity.
+func (m *ClarificationMutation) RemovedContestIDs() (ids []int) {
+	for id := range m.removedcontest {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ContestIDs returns the "contest" edge IDs in the mutation.
+func (m *ClarificationMutation) ContestIDs() (ids []int) {
+	for id := range m.contest {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetContest resets all changes to the "contest" edge.
+func (m *ClarificationMutation) ResetContest() {
+	m.contest = nil
+	m.clearedcontest = false
+	m.removedcontest = nil
+}
+
+// AddTaskIDs adds the "task" edge to the Task entity by ids.
+func (m *ClarificationMutation) AddTaskIDs(ids ...int) {
+	if m.task == nil {
+		m.task = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.task[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTask clears the "task" edge to the Task entity.
+func (m *ClarificationMutation) ClearTask() {
+	m.clearedtask = true
+}
+
+// TaskCleared reports if the "task" edge to the Task entity was cleared.
+func (m *ClarificationMutation) TaskCleared() bool {
+	return m.clearedtask
+}
+
+// RemoveTaskIDs removes the "task" edge to the Task entity by IDs.
+func (m *ClarificationMutation) RemoveTaskIDs(ids ...int) {
+	if m.removedtask == nil {
+		m.removedtask = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.task, ids[i])
+		m.removedtask[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTask returns the removed IDs of the "task" edge to the Task entity.
+func (m *ClarificationMutation) RemovedTaskIDs() (ids []int) {
+	for id := range m.removedtask {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TaskIDs returns the "task" edge IDs in the mutation.
+func (m *ClarificationMutation) TaskIDs() (ids []int) {
+	for id := range m.task {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTask resets all changes to the "task" edge.
+func (m *ClarificationMutation) ResetTask() {
+	m.task = nil
+	m.clearedtask = false
+	m.removedtask = nil
+}
+
+// AddUserIDs adds the "user" edge to the User entity by ids.
+func (m *ClarificationMutation) AddUserIDs(ids ...int) {
+	if m.user == nil {
+		m.user = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.user[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *ClarificationMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *ClarificationMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// RemoveUserIDs removes the "user" edge to the User entity by IDs.
+func (m *ClarificationMutation) RemoveUserIDs(ids ...int) {
+	if m.removeduser == nil {
+		m.removeduser = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.user, ids[i])
+		m.removeduser[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUser returns the removed IDs of the "user" edge to the User entity.
+func (m *ClarificationMutation) RemovedUserIDs() (ids []int) {
+	for id := range m.removeduser {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+func (m *ClarificationMutation) UserIDs() (ids []int) {
+	for id := range m.user {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *ClarificationMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+	m.removeduser = nil
+}
+
+// AddAnswerUserIDs adds the "answer_user" edge to the User entity by ids.
+func (m *ClarificationMutation) AddAnswerUserIDs(ids ...int) {
+	if m.answer_user == nil {
+		m.answer_user = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.answer_user[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAnswerUser clears the "answer_user" edge to the User entity.
+func (m *ClarificationMutation) ClearAnswerUser() {
+	m.clearedanswer_user = true
+}
+
+// AnswerUserCleared reports if the "answer_user" edge to the User entity was cleared.
+func (m *ClarificationMutation) AnswerUserCleared() bool {
+	return m.clearedanswer_user
+}
+
+// RemoveAnswerUserIDs removes the "answer_user" edge to the User entity by IDs.
+func (m *ClarificationMutation) RemoveAnswerUserIDs(ids ...int) {
+	if m.removedanswer_user == nil {
+		m.removedanswer_user = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.answer_user, ids[i])
+		m.removedanswer_user[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAnswerUser returns the removed IDs of the "answer_user" edge to the User entity.
+func (m *ClarificationMutation) RemovedAnswerUserIDs() (ids []int) {
+	for id := range m.removedanswer_user {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AnswerUserIDs returns the "answer_user" edge IDs in the mutation.
+func (m *ClarificationMutation) AnswerUserIDs() (ids []int) {
+	for id := range m.answer_user {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAnswerUser resets all changes to the "answer_user" edge.
+func (m *ClarificationMutation) ResetAnswerUser() {
+	m.answer_user = nil
+	m.clearedanswer_user = false
+	m.removedanswer_user = nil
+}
+
+// Where appends a list predicates to the ClarificationMutation builder.
+func (m *ClarificationMutation) Where(ps ...predicate.Clarification) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ClarificationMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ClarificationMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Clarification, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ClarificationMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ClarificationMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Clarification).
+func (m *ClarificationMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ClarificationMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.content != nil {
+		fields = append(fields, clarification.FieldContent)
+	}
+	if m.is_public != nil {
+		fields = append(fields, clarification.FieldIsPublic)
+	}
+	if m.created_at != nil {
+		fields = append(fields, clarification.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, clarification.FieldUpdatedAt)
+	}
+	if m.answer_content != nil {
+		fields = append(fields, clarification.FieldAnswerContent)
+	}
+	if m.answer_created_at != nil {
+		fields = append(fields, clarification.FieldAnswerCreatedAt)
+	}
+	if m.answer_updated_at != nil {
+		fields = append(fields, clarification.FieldAnswerUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ClarificationMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case clarification.FieldContent:
+		return m.Content()
+	case clarification.FieldIsPublic:
+		return m.IsPublic()
+	case clarification.FieldCreatedAt:
+		return m.CreatedAt()
+	case clarification.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case clarification.FieldAnswerContent:
+		return m.AnswerContent()
+	case clarification.FieldAnswerCreatedAt:
+		return m.AnswerCreatedAt()
+	case clarification.FieldAnswerUpdatedAt:
+		return m.AnswerUpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ClarificationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case clarification.FieldContent:
+		return m.OldContent(ctx)
+	case clarification.FieldIsPublic:
+		return m.OldIsPublic(ctx)
+	case clarification.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case clarification.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case clarification.FieldAnswerContent:
+		return m.OldAnswerContent(ctx)
+	case clarification.FieldAnswerCreatedAt:
+		return m.OldAnswerCreatedAt(ctx)
+	case clarification.FieldAnswerUpdatedAt:
+		return m.OldAnswerUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Clarification field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClarificationMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case clarification.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
+		return nil
+	case clarification.FieldIsPublic:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsPublic(v)
+		return nil
+	case clarification.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case clarification.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case clarification.FieldAnswerContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAnswerContent(v)
+		return nil
+	case clarification.FieldAnswerCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAnswerCreatedAt(v)
+		return nil
+	case clarification.FieldAnswerUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAnswerUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Clarification field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ClarificationMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ClarificationMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClarificationMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Clarification numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ClarificationMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(clarification.FieldAnswerContent) {
+		fields = append(fields, clarification.FieldAnswerContent)
+	}
+	if m.FieldCleared(clarification.FieldAnswerCreatedAt) {
+		fields = append(fields, clarification.FieldAnswerCreatedAt)
+	}
+	if m.FieldCleared(clarification.FieldAnswerUpdatedAt) {
+		fields = append(fields, clarification.FieldAnswerUpdatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ClarificationMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ClarificationMutation) ClearField(name string) error {
+	switch name {
+	case clarification.FieldAnswerContent:
+		m.ClearAnswerContent()
+		return nil
+	case clarification.FieldAnswerCreatedAt:
+		m.ClearAnswerCreatedAt()
+		return nil
+	case clarification.FieldAnswerUpdatedAt:
+		m.ClearAnswerUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Clarification nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ClarificationMutation) ResetField(name string) error {
+	switch name {
+	case clarification.FieldContent:
+		m.ResetContent()
+		return nil
+	case clarification.FieldIsPublic:
+		m.ResetIsPublic()
+		return nil
+	case clarification.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case clarification.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case clarification.FieldAnswerContent:
+		m.ResetAnswerContent()
+		return nil
+	case clarification.FieldAnswerCreatedAt:
+		m.ResetAnswerCreatedAt()
+		return nil
+	case clarification.FieldAnswerUpdatedAt:
+		m.ResetAnswerUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Clarification field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ClarificationMutation) AddedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.contest != nil {
+		edges = append(edges, clarification.EdgeContest)
+	}
+	if m.task != nil {
+		edges = append(edges, clarification.EdgeTask)
+	}
+	if m.user != nil {
+		edges = append(edges, clarification.EdgeUser)
+	}
+	if m.answer_user != nil {
+		edges = append(edges, clarification.EdgeAnswerUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ClarificationMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case clarification.EdgeContest:
+		ids := make([]ent.Value, 0, len(m.contest))
+		for id := range m.contest {
+			ids = append(ids, id)
+		}
+		return ids
+	case clarification.EdgeTask:
+		ids := make([]ent.Value, 0, len(m.task))
+		for id := range m.task {
+			ids = append(ids, id)
+		}
+		return ids
+	case clarification.EdgeUser:
+		ids := make([]ent.Value, 0, len(m.user))
+		for id := range m.user {
+			ids = append(ids, id)
+		}
+		return ids
+	case clarification.EdgeAnswerUser:
+		ids := make([]ent.Value, 0, len(m.answer_user))
+		for id := range m.answer_user {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ClarificationMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.removedcontest != nil {
+		edges = append(edges, clarification.EdgeContest)
+	}
+	if m.removedtask != nil {
+		edges = append(edges, clarification.EdgeTask)
+	}
+	if m.removeduser != nil {
+		edges = append(edges, clarification.EdgeUser)
+	}
+	if m.removedanswer_user != nil {
+		edges = append(edges, clarification.EdgeAnswerUser)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ClarificationMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case clarification.EdgeContest:
+		ids := make([]ent.Value, 0, len(m.removedcontest))
+		for id := range m.removedcontest {
+			ids = append(ids, id)
+		}
+		return ids
+	case clarification.EdgeTask:
+		ids := make([]ent.Value, 0, len(m.removedtask))
+		for id := range m.removedtask {
+			ids = append(ids, id)
+		}
+		return ids
+	case clarification.EdgeUser:
+		ids := make([]ent.Value, 0, len(m.removeduser))
+		for id := range m.removeduser {
+			ids = append(ids, id)
+		}
+		return ids
+	case clarification.EdgeAnswerUser:
+		ids := make([]ent.Value, 0, len(m.removedanswer_user))
+		for id := range m.removedanswer_user {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ClarificationMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.clearedcontest {
+		edges = append(edges, clarification.EdgeContest)
+	}
+	if m.clearedtask {
+		edges = append(edges, clarification.EdgeTask)
+	}
+	if m.cleareduser {
+		edges = append(edges, clarification.EdgeUser)
+	}
+	if m.clearedanswer_user {
+		edges = append(edges, clarification.EdgeAnswerUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ClarificationMutation) EdgeCleared(name string) bool {
+	switch name {
+	case clarification.EdgeContest:
+		return m.clearedcontest
+	case clarification.EdgeTask:
+		return m.clearedtask
+	case clarification.EdgeUser:
+		return m.cleareduser
+	case clarification.EdgeAnswerUser:
+		return m.clearedanswer_user
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ClarificationMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Clarification unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ClarificationMutation) ResetEdge(name string) error {
+	switch name {
+	case clarification.EdgeContest:
+		m.ResetContest()
+		return nil
+	case clarification.EdgeTask:
+		m.ResetTask()
+		return nil
+	case clarification.EdgeUser:
+		m.ResetUser()
+		return nil
+	case clarification.EdgeAnswerUser:
+		m.ResetAnswerUser()
+		return nil
+	}
+	return fmt.Errorf("unknown Clarification edge %s", name)
+}
 
 // ContestMutation represents an operation that mutates the Contest nodes in the graph.
 type ContestMutation struct {
@@ -660,7 +1718,7 @@ func (m *ContestMutation) ResetTasks() {
 	m.removedtasks = nil
 }
 
-// AddClarificationIDs adds the "clarifications" edge to the ContestClarification entity by ids.
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by ids.
 func (m *ContestMutation) AddClarificationIDs(ids ...int) {
 	if m.clarifications == nil {
 		m.clarifications = make(map[int]struct{})
@@ -670,17 +1728,17 @@ func (m *ContestMutation) AddClarificationIDs(ids ...int) {
 	}
 }
 
-// ClearClarifications clears the "clarifications" edge to the ContestClarification entity.
+// ClearClarifications clears the "clarifications" edge to the Clarification entity.
 func (m *ContestMutation) ClearClarifications() {
 	m.clearedclarifications = true
 }
 
-// ClarificationsCleared reports if the "clarifications" edge to the ContestClarification entity was cleared.
+// ClarificationsCleared reports if the "clarifications" edge to the Clarification entity was cleared.
 func (m *ContestMutation) ClarificationsCleared() bool {
 	return m.clearedclarifications
 }
 
-// RemoveClarificationIDs removes the "clarifications" edge to the ContestClarification entity by IDs.
+// RemoveClarificationIDs removes the "clarifications" edge to the Clarification entity by IDs.
 func (m *ContestMutation) RemoveClarificationIDs(ids ...int) {
 	if m.removedclarifications == nil {
 		m.removedclarifications = make(map[int]struct{})
@@ -691,7 +1749,7 @@ func (m *ContestMutation) RemoveClarificationIDs(ids ...int) {
 	}
 }
 
-// RemovedClarifications returns the removed IDs of the "clarifications" edge to the ContestClarification entity.
+// RemovedClarifications returns the removed IDs of the "clarifications" edge to the Clarification entity.
 func (m *ContestMutation) RemovedClarificationsIDs() (ids []int) {
 	for id := range m.removedclarifications {
 		ids = append(ids, id)
@@ -1299,1064 +2357,6 @@ func (m *ContestMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Contest edge %s", name)
-}
-
-// ContestClarificationMutation represents an operation that mutates the ContestClarification nodes in the graph.
-type ContestClarificationMutation struct {
-	config
-	op                 Op
-	typ                string
-	id                 *int
-	content            *string
-	is_public          *bool
-	created_at         *time.Time
-	updated_at         *time.Time
-	answer_content     *string
-	answer_created_at  *time.Time
-	answer_updated_at  *time.Time
-	clearedFields      map[string]struct{}
-	contest            map[int]struct{}
-	removedcontest     map[int]struct{}
-	clearedcontest     bool
-	task               map[int]struct{}
-	removedtask        map[int]struct{}
-	clearedtask        bool
-	user               map[int]struct{}
-	removeduser        map[int]struct{}
-	cleareduser        bool
-	answer_user        map[int]struct{}
-	removedanswer_user map[int]struct{}
-	clearedanswer_user bool
-	done               bool
-	oldValue           func(context.Context) (*ContestClarification, error)
-	predicates         []predicate.ContestClarification
-}
-
-var _ ent.Mutation = (*ContestClarificationMutation)(nil)
-
-// contestclarificationOption allows management of the mutation configuration using functional options.
-type contestclarificationOption func(*ContestClarificationMutation)
-
-// newContestClarificationMutation creates new mutation for the ContestClarification entity.
-func newContestClarificationMutation(c config, op Op, opts ...contestclarificationOption) *ContestClarificationMutation {
-	m := &ContestClarificationMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeContestClarification,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withContestClarificationID sets the ID field of the mutation.
-func withContestClarificationID(id int) contestclarificationOption {
-	return func(m *ContestClarificationMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *ContestClarification
-		)
-		m.oldValue = func(ctx context.Context) (*ContestClarification, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().ContestClarification.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withContestClarification sets the old ContestClarification of the mutation.
-func withContestClarification(node *ContestClarification) contestclarificationOption {
-	return func(m *ContestClarificationMutation) {
-		m.oldValue = func(context.Context) (*ContestClarification, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ContestClarificationMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m ContestClarificationMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of ContestClarification entities.
-func (m *ContestClarificationMutation) SetID(id int) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *ContestClarificationMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *ContestClarificationMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().ContestClarification.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetContent sets the "content" field.
-func (m *ContestClarificationMutation) SetContent(s string) {
-	m.content = &s
-}
-
-// Content returns the value of the "content" field in the mutation.
-func (m *ContestClarificationMutation) Content() (r string, exists bool) {
-	v := m.content
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldContent returns the old "content" field's value of the ContestClarification entity.
-// If the ContestClarification object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestClarificationMutation) OldContent(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldContent is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldContent requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldContent: %w", err)
-	}
-	return oldValue.Content, nil
-}
-
-// ResetContent resets all changes to the "content" field.
-func (m *ContestClarificationMutation) ResetContent() {
-	m.content = nil
-}
-
-// SetIsPublic sets the "is_public" field.
-func (m *ContestClarificationMutation) SetIsPublic(b bool) {
-	m.is_public = &b
-}
-
-// IsPublic returns the value of the "is_public" field in the mutation.
-func (m *ContestClarificationMutation) IsPublic() (r bool, exists bool) {
-	v := m.is_public
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsPublic returns the old "is_public" field's value of the ContestClarification entity.
-// If the ContestClarification object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestClarificationMutation) OldIsPublic(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsPublic is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsPublic requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsPublic: %w", err)
-	}
-	return oldValue.IsPublic, nil
-}
-
-// ResetIsPublic resets all changes to the "is_public" field.
-func (m *ContestClarificationMutation) ResetIsPublic() {
-	m.is_public = nil
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (m *ContestClarificationMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *ContestClarificationMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the ContestClarification entity.
-// If the ContestClarification object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestClarificationMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *ContestClarificationMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *ContestClarificationMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *ContestClarificationMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the ContestClarification entity.
-// If the ContestClarification object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestClarificationMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *ContestClarificationMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-}
-
-// SetAnswerContent sets the "answer_content" field.
-func (m *ContestClarificationMutation) SetAnswerContent(s string) {
-	m.answer_content = &s
-}
-
-// AnswerContent returns the value of the "answer_content" field in the mutation.
-func (m *ContestClarificationMutation) AnswerContent() (r string, exists bool) {
-	v := m.answer_content
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAnswerContent returns the old "answer_content" field's value of the ContestClarification entity.
-// If the ContestClarification object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestClarificationMutation) OldAnswerContent(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAnswerContent is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAnswerContent requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAnswerContent: %w", err)
-	}
-	return oldValue.AnswerContent, nil
-}
-
-// ClearAnswerContent clears the value of the "answer_content" field.
-func (m *ContestClarificationMutation) ClearAnswerContent() {
-	m.answer_content = nil
-	m.clearedFields[contestclarification.FieldAnswerContent] = struct{}{}
-}
-
-// AnswerContentCleared returns if the "answer_content" field was cleared in this mutation.
-func (m *ContestClarificationMutation) AnswerContentCleared() bool {
-	_, ok := m.clearedFields[contestclarification.FieldAnswerContent]
-	return ok
-}
-
-// ResetAnswerContent resets all changes to the "answer_content" field.
-func (m *ContestClarificationMutation) ResetAnswerContent() {
-	m.answer_content = nil
-	delete(m.clearedFields, contestclarification.FieldAnswerContent)
-}
-
-// SetAnswerCreatedAt sets the "answer_created_at" field.
-func (m *ContestClarificationMutation) SetAnswerCreatedAt(t time.Time) {
-	m.answer_created_at = &t
-}
-
-// AnswerCreatedAt returns the value of the "answer_created_at" field in the mutation.
-func (m *ContestClarificationMutation) AnswerCreatedAt() (r time.Time, exists bool) {
-	v := m.answer_created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAnswerCreatedAt returns the old "answer_created_at" field's value of the ContestClarification entity.
-// If the ContestClarification object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestClarificationMutation) OldAnswerCreatedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAnswerCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAnswerCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAnswerCreatedAt: %w", err)
-	}
-	return oldValue.AnswerCreatedAt, nil
-}
-
-// ClearAnswerCreatedAt clears the value of the "answer_created_at" field.
-func (m *ContestClarificationMutation) ClearAnswerCreatedAt() {
-	m.answer_created_at = nil
-	m.clearedFields[contestclarification.FieldAnswerCreatedAt] = struct{}{}
-}
-
-// AnswerCreatedAtCleared returns if the "answer_created_at" field was cleared in this mutation.
-func (m *ContestClarificationMutation) AnswerCreatedAtCleared() bool {
-	_, ok := m.clearedFields[contestclarification.FieldAnswerCreatedAt]
-	return ok
-}
-
-// ResetAnswerCreatedAt resets all changes to the "answer_created_at" field.
-func (m *ContestClarificationMutation) ResetAnswerCreatedAt() {
-	m.answer_created_at = nil
-	delete(m.clearedFields, contestclarification.FieldAnswerCreatedAt)
-}
-
-// SetAnswerUpdatedAt sets the "answer_updated_at" field.
-func (m *ContestClarificationMutation) SetAnswerUpdatedAt(t time.Time) {
-	m.answer_updated_at = &t
-}
-
-// AnswerUpdatedAt returns the value of the "answer_updated_at" field in the mutation.
-func (m *ContestClarificationMutation) AnswerUpdatedAt() (r time.Time, exists bool) {
-	v := m.answer_updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAnswerUpdatedAt returns the old "answer_updated_at" field's value of the ContestClarification entity.
-// If the ContestClarification object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestClarificationMutation) OldAnswerUpdatedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAnswerUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAnswerUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAnswerUpdatedAt: %w", err)
-	}
-	return oldValue.AnswerUpdatedAt, nil
-}
-
-// ClearAnswerUpdatedAt clears the value of the "answer_updated_at" field.
-func (m *ContestClarificationMutation) ClearAnswerUpdatedAt() {
-	m.answer_updated_at = nil
-	m.clearedFields[contestclarification.FieldAnswerUpdatedAt] = struct{}{}
-}
-
-// AnswerUpdatedAtCleared returns if the "answer_updated_at" field was cleared in this mutation.
-func (m *ContestClarificationMutation) AnswerUpdatedAtCleared() bool {
-	_, ok := m.clearedFields[contestclarification.FieldAnswerUpdatedAt]
-	return ok
-}
-
-// ResetAnswerUpdatedAt resets all changes to the "answer_updated_at" field.
-func (m *ContestClarificationMutation) ResetAnswerUpdatedAt() {
-	m.answer_updated_at = nil
-	delete(m.clearedFields, contestclarification.FieldAnswerUpdatedAt)
-}
-
-// AddContestIDs adds the "contest" edge to the Contest entity by ids.
-func (m *ContestClarificationMutation) AddContestIDs(ids ...int) {
-	if m.contest == nil {
-		m.contest = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.contest[ids[i]] = struct{}{}
-	}
-}
-
-// ClearContest clears the "contest" edge to the Contest entity.
-func (m *ContestClarificationMutation) ClearContest() {
-	m.clearedcontest = true
-}
-
-// ContestCleared reports if the "contest" edge to the Contest entity was cleared.
-func (m *ContestClarificationMutation) ContestCleared() bool {
-	return m.clearedcontest
-}
-
-// RemoveContestIDs removes the "contest" edge to the Contest entity by IDs.
-func (m *ContestClarificationMutation) RemoveContestIDs(ids ...int) {
-	if m.removedcontest == nil {
-		m.removedcontest = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.contest, ids[i])
-		m.removedcontest[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedContest returns the removed IDs of the "contest" edge to the Contest entity.
-func (m *ContestClarificationMutation) RemovedContestIDs() (ids []int) {
-	for id := range m.removedcontest {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ContestIDs returns the "contest" edge IDs in the mutation.
-func (m *ContestClarificationMutation) ContestIDs() (ids []int) {
-	for id := range m.contest {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetContest resets all changes to the "contest" edge.
-func (m *ContestClarificationMutation) ResetContest() {
-	m.contest = nil
-	m.clearedcontest = false
-	m.removedcontest = nil
-}
-
-// AddTaskIDs adds the "task" edge to the Task entity by ids.
-func (m *ContestClarificationMutation) AddTaskIDs(ids ...int) {
-	if m.task == nil {
-		m.task = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.task[ids[i]] = struct{}{}
-	}
-}
-
-// ClearTask clears the "task" edge to the Task entity.
-func (m *ContestClarificationMutation) ClearTask() {
-	m.clearedtask = true
-}
-
-// TaskCleared reports if the "task" edge to the Task entity was cleared.
-func (m *ContestClarificationMutation) TaskCleared() bool {
-	return m.clearedtask
-}
-
-// RemoveTaskIDs removes the "task" edge to the Task entity by IDs.
-func (m *ContestClarificationMutation) RemoveTaskIDs(ids ...int) {
-	if m.removedtask == nil {
-		m.removedtask = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.task, ids[i])
-		m.removedtask[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTask returns the removed IDs of the "task" edge to the Task entity.
-func (m *ContestClarificationMutation) RemovedTaskIDs() (ids []int) {
-	for id := range m.removedtask {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// TaskIDs returns the "task" edge IDs in the mutation.
-func (m *ContestClarificationMutation) TaskIDs() (ids []int) {
-	for id := range m.task {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetTask resets all changes to the "task" edge.
-func (m *ContestClarificationMutation) ResetTask() {
-	m.task = nil
-	m.clearedtask = false
-	m.removedtask = nil
-}
-
-// AddUserIDs adds the "user" edge to the User entity by ids.
-func (m *ContestClarificationMutation) AddUserIDs(ids ...int) {
-	if m.user == nil {
-		m.user = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.user[ids[i]] = struct{}{}
-	}
-}
-
-// ClearUser clears the "user" edge to the User entity.
-func (m *ContestClarificationMutation) ClearUser() {
-	m.cleareduser = true
-}
-
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *ContestClarificationMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// RemoveUserIDs removes the "user" edge to the User entity by IDs.
-func (m *ContestClarificationMutation) RemoveUserIDs(ids ...int) {
-	if m.removeduser == nil {
-		m.removeduser = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.user, ids[i])
-		m.removeduser[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedUser returns the removed IDs of the "user" edge to the User entity.
-func (m *ContestClarificationMutation) RemovedUserIDs() (ids []int) {
-	for id := range m.removeduser {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// UserIDs returns the "user" edge IDs in the mutation.
-func (m *ContestClarificationMutation) UserIDs() (ids []int) {
-	for id := range m.user {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetUser resets all changes to the "user" edge.
-func (m *ContestClarificationMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-	m.removeduser = nil
-}
-
-// AddAnswerUserIDs adds the "answer_user" edge to the User entity by ids.
-func (m *ContestClarificationMutation) AddAnswerUserIDs(ids ...int) {
-	if m.answer_user == nil {
-		m.answer_user = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.answer_user[ids[i]] = struct{}{}
-	}
-}
-
-// ClearAnswerUser clears the "answer_user" edge to the User entity.
-func (m *ContestClarificationMutation) ClearAnswerUser() {
-	m.clearedanswer_user = true
-}
-
-// AnswerUserCleared reports if the "answer_user" edge to the User entity was cleared.
-func (m *ContestClarificationMutation) AnswerUserCleared() bool {
-	return m.clearedanswer_user
-}
-
-// RemoveAnswerUserIDs removes the "answer_user" edge to the User entity by IDs.
-func (m *ContestClarificationMutation) RemoveAnswerUserIDs(ids ...int) {
-	if m.removedanswer_user == nil {
-		m.removedanswer_user = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.answer_user, ids[i])
-		m.removedanswer_user[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedAnswerUser returns the removed IDs of the "answer_user" edge to the User entity.
-func (m *ContestClarificationMutation) RemovedAnswerUserIDs() (ids []int) {
-	for id := range m.removedanswer_user {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// AnswerUserIDs returns the "answer_user" edge IDs in the mutation.
-func (m *ContestClarificationMutation) AnswerUserIDs() (ids []int) {
-	for id := range m.answer_user {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetAnswerUser resets all changes to the "answer_user" edge.
-func (m *ContestClarificationMutation) ResetAnswerUser() {
-	m.answer_user = nil
-	m.clearedanswer_user = false
-	m.removedanswer_user = nil
-}
-
-// Where appends a list predicates to the ContestClarificationMutation builder.
-func (m *ContestClarificationMutation) Where(ps ...predicate.ContestClarification) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the ContestClarificationMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ContestClarificationMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.ContestClarification, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *ContestClarificationMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *ContestClarificationMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (ContestClarification).
-func (m *ContestClarificationMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *ContestClarificationMutation) Fields() []string {
-	fields := make([]string, 0, 7)
-	if m.content != nil {
-		fields = append(fields, contestclarification.FieldContent)
-	}
-	if m.is_public != nil {
-		fields = append(fields, contestclarification.FieldIsPublic)
-	}
-	if m.created_at != nil {
-		fields = append(fields, contestclarification.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, contestclarification.FieldUpdatedAt)
-	}
-	if m.answer_content != nil {
-		fields = append(fields, contestclarification.FieldAnswerContent)
-	}
-	if m.answer_created_at != nil {
-		fields = append(fields, contestclarification.FieldAnswerCreatedAt)
-	}
-	if m.answer_updated_at != nil {
-		fields = append(fields, contestclarification.FieldAnswerUpdatedAt)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *ContestClarificationMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case contestclarification.FieldContent:
-		return m.Content()
-	case contestclarification.FieldIsPublic:
-		return m.IsPublic()
-	case contestclarification.FieldCreatedAt:
-		return m.CreatedAt()
-	case contestclarification.FieldUpdatedAt:
-		return m.UpdatedAt()
-	case contestclarification.FieldAnswerContent:
-		return m.AnswerContent()
-	case contestclarification.FieldAnswerCreatedAt:
-		return m.AnswerCreatedAt()
-	case contestclarification.FieldAnswerUpdatedAt:
-		return m.AnswerUpdatedAt()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *ContestClarificationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case contestclarification.FieldContent:
-		return m.OldContent(ctx)
-	case contestclarification.FieldIsPublic:
-		return m.OldIsPublic(ctx)
-	case contestclarification.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case contestclarification.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
-	case contestclarification.FieldAnswerContent:
-		return m.OldAnswerContent(ctx)
-	case contestclarification.FieldAnswerCreatedAt:
-		return m.OldAnswerCreatedAt(ctx)
-	case contestclarification.FieldAnswerUpdatedAt:
-		return m.OldAnswerUpdatedAt(ctx)
-	}
-	return nil, fmt.Errorf("unknown ContestClarification field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ContestClarificationMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case contestclarification.FieldContent:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetContent(v)
-		return nil
-	case contestclarification.FieldIsPublic:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsPublic(v)
-		return nil
-	case contestclarification.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case contestclarification.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
-		return nil
-	case contestclarification.FieldAnswerContent:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAnswerContent(v)
-		return nil
-	case contestclarification.FieldAnswerCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAnswerCreatedAt(v)
-		return nil
-	case contestclarification.FieldAnswerUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAnswerUpdatedAt(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ContestClarification field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *ContestClarificationMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ContestClarificationMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ContestClarificationMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown ContestClarification numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ContestClarificationMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(contestclarification.FieldAnswerContent) {
-		fields = append(fields, contestclarification.FieldAnswerContent)
-	}
-	if m.FieldCleared(contestclarification.FieldAnswerCreatedAt) {
-		fields = append(fields, contestclarification.FieldAnswerCreatedAt)
-	}
-	if m.FieldCleared(contestclarification.FieldAnswerUpdatedAt) {
-		fields = append(fields, contestclarification.FieldAnswerUpdatedAt)
-	}
-	return fields
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ContestClarificationMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ContestClarificationMutation) ClearField(name string) error {
-	switch name {
-	case contestclarification.FieldAnswerContent:
-		m.ClearAnswerContent()
-		return nil
-	case contestclarification.FieldAnswerCreatedAt:
-		m.ClearAnswerCreatedAt()
-		return nil
-	case contestclarification.FieldAnswerUpdatedAt:
-		m.ClearAnswerUpdatedAt()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestClarification nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ContestClarificationMutation) ResetField(name string) error {
-	switch name {
-	case contestclarification.FieldContent:
-		m.ResetContent()
-		return nil
-	case contestclarification.FieldIsPublic:
-		m.ResetIsPublic()
-		return nil
-	case contestclarification.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case contestclarification.FieldUpdatedAt:
-		m.ResetUpdatedAt()
-		return nil
-	case contestclarification.FieldAnswerContent:
-		m.ResetAnswerContent()
-		return nil
-	case contestclarification.FieldAnswerCreatedAt:
-		m.ResetAnswerCreatedAt()
-		return nil
-	case contestclarification.FieldAnswerUpdatedAt:
-		m.ResetAnswerUpdatedAt()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestClarification field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ContestClarificationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.contest != nil {
-		edges = append(edges, contestclarification.EdgeContest)
-	}
-	if m.task != nil {
-		edges = append(edges, contestclarification.EdgeTask)
-	}
-	if m.user != nil {
-		edges = append(edges, contestclarification.EdgeUser)
-	}
-	if m.answer_user != nil {
-		edges = append(edges, contestclarification.EdgeAnswerUser)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ContestClarificationMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case contestclarification.EdgeContest:
-		ids := make([]ent.Value, 0, len(m.contest))
-		for id := range m.contest {
-			ids = append(ids, id)
-		}
-		return ids
-	case contestclarification.EdgeTask:
-		ids := make([]ent.Value, 0, len(m.task))
-		for id := range m.task {
-			ids = append(ids, id)
-		}
-		return ids
-	case contestclarification.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.user))
-		for id := range m.user {
-			ids = append(ids, id)
-		}
-		return ids
-	case contestclarification.EdgeAnswerUser:
-		ids := make([]ent.Value, 0, len(m.answer_user))
-		for id := range m.answer_user {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ContestClarificationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.removedcontest != nil {
-		edges = append(edges, contestclarification.EdgeContest)
-	}
-	if m.removedtask != nil {
-		edges = append(edges, contestclarification.EdgeTask)
-	}
-	if m.removeduser != nil {
-		edges = append(edges, contestclarification.EdgeUser)
-	}
-	if m.removedanswer_user != nil {
-		edges = append(edges, contestclarification.EdgeAnswerUser)
-	}
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ContestClarificationMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case contestclarification.EdgeContest:
-		ids := make([]ent.Value, 0, len(m.removedcontest))
-		for id := range m.removedcontest {
-			ids = append(ids, id)
-		}
-		return ids
-	case contestclarification.EdgeTask:
-		ids := make([]ent.Value, 0, len(m.removedtask))
-		for id := range m.removedtask {
-			ids = append(ids, id)
-		}
-		return ids
-	case contestclarification.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.removeduser))
-		for id := range m.removeduser {
-			ids = append(ids, id)
-		}
-		return ids
-	case contestclarification.EdgeAnswerUser:
-		ids := make([]ent.Value, 0, len(m.removedanswer_user))
-		for id := range m.removedanswer_user {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ContestClarificationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.clearedcontest {
-		edges = append(edges, contestclarification.EdgeContest)
-	}
-	if m.clearedtask {
-		edges = append(edges, contestclarification.EdgeTask)
-	}
-	if m.cleareduser {
-		edges = append(edges, contestclarification.EdgeUser)
-	}
-	if m.clearedanswer_user {
-		edges = append(edges, contestclarification.EdgeAnswerUser)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ContestClarificationMutation) EdgeCleared(name string) bool {
-	switch name {
-	case contestclarification.EdgeContest:
-		return m.clearedcontest
-	case contestclarification.EdgeTask:
-		return m.clearedtask
-	case contestclarification.EdgeUser:
-		return m.cleareduser
-	case contestclarification.EdgeAnswerUser:
-		return m.clearedanswer_user
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ContestClarificationMutation) ClearEdge(name string) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown ContestClarification unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ContestClarificationMutation) ResetEdge(name string) error {
-	switch name {
-	case contestclarification.EdgeContest:
-		m.ResetContest()
-		return nil
-	case contestclarification.EdgeTask:
-		m.ResetTask()
-		return nil
-	case contestclarification.EdgeUser:
-		m.ResetUser()
-		return nil
-	case contestclarification.EdgeAnswerUser:
-		m.ResetAnswerUser()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestClarification edge %s", name)
 }
 
 // ContestTaskMutation represents an operation that mutates the ContestTask nodes in the graph.
@@ -5903,7 +5903,7 @@ func (m *TaskMutation) ResetSubmits() {
 	m.removedsubmits = nil
 }
 
-// AddClarificationIDs adds the "clarifications" edge to the ContestClarification entity by ids.
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by ids.
 func (m *TaskMutation) AddClarificationIDs(ids ...int) {
 	if m.clarifications == nil {
 		m.clarifications = make(map[int]struct{})
@@ -5913,17 +5913,17 @@ func (m *TaskMutation) AddClarificationIDs(ids ...int) {
 	}
 }
 
-// ClearClarifications clears the "clarifications" edge to the ContestClarification entity.
+// ClearClarifications clears the "clarifications" edge to the Clarification entity.
 func (m *TaskMutation) ClearClarifications() {
 	m.clearedclarifications = true
 }
 
-// ClarificationsCleared reports if the "clarifications" edge to the ContestClarification entity was cleared.
+// ClarificationsCleared reports if the "clarifications" edge to the Clarification entity was cleared.
 func (m *TaskMutation) ClarificationsCleared() bool {
 	return m.clearedclarifications
 }
 
-// RemoveClarificationIDs removes the "clarifications" edge to the ContestClarification entity by IDs.
+// RemoveClarificationIDs removes the "clarifications" edge to the Clarification entity by IDs.
 func (m *TaskMutation) RemoveClarificationIDs(ids ...int) {
 	if m.removedclarifications == nil {
 		m.removedclarifications = make(map[int]struct{})
@@ -5934,7 +5934,7 @@ func (m *TaskMutation) RemoveClarificationIDs(ids ...int) {
 	}
 }
 
-// RemovedClarifications returns the removed IDs of the "clarifications" edge to the ContestClarification entity.
+// RemovedClarifications returns the removed IDs of the "clarifications" edge to the Clarification entity.
 func (m *TaskMutation) RemovedClarificationsIDs() (ids []int) {
 	for id := range m.removedclarifications {
 		ids = append(ids, id)
@@ -9260,7 +9260,7 @@ func (m *UserMutation) ResetSubmits() {
 	m.removedsubmits = nil
 }
 
-// AddClarificationIDs adds the "clarifications" edge to the ContestClarification entity by ids.
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by ids.
 func (m *UserMutation) AddClarificationIDs(ids ...int) {
 	if m.clarifications == nil {
 		m.clarifications = make(map[int]struct{})
@@ -9270,17 +9270,17 @@ func (m *UserMutation) AddClarificationIDs(ids ...int) {
 	}
 }
 
-// ClearClarifications clears the "clarifications" edge to the ContestClarification entity.
+// ClearClarifications clears the "clarifications" edge to the Clarification entity.
 func (m *UserMutation) ClearClarifications() {
 	m.clearedclarifications = true
 }
 
-// ClarificationsCleared reports if the "clarifications" edge to the ContestClarification entity was cleared.
+// ClarificationsCleared reports if the "clarifications" edge to the Clarification entity was cleared.
 func (m *UserMutation) ClarificationsCleared() bool {
 	return m.clearedclarifications
 }
 
-// RemoveClarificationIDs removes the "clarifications" edge to the ContestClarification entity by IDs.
+// RemoveClarificationIDs removes the "clarifications" edge to the Clarification entity by IDs.
 func (m *UserMutation) RemoveClarificationIDs(ids ...int) {
 	if m.removedclarifications == nil {
 		m.removedclarifications = make(map[int]struct{})
@@ -9291,7 +9291,7 @@ func (m *UserMutation) RemoveClarificationIDs(ids ...int) {
 	}
 }
 
-// RemovedClarifications returns the removed IDs of the "clarifications" edge to the ContestClarification entity.
+// RemovedClarifications returns the removed IDs of the "clarifications" edge to the Clarification entity.
 func (m *UserMutation) RemovedClarificationsIDs() (ids []int) {
 	for id := range m.removedclarifications {
 		ids = append(ids, id)
@@ -9314,7 +9314,7 @@ func (m *UserMutation) ResetClarifications() {
 	m.removedclarifications = nil
 }
 
-// AddAnsweredClarificationIDs adds the "answered_clarifications" edge to the ContestClarification entity by ids.
+// AddAnsweredClarificationIDs adds the "answered_clarifications" edge to the Clarification entity by ids.
 func (m *UserMutation) AddAnsweredClarificationIDs(ids ...int) {
 	if m.answered_clarifications == nil {
 		m.answered_clarifications = make(map[int]struct{})
@@ -9324,17 +9324,17 @@ func (m *UserMutation) AddAnsweredClarificationIDs(ids ...int) {
 	}
 }
 
-// ClearAnsweredClarifications clears the "answered_clarifications" edge to the ContestClarification entity.
+// ClearAnsweredClarifications clears the "answered_clarifications" edge to the Clarification entity.
 func (m *UserMutation) ClearAnsweredClarifications() {
 	m.clearedanswered_clarifications = true
 }
 
-// AnsweredClarificationsCleared reports if the "answered_clarifications" edge to the ContestClarification entity was cleared.
+// AnsweredClarificationsCleared reports if the "answered_clarifications" edge to the Clarification entity was cleared.
 func (m *UserMutation) AnsweredClarificationsCleared() bool {
 	return m.clearedanswered_clarifications
 }
 
-// RemoveAnsweredClarificationIDs removes the "answered_clarifications" edge to the ContestClarification entity by IDs.
+// RemoveAnsweredClarificationIDs removes the "answered_clarifications" edge to the Clarification entity by IDs.
 func (m *UserMutation) RemoveAnsweredClarificationIDs(ids ...int) {
 	if m.removedanswered_clarifications == nil {
 		m.removedanswered_clarifications = make(map[int]struct{})
@@ -9345,7 +9345,7 @@ func (m *UserMutation) RemoveAnsweredClarificationIDs(ids ...int) {
 	}
 }
 
-// RemovedAnsweredClarifications returns the removed IDs of the "answered_clarifications" edge to the ContestClarification entity.
+// RemovedAnsweredClarifications returns the removed IDs of the "answered_clarifications" edge to the Clarification entity.
 func (m *UserMutation) RemovedAnsweredClarificationsIDs() (ids []int) {
 	for id := range m.removedanswered_clarifications {
 		ids = append(ids, id)

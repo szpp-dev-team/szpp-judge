@@ -9,11 +9,11 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestclarification"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 )
 
-// ContestClarification is the model entity for the ContestClarification schema.
-type ContestClarification struct {
+// Clarification is the model entity for the Clarification schema.
+type Clarification struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -32,13 +32,13 @@ type ContestClarification struct {
 	// AnswerUpdatedAt holds the value of the "answer_updated_at" field.
 	AnswerUpdatedAt *time.Time `json:"answer_updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ContestClarificationQuery when eager-loading is set.
-	Edges        ContestClarificationEdges `json:"edges"`
+	// The values are being populated by the ClarificationQuery when eager-loading is set.
+	Edges        ClarificationEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// ContestClarificationEdges holds the relations/edges for other nodes in the graph.
-type ContestClarificationEdges struct {
+// ClarificationEdges holds the relations/edges for other nodes in the graph.
+type ClarificationEdges struct {
 	// Contest holds the value of the contest edge.
 	Contest []*Contest `json:"contest,omitempty"`
 	// Task holds the value of the task edge.
@@ -54,7 +54,7 @@ type ContestClarificationEdges struct {
 
 // ContestOrErr returns the Contest value or an error if the edge
 // was not loaded in eager-loading.
-func (e ContestClarificationEdges) ContestOrErr() ([]*Contest, error) {
+func (e ClarificationEdges) ContestOrErr() ([]*Contest, error) {
 	if e.loadedTypes[0] {
 		return e.Contest, nil
 	}
@@ -63,7 +63,7 @@ func (e ContestClarificationEdges) ContestOrErr() ([]*Contest, error) {
 
 // TaskOrErr returns the Task value or an error if the edge
 // was not loaded in eager-loading.
-func (e ContestClarificationEdges) TaskOrErr() ([]*Task, error) {
+func (e ClarificationEdges) TaskOrErr() ([]*Task, error) {
 	if e.loadedTypes[1] {
 		return e.Task, nil
 	}
@@ -72,7 +72,7 @@ func (e ContestClarificationEdges) TaskOrErr() ([]*Task, error) {
 
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading.
-func (e ContestClarificationEdges) UserOrErr() ([]*User, error) {
+func (e ClarificationEdges) UserOrErr() ([]*User, error) {
 	if e.loadedTypes[2] {
 		return e.User, nil
 	}
@@ -81,7 +81,7 @@ func (e ContestClarificationEdges) UserOrErr() ([]*User, error) {
 
 // AnswerUserOrErr returns the AnswerUser value or an error if the edge
 // was not loaded in eager-loading.
-func (e ContestClarificationEdges) AnswerUserOrErr() ([]*User, error) {
+func (e ClarificationEdges) AnswerUserOrErr() ([]*User, error) {
 	if e.loadedTypes[3] {
 		return e.AnswerUser, nil
 	}
@@ -89,17 +89,17 @@ func (e ContestClarificationEdges) AnswerUserOrErr() ([]*User, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*ContestClarification) scanValues(columns []string) ([]any, error) {
+func (*Clarification) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case contestclarification.FieldIsPublic:
+		case clarification.FieldIsPublic:
 			values[i] = new(sql.NullBool)
-		case contestclarification.FieldID:
+		case clarification.FieldID:
 			values[i] = new(sql.NullInt64)
-		case contestclarification.FieldContent, contestclarification.FieldAnswerContent:
+		case clarification.FieldContent, clarification.FieldAnswerContent:
 			values[i] = new(sql.NullString)
-		case contestclarification.FieldCreatedAt, contestclarification.FieldUpdatedAt, contestclarification.FieldAnswerCreatedAt, contestclarification.FieldAnswerUpdatedAt:
+		case clarification.FieldCreatedAt, clarification.FieldUpdatedAt, clarification.FieldAnswerCreatedAt, clarification.FieldAnswerUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -109,143 +109,143 @@ func (*ContestClarification) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the ContestClarification fields.
-func (cc *ContestClarification) assignValues(columns []string, values []any) error {
+// to the Clarification fields.
+func (c *Clarification) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case contestclarification.FieldID:
+		case clarification.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			cc.ID = int(value.Int64)
-		case contestclarification.FieldContent:
+			c.ID = int(value.Int64)
+		case clarification.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field content", values[i])
 			} else if value.Valid {
-				cc.Content = value.String
+				c.Content = value.String
 			}
-		case contestclarification.FieldIsPublic:
+		case clarification.FieldIsPublic:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_public", values[i])
 			} else if value.Valid {
-				cc.IsPublic = value.Bool
+				c.IsPublic = value.Bool
 			}
-		case contestclarification.FieldCreatedAt:
+		case clarification.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				cc.CreatedAt = value.Time
+				c.CreatedAt = value.Time
 			}
-		case contestclarification.FieldUpdatedAt:
+		case clarification.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				cc.UpdatedAt = value.Time
+				c.UpdatedAt = value.Time
 			}
-		case contestclarification.FieldAnswerContent:
+		case clarification.FieldAnswerContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field answer_content", values[i])
 			} else if value.Valid {
-				cc.AnswerContent = new(string)
-				*cc.AnswerContent = value.String
+				c.AnswerContent = new(string)
+				*c.AnswerContent = value.String
 			}
-		case contestclarification.FieldAnswerCreatedAt:
+		case clarification.FieldAnswerCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field answer_created_at", values[i])
 			} else if value.Valid {
-				cc.AnswerCreatedAt = new(time.Time)
-				*cc.AnswerCreatedAt = value.Time
+				c.AnswerCreatedAt = new(time.Time)
+				*c.AnswerCreatedAt = value.Time
 			}
-		case contestclarification.FieldAnswerUpdatedAt:
+		case clarification.FieldAnswerUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field answer_updated_at", values[i])
 			} else if value.Valid {
-				cc.AnswerUpdatedAt = new(time.Time)
-				*cc.AnswerUpdatedAt = value.Time
+				c.AnswerUpdatedAt = new(time.Time)
+				*c.AnswerUpdatedAt = value.Time
 			}
 		default:
-			cc.selectValues.Set(columns[i], values[i])
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the ContestClarification.
+// Value returns the ent.Value that was dynamically selected and assigned to the Clarification.
 // This includes values selected through modifiers, order, etc.
-func (cc *ContestClarification) Value(name string) (ent.Value, error) {
-	return cc.selectValues.Get(name)
+func (c *Clarification) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
 }
 
-// QueryContest queries the "contest" edge of the ContestClarification entity.
-func (cc *ContestClarification) QueryContest() *ContestQuery {
-	return NewContestClarificationClient(cc.config).QueryContest(cc)
+// QueryContest queries the "contest" edge of the Clarification entity.
+func (c *Clarification) QueryContest() *ContestQuery {
+	return NewClarificationClient(c.config).QueryContest(c)
 }
 
-// QueryTask queries the "task" edge of the ContestClarification entity.
-func (cc *ContestClarification) QueryTask() *TaskQuery {
-	return NewContestClarificationClient(cc.config).QueryTask(cc)
+// QueryTask queries the "task" edge of the Clarification entity.
+func (c *Clarification) QueryTask() *TaskQuery {
+	return NewClarificationClient(c.config).QueryTask(c)
 }
 
-// QueryUser queries the "user" edge of the ContestClarification entity.
-func (cc *ContestClarification) QueryUser() *UserQuery {
-	return NewContestClarificationClient(cc.config).QueryUser(cc)
+// QueryUser queries the "user" edge of the Clarification entity.
+func (c *Clarification) QueryUser() *UserQuery {
+	return NewClarificationClient(c.config).QueryUser(c)
 }
 
-// QueryAnswerUser queries the "answer_user" edge of the ContestClarification entity.
-func (cc *ContestClarification) QueryAnswerUser() *UserQuery {
-	return NewContestClarificationClient(cc.config).QueryAnswerUser(cc)
+// QueryAnswerUser queries the "answer_user" edge of the Clarification entity.
+func (c *Clarification) QueryAnswerUser() *UserQuery {
+	return NewClarificationClient(c.config).QueryAnswerUser(c)
 }
 
-// Update returns a builder for updating this ContestClarification.
-// Note that you need to call ContestClarification.Unwrap() before calling this method if this ContestClarification
+// Update returns a builder for updating this Clarification.
+// Note that you need to call Clarification.Unwrap() before calling this method if this Clarification
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (cc *ContestClarification) Update() *ContestClarificationUpdateOne {
-	return NewContestClarificationClient(cc.config).UpdateOne(cc)
+func (c *Clarification) Update() *ClarificationUpdateOne {
+	return NewClarificationClient(c.config).UpdateOne(c)
 }
 
-// Unwrap unwraps the ContestClarification entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Clarification entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (cc *ContestClarification) Unwrap() *ContestClarification {
-	_tx, ok := cc.config.driver.(*txDriver)
+func (c *Clarification) Unwrap() *Clarification {
+	_tx, ok := c.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: ContestClarification is not a transactional entity")
+		panic("ent: Clarification is not a transactional entity")
 	}
-	cc.config.driver = _tx.drv
-	return cc
+	c.config.driver = _tx.drv
+	return c
 }
 
 // String implements the fmt.Stringer.
-func (cc *ContestClarification) String() string {
+func (c *Clarification) String() string {
 	var builder strings.Builder
-	builder.WriteString("ContestClarification(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", cc.ID))
+	builder.WriteString("Clarification(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
 	builder.WriteString("content=")
-	builder.WriteString(cc.Content)
+	builder.WriteString(c.Content)
 	builder.WriteString(", ")
 	builder.WriteString("is_public=")
-	builder.WriteString(fmt.Sprintf("%v", cc.IsPublic))
+	builder.WriteString(fmt.Sprintf("%v", c.IsPublic))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(cc.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(cc.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := cc.AnswerContent; v != nil {
+	if v := c.AnswerContent; v != nil {
 		builder.WriteString("answer_content=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := cc.AnswerCreatedAt; v != nil {
+	if v := c.AnswerCreatedAt; v != nil {
 		builder.WriteString("answer_created_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := cc.AnswerUpdatedAt; v != nil {
+	if v := c.AnswerUpdatedAt; v != nil {
 		builder.WriteString("answer_updated_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
@@ -253,5 +253,5 @@ func (cc *ContestClarification) String() string {
 	return builder.String()
 }
 
-// ContestClarifications is a parsable slice of ContestClarification.
-type ContestClarifications []*ContestClarification
+// Clarifications is a parsable slice of Clarification.
+type Clarifications []*Clarification

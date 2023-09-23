@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestclarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -178,14 +178,14 @@ func (tc *TaskCreate) AddSubmits(s ...*Submit) *TaskCreate {
 	return tc.AddSubmitIDs(ids...)
 }
 
-// AddClarificationIDs adds the "clarifications" edge to the ContestClarification entity by IDs.
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by IDs.
 func (tc *TaskCreate) AddClarificationIDs(ids ...int) *TaskCreate {
 	tc.mutation.AddClarificationIDs(ids...)
 	return tc
 }
 
-// AddClarifications adds the "clarifications" edges to the ContestClarification entity.
-func (tc *TaskCreate) AddClarifications(c ...*ContestClarification) *TaskCreate {
+// AddClarifications adds the "clarifications" edges to the Clarification entity.
+func (tc *TaskCreate) AddClarifications(c ...*Clarification) *TaskCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -430,7 +430,7 @@ func (tc *TaskCreate) createSpec() (*Task, *sqlgraph.CreateSpec) {
 			Columns: task.ClarificationsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(contestclarification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

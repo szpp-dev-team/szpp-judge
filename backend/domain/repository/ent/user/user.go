@@ -54,14 +54,14 @@ const (
 	SubmitsColumn = "user_submits"
 	// ClarificationsTable is the table that holds the clarifications relation/edge. The primary key declared below.
 	ClarificationsTable = "user_clarifications"
-	// ClarificationsInverseTable is the table name for the ContestClarification entity.
-	// It exists in this package in order to avoid circular dependency with the "contestclarification" package.
-	ClarificationsInverseTable = "contest_clarifications"
+	// ClarificationsInverseTable is the table name for the Clarification entity.
+	// It exists in this package in order to avoid circular dependency with the "clarification" package.
+	ClarificationsInverseTable = "clarifications"
 	// AnsweredClarificationsTable is the table that holds the answered_clarifications relation/edge. The primary key declared below.
 	AnsweredClarificationsTable = "user_answered_clarifications"
-	// AnsweredClarificationsInverseTable is the table name for the ContestClarification entity.
-	// It exists in this package in order to avoid circular dependency with the "contestclarification" package.
-	AnsweredClarificationsInverseTable = "contest_clarifications"
+	// AnsweredClarificationsInverseTable is the table name for the Clarification entity.
+	// It exists in this package in order to avoid circular dependency with the "clarification" package.
+	AnsweredClarificationsInverseTable = "clarifications"
 	// ContestsTable is the table that holds the contests relation/edge. The primary key declared below.
 	ContestsTable = "contest_users"
 	// ContestsInverseTable is the table name for the Contest entity.
@@ -90,10 +90,10 @@ var Columns = []string{
 var (
 	// ClarificationsPrimaryKey and ClarificationsColumn2 are the table columns denoting the
 	// primary key for the clarifications relation (M2M).
-	ClarificationsPrimaryKey = []string{"user_id", "contest_clarification_id"}
+	ClarificationsPrimaryKey = []string{"user_id", "clarification_id"}
 	// AnsweredClarificationsPrimaryKey and AnsweredClarificationsColumn2 are the table columns denoting the
 	// primary key for the answered_clarifications relation (M2M).
-	AnsweredClarificationsPrimaryKey = []string{"user_id", "contest_clarification_id"}
+	AnsweredClarificationsPrimaryKey = []string{"user_id", "clarification_id"}
 	// ContestsPrimaryKey and ContestsColumn2 are the table columns denoting the
 	// primary key for the contests relation (M2M).
 	ContestsPrimaryKey = []string{"contest_id", "user_id"}

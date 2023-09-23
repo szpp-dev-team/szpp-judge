@@ -56,7 +56,7 @@ type TaskEdges struct {
 	// Submits holds the value of the submits edge.
 	Submits []*Submit `json:"submits,omitempty"`
 	// Clarifications holds the value of the clarifications edge.
-	Clarifications []*ContestClarification `json:"clarifications,omitempty"`
+	Clarifications []*Clarification `json:"clarifications,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// Contests holds the value of the contests edge.
@@ -97,7 +97,7 @@ func (e TaskEdges) SubmitsOrErr() ([]*Submit, error) {
 
 // ClarificationsOrErr returns the Clarifications value or an error if the edge
 // was not loaded in eager-loading.
-func (e TaskEdges) ClarificationsOrErr() ([]*ContestClarification, error) {
+func (e TaskEdges) ClarificationsOrErr() ([]*Clarification, error) {
 	if e.loadedTypes[3] {
 		return e.Clarifications, nil
 	}
@@ -277,7 +277,7 @@ func (t *Task) QuerySubmits() *SubmitQuery {
 }
 
 // QueryClarifications queries the "clarifications" edge of the Task entity.
-func (t *Task) QueryClarifications() *ContestClarificationQuery {
+func (t *Task) QueryClarifications() *ClarificationQuery {
 	return NewTaskClient(t.config).QueryClarifications(t)
 }
 
