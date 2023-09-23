@@ -25,11 +25,11 @@ func CreateUser(t *testing.T, client *ent.Client, username, role string) *ent.Us
 	return user
 }
 
-func CreateTask(t *testing.T, client *ent.Client, jt any, userID int, contestID *int) *ent.Task {
+func CreateTask(t *testing.T, client *ent.Client, title string, jt any, userID int, contestID *int) *ent.Task {
 	t.Helper()
 
 	q := client.Task.Create().
-		SetTitle("hoge").
+		SetTitle(title).
 		SetStatement("fuga").
 		SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
 		SetExecTimeLimit(2000).
@@ -37,9 +37,6 @@ func CreateTask(t *testing.T, client *ent.Client, jt any, userID int, contestID 
 		SetJudgeType(ent_task.JudgeTypeNormal).
 		SetUserID(userID).
 		SetCreatedAt(timejst.Now())
-	// if contestID != nil {
-	// 	q = q.SetContestID(*contestID)
-	// }
 
 	switch jt := jt.(type) {
 	case *judgev1.JudgeType_Normal:

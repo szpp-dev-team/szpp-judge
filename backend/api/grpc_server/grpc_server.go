@@ -10,6 +10,7 @@ import (
 	grpc_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/grpc"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/judge"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
+	"github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -34,7 +35,9 @@ func New(opts ...api.OptionFunc) *grpc.Server {
 	}
 	healthcheckSrv := grpc_interfaces.NewHealthcheckServiceServer()
 	pb.RegisterHealthcheckServiceServer(srv, healthcheckSrv)
-	taskInteractor := tasks.NewInteractor(opt.EntClient, opt.TestcasesRepository)
+	userSrv := grpc_interfaces.NewUserServiceServer(user.NewInteractor(opt.entClient))
+	pb.RegisterUserServiceServer(srv, userSrv)
+	taskInteractor := tasks.NewInteractor(opt.entClient, opt.testcasesRepository)
 	taskSrv := grpc_interfaces.NewTaskServiceServer(taskInteractor)
 	pb.RegisterTaskServiceServer(srv, taskSrv)
 	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient)

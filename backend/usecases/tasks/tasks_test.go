@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
@@ -43,8 +44,11 @@ func Test_CreateTask(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
+			defer utils.TruncateDB(t, entClient)
+			utils.TruncateDB(t, entClient)
+
 			ctx := context.Background()
-			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
+			user := fixture.CreateUser(t, entClient, "hofds", "ADMIN")
 			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
 
 			if test.modify != nil {
@@ -61,25 +65,24 @@ func Test_CreateTask(t *testing.T) {
 			if test.assert != nil {
 				test.assert(ctx, t, req, resp)
 			}
-
-			utils.TruncateDB(t, entClient)
 		})
 	}
 }
 
 func Test_UpdateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
+	defer entClient.Close()
 	interactor := NewInteractor(entClient, nil)
 
 	tests := map[string]struct {
-		prepare func(t *testing.T, req *backendv1.UpdateTaskRequest)
+		prepare func(t *testing.T, user *ent.User, req *backendv1.UpdateTaskRequest)
 		modify  func(req *backendv1.UpdateTaskRequest)
 		wantErr bool
 		assert  func(ctx context.Context, t *testing.T, req *backendv1.UpdateTaskRequest, resp *backendv1.UpdateTaskResponse)
 	}{
 		"success": {
-			prepare: func(t *testing.T, req *backendv1.UpdateTaskRequest) {
-				task := fixture.CreateTask(t, entClient, judgev1.JudgeType_Normal{Normal: &judgev1.JudgeTypeNormal{CaseInsensitive: lo.ToPtr(false)}}, 1, nil)
+			prepare: func(t *testing.T, user *ent.User, req *backendv1.UpdateTaskRequest) {
+				task := fixture.CreateTask(t, entClient, "a", judgev1.JudgeType_Normal{Normal: &judgev1.JudgeTypeNormal{CaseInsensitive: lo.ToPtr(false)}}, user.ID, nil)
 				req.TaskId = int32(task.ID)
 			},
 			modify: func(req *backendv1.UpdateTaskRequest) {
@@ -98,6 +101,8 @@ func Test_UpdateTask(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
+			defer utils.TruncateDB(t, entClient)
+
 			ctx := context.Background()
 			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
 			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
@@ -106,7 +111,7 @@ func Test_UpdateTask(t *testing.T) {
 				test.modify(req)
 			}
 			if test.prepare != nil {
-				test.prepare(t, req)
+				test.prepare(t, user, req)
 			}
 
 			resp, err := interactor.UpdateTask(ctx, req)
@@ -119,8 +124,6 @@ func Test_UpdateTask(t *testing.T) {
 			if test.assert != nil {
 				test.assert(ctx, t, req, resp)
 			}
-
-			utils.TruncateDB(t, entClient)
 		})
 	}
 }
@@ -138,18 +141,20 @@ func Test_GetTask(t *testing.T) {
 		"success": {
 			prepare: func(t *testing.T, req *backendv1.GetTaskRequest) {
 				user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
-				task := fixture.CreateTask(t, entClient, newJudgeTypeNormal(false), user.ID, nil)
+				task := fixture.CreateTask(t, entClient, "a", newJudgeTypeNormal(false), user.ID, nil)
 				req.TaskId = int32(task.ID)
 			},
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.GetTaskRequest, resp *backendv1.GetTaskResponse) {
 				task := entClient.Task.GetX(context.Background(), int(resp.Task.Id))
-				assert.Equal(t, "hoge", task.Title)
+				assert.Equal(t, "a", task.Title)
 			},
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
+			defer utils.TruncateDB(t, entClient)
+
 			ctx := context.Background()
 			req := &backendv1.GetTaskRequest{}
 			if test.prepare != nil {
@@ -164,8 +169,6 @@ func Test_GetTask(t *testing.T) {
 			if test.assert != nil {
 				test.assert(ctx, t, req, resp)
 			}
-
-			utils.TruncateDB(t, entClient)
 		})
 	}
 }
@@ -208,10 +211,12 @@ func Test_GetTestcaseSets(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
+			defer utils.TruncateDB(t, entClient)
+
 			ctx := context.Background()
 
 			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
-			task := fixture.CreateTask(t, entClient, newJudgeTypeNormal(false), user.ID, nil)
+			task := fixture.CreateTask(t, entClient, "a", newJudgeTypeNormal(false), user.ID, nil)
 
 			req := &backendv1.GetTestcaseSetsRequest{TaskId: int32(task.ID)}
 			if test.prepare != nil {
@@ -226,8 +231,6 @@ func Test_GetTestcaseSets(t *testing.T) {
 			if test.assert != nil {
 				test.assert(ctx, t, req, resp)
 			}
-
-			utils.TruncateDB(t, entClient)
 		})
 	}
 }
@@ -385,11 +388,13 @@ func Test_SyncTestcaseSets(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
+			defer utils.TruncateDB(t, entClient)
+
 			ctx := context.Background()
-			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
+			user := fixture.CreateUser(t, entClient, name, "ADMIN")
 			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
 
-			task := fixture.CreateTask(t, entClient, ent_task.JudgeTypeNormal, int(user.ID), nil)
+			task := fixture.CreateTask(t, entClient, "a", ent_task.JudgeTypeNormal, int(user.ID), nil)
 
 			testcaseSets, testcases := seedMutationTestcasePairs()
 			req := &backendv1.SyncTestcaseSetsRequest{
@@ -412,8 +417,6 @@ func Test_SyncTestcaseSets(t *testing.T) {
 			if test.assert != nil {
 				test.assert(ctx, t, req, resp)
 			}
-
-			utils.TruncateDB(t, entClient)
 		})
 	}
 }

@@ -82,7 +82,7 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 	i.logger.Info("succeeded to register task information", slog.Int("task_id", task.ID))
 
 	return &backendv1.CreateTaskResponse{
-		Task: toPbTask(task),
+		Task: ToPbTask(task),
 	}, nil
 }
 
@@ -96,7 +96,7 @@ func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest)
 	}
 
 	return &backendv1.GetTaskResponse{
-		Task: toPbTask(task),
+		Task: ToPbTask(task),
 	}, nil
 }
 
@@ -156,7 +156,7 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 	i.logger.Info("succeeded to update task information", slog.Int("task_id", task.ID))
 
 	return &backendv1.UpdateTaskResponse{
-		Task: toPbTask(task),
+		Task: ToPbTask(task),
 	}, nil
 }
 
@@ -368,7 +368,7 @@ func diffSlices[T comparable](prevList, nextList []T) (addList, removeList []T) 
 	return addList, removeList
 }
 
-func toPbTask(t *ent.Task) *backendv1.Task {
+func ToPbTask(t *ent.Task) *backendv1.Task {
 	var updatedAt *timestamppb.Timestamp
 	if t.UpdatedAt != nil {
 		updatedAt = timestamppb.New(*t.UpdatedAt)

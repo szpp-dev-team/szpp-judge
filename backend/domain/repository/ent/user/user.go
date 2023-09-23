@@ -28,6 +28,10 @@ const (
 	EdgeTasks = "tasks"
 	// EdgeSubmits holds the string denoting the submits edge name in mutations.
 	EdgeSubmits = "submits"
+	// EdgeContests holds the string denoting the contests edge name in mutations.
+	EdgeContests = "contests"
+	// EdgeContestUser holds the string denoting the contest_user edge name in mutations.
+	EdgeContestUser = "contest_user"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// TasksTable is the table that holds the tasks relation/edge.
@@ -44,6 +48,18 @@ const (
 	SubmitsInverseTable = "submits"
 	// SubmitsColumn is the table column denoting the submits relation/edge.
 	SubmitsColumn = "user_submits"
+	// ContestsTable is the table that holds the contests relation/edge. The primary key declared below.
+	ContestsTable = "contest_users"
+	// ContestsInverseTable is the table name for the Contest entity.
+	// It exists in this package in order to avoid circular dependency with the "contest" package.
+	ContestsInverseTable = "contests"
+	// ContestUserTable is the table that holds the contest_user relation/edge.
+	ContestUserTable = "contest_users"
+	// ContestUserInverseTable is the table name for the ContestUser entity.
+	// It exists in this package in order to avoid circular dependency with the "contestuser" package.
+	ContestUserInverseTable = "contest_users"
+	// ContestUserColumn is the table column denoting the contest_user relation/edge.
+	ContestUserColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -56,6 +72,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
+
+var (
+	// ContestsPrimaryKey and ContestsColumn2 are the table columns denoting the
+	// primary key for the contests relation (M2M).
+	ContestsPrimaryKey = []string{"contest_id", "user_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -127,6 +149,34 @@ func BySubmits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSubmitsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByContestsCount orders the results by contests count.
+func ByContestsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newContestsStep(), opts...)
+	}
+}
+
+// ByContests orders the results by contests terms.
+func ByContests(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newContestsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByContestUserCount orders the results by contest_user count.
+func ByContestUserCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newContestUserStep(), opts...)
+	}
+}
+
+// ByContestUser orders the results by contest_user terms.
+func ByContestUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newContestUserStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newTasksStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -139,5 +189,19 @@ func newSubmitsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubmitsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubmitsTable, SubmitsColumn),
+	)
+}
+func newContestsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ContestsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ContestsTable, ContestsPrimaryKey...),
+	)
+}
+func newContestUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ContestUserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, ContestUserTable, ContestUserColumn),
 	)
 }

@@ -7,6 +7,32 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 
 /**
+ * @generated from enum backend.v1.Role
+ */
+export enum Role {
+  /**
+   * @generated from enum value: ROLE_UNSPECIFIED = 0;
+   */
+  ROLE_UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ADMIN = 1;
+   */
+  ADMIN = 1,
+
+  /**
+   * @generated from enum value: USER = 2;
+   */
+  USER = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(Role)
+proto3.util.setEnumType(Role, "backend.v1.Role", [
+  { no: 0, name: "ROLE_UNSPECIFIED" },
+  { no: 1, name: "ADMIN" },
+  { no: 2, name: "USER" },
+]);
+
+/**
  * @generated from message backend.v1.User
  */
 export class User extends Message<User> {
