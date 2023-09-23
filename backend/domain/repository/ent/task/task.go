@@ -75,9 +75,9 @@ const (
 	SubmitsColumn = "task_submits"
 	// ClarificationsTable is the table that holds the clarifications relation/edge. The primary key declared below.
 	ClarificationsTable = "task_clarifications"
-	// ClarificationsInverseTable is the table name for the ContestClarification entity.
-	// It exists in this package in order to avoid circular dependency with the "contestclarification" package.
-	ClarificationsInverseTable = "contest_clarifications"
+	// ClarificationsInverseTable is the table name for the Clarification entity.
+	// It exists in this package in order to avoid circular dependency with the "clarification" package.
+	ClarificationsInverseTable = "clarifications"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "tasks"
 	// UserInverseTable is the table name for the User entity.
@@ -124,7 +124,7 @@ var ForeignKeys = []string{
 var (
 	// ClarificationsPrimaryKey and ClarificationsColumn2 are the table columns denoting the
 	// primary key for the clarifications relation (M2M).
-	ClarificationsPrimaryKey = []string{"task_id", "contest_clarification_id"}
+	ClarificationsPrimaryKey = []string{"task_id", "clarification_id"}
 	// ContestsPrimaryKey and ContestsColumn2 are the table columns denoting the
 	// primary key for the contests relation (M2M).
 	ContestsPrimaryKey = []string{"contest_id", "task_id"}

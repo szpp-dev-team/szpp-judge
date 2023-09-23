@@ -6,12 +6,12 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-type ContestClarification struct {
+type Clarification struct {
 	ent.Schema
 }
 
 // Fields of the ContestClarification.
-func (ContestClarification) Fields() []ent.Field {
+func (Clarification) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.String("content"),
@@ -30,7 +30,7 @@ func (ContestClarification) Fields() []ent.Field {
 	}
 }
 
-func (ContestClarification) Edges() []ent.Edge {
+func (Clarification) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("contest", Contest.Type). // discuss: コンテストに対して、Clarificationは複数存在するので、Uniqueではない?
 			Ref("clarifications").
