@@ -1,10 +1,10 @@
-import type { ScoreStatus } from "@/src/model/task";
+import { ScoreStatus } from "@/src/model/task";
 import { calcNthTaskSeq } from "@/src/usecases/contest";
 import { Duration, fmtDatetime } from "@/src/util/time";
 import { Box, FormControl, FormLabel, Icon, Link, Switch, Text } from "@chakra-ui/react";
 import type { BoxProps, LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
-import React, { type ReactNode, useMemo, useState } from "react";
+import React, { type ReactNode, useCallback, useMemo, useState } from "react";
 import type { IconType } from "react-icons";
 import { IoBarChart, IoChatboxEllipses, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
 import { SIDEBAR_TOGGLE_KNOB_H, SIDEBAR_TOGGLE_KNOB_TOP, SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
@@ -266,12 +266,12 @@ const SidebarRemainingTime = ({ startAt, endAt, now }: {
   endAt: Date;
   now: Date;
 }): JSX.Element | undefined => {
-  const render = (label: string, remainTime: string) => (
+  const render = useCallback((label: string, remainTime: string) => (
     <Box as="li">
       <Text as="span" fontSize="2xs">{label}</Text>
       <Text as="time" dateTime={remainTime} display="block" fontSize="md" fontWeight="medium">{remainTime}</Text>
     </Box>
-  );
+  ), []);
   if (now < startAt) {
     const untilStart = new Duration(now, startAt);
     return (untilStart.hours() < 24) ? render("コンテスト開始まで", untilStart.fmtHMS()) : undefined;
