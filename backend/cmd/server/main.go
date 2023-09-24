@@ -60,7 +60,7 @@ func main() {
 	}
 	defer lsnr.Close()
 	go func() {
-		logger.Info("server launched")
+		logger.Info("server launched", slog.String("port", config.GrpcPort))
 		if err := srv.Serve(lsnr); err != nil {
 			log.Fatal(err)
 		}
