@@ -9,14 +9,18 @@ import (
 	"syscall"
 	"time"
 
+	"cloud.google.com/go/storage"
 	"github.com/go-sql-driver/mysql"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	"golang.org/x/exp/slog"
 )
 
 func main() {
+	ctx := context.Background()
+
 	config, err := config.New()
 	if err != nil {
 		log.Fatal(err)
@@ -42,17 +46,25 @@ func main() {
 		log.Fatal(err)
 	}
 	defer entClient.Close()
-	if err := entClient.Schema.Create(context.Background()); err != nil {
+	if err := entClient.Schema.Create(ctx); err != nil {
 		log.Fatal(err)
 	}
 
 	// logger
 	logger := slog.Default()
 
+	storageClient, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer storageClient.Close()
+	testcasesRepository := testcases.NewRepository(storageClient)
+
 	srv := grpc_server.New(
 		grpc_server.WithLogger(logger),
 		grpc_server.WithEntClient(entClient),
 		grpc_server.WithReflection(config.ModeDev),
+		grpc_server.WithTestcasesRepository(testcasesRepository),
 	)
 	lsnr, err := net.Listen("tcp", "0.0.0.0:"+config.GrpcPort)
 	if err != nil {
