@@ -54,7 +54,7 @@ func main() {
 		grpc_server.WithEntClient(entClient),
 		grpc_server.WithReflection(config.ModeDev),
 	)
-	lsnr, err := net.Listen("tcp", ":"+config.GrpcPort)
+	lsnr, err := net.Listen("tcp", "0.0.0.0:"+config.GrpcPort)
 	if err != nil {
 		log.Fatal(err)
 	}
