@@ -42,7 +42,7 @@ const isTasksViewable = (contest: PlainMessage<Contest>, now: Date): boolean => 
   return now >= startAt.toDate();
 };
 
-const generateContest = (slug: string): PlainMessage<Contest> | undefined => {
+const generateContest = (slug: string): PlainMessage<Contest> | null => {
   switch (slug) {
     case "sbc001":
       return {
@@ -104,6 +104,8 @@ const generateContest = (slug: string): PlainMessage<Contest> | undefined => {
         taskIds: contestTaskIds,
         description: contestDescription,
       };
+    default:
+      return null;
   }
 };
 
