@@ -14,15 +14,15 @@ export type ContestSidebarProps = {
   /** 画面上部から下へずらす量。GlobalHeaderの高さを期待する。"0px"など単位も必要。 */
   top?: string | "0px";
   /** コンテスト開始日時 */
-  startAt: Date;
+  startAt?: Date;
   /** コンテスト終了日時 */
-  endAt: Date;
+  endAt?: Date;
   /** 現在時刻 */
   now: Date;
   /** コンテストの slug */
   slug: string;
   /** コンテストの問題と得点状況 */
-  tasks: ReadonlyArray<{
+  tasks: Array<{
     id: number;
     title: string;
     scoreStatus?: ScoreStatus;
@@ -117,8 +117,8 @@ const SidebarMainPane = ({
   ...props
 }: SidebarMainPaneProps) => {
   const contestRootPath = `/contests/${slug}`;
-  const contestStarted = now >= startAt;
-  const contestFinished = now >= endAt;
+  const contestStarted = startAt ? now >= startAt : false;
+  const contestFinished = endAt ? now >= endAt : false;
 
   return (
     <Box
@@ -205,9 +205,13 @@ const SidebarMainPane = ({
         borderTop="1px"
         borderColor={DIVIDER_COLOR}
       >
-        <SidebarRemainingTime startAt={startAt} endAt={endAt} now={now} />
-        <SidebarDatetime label="開始" datetime={startAt} />
-        <SidebarDatetime label="終了" datetime={endAt} />
+        {(startAt == null || endAt == null) ? <></> : (
+          <>
+            <SidebarRemainingTime startAt={startAt} endAt={endAt} now={now} />
+            <SidebarDatetime label="開始" datetime={startAt} />
+            <SidebarDatetime label="終了" datetime={endAt} />
+          </>
+        )}
       </Box>
     </Box>
   );
