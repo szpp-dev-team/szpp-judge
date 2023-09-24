@@ -33,6 +33,7 @@ export const calcNthTaskSeq = (i: number, numTotalTasks: number): string => {
 
 export const useRouterContestSlug = () => {
   const { query } = useRouter();
+  /// URLに [contest_slug] が含まれていないページでは undefined になるので注意
   return query.contest_slug as string;
 };
 
