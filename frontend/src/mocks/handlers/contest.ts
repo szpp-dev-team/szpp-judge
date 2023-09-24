@@ -28,6 +28,11 @@ const contestDescription = String.raw`
 Bob, Alice, Benjamin
 `;
 
+// レスポンスを生成する時点で new Date() をすると、APIを叩くたびに
+// コンテスト開始時刻や終了時刻が更新されてしまう。
+// すると開始5秒前や終了5秒前の動作確認が難しくなりそう (例えば開始時点で問題一覧取得を叩いたら 403 にならないで欲しい)。
+// そのため、このファイルが読み込まれた時点で now をフリーズしている。
+// now を更新したい場合はブラウザでページをリロードすればよい。
 const now = new Date();
 const beforeNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() - dur));
 const afterNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() + dur));
@@ -45,8 +50,8 @@ const generateContest = (slug: string): PlainMessage<Contest> | undefined => {
         slug: "sbc001",
         name: "開始2日前verコンテスト",
         contestType: ContestType.OFFICIAL,
-        startAt: beforeNow(Duration.DAY * 2),
-        endAt: afterNow(Duration.MINUTE * 90),
+        startAt: afterNow(Duration.DAY * 2),
+        endAt: afterNow(Duration.DAY * 2 + Duration.MINUTE * 90),
         penaltySeconds: 300,
         taskIds: contestTaskIds,
         description: contestDescription,
