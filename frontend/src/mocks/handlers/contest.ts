@@ -37,7 +37,7 @@ const now = new Date();
 const beforeNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() - dur));
 const afterNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() + dur));
 
-const canTasksViewable = (contest: PlainMessage<Contest>, now: Date): boolean => {
+const isTasksViewable = (contest: PlainMessage<Contest>, now: Date): boolean => {
   const startAt = contest.startAt! as Timestamp;
   return now >= startAt.toDate();
 };
@@ -146,7 +146,7 @@ export const contestHandlers: RequestHandler[] = [
         ctx.status(404),
       );
     }
-    if (!canTasksViewable(contest, new Date())) {
+    if (!isTasksViewable(contest, new Date())) {
       return res(
         ctx.delay(500),
         ctx.status(403),
@@ -168,7 +168,7 @@ export const contestHandlers: RequestHandler[] = [
         ctx.status(404),
       );
     }
-    if (!canTasksViewable(contest, new Date())) {
+    if (!isTasksViewable(contest, new Date())) {
       return res(
         ctx.delay(500),
         ctx.status(403),
@@ -188,7 +188,7 @@ export const contestHandlers: RequestHandler[] = [
         ctx.status(404),
       );
     }
-    if (!canTasksViewable(contest, new Date())) {
+    if (!isTasksViewable(contest, new Date())) {
       return res(
         ctx.delay(500),
         ctx.status(403),
