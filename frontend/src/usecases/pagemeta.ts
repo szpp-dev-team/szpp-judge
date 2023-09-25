@@ -1,4 +1,4 @@
-import { useGetContest, useRouterContestSlug } from "./contest";
+import { useGetContest, useRouterContestSlug, useRouterSubmissionId } from "./contest";
 
 const TITLE_SUFFIX = "SZPP Judge";
 
@@ -15,4 +15,9 @@ export const useContestPageTitle = (prefix: string): string => {
   } else {
     return `${prefix} | ${TITLE_SUFFIX}`;
   }
+};
+
+export const useSubmissionDetailPageTitle = (prefix: string = "提出 #"): string => {
+  const id = useRouterSubmissionId();
+  return useContestPageTitle(`${prefix}${id}`);
 };
