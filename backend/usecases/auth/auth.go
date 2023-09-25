@@ -70,7 +70,10 @@ func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAcce
 	} else {
 		secret := i.Secret
 		username := intercepter.GetClaimsFromContext(ctx).Username
-		accessToken, _ := generateAccessToken([]byte(secret), username)
+		accessToken, err := generateAccessToken([]byte(secret), username)
+		if err != nil {
+			return nil, err
+		}
 		return &pb.RefreshAccessTokenResponse{
 			AccessToken: accessToken,
 		}, nil
