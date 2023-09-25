@@ -28,8 +28,8 @@ const ContestListWithFilter = (header: string, f: (c: Contest) => boolean) => {
           <Table variant="bordered-narrow">
             <Thead>
               <Tr>
-                <Th textAlign="center">開始</Th>
-                <Th textAlign="center">終了</Th>
+                <Th textAlign="center" width={100}>開始</Th>
+                <Th textAlign="center" width={100}>終了</Th>
                 <Th textAlign="center">コンテスト名</Th>
                 <Th textAlign="center">問題数</Th>
               </Tr>
