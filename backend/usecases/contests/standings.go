@@ -51,9 +51,10 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// sort by submit_at (asc)
+	// sort submissions by submit_at (asc)
 	sort.SliceStable(submits, func(i, j int) bool { return submits[i].SubmittedAt.Before(submits[j].SubmittedAt) })
 
+	// get user info
 	user_info, err := separateSubmit(i, ctx, submits, contest)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -100,17 +101,16 @@ func separateSubmit(i *Interactor, ctx context.Context, submits []*ent.Submit, c
 
 	for _, submit := range submits {
 
+		// exception handling
 		if submit.SubmittedAt.Before(contest.StartAt) || contest.StartAt.After(submit.SubmittedAt) {
 			continue
 		}
-
 		if isTaskAlreadySolved(user_info, submit.Edges.User.ID, submit.Edges.Task.ID) {
 			continue
 		}
 
 		// initialize
 		err := initializeContestTasksResult(i, ctx, user_info, submit.Edges.User.ID, contest.ID)
-
 		if err != nil {
 			return nil, err
 		}
