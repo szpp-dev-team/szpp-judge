@@ -14,7 +14,13 @@ import {
   Tbody,
   Td
 } from "@chakra-ui/react";
-import { Contest } from "@/src/gen/proto/backend/v1/contest_resources_pb";
+import { Contest, ContestType } from "@/src/gen/proto/backend/v1/contest_resources_pb";
+
+const ContestTypeToString = (t: ContestType) => {
+  if (t == ContestType.OFFICIAL) return "official";
+  if (t == ContestType.VIRTUAL) return "virtual";
+  return "unspecified";
+};
 
 const ContestListWithFilter = (header: string, f: (c: Contest) => boolean) => {
   const { contests } = useListContests({});
@@ -31,7 +37,8 @@ const ContestListWithFilter = (header: string, f: (c: Contest) => boolean) => {
                 <Th textAlign="center" width={100}>開始</Th>
                 <Th textAlign="center" width={100}>終了</Th>
                 <Th textAlign="center">コンテスト名</Th>
-                <Th textAlign="center">問題数</Th>
+                <Th textAlign="center" width={100}>種別</Th>
+                <Th textAlign="center" width={50}>問題数</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -42,6 +49,7 @@ const ContestListWithFilter = (header: string, f: (c: Contest) => boolean) => {
                   <Td textAlign="left">
                     <Link href={`/contests/${c.slug}`}>{c.name}</Link>
                   </Td>
+                  <Td textAlign="center">{ContestTypeToString(c.contestType)}</Td>
                   <Td textAlign="center">{c.taskIds.length}</Td>
                 </Tr>
               ))}
