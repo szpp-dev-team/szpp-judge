@@ -36,8 +36,7 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = u_user.VerifyPassword(user.HashedPassword, req.Password)
-	if err != nil {
+	if err = u_user.VerifyPassword(user.HashedPassword, req.Password); err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
@@ -55,8 +54,7 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 }
 
 func (i *Interactor) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.LogoutResponse, error) {
-	err := killRefreshToken(ctx, i.entClient, req.RefreshToken)
-	if err != nil {
+	if err := killRefreshToken(ctx, i.entClient, req.RefreshToken); err != nil {
 		return nil, err
 	}
 	return &pb.LogoutResponse{}, nil

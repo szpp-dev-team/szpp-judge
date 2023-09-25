@@ -58,8 +58,8 @@ func generateRefreshToken(ctx context.Context, entClient *ent.Client) (string, e
 		SetToken(token).
 		SetExpiresAt(expiresAt).
 		SetIsDead(false)
-	_, err := q.Save(ctx)
-	if err != nil {
+
+	if _, err := q.Save(ctx); err != nil {
 		return "", status.Error(codes.Internal, err.Error())
 	}
 
