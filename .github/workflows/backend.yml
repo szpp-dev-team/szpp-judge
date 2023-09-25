@@ -8,8 +8,6 @@ on:
       - proto-gen/go/**
       - .github/workflows/backend.yml
   push:
-    branches:
-      - develop
     paths:
       - backend/**
       - proto-gen/go/**
