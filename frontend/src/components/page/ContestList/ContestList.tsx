@@ -1,4 +1,5 @@
 import { Link } from "@/src/components/ui/Link";
+import { Contest, ContestType } from "@/src/gen/proto/backend/v1/contest_resources_pb";
 import { useListContests } from "@/src/usecases/contest";
 import {
   Box,
@@ -6,15 +7,14 @@ import {
   CardBody,
   CardHeader,
   Heading,
-  TableContainer,
   Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
   Thead,
   Tr,
-  Th,
-  Tbody,
-  Td
 } from "@chakra-ui/react";
-import { Contest, ContestType } from "@/src/gen/proto/backend/v1/contest_resources_pb";
 
 const ContestTypeToString = (t: ContestType) => {
   if (t == ContestType.OFFICIAL) return "official";
@@ -72,7 +72,7 @@ export const ContestList = () => {
         <CardBody>
           {ContestListWithFilter("開催中", (c) => {
             return c.startAt != undefined && c.startAt?.toDate() <= now
-                   && c.endAt != undefined && now <= c.endAt?.toDate();
+              && c.endAt != undefined && now <= c.endAt?.toDate();
           })}
           {ContestListWithFilter("開催予定", (c) => {
             return c.startAt != undefined && now < c.startAt?.toDate();
