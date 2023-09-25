@@ -5,7 +5,14 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Heading
+  Heading,
+  TableContainer,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td
 } from "@chakra-ui/react";
 
 export const ContestList = () => {
@@ -17,21 +24,28 @@ export const ContestList = () => {
           <Heading as="h1">コンテスト一覧</Heading>
         </CardHeader>
         <CardBody>
-          <div>
-            <strong>動作確認用</strong>
-            <ul>
-              <li>
-                <Link href="/contests/not_exist/tasks">
-                  Go to <code>note_exist/tasks</code>
-                </Link>
-              </li>
-              {contests?.map((c) => (
-                <li key={c.id}>
-                  <Link href={`/contests/${c.slug}`}>Go to {c.name}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <TableContainer>
+            <Table variant="bordered-narrow">
+              <Thead>
+                <Tr>
+                  <Th textAlign="center">開始日時</Th>
+                  <Th textAlign="center">コンテスト名</Th>
+                  <Th textAlign="center">問題数</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {contests?.map((c) => (
+                  <Tr key={c.slug}>
+                    <Td textAlign="center">{c.startAt?.toDate().toLocaleString()}</Td>
+                    <Td textAlign="left">
+                      <Link href={`/contests/${c.slug}`}>{c.name}</Link>
+                    </Td>
+                    <Td textAlign="center">{c.taskIds.length}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
         </CardBody>
       </Card>
     </Box>
