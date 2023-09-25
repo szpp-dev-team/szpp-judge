@@ -1,6 +1,8 @@
-import Link from "next/link";
+import { Link } from "@/src/components/ui/Link";
+import { useListContests } from "@/src/usecases/contest";
 
 export const ContestList = () => {
+  const { contests } = useListContests({});
   return (
     <div>
       <strong>動作確認用</strong>
@@ -10,11 +12,11 @@ export const ContestList = () => {
             Go to <code>note_exist/tasks</code>
           </Link>
         </li>
-        <li>
-          <Link href="/contests/sbc001/tasks">
-            Go to <code>sbc001/tasks</code>
-          </Link>
-        </li>
+        {contests?.map((c) => (
+          <li key={c.id}>
+            <Link href={`/contests/${c.slug}`}>Go to {c.name}</Link>
+          </li>
+        ))}
       </ul>
     </div>
   );

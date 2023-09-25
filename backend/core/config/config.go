@@ -1,6 +1,10 @@
 package config
 
-import "github.com/kelseyhightower/envconfig"
+import (
+	"os"
+
+	"github.com/kelseyhightower/envconfig"
+)
 
 type Config struct {
 	DBUser    string `envconfig:"MYSQL_USER" required:"true"`
@@ -17,6 +21,10 @@ func New() (*Config, error) {
 	config := &Config{}
 	if err := envconfig.Process("", config); err != nil {
 		return nil, err
+	}
+	// for Cloud Run
+	if port := os.Getenv("PORT"); port != "" {
+		config.GrpcPort = port
 	}
 	return config, nil
 }

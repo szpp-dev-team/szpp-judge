@@ -1,16 +1,16 @@
 import { useContestPageTitle } from "@/src/usecases/pagemeta";
 import Head from "next/head";
 import { ContestLayout } from "../../layout/ContestLayout";
-import { TaskCollection } from "./TaskCollection";
+import { ContestTop } from "./ContestTop";
 
-export const TaskCollectionPage = () => {
-  const title = useContestPageTitle("問題");
+export const ContestTopPage = () => {
+  const title = useContestPageTitle("トップ");
   return (
     <ContestLayout>
       <Head>
         <title>{title}</title>
       </Head>
-      <TaskCollection />
+      <ContestTop />
     </ContestLayout>
   );
 };

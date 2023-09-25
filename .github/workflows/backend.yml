@@ -7,6 +7,13 @@ on:
       - backend/**
       - proto-gen/go/**
       - .github/workflows/backend.yml
+  push:
+    branches:
+      - develop
+    paths:
+      - backend/**
+      - proto-gen/go/**
+      - .github/workflows/backend.yml
 defaults:
   run:
     working-directory: ./backend

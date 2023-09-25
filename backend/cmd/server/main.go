@@ -3,13 +3,12 @@ package main
 import (
 	"context"
 	"log"
+	"log/slog"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"log/slog"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/storage"
@@ -26,6 +25,7 @@ import (
 
 func main() {
 	ctx := context.Background()
+
 	config, err := config.New()
 	if err != nil {
 		log.Fatal(err)
@@ -85,13 +85,13 @@ func main() {
 		api.WithTestcasesRepository(testcasesRepository),
 		api.WithJudgeClient(judgeClient),
 	)
-	lsnr, err := net.Listen("tcp", ":"+config.GrpcPort)
+	lsnr, err := net.Listen("tcp", "0.0.0.0:"+config.GrpcPort)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer lsnr.Close()
 	go func() {
-		logger.Info("grpc server launched")
+		logger.Info("server launched", slog.String("port", config.GrpcPort))
 		if err := grpcSrv.Serve(lsnr); err != nil {
 			log.Fatal(err)
 		}

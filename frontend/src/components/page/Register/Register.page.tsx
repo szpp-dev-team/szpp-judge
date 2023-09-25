@@ -1,13 +1,14 @@
-import { pageTitle } from "@/src/util/pagemeta";
+import { usePageTitle } from "@/src/usecases/pagemeta";
 import Head from "next/head";
 import { WithHeaderFooter } from "../../layout/WithHeaderFooter";
 import { Register } from "./Register";
 
 export const RegisterPage = () => {
+  const title = usePageTitle("ユーザ登録");
   return (
     <WithHeaderFooter>
       <Head>
-        <title>{pageTitle("ユーザ登録")}</title>
+        <title>{title}</title>
       </Head>
       <Register />
     </WithHeaderFooter>

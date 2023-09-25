@@ -1,7 +1,7 @@
 import { JudgeStatusBadge } from "@/src/components/model/judge/JudgeStatusBadge";
 // import { DifficultyBadge } from "@/src/components/model/task/DifficultyBadge";
 // import { Difficulty } from "@/src/model/task";
-import { useListContestTasks } from "@/src/usecases/contest";
+import { useListContestTasks, useRouterContestSlug } from "@/src/usecases/contest";
 import { QuestionIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -19,14 +19,11 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useRouter } from "next/router";
 import { Link } from "../../ui/Link";
 
 export const TaskCollection = () => {
-  const { query: { contest_slug } } = useRouter();
-  const { contestTasksQuery } = useListContestTasks({
-    contestSlug: contest_slug as string, // `pages/[contest_slug]/tasks` なので必ず string
-  });
+  const contestSlug = useRouterContestSlug();
+  const { tasks } = useListContestTasks({ contestSlug });
 
   return (
     <Box px={16} h="100%">
@@ -55,10 +52,10 @@ export const TaskCollection = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {contestTasksQuery.data?.tasks.map((t, seq) => (
+                {tasks?.map((t, seq) => (
                   <Tr key={t.id}>
                     <Td textAlign="center">
-                      <Link href={`/contests/${contest_slug}/tasks/${seq + 1}`}>{seq + 1}</Link>
+                      <Link href={`/contests/${contestSlug}/tasks/${seq + 1}`}>{seq + 1}</Link>
                     </Td>
                     <Td textAlign="center">
                       {/* FIXME: convert Difficulty Enum to DifficultyBadge.dif */}
@@ -67,7 +64,7 @@ export const TaskCollection = () => {
                     </Td>
                     <Td textAlign="center">{t.score}</Td>
                     <Td textAlign="left" whiteSpace="normal" minW={56}>
-                      <Link href={`/contests/${contest_slug}/tasks/${seq + 1}`}>{t.title}</Link>
+                      <Link href={`/contests/${contestSlug}/tasks/${seq + 1}`}>{t.title}</Link>
                     </Td>
                     <Td textAlign="center">
                       {/* TODO: get judge status (or progress) from server */}
