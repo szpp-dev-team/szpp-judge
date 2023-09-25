@@ -90,7 +90,63 @@ func Test_Login(t *testing.T) {
 }
 
 func Test_Logout(t *testing.T) {
+	entClient := utils.NewTestClient(t)
+	defer entClient.Close()
+	secret := "JWT_SECRET"
+	interactor := NewInteractor(entClient, secret)
+	tests := map[string]struct {
+		prepare func(t *testing.T)
+		wantErr bool
+		assert  func(ctx context.Context, t *testing.T, req *backendv1.LogoutRequest, resp *backendv1.LogoutResponse)
+	}{
+		"success": {
+			// logoutを実行するとrefreshTokenが死ぬ
+			prepare: func(t *testing.T) {
+				now := timejst.Now()
+				q := entClient.User.Create().
+					SetUsername("authLogoutTestUser0").
+					SetHashedPassword(user.HashPassword("tooreeee")).
+					SetEmail("szppi_authlogouttestuser0@szpp.com").
+					SetRole("USER").
+					SetCreatedAt(now).
+					SetUpdatedAt(now)
+				_, err := q.Save(context.Background())
+				require.NoError(t, err)
+			},
+			assert: func(ctx context.Context, t *testing.T, req *backendv1.LogoutRequest, resp *backendv1.LogoutResponse) {
+				token, err := entClient.RefreshToken.Query().Where(enttoken.Token(req.RefreshToken)).Only(ctx)
+				require.NoError(t, err)
+				assert.True(t, token.IsDead)
+			},
+		},
+	}
 
+	i := 0
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: fmt.Sprintf("authLogoutTestUser%d", i)})
+
+			loginReq := &backendv1.LoginRequest{
+				Username: fmt.Sprintf("authLogoutTestUser%d", i),
+				Password: "tooreeee",
+			}
+			loginResp, err := interactor.Login(ctx, loginReq)
+			refreshToken := loginResp.RefreshToken
+			logoutReq := &backendv1.LogoutRequest{
+				RefreshToken: refreshToken,
+			}
+			logoutResp, err := interactor.Logout(ctx, logoutReq)
+			if test.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			if test.assert != nil {
+				test.assert(ctx, t, logoutReq, logoutResp)
+			}
+		})
+	}
 }
 
 func Test_RefreshAccessToken(t *testing.T) {
