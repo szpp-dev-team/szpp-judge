@@ -187,11 +187,9 @@ func (i *Interactor) CreateClarification(ctx context.Context, req *backendv1.Cre
 		SetIsPublic(false).
 		SetCreatedAt(now).
 		SetUpdatedAt(now).
-		//IDK : Addhogehogeで良いのか
 		AddContest(contest).
 		AddTask(task).
 		AddUser(user).
-		AddAnswerUser(nil). //IDK: ここはnilで良いのか？
 		Save(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to create clarification")
@@ -209,30 +207,32 @@ func (i *Interactor) CreateClarification(ctx context.Context, req *backendv1.Cre
 }
 
 func (i *Interactor) ListClarifications(ctx context.Context, req *backendv1.ListClarificationsRequest) (*backendv1.ListClarificationsResponse, error) {
-	clarifications, err := i.entClient.Clarification.Query().Where(clarification.HasContestWith(ent_contest.Slug(req.ContestSlug))).All(ctx)
+	// Eager-load the related Users using WithUsers()
+	clarifications, err := i.entClient.Clarification.Query().
+		WithUser().
+		Where(clarification.HasContestWith(ent_contest.Slug(req.ContestSlug))).
+		All(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to get clarifications")
 	}
 
-	//IDK ここの実装怪しす。
 	username := intercepter.GetClaimsFromContext(ctx).Username
 	user, err := i.entClient.User.Query().Where(ent_user.Username(username)).Only(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to get user")
 	}
 
-
 	var pbClarifications []*backendv1.Clarification
 	for _, clarification := range clarifications {
 		isMine := false
-		for _, u := range clarification.Edges.User {
+		for _, u := range clarification.Edges.User {  // Adjusted this line (assuming the edge name is Users)
 			if u.ID == user.ID {
 				isMine = true
 				break
 			}
 		}
-	
-		if isMine {
+
+		if isMine || clarification.IsPublic {
 			pbClarifications = append(pbClarifications, &backendv1.Clarification{
 				Id:       int32(clarification.ID),
 				Content:  clarification.Content,
@@ -245,7 +245,6 @@ func (i *Interactor) ListClarifications(ctx context.Context, req *backendv1.List
 	return &backendv1.ListClarificationsResponse{
 		Clarifications: pbClarifications,
 	}, nil
-	
 }
 
 func (i *Interactor) DeleteClarification(ctx context.Context, req *backendv1.DeleteClarificationRequest) (*backendv1.DeleteClarificationResponse, error) {
@@ -254,6 +253,16 @@ func (i *Interactor) DeleteClarification(ctx context.Context, req *backendv1.Del
     if err != nil {
         return nil, status.Error(codes.Internal, "failed to get clarification")
     }
+
+	//自分で作成したClarificationのみ削除可能
+	username := intercepter.GetClaimsFromContext(ctx).Username
+	user, err := i.entClient.User.Query().Where(ent_user.Username(username)).Only(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to get user")
+	}
+	if user.ID != clarification.Edges.User[0].ID {
+		return nil, status.Error(codes.Internal, "failed to delete clarification")
+	}
 
     // 該当するClarificationエンティティを削除
     err = i.entClient.Clarification.DeleteOne(clarification).Exec(ctx)
@@ -278,10 +287,15 @@ func (i *Interactor) CreateAnswer(ctx context.Context, req *backendv1.CreateAnsw
 		return nil, status.Error(codes.Internal, "failed to get user")
 	}
 
+	//userののRoleがadminがWRITERではない場合はエラー
+	if user.Role != "admin" && user.Role != "WRITER" {
+		return nil, status.Error(codes.Internal, "failed to create clarification")
+	}
+
 	now := time.Now()
 	// 回答内容を設定
 	clarification, err = clarification.Update().
-		//SetIsPublic(req.IsPublic) //IDK: isPublicの更新はどうする？
+		SetIsPublic(req.IsPublic).
 		SetAnswerContent(req.Content).
 		SetUpdatedAt(now).
 		SetAnswerCreatedAt(now).
@@ -292,28 +306,30 @@ func (i *Interactor) CreateAnswer(ctx context.Context, req *backendv1.CreateAnsw
 		return nil, status.Error(codes.Internal, "failed to update clarification")
 	}
 
-	// nil チェック
-	var answerContent string
-	if clarification.AnswerContent != nil {
-		answerContent = *clarification.AnswerContent//IDK: ここ自信なし。
-	}
-	var answerCreatedAt, answerUpdatedAt *timestamppb.Timestamp
-	if clarification.AnswerCreatedAt != nil {
-		answerCreatedAt = timestamppb.New(*clarification.AnswerCreatedAt)
-	}
-	if clarification.AnswerUpdatedAt != nil {
-		answerUpdatedAt = timestamppb.New(*clarification.AnswerUpdatedAt)
-	}
+    // nil チェック
+    var answerContent string
+    if clarification.AnswerContent != nil {
+        answerContent = *clarification.AnswerContent
+    }
+    var answerCreatedAt, answerUpdatedAt *timestamppb.Timestamp
+    if clarification.AnswerCreatedAt != nil {
+        answerCreatedAt = timestamppb.New(*clarification.AnswerCreatedAt)
+    }
+    if clarification.AnswerUpdatedAt != nil {
+        answerUpdatedAt = timestamppb.New(*clarification.AnswerUpdatedAt)
+    }
 
-	return &backendv1.CreateAnswerResponse{// IDK: isPublicはどうする？
-		Answer: &backendv1.Clarification_Answer {
-			Id: int32(clarification.ID),
-			Content: answerContent,
-			IsMine: true,
-			CreatedAt: answerCreatedAt,
-			UpdatedAt: answerUpdatedAt,
-		},
-	}, nil
+    // Answerに関する情報とIsPublicを返す
+    return &backendv1.CreateAnswerResponse{
+        Answer: &backendv1.Clarification_Answer {
+            Id: int32(clarification.ID),
+            Content: answerContent,
+            IsMine: true,
+            CreatedAt: answerCreatedAt,
+            UpdatedAt: answerUpdatedAt,
+        },
+        //IsPublic: clarification.IsPublic,  // ここでIsPublicを返す
+    }, nil
 }
 
 func (i *Interactor) UpdateAnswer (ctx context.Context, req *backendv1.UpdateAnswerRequest) (*backendv1.UpdateAnswerResponse, error) {
@@ -337,7 +353,7 @@ func (i *Interactor) UpdateAnswer (ctx context.Context, req *backendv1.UpdateAns
 	// nil チェック
 	var answerContent string
 	if clarification.AnswerContent != nil {
-		answerContent = *clarification.AnswerContent//IDK: ここ自信なし。
+		answerContent = *clarification.AnswerContent
 	}
 	var answerUpdatedAt *timestamppb.Timestamp
 	if clarification.AnswerUpdatedAt != nil {
