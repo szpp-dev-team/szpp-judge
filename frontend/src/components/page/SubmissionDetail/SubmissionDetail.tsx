@@ -2,7 +2,22 @@ import { JudgeStatus as PbJudgeStatus } from "@/src/gen/proto/judge/v1/resources
 import { JudgeStatus } from "@/src/model/judge";
 import { useRouterSubmissionId } from "@/src/usecases/contest";
 import { useGetSubmissionDetail } from "@/src/usecases/judge";
-import { Box, Card, CardBody, CardHeader, Grid, GridItem, Heading } from "@chakra-ui/react";
+import {
+  Box,
+  Card,
+  CardBody,
+  CardHeader,
+  Grid,
+  GridItem,
+  Heading,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { JudgeStatusBadge } from "../../model/judge/JudgeStatusBadge";
 import { Link } from "../../ui/Link";
@@ -17,12 +32,12 @@ const Pair = ({ data }: PairProps): ReactNode => {
     <>
       <GridItem
         as="dt"
-        fontSize="sm"
         display="flex"
         py={2}
         alignItems="center"
         justifyContent="center"
-        borderWidth="thin"
+        borderBottom="1px"
+        borderRight="1px"
         borderColor="gray.300"
         bg="gray.50"
         fontWeight="bold"
@@ -31,12 +46,12 @@ const Pair = ({ data }: PairProps): ReactNode => {
       </GridItem>
       <GridItem
         as="dd"
-        fontSize="sm"
         display="flex"
         py={2}
         alignItems="center"
         justifyContent="center"
-        borderWidth="thin"
+        borderBottom="1px"
+        borderRight="1px"
         borderColor="gray.300"
       >
         {data[1]}
@@ -69,20 +84,29 @@ export const SubmissionDetail = () => {
           <CardHeader>
             <Heading as="h1">{`提出 #${idStr}`}</Heading>
           </CardHeader>
-          <CardBody>
-            <Grid as="dl" textAlign="center" templateColumns="3fr 5fr" borderWidth="thin" minW="750px">
+          <CardBody display="flex" flexDir="column" gap={4}>
+            <Heading as="h2">提出情報</Heading>
+            <Grid
+              as="dl"
+              textAlign="center"
+              templateColumns="3fr 5fr"
+              borderTop="1px"
+              borderLeft="1px"
+              borderColor="gray.300"
+              fontSize="sm"
+              minW="750px"
+            >
               {/* sv-SE ローケルでのフォーマットは `YYYY-mm-dd HH:MM:SS`*/}
               <Pair data={["提出日時", submissionDetail?.submittedAt?.toDate().toLocaleString("sv-SE")]} />
               <Pair data={["問題", <Link href="#">{submissionDetail?.taskTitle}</Link>]} />
-              <Pair data={["言語", `${submissionDetail?.execTimeMs} ms`]} />
               <Pair
                 data={[
                   "ユーザ",
                   <Link href={`/users/${submissionDetail?.username}`}>{submissionDetail?.username}</Link>,
                 ]}
               />
-              <Pair data={["実行時間", `${submissionDetail?.execTimeMs} ms`]} />
-              <Pair data={["メモリ", `${submissionDetail?.execMemoryKib} KB`]} />
+              <Pair data={["言語", `${submissionDetail?.execTimeMs} ms`]} />
+              <Pair data={["得点", submissionDetail?.score]} />
               <Pair
                 data={[
                   "結果",
@@ -91,8 +115,37 @@ export const SubmissionDetail = () => {
                   />,
                 ]}
               />
-              <Pair data={["得点", submissionDetail?.score]} />
+              <Pair data={["実行時間", `${submissionDetail?.execTimeMs} ms`]} />
+              <Pair data={["メモリ", `${submissionDetail?.execMemoryKib} KB`]} />
             </Grid>
+
+            <Heading as="h2">ジャッジ結果</Heading>
+            <TableContainer>
+              <Table variant="bordered-narrow">
+                <Thead>
+                  <Tr>
+                    <Th textAlign="center">ケース名</Th>
+                    <Th textAlign="center">結果</Th>
+                    <Th textAlign="center">実行時間</Th>
+                    <Th textAlign="center">メモリ</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {submissionDetail?.testcaseResults.map(t => (
+                    <Tr>
+                      <Td textAlign="center">{t.testcaseName}</Td>
+                      <Td textAlign="center">
+                        <JudgeStatusBadge
+                          status={PbJudgeStatus[t.judgeStatus].toString() as JudgeStatus}
+                        />
+                      </Td>
+                      <Td textAlign="center">{t.execTimeMs} ms</Td>
+                      <Td textAlign="center">{t.execMemoryKib} KB</Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
           </CardBody>
         </Card>
       </Box>
