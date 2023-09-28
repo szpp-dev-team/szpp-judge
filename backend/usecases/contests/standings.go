@@ -20,7 +20,7 @@ type TaskDetail struct {
 	score         int
 	penalty_count int
 	ac_submit_id  *int           // nil
-	until_ac    *time.Duration // nil
+	until_ac      *time.Duration // nil
 }
 
 type StandingsRecord struct {
@@ -28,7 +28,7 @@ type StandingsRecord struct {
 	user_name           string
 	total_score         int
 	total_penalty_count int
-	latest_until_ac   *time.Duration // nil
+	latest_until_ac     *time.Duration // nil
 	task_detail_list    []TaskDetail
 }
 
@@ -71,7 +71,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		standings_record = append(standings_record, toStandingsRecord(row))
 	}
 
-	return &backendv1.GetStandingsResponse {
+	return &backendv1.GetStandingsResponse{
 		StandingsList: standings_record,
 	}, nil
 }
@@ -103,7 +103,7 @@ func GetStandingsRecordSlice(user_info map[int]StandingsRecord) []StandingsRecor
 
 /*
 * separate submit by user_id
-*/
+ */
 func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submit, contest *ent.Contest) (map[int]StandingsRecord, error) {
 	user_info := make(map[int]StandingsRecord)
 
@@ -144,7 +144,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 
 /*
 * set initial values for user_info task_detail task_id
-*/
+ */
 func initializeContestTasksResult(i *Interactor, ctx context.Context, user_info map[int]StandingsRecord, user_id int, contest_id int) error {
 
 	_, initialized_flag := user_info[user_id]
