@@ -106,7 +106,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submits []*ent.Submit, c
 	for _, submit := range submits {
 
 		// exception handling
-		if submit.SubmittedAt.Before(contest.StartAt) || contest.StartAt.After(submit.SubmittedAt) {
+		if submit.SubmittedAt.Before(contest.StartAt) || contest.EndAt.After(submit.SubmittedAt) {
 			continue
 		}
 		if isTaskAlreadySolved(user_info, submit.Edges.User.ID, submit.Edges.Task.ID) {
