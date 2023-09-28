@@ -13,6 +13,8 @@ import (
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type TaskDetail struct {
@@ -207,12 +209,38 @@ func isTaskAlreadySolved(user_info map[int]StandingsRecord, user_id int, task_id
 }
 
 func toStandingsRecord(standings StandingsRecord) *backendv1.StandingsRecord {
+	var taskDetailList []*backendv1.StandingsRecord_TaskDetail
+	for _, row := range standings.task_detail_list {
+		taskDetailList = append(taskDetailList, toStandingsRecordTaskDetail(row))
+	}
+
 	return &backendv1.StandingsRecord{
 		Rank:              int32(standings.rank),
 		Username:          standings.user_name,
 		TotalScore:        int32(standings.total_score),
 		TotalPenaltyCount: int32(standings.total_penalty_count),
-		LatestAcAt:        standings.latest_until_ac,
-		TaskDetailList:    standings.task_detail_list,
+		LatestAcAt:        toTimestamp(standings.latest_until_ac),
+		TaskDetailList:    taskDetailList,
+	}
+}
+
+func toTimestamp(d *time.Duration) *timestamppb.Timestamp {
+	seconds := int64(d.Seconds())
+	nanos := int64(d.Nanoseconds() % 1e9)
+	return timestamppb.New(time.Unix(seconds, nanos))
+}
+
+func toStandingsRecordTaskDetail(td TaskDetail) *backendv1.StandingsRecord_TaskDetail {
+	var acSubmitID int32
+	if td.ac_submit_id != nil {
+		acSubmitID = int32(*td.ac_submit_id)
+	}
+
+	return &backendv1.StandingsRecord_TaskDetail{
+		TaskId: int32(td.task_id),
+		Score: int32(td.score),
+		PenaltyCount: int32(td.penalty_count),
+		AcSubmitId: &acSubmitID,
+		UntilAc: durationpb.New(*td.until_ac),
 	}
 }
