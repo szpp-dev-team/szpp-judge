@@ -237,10 +237,10 @@ func toStandingsRecordTaskDetail(td TaskDetail) *backendv1.StandingsRecord_TaskD
 	}
 
 	return &backendv1.StandingsRecord_TaskDetail{
-		TaskId: int32(td.task_id),
-		Score: int32(td.score),
+		TaskId:       int32(td.task_id),
+		Score:        int32(td.score),
 		PenaltyCount: int32(td.penalty_count),
-		AcSubmitId: &acSubmitID,
-		UntilAc: durationpb.New(*td.until_ac),
+		AcSubmitId:   &acSubmitID,
+		UntilAc:      durationpb.New(*td.until_ac),
 	}
 }
