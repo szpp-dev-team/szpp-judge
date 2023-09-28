@@ -18,9 +18,15 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import dynamic from "next/dynamic";
 import { ReactNode } from "react";
 import { JudgeStatusBadge } from "../../model/judge/JudgeStatusBadge";
 import { Link } from "../../ui/Link";
+
+const Editor = dynamic(() => import("@/src/components/ui/Editor").then(mod => mod.Editor), {
+  loading: () => <p>読み込み中です</p>,
+  ssr: false,
+});
 
 type PairProps = {
   data: [/** key */ string, /** value */ ReactNode];
@@ -131,8 +137,8 @@ export const SubmissionDetail = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {submissionDetail?.testcaseResults.map(t => (
-                    <Tr>
+                  {submissionDetail?.testcaseResults.map((t, i) => (
+                    <Tr key={i}>
                       <Td textAlign="center">{t.testcaseName}</Td>
                       <Td textAlign="center">
                         <JudgeStatusBadge
@@ -146,6 +152,8 @@ export const SubmissionDetail = () => {
                 </Tbody>
               </Table>
             </TableContainer>
+            <Heading as="h2">ソースコード</Heading>
+            <Editor doc={submissionDetail?.sourceCode} readonly={true} />
           </CardBody>
         </Card>
       </Box>
