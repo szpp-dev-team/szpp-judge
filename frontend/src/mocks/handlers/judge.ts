@@ -1,4 +1,4 @@
-import type { SubmissionDetail } from "@/src/gen/proto/backend/v1/judge_resources_pb";
+import type { JudgeProgress, SubmissionDetail } from "@/src/gen/proto/backend/v1/judge_resources_pb";
 import { JudgeService } from "@/src/gen/proto/backend/v1/judge_service-JudgeService_connectquery";
 import { JudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { PlainMessage, Timestamp } from "@bufbuild/protobuf";
@@ -40,12 +40,23 @@ const dummySubmissionDetails: PlainMessage<SubmissionDetail>[] = [
     execTimeMs: 1,
     execMemoryKib: 3000,
     testcaseResults: [
-      { testcaseName: "Sample", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
-      { testcaseName: "All", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
+      { testcaseName: "sample_1", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
+      { testcaseName: "sample_2", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
+      { testcaseName: "testcase_1", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
+      { testcaseName: "testcase_2", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
+      { testcaseName: "testcase_3", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
+      { testcaseName: "testcase_4", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
     ],
     submittedAt: Timestamp.fromDate(new Date("2023-09-25")),
   },
 ];
+
+const dummyJudgeProgress: Record<"inProgress" | "ac" | "wa" | "ce", PlainMessage<JudgeProgress>> = {
+  inProgress: { status: JudgeStatus.JUDGE_STATUS_UNSPECIFIED, totalTestcases: 20, completedTestcases: 8 },
+  ac: { status: JudgeStatus.AC, totalTestcases: 20, completedTestcases: 20 },
+  wa: { status: JudgeStatus.WA, totalTestcases: 20, completedTestcases: 12 },
+  ce: { status: JudgeStatus.CE, totalTestcases: 20, completedTestcases: 0 },
+};
 
 export const judgeHandlers: RequestHandler[] = [
   grpcMock(JudgeService, "getSubmissionDetail", async (ctx, res, decodeReq, encodeResp) => {
@@ -57,5 +68,24 @@ export const judgeHandlers: RequestHandler[] = [
     } else {
       return res(ctx.status(404));
     }
+  }),
+  grpcMock(JudgeService, "getJudgeProgress", async (ctx, res, decodeReq, encodeResp) => {
+    const { submissionId } = await decodeReq();
+
+    // モックでは submissions は 100 件しかないとする
+    if (submissionId > 100) {
+      return res(ctx.status(404));
+    }
+
+    const r = Math.random();
+    const judgeProgress = r < 0.25
+      ? dummyJudgeProgress.inProgress
+      : r < 0.5
+      ? dummyJudgeProgress.ac
+      : r < 0.75
+      ? dummyJudgeProgress.wa
+      : dummyJudgeProgress.ce;
+
+    return res(encodeResp({ judgeProgress }));
   }),
 ];
