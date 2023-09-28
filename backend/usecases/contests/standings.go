@@ -193,7 +193,7 @@ func isTaskAlreadySolved(user_info map[int]StandingsRecord, user_id int, task_id
 	for _, task_detail := range specific_user_task_detail_list {
 
 		if task_detail.task_id == task_id && task_detail.ac_submit_id != nil {
-			// user alreadly solved this task
+			// user already solved this task
 			return true
 		}
 
