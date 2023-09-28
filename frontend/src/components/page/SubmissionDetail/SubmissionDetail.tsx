@@ -87,7 +87,6 @@ export const SubmissionDetail = () => {
                 data={[
                   "結果",
                   <JudgeStatusBadge
-                    width="4rem"
                     status={PbJudgeStatus[submissionDetail?.status ?? 0].toString() as JudgeStatus}
                   />,
                 ]}
