@@ -37,7 +37,9 @@ const STATUS_WA = "WA"
 
 func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandingsRequest) (*backendv1.GetStandingsResponse, error) {
 	// get contest info
-	contest, err := i.entClient.Contest.Query().Where(ent_contest.ID(int(req.ContestId))).Only(ctx)
+	contest, err := i.entClient.Contest.Query().
+		Where(ent_contest.ID(int(req.ContestId))).
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, status.Errorf(codes.NotFound, "the contest(id: %d) is not found", req.ContestId)
@@ -46,7 +48,9 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	}
 
 	// get contest submits
-	submits, err := i.entClient.Submit.Query().Where(ent_submit.ID(int(req.ContestId))).All(ctx)
+	submits, err := i.entClient.Submit.Query().
+		Where(ent_submit.ID(int(req.ContestId))).
+		All(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -95,7 +99,7 @@ func GetStandingsRecordSlice(user_info map[int]StandingsRecord) []StandingsRecor
 
 /*
 * separate submit by user_id
- */
+*/
 func separateSubmit(i *Interactor, ctx context.Context, submits []*ent.Submit, contest *ent.Contest) (map[int]StandingsRecord, error) {
 	user_info := make(map[int]StandingsRecord)
 
@@ -124,21 +128,19 @@ func separateSubmit(i *Interactor, ctx context.Context, submits []*ent.Submit, c
 			update_user_info.latest_until_ac = &until_ac
 			update_user_info.total_score += update_user_info.task_detail_list[index].score
 			update_user_info.total_penalty_count += update_user_info.task_detail_list[index].penalty_count
-
 		} else {
 			update_user_info.task_detail_list[index].penalty_count++
 		}
 
 		user_info[submit.Edges.User.ID] = update_user_info
-
 	}
 
 	return user_info, nil
 }
 
 /*
-* set initial values for user_info taskdetail task_id
- */
+* set initial values for user_info task_detail task_id
+*/
 func initializeContestTasksResult(i *Interactor, ctx context.Context, user_info map[int]StandingsRecord, user_id int, contest_id int) error {
 
 	_, initialized_flag := user_info[user_id]
@@ -148,7 +150,7 @@ func initializeContestTasksResult(i *Interactor, ctx context.Context, user_info 
 		return nil
 	}
 
-	// get uesr info
+	// get user info
 	user, err := i.entClient.User.Query().Where(ent_user.ID(user_id)).Only(ctx)
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())
