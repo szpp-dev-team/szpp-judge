@@ -100,30 +100,30 @@ func GetStandingsRecordSlice(user_info map[int]StandingsRecord) []StandingsRecor
 /*
 * separate submit by user_id
 */
-func separateSubmit(i *Interactor, ctx context.Context, submits []*ent.Submit, contest *ent.Contest) (map[int]StandingsRecord, error) {
+func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submit, contest *ent.Contest) (map[int]StandingsRecord, error) {
 	user_info := make(map[int]StandingsRecord)
 
-	for _, submit := range submits {
+	for _, submission := range submissions {
 
 		// exception handling
-		if submit.SubmittedAt.Before(contest.StartAt) || contest.EndAt.After(submit.SubmittedAt) {
+		if submission.SubmittedAt.Before(contest.StartAt) || contest.EndAt.After(submission.SubmittedAt) {
 			continue
 		}
-		if isTaskAlreadySolved(user_info, submit.Edges.User.ID, submit.Edges.Task.ID) {
+		if isTaskAlreadySolved(user_info, submission.Edges.User.ID, submission.Edges.Task.ID) {
 			continue
 		}
 
 		// initialize
-		err := initializeContestTasksResult(i, ctx, user_info, submit.Edges.User.ID, contest.ID)
+		err := initializeContestTasksResult(i, ctx, user_info, submission.Edges.User.ID, contest.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		index := getTaskDetailIndex(user_info, submit.Edges.User.ID, submit.Edges.Task.ID)
-		update_user_info := user_info[submit.Edges.User.ID]
-		if *submit.Status == STATUS_AC {
+		index := getTaskDetailIndex(user_info, submission.Edges.User.ID, submission.Edges.Task.ID)
+		update_user_info := user_info[submission.Edges.User.ID]
+		if *submission.Status == STATUS_AC {
 			until_ac := contest.StartAt.Sub(time.Now())
-			update_user_info.task_detail_list[index].ac_submit_id = &submit.ID
+			update_user_info.task_detail_list[index].ac_submit_id = &submission.ID
 			update_user_info.task_detail_list[index].until_ac = &until_ac
 			update_user_info.latest_until_ac = &until_ac
 			update_user_info.total_score += update_user_info.task_detail_list[index].score
@@ -132,7 +132,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submits []*ent.Submit, c
 			update_user_info.task_detail_list[index].penalty_count++
 		}
 
-		user_info[submit.Edges.User.ID] = update_user_info
+		user_info[submission.Edges.User.ID] = update_user_info
 	}
 
 	return user_info, nil
