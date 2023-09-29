@@ -6,7 +6,6 @@ import (
 	"log/slog"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	grpc_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/grpc"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/contests"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/judge"
@@ -17,8 +16,8 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func New(opts ...api.OptionFunc) *grpc.Server {
-	opt := api.DefaultOption()
+func New(opts ...optionFunc) *grpc.Server {
+	opt := defaultOption()
 	for _, f := range opts {
 		f(opt)
 	}

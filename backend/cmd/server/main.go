@@ -13,7 +13,6 @@ import (
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/storage"
 	"github.com/go-sql-driver/mysql"
-	"github.com/szpp-dev-team/szpp-judge/backend/api"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
@@ -77,13 +76,13 @@ func main() {
 	// logger
 	logger := slog.Default()
 
-	grpcSrv := grpc_server.New(
-		api.WithLogger(logger),
-		api.WithEntClient(entClient),
-		api.WithReflection(config.ModeDev),
-		api.WithCloudtasksClient(cloudtasksClient),
-		api.WithTestcasesRepository(testcasesRepository),
-		api.WithJudgeClient(judgeClient),
+	srv := grpc_server.New(
+		grpc_server.WithLogger(logger),
+		grpc_server.WithEntClient(entClient),
+		grpc_server.WithReflection(config.ModeDev),
+		grpc_server.WithCloudtasksClient(cloudtasksClient),
+		grpc_server.WithTestcasesRepository(testcasesRepository),
+		grpc_server.WithJudgeClient(judgeClient),
 	)
 	lsnr, err := net.Listen("tcp", "0.0.0.0:"+config.GrpcPort)
 	if err != nil {
@@ -92,13 +91,13 @@ func main() {
 	defer lsnr.Close()
 	go func() {
 		logger.Info("server launched", slog.String("port", config.GrpcPort))
-		if err := grpcSrv.Serve(lsnr); err != nil {
+		if err := srv.Serve(lsnr); err != nil {
 			log.Fatal(err)
 		}
 	}()
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	<-sigCh
-	logger.Info("servers are being stopped")
-	grpcSrv.GracefulStop()
+	logger.Info("server is being stopped")
+	srv.GracefulStop()
 }

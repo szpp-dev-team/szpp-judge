@@ -1,4 +1,4 @@
-package api
+package grpc_server
 
 import (
 	"log/slog"
@@ -18,46 +18,46 @@ type option struct {
 	JudgeClient         judgev1.JudgeServiceClient
 }
 
-func DefaultOption() *option {
+func defaultOption() *option {
 	return &option{
 		Logger: slog.Default(),
 	}
 }
 
-type OptionFunc func(*option)
+type optionFunc func(*option)
 
-func WithLogger(logger *slog.Logger) OptionFunc {
+func WithLogger(logger *slog.Logger) optionFunc {
 	return func(o *option) {
 		o.Logger = logger
 	}
 }
 
 // publish grpc server information(method, service, etc.)
-func WithReflection(b bool) OptionFunc {
+func WithReflection(b bool) optionFunc {
 	return func(o *option) {
 		o.UseReflection = b
 	}
 }
 
-func WithEntClient(c *ent.Client) OptionFunc {
+func WithEntClient(c *ent.Client) optionFunc {
 	return func(o *option) {
 		o.EntClient = c
 	}
 }
 
-func WithCloudtasksClient(c *cloudtasks.Client) OptionFunc {
+func WithCloudtasksClient(c *cloudtasks.Client) optionFunc {
 	return func(o *option) {
 		o.CloudtasksClient = c
 	}
 }
 
-func WithTestcasesRepository(r testcases.Repository) OptionFunc {
+func WithTestcasesRepository(r testcases.Repository) optionFunc {
 	return func(o *option) {
 		o.TestcasesRepository = r
 	}
 }
 
-func WithJudgeClient(c judgev1.JudgeServiceClient) OptionFunc {
+func WithJudgeClient(c judgev1.JudgeServiceClient) optionFunc {
 	return func(o *option) {
 		o.JudgeClient = c
 	}
