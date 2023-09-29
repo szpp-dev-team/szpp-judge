@@ -10,5 +10,6 @@ lint:
       - judge/v1/resources.proto
       - backend/v1/task_resources.proto
       - backend/v1/contest_resources.proto
+      - backend/v1/user_resources.proto
 deps:
   - buf.build/googleapis/googleapis
