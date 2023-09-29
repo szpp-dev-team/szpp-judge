@@ -5,6 +5,7 @@ go 1.21
 replace github.com/szpp-dev-team/szpp-judge/proto-gen/go => ../proto-gen/go
 
 require (
+	cloud.google.com/go/cloudtasks v1.12.1
 	cloud.google.com/go/storage v1.32.0
 	entgo.io/ent v0.12.3
 	github.com/go-sql-driver/mysql v1.7.1
@@ -18,7 +19,7 @@ require (
 	github.com/szpp-dev-team/szpp-judge/proto-gen/go v0.0.0-00010101000000-000000000000
 	golang.org/x/crypto v0.13.0
 	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
-	google.golang.org/grpc v1.57.0
+	google.golang.org/grpc v1.58.0
 	google.golang.org/protobuf v1.31.0
 )
 

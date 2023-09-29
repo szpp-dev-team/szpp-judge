@@ -514,6 +514,29 @@ func HasLanguageWith(preds ...predicate.Language) predicate.Submit {
 	})
 }
 
+// HasContest applies the HasEdge predicate on the "contest" edge.
+func HasContest() predicate.Submit {
+	return predicate.Submit(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ContestTable, ContestColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasContestWith applies the HasEdge predicate on the "contest" edge with a given conditions (other predicates).
+func HasContestWith(preds ...predicate.Contest) predicate.Submit {
+	return predicate.Submit(func(s *sql.Selector) {
+		step := newContestStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasTestcaseResults applies the HasEdge predicate on the "testcase_results" edge.
 func HasTestcaseResults() predicate.Submit {
 	return predicate.Submit(func(s *sql.Selector) {

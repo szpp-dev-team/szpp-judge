@@ -132,6 +132,7 @@ func Test_Logout(t *testing.T) {
 				Password: "tooreeee",
 			}
 			loginResp, err := interactor.Login(ctx, loginReq)
+			require.NoError(t, err)
 			refreshToken := loginResp.RefreshToken
 			logoutReq := &backendv1.LogoutRequest{
 				RefreshToken: refreshToken,

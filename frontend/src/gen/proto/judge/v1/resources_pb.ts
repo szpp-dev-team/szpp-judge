@@ -54,6 +54,11 @@ export enum JudgeStatus {
    * @generated from enum value: WA = 8;
    */
   WA = 8,
+
+  /**
+   * @generated from enum value: WJ = 9;
+   */
+  WJ = 9,
 }
 // Retrieve enum metadata with: proto3.getEnumType(JudgeStatus)
 proto3.util.setEnumType(JudgeStatus, "judge.v1.JudgeStatus", [
@@ -66,6 +71,7 @@ proto3.util.setEnumType(JudgeStatus, "judge.v1.JudgeStatus", [
   { no: 6, name: "RE" },
   { no: 7, name: "TLE" },
   { no: 8, name: "WA" },
+  { no: 9, name: "WJ" },
 ]);
 
 /**

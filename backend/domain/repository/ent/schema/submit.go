@@ -25,9 +25,10 @@ func (Submit) Fields() []ent.Field {
 
 func (Submit) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("user", User.Type).Ref("submits").Unique(),
-		edge.From("task", Task.Type).Ref("submits").Unique(),
-		edge.From("language", Language.Type).Ref("submits").Unique(),
+		edge.From("user", User.Type).Ref("submits").Unique().Required(),
+		edge.From("task", Task.Type).Ref("submits").Unique().Required(),
+		edge.From("language", Language.Type).Ref("submits").Unique().Required(),
+		edge.From("contest", Contest.Type).Ref("submits").Unique(),
 		edge.To("testcase_results", TestcaseResult.Type),
 	}
 }

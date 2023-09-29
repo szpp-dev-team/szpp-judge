@@ -13,11 +13,12 @@ CREATE TABLE `testcase_sets` (
   `is_sample` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `task_testcase_sets` bigint(20) DEFAULT NULL,
+  `task_testcase_sets` bigint(20) NOT NULL,
+  `score_ratio` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `testcaseset_name_task_testcase_sets` (`name`,`task_testcase_sets`),
   KEY `testcase_sets_tasks_testcase_sets` (`task_testcase_sets`),
-  CONSTRAINT `testcase_sets_tasks_testcase_sets` FOREIGN KEY (`task_testcase_sets`) REFERENCES `tasks` (`id`) ON DELETE SET NULL
+  CONSTRAINT `testcase_sets_tasks_testcase_sets` FOREIGN KEY (`task_testcase_sets`) REFERENCES `tasks` (`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
@@ -33,7 +34,8 @@ CREATE TABLE `testcase_sets` (
 | is_sample | tinyint(1) |  | false |  |  |  |  |
 | created_at | timestamp | NULL | true |  |  |  |  |
 | updated_at | timestamp | NULL | true |  |  |  |  |
-| task_testcase_sets | bigint(20) | NULL | true |  |  | [tasks](tasks.md) |  |
+| task_testcase_sets | bigint(20) |  | false |  |  | [tasks](tasks.md) |  |
+| score_ratio | bigint(20) |  | false |  |  |  |  |
 
 ## Constraints
 

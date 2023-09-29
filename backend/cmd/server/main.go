@@ -3,19 +3,23 @@ package main
 import (
 	"context"
 	"log"
+	"log/slog"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/storage"
 	"github.com/go-sql-driver/mysql"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
-	"golang.org/x/exp/slog"
+	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -50,21 +54,35 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// logger
-	logger := slog.Default()
-
+	// api clients
+	cloudtasksClient, err := cloudtasks.NewClient(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cloudtasksClient.Close()
 	storageClient, err := storage.NewClient(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer storageClient.Close()
 	testcasesRepository := testcases.NewRepository(storageClient)
+	conn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+	judgeClient := judgev1.NewJudgeServiceClient(conn)
+
+	// logger
+	logger := slog.Default()
 
 	srv := grpc_server.New(
 		grpc_server.WithLogger(logger),
 		grpc_server.WithEntClient(entClient),
 		grpc_server.WithReflection(config.ModeDev),
+		grpc_server.WithCloudtasksClient(cloudtasksClient),
 		grpc_server.WithTestcasesRepository(testcasesRepository),
+		grpc_server.WithJudgeClient(judgeClient),
 	)
 	lsnr, err := net.Listen("tcp", "0.0.0.0:"+config.GrpcPort)
 	if err != nil {

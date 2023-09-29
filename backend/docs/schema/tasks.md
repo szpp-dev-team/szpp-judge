@@ -19,10 +19,10 @@ CREATE TABLE `tasks` (
   `judge_code_path` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `user_tasks` bigint(20) DEFAULT NULL,
+  `user_tasks` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `tasks_users_tasks` (`user_tasks`),
-  CONSTRAINT `tasks_users_tasks` FOREIGN KEY (`user_tasks`) REFERENCES `users` (`id`) ON DELETE SET NULL
+  CONSTRAINT `tasks_users_tasks` FOREIGN KEY (`user_tasks`) REFERENCES `users` (`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
@@ -32,7 +32,7 @@ CREATE TABLE `tasks` (
 
 | Name | Type | Default | Nullable | Extra Definition | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | ---------------- | -------- | ------- | ------- |
-| id | bigint(20) |  | false | auto_increment | [testcases](testcases.md) [testcase_sets](testcase_sets.md) |  |  |
+| id | bigint(20) |  | false | auto_increment | [contest_tasks](contest_tasks.md) [submits](submits.md) [testcases](testcases.md) [testcase_sets](testcase_sets.md) |  |  |
 | title | varchar(255) |  | false |  |  |  |  |
 | statement | varchar(255) |  | false |  |  |  |  |
 | difficulty | varchar(255) |  | false |  |  |  |  |
@@ -44,7 +44,7 @@ CREATE TABLE `tasks` (
 | judge_code_path | varchar(255) | NULL | true |  |  |  |  |
 | created_at | timestamp | NULL | true |  |  |  |  |
 | updated_at | timestamp | NULL | true |  |  |  |  |
-| user_tasks | bigint(20) | NULL | true |  |  | [users](users.md) |  |
+| user_tasks | bigint(20) |  | false |  |  | [users](users.md) |  |
 
 ## Constraints
 

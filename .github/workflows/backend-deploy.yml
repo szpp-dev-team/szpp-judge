@@ -1,0 +1,54 @@
+name: backend-deploy
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - backend/**
+      - proto-gen/go/**
+      - .github/workflows/backend.yml
+jobs:
+  deploy-cloud-functions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/736396535207/locations/global/workloadIdentityPools/szpp-judge-github/providers/github'
+          service_account: 'github-action-675990712@szpp-judge-3776.iam.gserviceaccount.com'
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '^1.21'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      - name: 'Deploy handle-judge-task'
+        working-directory: ./backend/cloud-functions/handle-judge-task
+        run: |
+          go mod vendor
+          gcloud functions deploy handle-judge-task \
+            --gen2 \
+            --runtime=go121 \
+            --region=asia-northeast1 \
+            --source=. \
+            --entry-point=HandleJudgeTask \
+            --trigger-http \
+            --no-allow-unauthenticated \
+            --set-env-vars MYSQL_USER=${{ secrets.MYSQL_USER }} \
+            --set-env-vars MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
+            --set-env-vars MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} \
+            --set-env-vars BACKEND_DB_ADDR=${{ secrets.BACKEND_DB_ADDR }} \
+            --set-env-vars BACKEND_JUDGE_ADDR=${{ secrets.BACKEND_JUDGE_ADDR }}
+
+          

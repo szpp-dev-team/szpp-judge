@@ -3356,6 +3356,8 @@ type SubmitMutation struct {
 	clearedtask             bool
 	language                *int
 	clearedlanguage         bool
+	contest                 *int
+	clearedcontest          bool
 	testcase_results        map[int]struct{}
 	removedtestcase_results map[int]struct{}
 	clearedtestcase_results bool
@@ -3965,6 +3967,45 @@ func (m *SubmitMutation) ResetLanguage() {
 	m.clearedlanguage = false
 }
 
+// SetContestID sets the "contest" edge to the Contest entity by id.
+func (m *SubmitMutation) SetContestID(id int) {
+	m.contest = &id
+}
+
+// ClearContest clears the "contest" edge to the Contest entity.
+func (m *SubmitMutation) ClearContest() {
+	m.clearedcontest = true
+}
+
+// ContestCleared reports if the "contest" edge to the Contest entity was cleared.
+func (m *SubmitMutation) ContestCleared() bool {
+	return m.clearedcontest
+}
+
+// ContestID returns the "contest" edge ID in the mutation.
+func (m *SubmitMutation) ContestID() (id int, exists bool) {
+	if m.contest != nil {
+		return *m.contest, true
+	}
+	return
+}
+
+// ContestIDs returns the "contest" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ContestID instead. It exists only for internal usage by the builders.
+func (m *SubmitMutation) ContestIDs() (ids []int) {
+	if id := m.contest; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetContest resets all changes to the "contest" edge.
+func (m *SubmitMutation) ResetContest() {
+	m.contest = nil
+	m.clearedcontest = false
+}
+
 // AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by ids.
 func (m *SubmitMutation) AddTestcaseResultIDs(ids ...int) {
 	if m.testcase_results == nil {
@@ -4326,7 +4367,7 @@ func (m *SubmitMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *SubmitMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.user != nil {
 		edges = append(edges, submit.EdgeUser)
 	}
@@ -4335,6 +4376,9 @@ func (m *SubmitMutation) AddedEdges() []string {
 	}
 	if m.language != nil {
 		edges = append(edges, submit.EdgeLanguage)
+	}
+	if m.contest != nil {
+		edges = append(edges, submit.EdgeContest)
 	}
 	if m.testcase_results != nil {
 		edges = append(edges, submit.EdgeTestcaseResults)
@@ -4358,6 +4402,10 @@ func (m *SubmitMutation) AddedIDs(name string) []ent.Value {
 		if id := m.language; id != nil {
 			return []ent.Value{*id}
 		}
+	case submit.EdgeContest:
+		if id := m.contest; id != nil {
+			return []ent.Value{*id}
+		}
 	case submit.EdgeTestcaseResults:
 		ids := make([]ent.Value, 0, len(m.testcase_results))
 		for id := range m.testcase_results {
@@ -4370,7 +4418,7 @@ func (m *SubmitMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SubmitMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedtestcase_results != nil {
 		edges = append(edges, submit.EdgeTestcaseResults)
 	}
@@ -4393,7 +4441,7 @@ func (m *SubmitMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *SubmitMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.cleareduser {
 		edges = append(edges, submit.EdgeUser)
 	}
@@ -4402,6 +4450,9 @@ func (m *SubmitMutation) ClearedEdges() []string {
 	}
 	if m.clearedlanguage {
 		edges = append(edges, submit.EdgeLanguage)
+	}
+	if m.clearedcontest {
+		edges = append(edges, submit.EdgeContest)
 	}
 	if m.clearedtestcase_results {
 		edges = append(edges, submit.EdgeTestcaseResults)
@@ -4419,6 +4470,8 @@ func (m *SubmitMutation) EdgeCleared(name string) bool {
 		return m.clearedtask
 	case submit.EdgeLanguage:
 		return m.clearedlanguage
+	case submit.EdgeContest:
+		return m.clearedcontest
 	case submit.EdgeTestcaseResults:
 		return m.clearedtestcase_results
 	}
@@ -4438,6 +4491,9 @@ func (m *SubmitMutation) ClearEdge(name string) error {
 	case submit.EdgeLanguage:
 		m.ClearLanguage()
 		return nil
+	case submit.EdgeContest:
+		m.ClearContest()
+		return nil
 	}
 	return fmt.Errorf("unknown Submit unique edge %s", name)
 }
@@ -4454,6 +4510,9 @@ func (m *SubmitMutation) ResetEdge(name string) error {
 		return nil
 	case submit.EdgeLanguage:
 		m.ResetLanguage()
+		return nil
+	case submit.EdgeContest:
+		m.ResetContest()
 		return nil
 	case submit.EdgeTestcaseResults:
 		m.ResetTestcaseResults()
