@@ -10,6 +10,7 @@ import { backendGrpcTransport } from "../config/grpc";
 import("../mocks").catch((reason) => console.error(reason));
 
 z.setErrorMap(defaultErrorMap);
+// 特に意味のない行
 
 const queryClient = new QueryClient();
 
