@@ -9,6 +9,54 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 )
 
+// The ContestFunc type is an adapter to allow the use of ordinary
+// function as Contest mutator.
+type ContestFunc func(context.Context, *ent.ContestMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ContestFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ContestMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ContestMutation", m)
+}
+
+// The ContestTaskFunc type is an adapter to allow the use of ordinary
+// function as ContestTask mutator.
+type ContestTaskFunc func(context.Context, *ent.ContestTaskMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ContestTaskFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ContestTaskMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ContestTaskMutation", m)
+}
+
+// The ContestUserFunc type is an adapter to allow the use of ordinary
+// function as ContestUser mutator.
+type ContestUserFunc func(context.Context, *ent.ContestUserMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ContestUserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ContestUserMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ContestUserMutation", m)
+}
+
+// The LanguageFunc type is an adapter to allow the use of ordinary
+// function as Language mutator.
+type LanguageFunc func(context.Context, *ent.LanguageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LanguageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.LanguageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LanguageMutation", m)
+}
+
 // The RefreshTokenFunc type is an adapter to allow the use of ordinary
 // function as RefreshToken mutator.
 type RefreshTokenFunc func(context.Context, *ent.RefreshTokenMutation) (ent.Value, error)
@@ -19,6 +67,18 @@ func (f RefreshTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RefreshTokenMutation", m)
+}
+
+// The SubmitFunc type is an adapter to allow the use of ordinary
+// function as Submit mutator.
+type SubmitFunc func(context.Context, *ent.SubmitMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubmitFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubmitMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubmitMutation", m)
 }
 
 // The TaskFunc type is an adapter to allow the use of ordinary
@@ -43,6 +103,18 @@ func (f TestcaseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestcaseMutation", m)
+}
+
+// The TestcaseResultFunc type is an adapter to allow the use of ordinary
+// function as TestcaseResult mutator.
+type TestcaseResultFunc func(context.Context, *ent.TestcaseResultMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestcaseResultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestcaseResultMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestcaseResultMutation", m)
 }
 
 // The TestcaseSetFunc type is an adapter to allow the use of ordinary

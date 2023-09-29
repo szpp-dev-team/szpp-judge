@@ -25,7 +25,7 @@ endif
 .PHONY: test
 test: mysql/start
 	@TEST_MYSQL_PORT=$(shell docker port $(CONTAINER_ID) | grep 3306/tcp | awk -F ' -> ' '{print $$2}' | awk -F ':' '{print $$2}') \
-	go test ./... -v \
+	go test ./... -race -shuffle=on -v \
 	; docker rm -f $(CONTAINER_ID)
 
 .PHONY: test-ci
