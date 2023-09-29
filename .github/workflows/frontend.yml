@@ -2,8 +2,6 @@ name: frontend
 on:
   workflow_dispatch:
   push:
-    branches:
-      - develop
     paths:
       - frontend/**
       - '!frontend/src/gen/**'
