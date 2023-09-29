@@ -27,7 +27,7 @@ jobs:
         uses: 'google-github-actions/auth@v1'
         with:
           workload_identity_provider: 'projects/736396535207/locations/global/workloadIdentityPools/szpp-judge-github/providers/github'
-          service_account: 'github-action-675990712@my-project.iam.gserviceaccount.com'
+          service_account: 'github-action-675990712@szpp-judge-3776.iam.gserviceaccount.com'
       - uses: actions/setup-go@v4
         with:
           go-version: '^1.21'
