@@ -97,19 +97,15 @@ func (cc *ClarificationCreate) SetID(i int) *ClarificationCreate {
 	return cc
 }
 
-// AddContestIDs adds the "contest" edge to the Contest entity by IDs.
-func (cc *ClarificationCreate) AddContestIDs(ids ...int) *ClarificationCreate {
-	cc.mutation.AddContestIDs(ids...)
+// SetContestID sets the "contest" edge to the Contest entity by ID.
+func (cc *ClarificationCreate) SetContestID(id int) *ClarificationCreate {
+	cc.mutation.SetContestID(id)
 	return cc
 }
 
-// AddContest adds the "contest" edges to the Contest entity.
-func (cc *ClarificationCreate) AddContest(c ...*Contest) *ClarificationCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cc.AddContestIDs(ids...)
+// SetContest sets the "contest" edge to the Contest entity.
+func (cc *ClarificationCreate) SetContest(c *Contest) *ClarificationCreate {
+	return cc.SetContestID(c.ID)
 }
 
 // AddTaskIDs adds the "task" edge to the Task entity by IDs.
@@ -203,7 +199,7 @@ func (cc *ClarificationCreate) check() error {
 	if _, ok := cc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Clarification.updated_at"`)}
 	}
-	if len(cc.mutation.ContestIDs()) == 0 {
+	if _, ok := cc.mutation.ContestID(); !ok {
 		return &ValidationError{Name: "contest", err: errors.New(`ent: missing required edge "Clarification.contest"`)}
 	}
 	if len(cc.mutation.TaskIDs()) == 0 {
@@ -278,10 +274,10 @@ func (cc *ClarificationCreate) createSpec() (*Clarification, *sqlgraph.CreateSpe
 	}
 	if nodes := cc.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   clarification.ContestTable,
-			Columns: clarification.ContestPrimaryKey,
+			Columns: []string{clarification.ContestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
@@ -290,6 +286,7 @@ func (cc *ClarificationCreate) createSpec() (*Clarification, *sqlgraph.CreateSpe
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.contest_clarifications = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.TaskIDs(); len(nodes) > 0 {

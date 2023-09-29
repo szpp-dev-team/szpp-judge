@@ -36,11 +36,13 @@ const (
 	EdgeAnswerUser = "answer_user"
 	// Table holds the table name of the clarification in the database.
 	Table = "clarifications"
-	// ContestTable is the table that holds the contest relation/edge. The primary key declared below.
-	ContestTable = "contest_clarifications"
+	// ContestTable is the table that holds the contest relation/edge.
+	ContestTable = "clarifications"
 	// ContestInverseTable is the table name for the Contest entity.
 	// It exists in this package in order to avoid circular dependency with the "contest" package.
 	ContestInverseTable = "contests"
+	// ContestColumn is the table column denoting the contest relation/edge.
+	ContestColumn = "contest_clarifications"
 	// TaskTable is the table that holds the task relation/edge. The primary key declared below.
 	TaskTable = "task_clarifications"
 	// TaskInverseTable is the table name for the Task entity.
@@ -70,10 +72,13 @@ var Columns = []string{
 	FieldAnswerUpdatedAt,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "clarifications"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"contest_clarifications",
+}
+
 var (
-	// ContestPrimaryKey and ContestColumn2 are the table columns denoting the
-	// primary key for the contest relation (M2M).
-	ContestPrimaryKey = []string{"contest_id", "clarification_id"}
 	// TaskPrimaryKey and TaskColumn2 are the table columns denoting the
 	// primary key for the task relation (M2M).
 	TaskPrimaryKey = []string{"task_id", "clarification_id"}
@@ -89,6 +94,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -138,17 +148,10 @@ func ByAnswerUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAnswerUpdatedAt, opts...).ToFunc()
 }
 
-// ByContestCount orders the results by contest count.
-func ByContestCount(opts ...sql.OrderTermOption) OrderOption {
+// ByContestField orders the results by contest field.
+func ByContestField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newContestStep(), opts...)
-	}
-}
-
-// ByContest orders the results by contest terms.
-func ByContest(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newContestStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newContestStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -197,7 +200,7 @@ func newContestStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ContestInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ContestTable, ContestPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2O, true, ContestTable, ContestColumn),
 	)
 }
 func newTaskStep() *sqlgraph.Step {

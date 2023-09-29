@@ -425,7 +425,7 @@ func HasContest() predicate.Clarification {
 	return predicate.Clarification(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ContestTable, ContestPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, ContestTable, ContestColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

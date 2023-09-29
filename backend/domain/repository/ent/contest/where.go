@@ -559,7 +559,7 @@ func HasClarifications() predicate.Contest {
 	return predicate.Contest(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ClarificationsTable, ClarificationsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClarificationsTable, ClarificationsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

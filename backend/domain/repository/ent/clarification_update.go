@@ -115,19 +115,15 @@ func (cu *ClarificationUpdate) ClearAnswerUpdatedAt() *ClarificationUpdate {
 	return cu
 }
 
-// AddContestIDs adds the "contest" edge to the Contest entity by IDs.
-func (cu *ClarificationUpdate) AddContestIDs(ids ...int) *ClarificationUpdate {
-	cu.mutation.AddContestIDs(ids...)
+// SetContestID sets the "contest" edge to the Contest entity by ID.
+func (cu *ClarificationUpdate) SetContestID(id int) *ClarificationUpdate {
+	cu.mutation.SetContestID(id)
 	return cu
 }
 
-// AddContest adds the "contest" edges to the Contest entity.
-func (cu *ClarificationUpdate) AddContest(c ...*Contest) *ClarificationUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cu.AddContestIDs(ids...)
+// SetContest sets the "contest" edge to the Contest entity.
+func (cu *ClarificationUpdate) SetContest(c *Contest) *ClarificationUpdate {
+	return cu.SetContestID(c.ID)
 }
 
 // AddTaskIDs adds the "task" edge to the Task entity by IDs.
@@ -180,25 +176,10 @@ func (cu *ClarificationUpdate) Mutation() *ClarificationMutation {
 	return cu.mutation
 }
 
-// ClearContest clears all "contest" edges to the Contest entity.
+// ClearContest clears the "contest" edge to the Contest entity.
 func (cu *ClarificationUpdate) ClearContest() *ClarificationUpdate {
 	cu.mutation.ClearContest()
 	return cu
-}
-
-// RemoveContestIDs removes the "contest" edge to Contest entities by IDs.
-func (cu *ClarificationUpdate) RemoveContestIDs(ids ...int) *ClarificationUpdate {
-	cu.mutation.RemoveContestIDs(ids...)
-	return cu
-}
-
-// RemoveContest removes "contest" edges to Contest entities.
-func (cu *ClarificationUpdate) RemoveContest(c ...*Contest) *ClarificationUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cu.RemoveContestIDs(ids...)
 }
 
 // ClearTask clears all "task" edges to the Task entity.
@@ -291,7 +272,18 @@ func (cu *ClarificationUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cu *ClarificationUpdate) check() error {
+	if _, ok := cu.mutation.ContestID(); cu.mutation.ContestCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Clarification.contest"`)
+	}
+	return nil
+}
+
 func (cu *ClarificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(clarification.Table, clarification.Columns, sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -332,39 +324,23 @@ func (cu *ClarificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ContestCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   clarification.ContestTable,
-			Columns: clarification.ContestPrimaryKey,
+			Columns: []string{clarification.ContestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedContestIDs(); len(nodes) > 0 && !cu.mutation.ContestCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   clarification.ContestTable,
-			Columns: clarification.ContestPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := cu.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   clarification.ContestTable,
-			Columns: clarification.ContestPrimaryKey,
+			Columns: []string{clarification.ContestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
@@ -614,19 +590,15 @@ func (cuo *ClarificationUpdateOne) ClearAnswerUpdatedAt() *ClarificationUpdateOn
 	return cuo
 }
 
-// AddContestIDs adds the "contest" edge to the Contest entity by IDs.
-func (cuo *ClarificationUpdateOne) AddContestIDs(ids ...int) *ClarificationUpdateOne {
-	cuo.mutation.AddContestIDs(ids...)
+// SetContestID sets the "contest" edge to the Contest entity by ID.
+func (cuo *ClarificationUpdateOne) SetContestID(id int) *ClarificationUpdateOne {
+	cuo.mutation.SetContestID(id)
 	return cuo
 }
 
-// AddContest adds the "contest" edges to the Contest entity.
-func (cuo *ClarificationUpdateOne) AddContest(c ...*Contest) *ClarificationUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cuo.AddContestIDs(ids...)
+// SetContest sets the "contest" edge to the Contest entity.
+func (cuo *ClarificationUpdateOne) SetContest(c *Contest) *ClarificationUpdateOne {
+	return cuo.SetContestID(c.ID)
 }
 
 // AddTaskIDs adds the "task" edge to the Task entity by IDs.
@@ -679,25 +651,10 @@ func (cuo *ClarificationUpdateOne) Mutation() *ClarificationMutation {
 	return cuo.mutation
 }
 
-// ClearContest clears all "contest" edges to the Contest entity.
+// ClearContest clears the "contest" edge to the Contest entity.
 func (cuo *ClarificationUpdateOne) ClearContest() *ClarificationUpdateOne {
 	cuo.mutation.ClearContest()
 	return cuo
-}
-
-// RemoveContestIDs removes the "contest" edge to Contest entities by IDs.
-func (cuo *ClarificationUpdateOne) RemoveContestIDs(ids ...int) *ClarificationUpdateOne {
-	cuo.mutation.RemoveContestIDs(ids...)
-	return cuo
-}
-
-// RemoveContest removes "contest" edges to Contest entities.
-func (cuo *ClarificationUpdateOne) RemoveContest(c ...*Contest) *ClarificationUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cuo.RemoveContestIDs(ids...)
 }
 
 // ClearTask clears all "task" edges to the Task entity.
@@ -803,7 +760,18 @@ func (cuo *ClarificationUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cuo *ClarificationUpdateOne) check() error {
+	if _, ok := cuo.mutation.ContestID(); cuo.mutation.ContestCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Clarification.contest"`)
+	}
+	return nil
+}
+
 func (cuo *ClarificationUpdateOne) sqlSave(ctx context.Context) (_node *Clarification, err error) {
+	if err := cuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(clarification.Table, clarification.Columns, sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt))
 	id, ok := cuo.mutation.ID()
 	if !ok {
@@ -861,39 +829,23 @@ func (cuo *ClarificationUpdateOne) sqlSave(ctx context.Context) (_node *Clarific
 	}
 	if cuo.mutation.ContestCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   clarification.ContestTable,
-			Columns: clarification.ContestPrimaryKey,
+			Columns: []string{clarification.ContestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedContestIDs(); len(nodes) > 0 && !cuo.mutation.ContestCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   clarification.ContestTable,
-			Columns: clarification.ContestPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := cuo.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   clarification.ContestTable,
-			Columns: clarification.ContestPrimaryKey,
+			Columns: []string{clarification.ContestColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),

@@ -22,3 +22,12 @@ export const ScoreStatusValues = [
  * - "zero": 0
  */
 export type ScoreStatus = (typeof ScoreStatusValues)[number];
+
+export const ScoreStatus = {
+  fromScore: (allotScore: number, userScore: number | undefined): ScoreStatus => {
+    if (userScore == null) return undefined;
+    if (userScore === 0) return "zero";
+    if (userScore < allotScore) return "partial";
+    return "perfect";
+  },
+};

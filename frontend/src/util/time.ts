@@ -12,11 +12,11 @@ export class Duration {
   /** ミリ秒単位の時間 */
   private readonly t: number;
 
-  private static readonly MILLI = 1;
-  private static readonly SECOND = Duration.MILLI * 1000;
-  private static readonly MINUTE = Duration.SECOND * 60;
-  private static readonly HOUR = Duration.MINUTE * 60;
-  private static readonly DAY = Duration.HOUR * 24;
+  static readonly MILLI = 1;
+  static readonly SECOND = Duration.MILLI * 1000;
+  static readonly MINUTE = Duration.SECOND * 60;
+  static readonly HOUR = Duration.MINUTE * 60;
+  static readonly DAY = Duration.HOUR * 24;
 
   constructor(from: Date, to: Date) {
     this.t = to.getTime() - from.getTime();

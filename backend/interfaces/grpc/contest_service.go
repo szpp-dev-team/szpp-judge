@@ -1,4 +1,4 @@
-package interfaces
+package grpc
 
 import (
 	"context"
@@ -60,5 +60,25 @@ func (s *contestServiceServer) UpdateAnswer(ctx context.Context, req *backendv1.
 }
 
 func (s *contestServiceServer) DeleteAnswer(ctx context.Context, req *backendv1.DeleteAnswerRequest) (*backendv1.DeleteAnswerResponse, error) {
-    return s.interactor.DeleteAnswer(ctx, req)
+	return s.interactor.DeleteAnswer(ctx, req)
+}
+
+// GetMySubmissionStatuses implements backendv1.ContestServiceServer.
+func (*contestServiceServer) GetMySubmissionStatuses(context.Context, *backendv1.GetMySubmissionStatusesRequest) (*backendv1.GetMySubmissionStatusesResponse, error) {
+	panic("unimplemented")
+}
+
+// GetStandings implements backendv1.ContestServiceServer.
+func (*contestServiceServer) GetStandings(context.Context, *backendv1.GetStandingsRequest) (*backendv1.GetStandingsResponse, error) {
+	panic("unimplemented")
+}
+
+// RegisterMe implements backendv1.ContestServiceServer.
+func (*contestServiceServer) RegisterMe(context.Context, *backendv1.RegisterMeRequest) (*backendv1.RegisterMeResponse, error) {
+	panic("unimplemented")
+}
+
+// SyncContestTasks implements backendv1.ContestServiceServer.
+func (*contestServiceServer) SyncContestTasks(context.Context, *backendv1.SyncContestTasksRequest) (*backendv1.SyncContestTasksResponse, error) {
+	panic("unimplemented")
 }

@@ -58,6 +58,11 @@ func Score(v int) predicate.ContestTask {
 	return predicate.ContestTask(sql.FieldEQ(FieldScore, v))
 }
 
+// Order applies equality check predicate on the "order" field. It's identical to OrderEQ.
+func Order(v int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldEQ(FieldOrder, v))
+}
+
 // ContestID applies equality check predicate on the "contest_id" field. It's identical to ContestIDEQ.
 func ContestID(v int) predicate.ContestTask {
 	return predicate.ContestTask(sql.FieldEQ(FieldContestID, v))
@@ -106,6 +111,46 @@ func ScoreLT(v int) predicate.ContestTask {
 // ScoreLTE applies the LTE predicate on the "score" field.
 func ScoreLTE(v int) predicate.ContestTask {
 	return predicate.ContestTask(sql.FieldLTE(FieldScore, v))
+}
+
+// OrderEQ applies the EQ predicate on the "order" field.
+func OrderEQ(v int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldEQ(FieldOrder, v))
+}
+
+// OrderNEQ applies the NEQ predicate on the "order" field.
+func OrderNEQ(v int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldNEQ(FieldOrder, v))
+}
+
+// OrderIn applies the In predicate on the "order" field.
+func OrderIn(vs ...int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldIn(FieldOrder, vs...))
+}
+
+// OrderNotIn applies the NotIn predicate on the "order" field.
+func OrderNotIn(vs ...int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldNotIn(FieldOrder, vs...))
+}
+
+// OrderGT applies the GT predicate on the "order" field.
+func OrderGT(v int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldGT(FieldOrder, v))
+}
+
+// OrderGTE applies the GTE predicate on the "order" field.
+func OrderGTE(v int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldGTE(FieldOrder, v))
+}
+
+// OrderLT applies the LT predicate on the "order" field.
+func OrderLT(v int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldLT(FieldOrder, v))
+}
+
+// OrderLTE applies the LTE predicate on the "order" field.
+func OrderLTE(v int) predicate.ContestTask {
+	return predicate.ContestTask(sql.FieldLTE(FieldOrder, v))
 }
 
 // ContestIDEQ applies the EQ predicate on the "contest_id" field.

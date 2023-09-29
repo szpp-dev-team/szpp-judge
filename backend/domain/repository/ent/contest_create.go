@@ -345,10 +345,10 @@ func (cc *ContestCreate) createSpec() (*Contest, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.ClarificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   contest.ClarificationsTable,
-			Columns: contest.ClarificationsPrimaryKey,
+			Columns: []string{contest.ClarificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),

@@ -32,6 +32,8 @@ const (
 	EdgeTask = "task"
 	// EdgeLanguage holds the string denoting the language edge name in mutations.
 	EdgeLanguage = "language"
+	// EdgeContest holds the string denoting the contest edge name in mutations.
+	EdgeContest = "contest"
 	// EdgeTestcaseResults holds the string denoting the testcase_results edge name in mutations.
 	EdgeTestcaseResults = "testcase_results"
 	// Table holds the table name of the submit in the database.
@@ -57,6 +59,13 @@ const (
 	LanguageInverseTable = "languages"
 	// LanguageColumn is the table column denoting the language relation/edge.
 	LanguageColumn = "language_submits"
+	// ContestTable is the table that holds the contest relation/edge.
+	ContestTable = "submits"
+	// ContestInverseTable is the table name for the Contest entity.
+	// It exists in this package in order to avoid circular dependency with the "contest" package.
+	ContestInverseTable = "contests"
+	// ContestColumn is the table column denoting the contest relation/edge.
+	ContestColumn = "contest_submits"
 	// TestcaseResultsTable is the table that holds the testcase_results relation/edge.
 	TestcaseResultsTable = "testcase_results"
 	// TestcaseResultsInverseTable is the table name for the TestcaseResult entity.
@@ -166,6 +175,13 @@ func ByLanguageField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByContestField orders the results by contest field.
+func ByContestField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newContestStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByTestcaseResultsCount orders the results by testcase_results count.
 func ByTestcaseResultsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -198,6 +214,13 @@ func newLanguageStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LanguageInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, LanguageTable, LanguageColumn),
+	)
+}
+func newContestStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ContestInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ContestTable, ContestColumn),
 	)
 }
 func newTestcaseResultsStep() *sqlgraph.Step {

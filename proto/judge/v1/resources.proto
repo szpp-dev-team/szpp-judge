@@ -12,6 +12,7 @@ enum JudgeStatus {
   RE = 6;
   TLE = 7;
   WA = 8;
+  WJ = 9;
 }
 
 message Testcase {

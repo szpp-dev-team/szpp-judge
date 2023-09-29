@@ -20,6 +20,8 @@ type ContestTask struct {
 	ID int `json:"id,omitempty"`
 	// Score holds the value of the "score" field.
 	Score int `json:"score,omitempty"`
+	// Order holds the value of the "order" field.
+	Order int `json:"order,omitempty"`
 	// ContestID holds the value of the "contest_id" field.
 	ContestID int `json:"contest_id,omitempty"`
 	// TaskID holds the value of the "task_id" field.
@@ -72,7 +74,7 @@ func (*ContestTask) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case contesttask.FieldID, contesttask.FieldScore, contesttask.FieldContestID, contesttask.FieldTaskID:
+		case contesttask.FieldID, contesttask.FieldScore, contesttask.FieldOrder, contesttask.FieldContestID, contesttask.FieldTaskID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -100,6 +102,12 @@ func (ct *ContestTask) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field score", values[i])
 			} else if value.Valid {
 				ct.Score = int(value.Int64)
+			}
+		case contesttask.FieldOrder:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field order", values[i])
+			} else if value.Valid {
+				ct.Order = int(value.Int64)
 			}
 		case contesttask.FieldContestID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -161,6 +169,9 @@ func (ct *ContestTask) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", ct.ID))
 	builder.WriteString("score=")
 	builder.WriteString(fmt.Sprintf("%v", ct.Score))
+	builder.WriteString(", ")
+	builder.WriteString("order=")
+	builder.WriteString(fmt.Sprintf("%v", ct.Order))
 	builder.WriteString(", ")
 	builder.WriteString("contest_id=")
 	builder.WriteString(fmt.Sprintf("%v", ct.ContestID))

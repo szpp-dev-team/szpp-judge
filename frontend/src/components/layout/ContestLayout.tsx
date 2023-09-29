@@ -1,5 +1,12 @@
-import type { ReactNode } from "react";
-import { ContestSidebar } from "../model/contest/ContestSidebar";
+import { ScoreStatus } from "@/src/model/task";
+import {
+  useGetContest,
+  useGetMySubmissionStatuses,
+  useListContestTasks,
+  useRouterContestSlug,
+} from "@/src/usecases/contest";
+import { type ReactNode, useMemo } from "react";
+import { ContestSidebar, ContestSidebarProps } from "../model/contest/ContestSidebar";
 import { GLOBAL_HEADER_H } from "../ui/GlobalHeader";
 import { WithHeaderFooter } from "./WithHeaderFooter";
 
@@ -8,28 +15,32 @@ export type ContestLayoutProps = {
 };
 
 export const ContestLayout = ({ children }: ContestLayoutProps) => {
+  const slug = useRouterContestSlug();
+
+  const { contest } = useGetContest({ slug });
+  const { tasks } = useListContestTasks({ contestSlug: slug });
+  const { submissionStatuses } = useGetMySubmissionStatuses({ contestSlug: slug });
+
+  const unifiedTasks = useMemo((): ContestSidebarProps["tasks"] => {
+    if (tasks == null || submissionStatuses == null) return [];
+    return submissionStatuses.map((s, i) => ({
+      id: s.taskId,
+      title: tasks[i].title,
+      scoreStatus: ScoreStatus.fromScore(tasks[i].score, s.score),
+    }));
+  }, [tasks, submissionStatuses]);
+
   return (
     <WithHeaderFooter
-      headerProps={{ contestSlug: "sbc001", contestTitle: "SZPP Beginners Contest 001" }}
+      headerProps={{ contestSlug: slug, contestTitle: contest?.name }}
       leftChildren={
         <ContestSidebar
           top={GLOBAL_HEADER_H}
-          startAt={new Date("2023-09-02 21:00")}
-          endAt={new Date("2023-09-04 01:00")}
-          now={new Date("2023-09-02 21:00:01")}
-          slug="sbc001"
-          tasks={[
-            { id: 1000, title: "すずっぴー君のおつかい" },
-            { id: 1001, title: "すずっぴー君の変死", scoreStatus: "perfect" },
-            { id: 1002, title: "すずっぴー君の怪死", scoreStatus: "perfect" },
-            { id: 1003, title: "すずっぴー君の爆死", scoreStatus: "zero" },
-            { id: 1004, title: "すずっぴー君の溺死" },
-            { id: 1005, title: "すずっぴー君の圧死", scoreStatus: "partial" },
-            { id: 1006, title: "すずっぴー君の尊死", scoreStatus: "zero" },
-            { id: 1007, title: "長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル長いタイトル" },
-            { id: 1008, title: "longlonglonglonglonglonglonglonglonglonglonglong", scoreStatus: "partial" },
-            { id: 1009, title: "すずっぴー君のおつかい" },
-          ]}
+          startAt={contest?.startAt?.toDate()}
+          endAt={contest?.endAt?.toDate()}
+          now={new Date()}
+          slug={slug}
+          tasks={unifiedTasks}
         />
       }
     >

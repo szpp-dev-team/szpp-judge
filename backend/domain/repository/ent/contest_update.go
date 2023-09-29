@@ -510,10 +510,10 @@ func (cu *ContestUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ClarificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   contest.ClarificationsTable,
-			Columns: contest.ClarificationsPrimaryKey,
+			Columns: []string{contest.ClarificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
@@ -523,10 +523,10 @@ func (cu *ContestUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.RemovedClarificationsIDs(); len(nodes) > 0 && !cu.mutation.ClarificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   contest.ClarificationsTable,
-			Columns: contest.ClarificationsPrimaryKey,
+			Columns: []string{contest.ClarificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
@@ -539,10 +539,10 @@ func (cu *ContestUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.ClarificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   contest.ClarificationsTable,
-			Columns: contest.ClarificationsPrimaryKey,
+			Columns: []string{contest.ClarificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
@@ -1169,10 +1169,10 @@ func (cuo *ContestUpdateOne) sqlSave(ctx context.Context) (_node *Contest, err e
 	}
 	if cuo.mutation.ClarificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   contest.ClarificationsTable,
-			Columns: contest.ClarificationsPrimaryKey,
+			Columns: []string{contest.ClarificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
@@ -1182,10 +1182,10 @@ func (cuo *ContestUpdateOne) sqlSave(ctx context.Context) (_node *Contest, err e
 	}
 	if nodes := cuo.mutation.RemovedClarificationsIDs(); len(nodes) > 0 && !cuo.mutation.ClarificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   contest.ClarificationsTable,
-			Columns: contest.ClarificationsPrimaryKey,
+			Columns: []string{contest.ClarificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
@@ -1198,10 +1198,10 @@ func (cuo *ContestUpdateOne) sqlSave(ctx context.Context) (_node *Contest, err e
 	}
 	if nodes := cuo.mutation.ClarificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   contest.ClarificationsTable,
-			Columns: contest.ClarificationsPrimaryKey,
+			Columns: []string{contest.ClarificationsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),

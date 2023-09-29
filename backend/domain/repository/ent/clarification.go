@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 )
 
 // Clarification is the model entity for the Clarification schema.
@@ -33,14 +34,15 @@ type Clarification struct {
 	AnswerUpdatedAt *time.Time `json:"answer_updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClarificationQuery when eager-loading is set.
-	Edges        ClarificationEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges                  ClarificationEdges `json:"edges"`
+	contest_clarifications *int
+	selectValues           sql.SelectValues
 }
 
 // ClarificationEdges holds the relations/edges for other nodes in the graph.
 type ClarificationEdges struct {
 	// Contest holds the value of the contest edge.
-	Contest []*Contest `json:"contest,omitempty"`
+	Contest *Contest `json:"contest,omitempty"`
 	// Task holds the value of the task edge.
 	Task []*Task `json:"task,omitempty"`
 	// User holds the value of the user edge.
@@ -53,9 +55,13 @@ type ClarificationEdges struct {
 }
 
 // ContestOrErr returns the Contest value or an error if the edge
-// was not loaded in eager-loading.
-func (e ClarificationEdges) ContestOrErr() ([]*Contest, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ClarificationEdges) ContestOrErr() (*Contest, error) {
 	if e.loadedTypes[0] {
+		if e.Contest == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: contest.Label}
+		}
 		return e.Contest, nil
 	}
 	return nil, &NotLoadedError{edge: "contest"}
@@ -101,6 +107,8 @@ func (*Clarification) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case clarification.FieldCreatedAt, clarification.FieldUpdatedAt, clarification.FieldAnswerCreatedAt, clarification.FieldAnswerUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case clarification.ForeignKeys[0]: // contest_clarifications
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -166,6 +174,13 @@ func (c *Clarification) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.AnswerUpdatedAt = new(time.Time)
 				*c.AnswerUpdatedAt = value.Time
+			}
+		case clarification.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field contest_clarifications", value)
+			} else if value.Valid {
+				c.contest_clarifications = new(int)
+				*c.contest_clarifications = int(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])

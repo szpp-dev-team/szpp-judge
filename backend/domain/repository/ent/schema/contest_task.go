@@ -14,6 +14,7 @@ func (ContestTask) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.Int("score"),
+		field.Int("order"),
 		field.Int("contest_id"),
 		field.Int("task_id"),
 	}

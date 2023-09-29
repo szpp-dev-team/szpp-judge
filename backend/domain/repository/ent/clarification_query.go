@@ -29,6 +29,7 @@ type ClarificationQuery struct {
 	withTask       *TaskQuery
 	withUser       *UserQuery
 	withAnswerUser *UserQuery
+	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -79,7 +80,7 @@ func (cq *ClarificationQuery) QueryContest() *ContestQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(clarification.Table, clarification.FieldID, selector),
 			sqlgraph.To(contest.Table, contest.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, clarification.ContestTable, clarification.ContestPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, clarification.ContestTable, clarification.ContestColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -476,6 +477,7 @@ func (cq *ClarificationQuery) prepareQuery(ctx context.Context) error {
 func (cq *ClarificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Clarification, error) {
 	var (
 		nodes       = []*Clarification{}
+		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [4]bool{
 			cq.withContest != nil,
@@ -484,6 +486,12 @@ func (cq *ClarificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 			cq.withAnswerUser != nil,
 		}
 	)
+	if cq.withContest != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, clarification.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Clarification).scanValues(nil, columns)
 	}
@@ -503,9 +511,8 @@ func (cq *ClarificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		return nodes, nil
 	}
 	if query := cq.withContest; query != nil {
-		if err := cq.loadContest(ctx, query, nodes,
-			func(n *Clarification) { n.Edges.Contest = []*Contest{} },
-			func(n *Clarification, e *Contest) { n.Edges.Contest = append(n.Edges.Contest, e) }); err != nil {
+		if err := cq.loadContest(ctx, query, nodes, nil,
+			func(n *Clarification, e *Contest) { n.Edges.Contest = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -534,62 +541,33 @@ func (cq *ClarificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 }
 
 func (cq *ClarificationQuery) loadContest(ctx context.Context, query *ContestQuery, nodes []*Clarification, init func(*Clarification), assign func(*Clarification, *Contest)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Clarification)
-	nids := make(map[int]map[*Clarification]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Clarification)
+	for i := range nodes {
+		if nodes[i].contest_clarifications == nil {
+			continue
 		}
+		fk := *nodes[i].contest_clarifications
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(clarification.ContestTable)
-		s.Join(joinT).On(s.C(contest.FieldID), joinT.C(clarification.ContestPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(clarification.ContestPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(clarification.ContestPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
+	if len(ids) == 0 {
+		return nil
 	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Clarification]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Contest](ctx, query, qr, query.inters)
+	query.Where(contest.IDIn(ids...))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "contest" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "contest_clarifications" returned %v`, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
+		for i := range nodes {
+			assign(nodes[i], n)
 		}
 	}
 	return nil

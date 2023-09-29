@@ -29,6 +29,12 @@ func (ctc *ContestTaskCreate) SetScore(i int) *ContestTaskCreate {
 	return ctc
 }
 
+// SetOrder sets the "order" field.
+func (ctc *ContestTaskCreate) SetOrder(i int) *ContestTaskCreate {
+	ctc.mutation.SetOrder(i)
+	return ctc
+}
+
 // SetContestID sets the "contest_id" field.
 func (ctc *ContestTaskCreate) SetContestID(i int) *ContestTaskCreate {
 	ctc.mutation.SetContestID(i)
@@ -94,6 +100,9 @@ func (ctc *ContestTaskCreate) check() error {
 	if _, ok := ctc.mutation.Score(); !ok {
 		return &ValidationError{Name: "score", err: errors.New(`ent: missing required field "ContestTask.score"`)}
 	}
+	if _, ok := ctc.mutation.Order(); !ok {
+		return &ValidationError{Name: "order", err: errors.New(`ent: missing required field "ContestTask.order"`)}
+	}
 	if _, ok := ctc.mutation.ContestID(); !ok {
 		return &ValidationError{Name: "contest_id", err: errors.New(`ent: missing required field "ContestTask.contest_id"`)}
 	}
@@ -142,6 +151,10 @@ func (ctc *ContestTaskCreate) createSpec() (*ContestTask, *sqlgraph.CreateSpec) 
 	if value, ok := ctc.mutation.Score(); ok {
 		_spec.SetField(contesttask.FieldScore, field.TypeInt, value)
 		_node.Score = value
+	}
+	if value, ok := ctc.mutation.Order(); ok {
+		_spec.SetField(contesttask.FieldOrder, field.TypeInt, value)
+		_node.Order = value
 	}
 	if nodes := ctc.mutation.ContestIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -247,6 +260,24 @@ func (u *ContestTaskUpsert) AddScore(v int) *ContestTaskUpsert {
 	return u
 }
 
+// SetOrder sets the "order" field.
+func (u *ContestTaskUpsert) SetOrder(v int) *ContestTaskUpsert {
+	u.Set(contesttask.FieldOrder, v)
+	return u
+}
+
+// UpdateOrder sets the "order" field to the value that was provided on create.
+func (u *ContestTaskUpsert) UpdateOrder() *ContestTaskUpsert {
+	u.SetExcluded(contesttask.FieldOrder)
+	return u
+}
+
+// AddOrder adds v to the "order" field.
+func (u *ContestTaskUpsert) AddOrder(v int) *ContestTaskUpsert {
+	u.Add(contesttask.FieldOrder, v)
+	return u
+}
+
 // SetContestID sets the "contest_id" field.
 func (u *ContestTaskUpsert) SetContestID(v int) *ContestTaskUpsert {
 	u.Set(contesttask.FieldContestID, v)
@@ -337,6 +368,27 @@ func (u *ContestTaskUpsertOne) AddScore(v int) *ContestTaskUpsertOne {
 func (u *ContestTaskUpsertOne) UpdateScore() *ContestTaskUpsertOne {
 	return u.Update(func(s *ContestTaskUpsert) {
 		s.UpdateScore()
+	})
+}
+
+// SetOrder sets the "order" field.
+func (u *ContestTaskUpsertOne) SetOrder(v int) *ContestTaskUpsertOne {
+	return u.Update(func(s *ContestTaskUpsert) {
+		s.SetOrder(v)
+	})
+}
+
+// AddOrder adds v to the "order" field.
+func (u *ContestTaskUpsertOne) AddOrder(v int) *ContestTaskUpsertOne {
+	return u.Update(func(s *ContestTaskUpsert) {
+		s.AddOrder(v)
+	})
+}
+
+// UpdateOrder sets the "order" field to the value that was provided on create.
+func (u *ContestTaskUpsertOne) UpdateOrder() *ContestTaskUpsertOne {
+	return u.Update(func(s *ContestTaskUpsert) {
+		s.UpdateOrder()
 	})
 }
 
@@ -595,6 +647,27 @@ func (u *ContestTaskUpsertBulk) AddScore(v int) *ContestTaskUpsertBulk {
 func (u *ContestTaskUpsertBulk) UpdateScore() *ContestTaskUpsertBulk {
 	return u.Update(func(s *ContestTaskUpsert) {
 		s.UpdateScore()
+	})
+}
+
+// SetOrder sets the "order" field.
+func (u *ContestTaskUpsertBulk) SetOrder(v int) *ContestTaskUpsertBulk {
+	return u.Update(func(s *ContestTaskUpsert) {
+		s.SetOrder(v)
+	})
+}
+
+// AddOrder adds v to the "order" field.
+func (u *ContestTaskUpsertBulk) AddOrder(v int) *ContestTaskUpsertBulk {
+	return u.Update(func(s *ContestTaskUpsert) {
+		s.AddOrder(v)
+	})
+}
+
+// UpdateOrder sets the "order" field to the value that was provided on create.
+func (u *ContestTaskUpsertBulk) UpdateOrder() *ContestTaskUpsertBulk {
+	return u.Update(func(s *ContestTaskUpsert) {
+		s.UpdateOrder()
 	})
 }
 

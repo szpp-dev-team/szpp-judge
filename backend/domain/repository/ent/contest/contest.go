@@ -59,11 +59,13 @@ const (
 	// TasksInverseTable is the table name for the Task entity.
 	// It exists in this package in order to avoid circular dependency with the "task" package.
 	TasksInverseTable = "tasks"
-	// ClarificationsTable is the table that holds the clarifications relation/edge. The primary key declared below.
-	ClarificationsTable = "contest_clarifications"
+	// ClarificationsTable is the table that holds the clarifications relation/edge.
+	ClarificationsTable = "clarifications"
 	// ClarificationsInverseTable is the table name for the Clarification entity.
 	// It exists in this package in order to avoid circular dependency with the "clarification" package.
 	ClarificationsInverseTable = "clarifications"
+	// ClarificationsColumn is the table column denoting the clarifications relation/edge.
+	ClarificationsColumn = "contest_clarifications"
 	// ContestUserTable is the table that holds the contest_user relation/edge.
 	ContestUserTable = "contest_users"
 	// ContestUserInverseTable is the table name for the ContestUser entity.
@@ -100,9 +102,6 @@ var (
 	// TasksPrimaryKey and TasksColumn2 are the table columns denoting the
 	// primary key for the tasks relation (M2M).
 	TasksPrimaryKey = []string{"contest_id", "task_id"}
-	// ClarificationsPrimaryKey and ClarificationsColumn2 are the table columns denoting the
-	// primary key for the clarifications relation (M2M).
-	ClarificationsPrimaryKey = []string{"contest_id", "clarification_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -271,7 +270,7 @@ func newClarificationsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClarificationsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ClarificationsTable, ClarificationsPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, ClarificationsTable, ClarificationsColumn),
 	)
 }
 func newContestUserStep() *sqlgraph.Step {
