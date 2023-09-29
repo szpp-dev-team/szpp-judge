@@ -370,7 +370,7 @@ func (i *Interactor) UpdateAnswer (ctx context.Context, req *backendv1.UpdateAns
 	}, nil
 }
 
-func (i *Interactor) DeleteAsnwer (ctx context.Context, req *backendv1.DeleteAnswerRequest) (*backendv1.DeleteAnswerResponse, error) {
+func (i *Interactor) DeleteAnswer (ctx context.Context, req *backendv1.DeleteAnswerRequest) (*backendv1.DeleteAnswerResponse, error) {
 	// 指定されたIDでClarificationエンティティを検索
 	clarification, err := i.entClient.Clarification.Query().Where(clarification.ID(int(req.AnswerId))).Only(ctx)//TODO: AnswerIDはないので、Clarification IDにする必要がある。
 	if err != nil {
