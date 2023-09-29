@@ -33,7 +33,7 @@ func (i *Interactor) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.G
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &pb.GetUserResponse{
-		User: toPbUser(user),
+		User: ToPbUser(user),
 	}, nil
 }
 
@@ -54,7 +54,7 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &pb.CreateUserResponse{
-		User: toPbUser(user),
+		User: ToPbUser(user),
 	}, nil
 }
 
@@ -80,7 +80,7 @@ func (i *Interactor) ExistsEmail(ctx context.Context, req *pb.ExistsEmailRequest
 	}, nil
 }
 
-func toPbUser(t *ent.User) *pb.User {
+func ToPbUser(t *ent.User) *pb.User {
 	return &pb.User{
 		Id:        int32(t.ID),
 		Username:  t.Username,
