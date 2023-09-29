@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -52,11 +53,13 @@ type SubmitEdges struct {
 	Task *Task `json:"task,omitempty"`
 	// Language holds the value of the language edge.
 	Language *Language `json:"language,omitempty"`
+	// Contest holds the value of the contest edge.
+	Contest *Contest `json:"contest,omitempty"`
 	// TestcaseResults holds the value of the testcase_results edge.
 	TestcaseResults []*TestcaseResult `json:"testcase_results,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -98,10 +101,23 @@ func (e SubmitEdges) LanguageOrErr() (*Language, error) {
 	return nil, &NotLoadedError{edge: "language"}
 }
 
+// ContestOrErr returns the Contest value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SubmitEdges) ContestOrErr() (*Contest, error) {
+	if e.loadedTypes[3] {
+		if e.Contest == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: contest.Label}
+		}
+		return e.Contest, nil
+	}
+	return nil, &NotLoadedError{edge: "contest"}
+}
+
 // TestcaseResultsOrErr returns the TestcaseResults value or an error if the edge
 // was not loaded in eager-loading.
 func (e SubmitEdges) TestcaseResultsOrErr() ([]*TestcaseResult, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.TestcaseResults, nil
 	}
 	return nil, &NotLoadedError{edge: "testcase_results"}
@@ -245,6 +261,11 @@ func (s *Submit) QueryTask() *TaskQuery {
 // QueryLanguage queries the "language" edge of the Submit entity.
 func (s *Submit) QueryLanguage() *LanguageQuery {
 	return NewSubmitClient(s.config).QueryLanguage(s)
+}
+
+// QueryContest queries the "contest" edge of the Submit entity.
+func (s *Submit) QueryContest() *ContestQuery {
+	return NewSubmitClient(s.config).QueryContest(s)
 }
 
 // QueryTestcaseResults queries the "testcase_results" edge of the Submit entity.

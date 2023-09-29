@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
@@ -171,14 +172,6 @@ func (su *SubmitUpdate) SetUserID(id int) *SubmitUpdate {
 	return su
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (su *SubmitUpdate) SetNillableUserID(id *int) *SubmitUpdate {
-	if id != nil {
-		su = su.SetUserID(*id)
-	}
-	return su
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (su *SubmitUpdate) SetUser(u *User) *SubmitUpdate {
 	return su.SetUserID(u.ID)
@@ -187,14 +180,6 @@ func (su *SubmitUpdate) SetUser(u *User) *SubmitUpdate {
 // SetTaskID sets the "task" edge to the Task entity by ID.
 func (su *SubmitUpdate) SetTaskID(id int) *SubmitUpdate {
 	su.mutation.SetTaskID(id)
-	return su
-}
-
-// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
-func (su *SubmitUpdate) SetNillableTaskID(id *int) *SubmitUpdate {
-	if id != nil {
-		su = su.SetTaskID(*id)
-	}
 	return su
 }
 
@@ -209,17 +194,28 @@ func (su *SubmitUpdate) SetLanguageID(id int) *SubmitUpdate {
 	return su
 }
 
-// SetNillableLanguageID sets the "language" edge to the Language entity by ID if the given value is not nil.
-func (su *SubmitUpdate) SetNillableLanguageID(id *int) *SubmitUpdate {
+// SetLanguage sets the "language" edge to the Language entity.
+func (su *SubmitUpdate) SetLanguage(l *Language) *SubmitUpdate {
+	return su.SetLanguageID(l.ID)
+}
+
+// SetContestID sets the "contest" edge to the Contest entity by ID.
+func (su *SubmitUpdate) SetContestID(id int) *SubmitUpdate {
+	su.mutation.SetContestID(id)
+	return su
+}
+
+// SetNillableContestID sets the "contest" edge to the Contest entity by ID if the given value is not nil.
+func (su *SubmitUpdate) SetNillableContestID(id *int) *SubmitUpdate {
 	if id != nil {
-		su = su.SetLanguageID(*id)
+		su = su.SetContestID(*id)
 	}
 	return su
 }
 
-// SetLanguage sets the "language" edge to the Language entity.
-func (su *SubmitUpdate) SetLanguage(l *Language) *SubmitUpdate {
-	return su.SetLanguageID(l.ID)
+// SetContest sets the "contest" edge to the Contest entity.
+func (su *SubmitUpdate) SetContest(c *Contest) *SubmitUpdate {
+	return su.SetContestID(c.ID)
 }
 
 // AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by IDs.
@@ -257,6 +253,12 @@ func (su *SubmitUpdate) ClearTask() *SubmitUpdate {
 // ClearLanguage clears the "language" edge to the Language entity.
 func (su *SubmitUpdate) ClearLanguage() *SubmitUpdate {
 	su.mutation.ClearLanguage()
+	return su
+}
+
+// ClearContest clears the "contest" edge to the Contest entity.
+func (su *SubmitUpdate) ClearContest() *SubmitUpdate {
+	su.mutation.ClearContest()
 	return su
 }
 
@@ -308,7 +310,24 @@ func (su *SubmitUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (su *SubmitUpdate) check() error {
+	if _, ok := su.mutation.UserID(); su.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Submit.user"`)
+	}
+	if _, ok := su.mutation.TaskID(); su.mutation.TaskCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Submit.task"`)
+	}
+	if _, ok := su.mutation.LanguageID(); su.mutation.LanguageCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Submit.language"`)
+	}
+	return nil
+}
+
 func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := su.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(submit.Table, submit.Columns, sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -442,6 +461,35 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.ContestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   submit.ContestTable,
+			Columns: []string{submit.ContestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ContestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   submit.ContestTable,
+			Columns: []string{submit.ContestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -653,14 +701,6 @@ func (suo *SubmitUpdateOne) SetUserID(id int) *SubmitUpdateOne {
 	return suo
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (suo *SubmitUpdateOne) SetNillableUserID(id *int) *SubmitUpdateOne {
-	if id != nil {
-		suo = suo.SetUserID(*id)
-	}
-	return suo
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (suo *SubmitUpdateOne) SetUser(u *User) *SubmitUpdateOne {
 	return suo.SetUserID(u.ID)
@@ -669,14 +709,6 @@ func (suo *SubmitUpdateOne) SetUser(u *User) *SubmitUpdateOne {
 // SetTaskID sets the "task" edge to the Task entity by ID.
 func (suo *SubmitUpdateOne) SetTaskID(id int) *SubmitUpdateOne {
 	suo.mutation.SetTaskID(id)
-	return suo
-}
-
-// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
-func (suo *SubmitUpdateOne) SetNillableTaskID(id *int) *SubmitUpdateOne {
-	if id != nil {
-		suo = suo.SetTaskID(*id)
-	}
 	return suo
 }
 
@@ -691,17 +723,28 @@ func (suo *SubmitUpdateOne) SetLanguageID(id int) *SubmitUpdateOne {
 	return suo
 }
 
-// SetNillableLanguageID sets the "language" edge to the Language entity by ID if the given value is not nil.
-func (suo *SubmitUpdateOne) SetNillableLanguageID(id *int) *SubmitUpdateOne {
+// SetLanguage sets the "language" edge to the Language entity.
+func (suo *SubmitUpdateOne) SetLanguage(l *Language) *SubmitUpdateOne {
+	return suo.SetLanguageID(l.ID)
+}
+
+// SetContestID sets the "contest" edge to the Contest entity by ID.
+func (suo *SubmitUpdateOne) SetContestID(id int) *SubmitUpdateOne {
+	suo.mutation.SetContestID(id)
+	return suo
+}
+
+// SetNillableContestID sets the "contest" edge to the Contest entity by ID if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableContestID(id *int) *SubmitUpdateOne {
 	if id != nil {
-		suo = suo.SetLanguageID(*id)
+		suo = suo.SetContestID(*id)
 	}
 	return suo
 }
 
-// SetLanguage sets the "language" edge to the Language entity.
-func (suo *SubmitUpdateOne) SetLanguage(l *Language) *SubmitUpdateOne {
-	return suo.SetLanguageID(l.ID)
+// SetContest sets the "contest" edge to the Contest entity.
+func (suo *SubmitUpdateOne) SetContest(c *Contest) *SubmitUpdateOne {
+	return suo.SetContestID(c.ID)
 }
 
 // AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by IDs.
@@ -739,6 +782,12 @@ func (suo *SubmitUpdateOne) ClearTask() *SubmitUpdateOne {
 // ClearLanguage clears the "language" edge to the Language entity.
 func (suo *SubmitUpdateOne) ClearLanguage() *SubmitUpdateOne {
 	suo.mutation.ClearLanguage()
+	return suo
+}
+
+// ClearContest clears the "contest" edge to the Contest entity.
+func (suo *SubmitUpdateOne) ClearContest() *SubmitUpdateOne {
+	suo.mutation.ClearContest()
 	return suo
 }
 
@@ -803,7 +852,24 @@ func (suo *SubmitUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (suo *SubmitUpdateOne) check() error {
+	if _, ok := suo.mutation.UserID(); suo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Submit.user"`)
+	}
+	if _, ok := suo.mutation.TaskID(); suo.mutation.TaskCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Submit.task"`)
+	}
+	if _, ok := suo.mutation.LanguageID(); suo.mutation.LanguageCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Submit.language"`)
+	}
+	return nil
+}
+
 func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err error) {
+	if err := suo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(submit.Table, submit.Columns, sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt))
 	id, ok := suo.mutation.ID()
 	if !ok {
@@ -954,6 +1020,35 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.ContestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   submit.ContestTable,
+			Columns: []string{submit.ContestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ContestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   submit.ContestTable,
+			Columns: []string{submit.ContestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

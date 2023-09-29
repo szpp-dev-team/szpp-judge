@@ -118,9 +118,9 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "contest_submits", Type: field.TypeInt, Nullable: true},
-		{Name: "language_submits", Type: field.TypeInt, Nullable: true},
-		{Name: "task_submits", Type: field.TypeInt, Nullable: true},
-		{Name: "user_submits", Type: field.TypeInt, Nullable: true},
+		{Name: "language_submits", Type: field.TypeInt},
+		{Name: "task_submits", Type: field.TypeInt},
+		{Name: "user_submits", Type: field.TypeInt},
 	}
 	// SubmitsTable holds the schema information for the "submits" table.
 	SubmitsTable = &schema.Table{
@@ -138,19 +138,19 @@ var (
 				Symbol:     "submits_languages_submits",
 				Columns:    []*schema.Column{SubmitsColumns[9]},
 				RefColumns: []*schema.Column{LanguagesColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "submits_tasks_submits",
 				Columns:    []*schema.Column{SubmitsColumns[10]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "submits_users_submits",
 				Columns:    []*schema.Column{SubmitsColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}

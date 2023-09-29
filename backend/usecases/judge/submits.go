@@ -6,9 +6,11 @@ import (
 	"log/slog"
 
 	"github.com/samber/lo"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	ent_language "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -82,6 +84,8 @@ func (i *Interactor) GetSubmissionDetail(ctx context.Context, req *backendv1.Get
 	submit, err := i.entClient.Submit.Query().
 		WithLanguage().
 		WithTask().
+		WithUser().
+		WithContest().
 		WithTestcaseResults(func(trq *ent.TestcaseResultQuery) {
 			trq.WithTestcase()
 		}).
@@ -101,18 +105,28 @@ func (i *Interactor) GetSubmissionDetail(ctx context.Context, req *backendv1.Get
 	}
 
 	var submissionDetail *backendv1.SubmissionDetail
-	if submit.Status == nil {
-		submissionDetail = &backendv1.SubmissionDetail{
-			Id:         int32(submit.ID),
-			UserId:     0,   // TODO: set
-			Username:   "",  // TODO: set
-			ContestId:  nil, // TODO: set
-			TaskId:     int32(submit.Edges.Task.ID),
-			TaskTitle:  submit.Edges.Task.Title,
-			LangId:     submit.Edges.Language.Slug,
-			SourceCode: string(source),
-		}
-	} else {
+	var contestID *int32
+	if submit.Edges.Contest != nil {
+		contestID = lo.ToPtr(int32(submit.Edges.Contest.ID))
+	}
+	var updatedAt *timestamppb.Timestamp
+	if submit.UpdatedAt != nil {
+		updatedAt = timestamppb.New(*submit.UpdatedAt)
+	}
+	submissionDetail = &backendv1.SubmissionDetail{
+		Id:          int32(submit.ID),
+		UserId:      int32(submit.Edges.User.ID),
+		Username:    submit.Edges.User.Username,
+		ContestId:   contestID,
+		TaskId:      int32(submit.Edges.Task.ID),
+		TaskTitle:   submit.Edges.Task.Title,
+		LangId:      submit.Edges.Language.Slug,
+		SourceCode:  string(source),
+		SubmittedAt: timestamppb.New(submit.SubmittedAt),
+		CreatedAt:   timestamppb.New(submit.CreatedAt),
+		UpdatedAt:   updatedAt,
+	}
+	if submit.Status != nil {
 		testcaseResults := make([]*backendv1.TestcaseResult, 0, len(submit.Edges.TestcaseResults))
 		for _, tcResult := range submit.Edges.TestcaseResults {
 			testcaseResults = append(testcaseResults, &backendv1.TestcaseResult{
@@ -122,21 +136,11 @@ func (i *Interactor) GetSubmissionDetail(ctx context.Context, req *backendv1.Get
 				ExecMemoryKib: uint32(tcResult.ExecMemory),
 			})
 		}
-		submissionDetail = &backendv1.SubmissionDetail{
-			Id:              int32(submit.ID),
-			UserId:          0,   // TODO: set
-			Username:        "",  // TODO: set
-			ContestId:       nil, // TODO: set
-			TaskId:          int32(submit.Edges.Task.ID),
-			TaskTitle:       submit.Edges.Task.Title,
-			Score:           int32(submit.Score),
-			LangId:          submit.Edges.Language.Slug,
-			SourceCode:      string(source),
-			Status:          lo.ToPtr(judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status])),
-			ExecTimeMs:      lo.ToPtr(uint32(submit.ExecTime)),
-			ExecMemoryKib:   lo.ToPtr(uint32(submit.ExecMemory)),
-			TestcaseResults: testcaseResults,
-		}
+		submissionDetail.Score = int32(submit.Score)
+		submissionDetail.Status = lo.ToPtr(judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status]))
+		submissionDetail.ExecTimeMs = lo.ToPtr(uint32(submit.ExecTime))
+		submissionDetail.ExecMemoryKib = lo.ToPtr(uint32(submit.ExecMemory))
+		submissionDetail.TestcaseResults = testcaseResults
 	}
 
 	return &backendv1.GetSubmissionDetailResponse{
@@ -145,44 +149,83 @@ func (i *Interactor) GetSubmissionDetail(ctx context.Context, req *backendv1.Get
 }
 
 func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSubmissionsRequest) (*backendv1.ListSubmissionsResponse, error) {
-	q := i.entClient.Submit.Query().WithLanguage().WithTask()
-	if req.ContestId != nil {
-		// TODO: HasContest
+	now := timejst.Now()
+
+	claims := intercepter.GetClaimsFromContext(ctx)
+	isAdmin := false
+	if claims != nil {
+		user, err := i.entClient.User.Query().Where(ent_user.Username(claims.Username)).Only(ctx)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		isAdmin = user.Role == backendv1.Role_ADMIN.String()
 	}
-	if req.Username != nil {
-		q = q.Where(ent_submit.HasUserWith(ent_user.Username(*req.Username)))
-	}
-	submits, err := q.All(ctx)
+
+	contest, err := i.entClient.Contest.Query().
+		WithSubmits(func(sq *ent.SubmitQuery) {
+			sq.WithUser()
+		}).
+		Where(ent_contest.ID(int(*req.ContestId))).
+		Only(ctx)
 	if err != nil {
-		i.logger.Error("failed to get the submissions", slog.Any("error", err))
+		if ent.IsNotFound(err) {
+			return nil, status.Error(codes.NotFound, "the contest was not found")
+		}
+		i.logger.Error("failed to get the contest", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-
-	submissionList := make([]*backendv1.SubmissionSummary, 0, len(submits))
-	for _, submit := range submits {
-		var judgeStatus *judgev1.JudgeStatus
-		if submit.Status != nil {
-			judgeStatus = lo.ToPtr(judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status]))
-		}
-		submissionList = append(submissionList, &backendv1.SubmissionSummary{
-			Id:            int32(submit.ID),
-			UserId:        0,   // TODO: set
-			Username:      "",  // TODO: set
-			ContestId:     nil, // TODO: set
-			TaskId:        int32(submit.Edges.Task.ID),
-			TaskTitle:     submit.Edges.Task.Title,
-			Score:         int32(submit.Score),
-			LangId:        submit.Edges.Language.Slug,
-			JudgeStatus:   judgeStatus,
-			ExecTimeMs:    lo.ToPtr(uint32(submit.ExecTime)),
-			ExecMemoryKib: lo.ToPtr(uint32(submit.ExecMemory)),
-			SubmittedAt:   timestamppb.New(submit.SubmittedAt),
-		})
+	// admin もしくはコンテスト終了後は全ての提出の閲覧が可能
+	if isAdmin || now.After(contest.EndAt) {
+		return &backendv1.ListSubmissionsResponse{
+			Submissions: lo.Map(contest.Edges.Submits, func(s *ent.Submit, _ int) *backendv1.SubmissionSummary {
+				return toPbSubmissionSummary(s, s.Edges.User)
+			}),
+		}, nil
+	}
+	// コンテスト開始前は permissionDenied として扱う
+	if now.Before(contest.StartAt) {
+		return nil, status.Error(codes.PermissionDenied, "contest is not held")
 	}
 
+	// 未ログインの場合は空を返す
+	if claims == nil {
+		return &backendv1.ListSubmissionsResponse{}, nil
+	}
+
+	// コンテスト開催中は自分の提出のみ返す
 	return &backendv1.ListSubmissionsResponse{
-		Submissions: submissionList,
+		Submissions: lo.FilterMap(contest.Edges.Submits, func(s *ent.Submit, _ int) (*backendv1.SubmissionSummary, bool) {
+			if s.Edges.User.Username != claims.Username {
+				return nil, false
+			}
+			return toPbSubmissionSummary(s, s.Edges.User), true
+		}),
 	}, nil
+}
+
+func toPbSubmissionSummary(submit *ent.Submit, user *ent.User) *backendv1.SubmissionSummary {
+	var judgeStatus *judgev1.JudgeStatus
+	if submit.Status != nil {
+		judgeStatus = lo.ToPtr(judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status]))
+	}
+	var contestID *int32
+	if submit.Edges.Contest != nil {
+		contestID = lo.ToPtr(int32(submit.Edges.Contest.ID))
+	}
+	return &backendv1.SubmissionSummary{
+		Id:            int32(submit.ID),
+		UserId:        int32(user.ID),
+		Username:      user.Username,
+		ContestId:     contestID,
+		TaskId:        int32(submit.Edges.Task.ID),
+		TaskTitle:     submit.Edges.Task.Title,
+		Score:         int32(submit.Score),
+		LangId:        submit.Edges.Language.Slug,
+		JudgeStatus:   judgeStatus,
+		ExecTimeMs:    lo.ToPtr(uint32(submit.ExecTime)),
+		ExecMemoryKib: lo.ToPtr(uint32(submit.ExecMemory)),
+		SubmittedAt:   timestamppb.New(submit.SubmittedAt),
+	}
 }
 
 func buildJudgeRequest(submitID int, langID string, task *ent.Task) (*judgev1.JudgeRequest, error) {

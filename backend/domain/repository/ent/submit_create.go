@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -120,14 +121,6 @@ func (sc *SubmitCreate) SetUserID(id int) *SubmitCreate {
 	return sc
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (sc *SubmitCreate) SetNillableUserID(id *int) *SubmitCreate {
-	if id != nil {
-		sc = sc.SetUserID(*id)
-	}
-	return sc
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (sc *SubmitCreate) SetUser(u *User) *SubmitCreate {
 	return sc.SetUserID(u.ID)
@@ -136,14 +129,6 @@ func (sc *SubmitCreate) SetUser(u *User) *SubmitCreate {
 // SetTaskID sets the "task" edge to the Task entity by ID.
 func (sc *SubmitCreate) SetTaskID(id int) *SubmitCreate {
 	sc.mutation.SetTaskID(id)
-	return sc
-}
-
-// SetNillableTaskID sets the "task" edge to the Task entity by ID if the given value is not nil.
-func (sc *SubmitCreate) SetNillableTaskID(id *int) *SubmitCreate {
-	if id != nil {
-		sc = sc.SetTaskID(*id)
-	}
 	return sc
 }
 
@@ -158,17 +143,28 @@ func (sc *SubmitCreate) SetLanguageID(id int) *SubmitCreate {
 	return sc
 }
 
-// SetNillableLanguageID sets the "language" edge to the Language entity by ID if the given value is not nil.
-func (sc *SubmitCreate) SetNillableLanguageID(id *int) *SubmitCreate {
+// SetLanguage sets the "language" edge to the Language entity.
+func (sc *SubmitCreate) SetLanguage(l *Language) *SubmitCreate {
+	return sc.SetLanguageID(l.ID)
+}
+
+// SetContestID sets the "contest" edge to the Contest entity by ID.
+func (sc *SubmitCreate) SetContestID(id int) *SubmitCreate {
+	sc.mutation.SetContestID(id)
+	return sc
+}
+
+// SetNillableContestID sets the "contest" edge to the Contest entity by ID if the given value is not nil.
+func (sc *SubmitCreate) SetNillableContestID(id *int) *SubmitCreate {
 	if id != nil {
-		sc = sc.SetLanguageID(*id)
+		sc = sc.SetContestID(*id)
 	}
 	return sc
 }
 
-// SetLanguage sets the "language" edge to the Language entity.
-func (sc *SubmitCreate) SetLanguage(l *Language) *SubmitCreate {
-	return sc.SetLanguageID(l.ID)
+// SetContest sets the "contest" edge to the Contest entity.
+func (sc *SubmitCreate) SetContest(c *Contest) *SubmitCreate {
+	return sc.SetContestID(c.ID)
 }
 
 // AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by IDs.
@@ -225,6 +221,15 @@ func (sc *SubmitCreate) check() error {
 	}
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Submit.created_at"`)}
+	}
+	if _, ok := sc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Submit.user"`)}
+	}
+	if _, ok := sc.mutation.TaskID(); !ok {
+		return &ValidationError{Name: "task", err: errors.New(`ent: missing required edge "Submit.task"`)}
+	}
+	if _, ok := sc.mutation.LanguageID(); !ok {
+		return &ValidationError{Name: "language", err: errors.New(`ent: missing required edge "Submit.language"`)}
 	}
 	return nil
 }
@@ -336,6 +341,23 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.language_submits = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ContestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   submit.ContestTable,
+			Columns: []string{submit.ContestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.contest_submits = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.TestcaseResultsIDs(); len(nodes) > 0 {

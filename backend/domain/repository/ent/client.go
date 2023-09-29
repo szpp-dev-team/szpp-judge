@@ -1045,6 +1045,22 @@ func (c *SubmitClient) QueryLanguage(s *Submit) *LanguageQuery {
 	return query
 }
 
+// QueryContest queries the contest edge of a Submit.
+func (c *SubmitClient) QueryContest(s *Submit) *ContestQuery {
+	query := (&ContestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(submit.Table, submit.FieldID, id),
+			sqlgraph.To(contest.Table, contest.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, submit.ContestTable, submit.ContestColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryTestcaseResults queries the testcase_results edge of a Submit.
 func (c *SubmitClient) QueryTestcaseResults(s *Submit) *TestcaseResultQuery {
 	query := (&TestcaseResultClient{config: c.config}).Query()

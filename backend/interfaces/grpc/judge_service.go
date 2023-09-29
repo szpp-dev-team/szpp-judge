@@ -5,6 +5,8 @@ import (
 
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/judge"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type judgeServiceServer struct {
@@ -24,6 +26,9 @@ func (s *judgeServiceServer) GetSubmissionDetail(ctx context.Context, req *backe
 }
 
 func (s *judgeServiceServer) ListSubmissions(ctx context.Context, req *backendv1.ListSubmissionsRequest) (*backendv1.ListSubmissionsResponse, error) {
+	if req.ContestId == nil {
+		return nil, status.Error(codes.InvalidArgument, "currently contestID must be set")
+	}
 	return s.interactor.ListSubmissions(ctx, req)
 }
 
