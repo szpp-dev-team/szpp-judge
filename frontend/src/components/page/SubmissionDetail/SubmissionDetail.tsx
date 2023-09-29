@@ -3,10 +3,10 @@ import { JudgeStatus } from "@/src/model/judge";
 import { useRouterSubmissionId } from "@/src/usecases/contest";
 import { useGetSubmissionDetail } from "@/src/usecases/judge";
 import {
-  Box,
   Card,
   CardBody,
   CardHeader,
+  Container,
   Grid,
   GridItem,
   Heading,
@@ -85,7 +85,7 @@ export const SubmissionDetail = () => {
 
   return (
     <>
-      <Box px={16} h="100%">
+      <Container maxW="container.lg">
         <Card px={3} py={4} h="100%" borderRadius={0}>
           <CardHeader>
             <Heading as="h1">提出 #{idStr}</Heading>
@@ -156,7 +156,7 @@ export const SubmissionDetail = () => {
             <Editor doc={submissionDetail?.sourceCode} readonly={true} />
           </CardBody>
         </Card>
-      </Box>
+      </Container>
     </>
   );
 };
