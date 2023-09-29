@@ -9,16 +9,16 @@
     "cleanUrls": true,
     "rewrites": [
       {
-        "page": "/contests/[contest_slug].html",
-        "regex": "^/contests/([^/]+?)(?:/)?$"
+        "regex": "^/contests/([^/]+?)(?:/)?$",
+        "destination": "/contests/[contest_slug].html"
       },
       {
-        "page": "/contests/[contest_slug]/submissions/[submission_id].html",
-        "regex": "^/contests/([^/]+?)/submissions/([^/]+?)(?:/)?$"
+        "regex": "^/contests/([^/]+?)/submissions/([^/]+?)(?:/)?$",
+        "destination": "/contests/[contest_slug]/submissions/[submission_id].html"
       },
       {
-        "page": "/contests/[contest_slug]/tasks.html",
-        "regex": "^/contests/([^/]+?)/tasks(?:/)?$"
+        "regex": "^/contests/([^/]+?)/tasks(?:/)?$",
+        "destination": "/contests/[contest_slug]/tasks.html"
       }
     ]
   }
