@@ -16,6 +16,8 @@ import {
   Tr,
 } from "@chakra-ui/react";
 
+// import 文にフォーマットが入ったけどそれだけでビルドエラーにつながるかね？ 
+
 const ContestTypeToString = (t: ContestType) => {
   if (t == ContestType.OFFICIAL) return "official";
   if (t == ContestType.VIRTUAL) return "virtual";
