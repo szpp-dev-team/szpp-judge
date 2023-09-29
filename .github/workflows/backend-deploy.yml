@@ -49,6 +49,6 @@ jobs:
             --set-env-vars MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
             --set-env-vars MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} \
             --set-env-vars BACKEND_DB_ADDR=${{ secrets.BACKEND_DB_ADDR }} \
-            --set-env-vars BACKEND_JUDGE_ADDR=${{ secrets.BACKEND_DB_PORT }}
+            --set-env-vars BACKEND_JUDGE_ADDR=${{ secrets.BACKEND_JUDGE_ADDR }}
 
           
