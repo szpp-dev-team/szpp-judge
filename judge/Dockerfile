@@ -3,6 +3,10 @@ FROM golang:1.21 AS builder
 WORKDIR /src
 COPY ./proto-gen ./proto-gen
 
+WORKDIR /src/langs
+COPY langs/go.mod ./
+RUN go mod download
+
 WORKDIR /src/judge
 COPY judge/go.mod judge/go.sum ./
 RUN go mod download
