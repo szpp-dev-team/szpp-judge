@@ -3,7 +3,9 @@ package handlejudgetask
 import (
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	_ "github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
@@ -24,7 +26,8 @@ func init() {
 	}
 	judgeConn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("failed to dial with judge-server", slog.String("judgeAddr", config.JudgeAddr))
+		os.Exit(1)
 	}
 	defer judgeConn.Close()
 	judgeClient := judgev1.NewJudgeServiceClient(judgeConn)
