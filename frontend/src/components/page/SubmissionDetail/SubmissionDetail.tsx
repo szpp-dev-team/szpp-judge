@@ -88,10 +88,10 @@ export const SubmissionDetail = () => {
       <Box px={16} h="100%">
         <Card px={3} py={4} h="100%" borderRadius={0}>
           <CardHeader>
-            <Heading as="h1">{`提出 #${idStr}`}</Heading>
+            <Heading as="h1">提出 #{idStr}</Heading>
           </CardHeader>
           <CardBody display="flex" flexDir="column" gap={4}>
-            <Heading as="h2">提出情報</Heading>
+            <Heading as="h2" size={["lg", null, "lg"]}>提出情報</Heading>
             <Grid
               as="dl"
               textAlign="center"
@@ -125,7 +125,7 @@ export const SubmissionDetail = () => {
               <Pair data={["メモリ", `${submissionDetail?.execMemoryKib} KB`]} />
             </Grid>
 
-            <Heading as="h2">ジャッジ結果</Heading>
+            <Heading as="h2" size={["md", null, "lg"]}>ジャッジ結果</Heading>
             <TableContainer>
               <Table variant="bordered-narrow">
                 <Thead>
@@ -152,7 +152,7 @@ export const SubmissionDetail = () => {
                 </Tbody>
               </Table>
             </TableContainer>
-            <Heading as="h2">ソースコード</Heading>
+            <Heading as="h2" size={["md", null, "lg"]}>ソースコード</Heading>
             <Editor doc={submissionDetail?.sourceCode} readonly={true} />
           </CardBody>
         </Card>
