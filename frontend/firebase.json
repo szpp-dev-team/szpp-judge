@@ -7,9 +7,19 @@
       "**/node_modules/**"
     ],
     "cleanUrls": true,
-    "rewrites": [{
-      "regex": "^/contests/([^/]+?)/tasks(?:/)?$",
-      "destination": "/contests/[contest_slug]/tasks.html"
-    }]
+    "rewrites": [
+      {
+        "regex": "^/contests/([^/]+?)(?:/)?$",
+        "destination": "/contests/[contest_slug].html"
+      },
+      {
+        "regex": "^/contests/([^/]+?)/submissions/([^/]+?)(?:/)?$",
+        "destination": "/contests/[contest_slug]/submissions/[submission_id].html"
+      },
+      {
+        "regex": "^/contests/([^/]+?)/tasks(?:/)?$",
+        "destination": "/contests/[contest_slug]/tasks.html"
+      }
+    ]
   }
 }

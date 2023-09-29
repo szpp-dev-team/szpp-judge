@@ -37,6 +37,15 @@ export const useRouterContestSlug = () => {
   return query.contest_slug as string;
 };
 
+/**
+ * URL から 提出 ID を取得
+ * URL に [submission_id] が含まれていないページでは undefined になるので注意
+ */
+export const useRouterSubmissionId = () => {
+  const { query } = useRouter();
+  return query.submission_id as string;
+};
+
 export const useListContests = (input?: PlainMessage<ListContestsRequest>) => {
   const { data, error, isLoading } = useQuery(listContests.useQuery(input));
   const contests = data?.contests;
