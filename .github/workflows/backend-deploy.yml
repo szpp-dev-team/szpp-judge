@@ -44,5 +44,11 @@ jobs:
             --source=. \
             --entry-point=HandleJudgeTask \
             --trigger-http \
-            --no-allow-unauthenticated
+            --no-allow-unauthenticated \
+            --set-env-vars MYSQL_USER=${{ secrets.MYSQL_USER }} \
+            --set-env-vars MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
+            --set-env-vars MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} \
+            --set-env-vars BACKEND_DB_ADDR=${{ secrets.BACKEND_DB_ADDR }} \
+            --set-env-vars BACKEND_JUDGE_ADDR=${{ secrets.BACKEND_DB_PORT }}
+
           
