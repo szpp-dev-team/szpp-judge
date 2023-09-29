@@ -6,20 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Contest is the predicate function for contest builders.
-type Contest func(*sql.Selector)
-
-// ContestTask is the predicate function for contesttask builders.
-type ContestTask func(*sql.Selector)
-
-// ContestUser is the predicate function for contestuser builders.
-type ContestUser func(*sql.Selector)
-
-// Language is the predicate function for language builders.
-type Language func(*sql.Selector)
-
-// Submit is the predicate function for submit builders.
-type Submit func(*sql.Selector)
+// RefreshToken is the predicate function for refreshtoken builders.
+type RefreshToken func(*sql.Selector)
 
 // Task is the predicate function for task builders.
 type Task func(*sql.Selector)

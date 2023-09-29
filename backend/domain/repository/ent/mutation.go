@@ -16,7 +16,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
@@ -33,65 +33,39 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeContest        = "Contest"
-	TypeContestTask    = "ContestTask"
-	TypeContestUser    = "ContestUser"
-	TypeLanguage       = "Language"
-	TypeSubmit         = "Submit"
-	TypeTask           = "Task"
-	TypeTestcase       = "Testcase"
-	TypeTestcaseResult = "TestcaseResult"
-	TypeTestcaseSet    = "TestcaseSet"
-	TypeUser           = "User"
+	TypeRefreshToken = "RefreshToken"
+	TypeTask         = "Task"
+	TypeTestcase     = "Testcase"
+	TypeTestcaseSet  = "TestcaseSet"
+	TypeUser         = "User"
 )
 
-// ContestMutation represents an operation that mutates the Contest nodes in the graph.
-type ContestMutation struct {
+// RefreshTokenMutation represents an operation that mutates the RefreshToken nodes in the graph.
+type RefreshTokenMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	name                *string
-	slug                *string
-	description         *string
-	penalty_seconds     *int
-	addpenalty_seconds  *int
-	contest_type        *string
-	is_public           *bool
-	start_at            *time.Time
-	end_at              *time.Time
-	clearedFields       map[string]struct{}
-	submits             map[int]struct{}
-	removedsubmits      map[int]struct{}
-	clearedsubmits      bool
-	users               map[int]struct{}
-	removedusers        map[int]struct{}
-	clearedusers        bool
-	tasks               map[int]struct{}
-	removedtasks        map[int]struct{}
-	clearedtasks        bool
-	contest_user        map[int]struct{}
-	removedcontest_user map[int]struct{}
-	clearedcontest_user bool
-	contest_task        map[int]struct{}
-	removedcontest_task map[int]struct{}
-	clearedcontest_task bool
-	done                bool
-	oldValue            func(context.Context) (*Contest, error)
-	predicates          []predicate.Contest
+	op            Op
+	typ           string
+	id            *int
+	token         *string
+	expires_at    *time.Time
+	is_dead       *bool
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*RefreshToken, error)
+	predicates    []predicate.RefreshToken
 }
 
-var _ ent.Mutation = (*ContestMutation)(nil)
+var _ ent.Mutation = (*RefreshTokenMutation)(nil)
 
-// contestOption allows management of the mutation configuration using functional options.
-type contestOption func(*ContestMutation)
+// refreshtokenOption allows management of the mutation configuration using functional options.
+type refreshtokenOption func(*RefreshTokenMutation)
 
-// newContestMutation creates new mutation for the Contest entity.
-func newContestMutation(c config, op Op, opts ...contestOption) *ContestMutation {
-	m := &ContestMutation{
+// newRefreshTokenMutation creates new mutation for the RefreshToken entity.
+func newRefreshTokenMutation(c config, op Op, opts ...refreshtokenOption) *RefreshTokenMutation {
+	m := &RefreshTokenMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeContest,
+		typ:           TypeRefreshToken,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -100,20 +74,20 @@ func newContestMutation(c config, op Op, opts ...contestOption) *ContestMutation
 	return m
 }
 
-// withContestID sets the ID field of the mutation.
-func withContestID(id int) contestOption {
-	return func(m *ContestMutation) {
+// withRefreshTokenID sets the ID field of the mutation.
+func withRefreshTokenID(id int) refreshtokenOption {
+	return func(m *RefreshTokenMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Contest
+			value *RefreshToken
 		)
-		m.oldValue = func(ctx context.Context) (*Contest, error) {
+		m.oldValue = func(ctx context.Context) (*RefreshToken, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Contest.Get(ctx, id)
+					value, err = m.Client().RefreshToken.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -122,10 +96,10 @@ func withContestID(id int) contestOption {
 	}
 }
 
-// withContest sets the old Contest of the mutation.
-func withContest(node *Contest) contestOption {
-	return func(m *ContestMutation) {
-		m.oldValue = func(context.Context) (*Contest, error) {
+// withRefreshToken sets the old RefreshToken of the mutation.
+func withRefreshToken(node *RefreshToken) refreshtokenOption {
+	return func(m *RefreshTokenMutation) {
+		m.oldValue = func(context.Context) (*RefreshToken, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -134,7 +108,7 @@ func withContest(node *Contest) contestOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ContestMutation) Client() *Client {
+func (m RefreshTokenMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -142,7 +116,7 @@ func (m ContestMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m ContestMutation) Tx() (*Tx, error) {
+func (m RefreshTokenMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -151,15 +125,9 @@ func (m ContestMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Contest entities.
-func (m *ContestMutation) SetID(id int) {
-	m.id = &id
-}
-
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ContestMutation) ID() (id int, exists bool) {
+func (m *RefreshTokenMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -170,7 +138,7 @@ func (m *ContestMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ContestMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *RefreshTokenMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -179,599 +147,129 @@ func (m *ContestMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Contest.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().RefreshToken.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// SetName sets the "name" field.
-func (m *ContestMutation) SetName(s string) {
-	m.name = &s
+// SetToken sets the "token" field.
+func (m *RefreshTokenMutation) SetToken(s string) {
+	m.token = &s
 }
 
-// Name returns the value of the "name" field in the mutation.
-func (m *ContestMutation) Name() (r string, exists bool) {
-	v := m.name
+// Token returns the value of the "token" field in the mutation.
+func (m *RefreshTokenMutation) Token() (r string, exists bool) {
+	v := m.token
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the Contest entity.
-// If the Contest object wasn't provided to the builder, the object is fetched from the database.
+// OldToken returns the old "token" field's value of the RefreshToken entity.
+// If the RefreshToken object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *RefreshTokenMutation) OldToken(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
+		return v, errors.New("OldToken is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
+		return v, errors.New("OldToken requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
+		return v, fmt.Errorf("querying old value for OldToken: %w", err)
 	}
-	return oldValue.Name, nil
+	return oldValue.Token, nil
 }
 
-// ResetName resets all changes to the "name" field.
-func (m *ContestMutation) ResetName() {
-	m.name = nil
+// ResetToken resets all changes to the "token" field.
+func (m *RefreshTokenMutation) ResetToken() {
+	m.token = nil
 }
 
-// SetSlug sets the "slug" field.
-func (m *ContestMutation) SetSlug(s string) {
-	m.slug = &s
+// SetExpiresAt sets the "expires_at" field.
+func (m *RefreshTokenMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
 }
 
-// Slug returns the value of the "slug" field in the mutation.
-func (m *ContestMutation) Slug() (r string, exists bool) {
-	v := m.slug
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *RefreshTokenMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSlug returns the old "slug" field's value of the Contest entity.
-// If the Contest object wasn't provided to the builder, the object is fetched from the database.
+// OldExpiresAt returns the old "expires_at" field's value of the RefreshToken entity.
+// If the RefreshToken object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestMutation) OldSlug(ctx context.Context) (v string, err error) {
+func (m *RefreshTokenMutation) OldExpiresAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSlug requires an ID field in the mutation")
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
 	}
-	return oldValue.Slug, nil
+	return oldValue.ExpiresAt, nil
 }
 
-// ResetSlug resets all changes to the "slug" field.
-func (m *ContestMutation) ResetSlug() {
-	m.slug = nil
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *RefreshTokenMutation) ResetExpiresAt() {
+	m.expires_at = nil
 }
 
-// SetDescription sets the "description" field.
-func (m *ContestMutation) SetDescription(s string) {
-	m.description = &s
+// SetIsDead sets the "is_dead" field.
+func (m *RefreshTokenMutation) SetIsDead(b bool) {
+	m.is_dead = &b
 }
 
-// Description returns the value of the "description" field in the mutation.
-func (m *ContestMutation) Description() (r string, exists bool) {
-	v := m.description
+// IsDead returns the value of the "is_dead" field in the mutation.
+func (m *RefreshTokenMutation) IsDead() (r bool, exists bool) {
+	v := m.is_dead
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldDescription returns the old "description" field's value of the Contest entity.
-// If the Contest object wasn't provided to the builder, the object is fetched from the database.
+// OldIsDead returns the old "is_dead" field's value of the RefreshToken entity.
+// If the RefreshToken object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *RefreshTokenMutation) OldIsDead(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsDead is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDescription requires an ID field in the mutation")
+		return v, errors.New("OldIsDead requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsDead: %w", err)
 	}
-	return oldValue.Description, nil
+	return oldValue.IsDead, nil
 }
 
-// ResetDescription resets all changes to the "description" field.
-func (m *ContestMutation) ResetDescription() {
-	m.description = nil
+// ResetIsDead resets all changes to the "is_dead" field.
+func (m *RefreshTokenMutation) ResetIsDead() {
+	m.is_dead = nil
 }
 
-// SetPenaltySeconds sets the "penalty_seconds" field.
-func (m *ContestMutation) SetPenaltySeconds(i int) {
-	m.penalty_seconds = &i
-	m.addpenalty_seconds = nil
-}
-
-// PenaltySeconds returns the value of the "penalty_seconds" field in the mutation.
-func (m *ContestMutation) PenaltySeconds() (r int, exists bool) {
-	v := m.penalty_seconds
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPenaltySeconds returns the old "penalty_seconds" field's value of the Contest entity.
-// If the Contest object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestMutation) OldPenaltySeconds(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPenaltySeconds is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPenaltySeconds requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPenaltySeconds: %w", err)
-	}
-	return oldValue.PenaltySeconds, nil
-}
-
-// AddPenaltySeconds adds i to the "penalty_seconds" field.
-func (m *ContestMutation) AddPenaltySeconds(i int) {
-	if m.addpenalty_seconds != nil {
-		*m.addpenalty_seconds += i
-	} else {
-		m.addpenalty_seconds = &i
-	}
-}
-
-// AddedPenaltySeconds returns the value that was added to the "penalty_seconds" field in this mutation.
-func (m *ContestMutation) AddedPenaltySeconds() (r int, exists bool) {
-	v := m.addpenalty_seconds
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetPenaltySeconds resets all changes to the "penalty_seconds" field.
-func (m *ContestMutation) ResetPenaltySeconds() {
-	m.penalty_seconds = nil
-	m.addpenalty_seconds = nil
-}
-
-// SetContestType sets the "contest_type" field.
-func (m *ContestMutation) SetContestType(s string) {
-	m.contest_type = &s
-}
-
-// ContestType returns the value of the "contest_type" field in the mutation.
-func (m *ContestMutation) ContestType() (r string, exists bool) {
-	v := m.contest_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldContestType returns the old "contest_type" field's value of the Contest entity.
-// If the Contest object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestMutation) OldContestType(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldContestType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldContestType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldContestType: %w", err)
-	}
-	return oldValue.ContestType, nil
-}
-
-// ResetContestType resets all changes to the "contest_type" field.
-func (m *ContestMutation) ResetContestType() {
-	m.contest_type = nil
-}
-
-// SetIsPublic sets the "is_public" field.
-func (m *ContestMutation) SetIsPublic(b bool) {
-	m.is_public = &b
-}
-
-// IsPublic returns the value of the "is_public" field in the mutation.
-func (m *ContestMutation) IsPublic() (r bool, exists bool) {
-	v := m.is_public
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsPublic returns the old "is_public" field's value of the Contest entity.
-// If the Contest object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestMutation) OldIsPublic(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsPublic is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsPublic requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsPublic: %w", err)
-	}
-	return oldValue.IsPublic, nil
-}
-
-// ResetIsPublic resets all changes to the "is_public" field.
-func (m *ContestMutation) ResetIsPublic() {
-	m.is_public = nil
-}
-
-// SetStartAt sets the "start_at" field.
-func (m *ContestMutation) SetStartAt(t time.Time) {
-	m.start_at = &t
-}
-
-// StartAt returns the value of the "start_at" field in the mutation.
-func (m *ContestMutation) StartAt() (r time.Time, exists bool) {
-	v := m.start_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStartAt returns the old "start_at" field's value of the Contest entity.
-// If the Contest object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestMutation) OldStartAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStartAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStartAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStartAt: %w", err)
-	}
-	return oldValue.StartAt, nil
-}
-
-// ResetStartAt resets all changes to the "start_at" field.
-func (m *ContestMutation) ResetStartAt() {
-	m.start_at = nil
-}
-
-// SetEndAt sets the "end_at" field.
-func (m *ContestMutation) SetEndAt(t time.Time) {
-	m.end_at = &t
-}
-
-// EndAt returns the value of the "end_at" field in the mutation.
-func (m *ContestMutation) EndAt() (r time.Time, exists bool) {
-	v := m.end_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEndAt returns the old "end_at" field's value of the Contest entity.
-// If the Contest object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestMutation) OldEndAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEndAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEndAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEndAt: %w", err)
-	}
-	return oldValue.EndAt, nil
-}
-
-// ResetEndAt resets all changes to the "end_at" field.
-func (m *ContestMutation) ResetEndAt() {
-	m.end_at = nil
-}
-
-// AddSubmitIDs adds the "submits" edge to the Submit entity by ids.
-func (m *ContestMutation) AddSubmitIDs(ids ...int) {
-	if m.submits == nil {
-		m.submits = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.submits[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSubmits clears the "submits" edge to the Submit entity.
-func (m *ContestMutation) ClearSubmits() {
-	m.clearedsubmits = true
-}
-
-// SubmitsCleared reports if the "submits" edge to the Submit entity was cleared.
-func (m *ContestMutation) SubmitsCleared() bool {
-	return m.clearedsubmits
-}
-
-// RemoveSubmitIDs removes the "submits" edge to the Submit entity by IDs.
-func (m *ContestMutation) RemoveSubmitIDs(ids ...int) {
-	if m.removedsubmits == nil {
-		m.removedsubmits = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.submits, ids[i])
-		m.removedsubmits[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubmits returns the removed IDs of the "submits" edge to the Submit entity.
-func (m *ContestMutation) RemovedSubmitsIDs() (ids []int) {
-	for id := range m.removedsubmits {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SubmitsIDs returns the "submits" edge IDs in the mutation.
-func (m *ContestMutation) SubmitsIDs() (ids []int) {
-	for id := range m.submits {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSubmits resets all changes to the "submits" edge.
-func (m *ContestMutation) ResetSubmits() {
-	m.submits = nil
-	m.clearedsubmits = false
-	m.removedsubmits = nil
-}
-
-// AddUserIDs adds the "users" edge to the User entity by ids.
-func (m *ContestMutation) AddUserIDs(ids ...int) {
-	if m.users == nil {
-		m.users = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.users[ids[i]] = struct{}{}
-	}
-}
-
-// ClearUsers clears the "users" edge to the User entity.
-func (m *ContestMutation) ClearUsers() {
-	m.clearedusers = true
-}
-
-// UsersCleared reports if the "users" edge to the User entity was cleared.
-func (m *ContestMutation) UsersCleared() bool {
-	return m.clearedusers
-}
-
-// RemoveUserIDs removes the "users" edge to the User entity by IDs.
-func (m *ContestMutation) RemoveUserIDs(ids ...int) {
-	if m.removedusers == nil {
-		m.removedusers = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.users, ids[i])
-		m.removedusers[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedUsers returns the removed IDs of the "users" edge to the User entity.
-func (m *ContestMutation) RemovedUsersIDs() (ids []int) {
-	for id := range m.removedusers {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// UsersIDs returns the "users" edge IDs in the mutation.
-func (m *ContestMutation) UsersIDs() (ids []int) {
-	for id := range m.users {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetUsers resets all changes to the "users" edge.
-func (m *ContestMutation) ResetUsers() {
-	m.users = nil
-	m.clearedusers = false
-	m.removedusers = nil
-}
-
-// AddTaskIDs adds the "tasks" edge to the Task entity by ids.
-func (m *ContestMutation) AddTaskIDs(ids ...int) {
-	if m.tasks == nil {
-		m.tasks = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.tasks[ids[i]] = struct{}{}
-	}
-}
-
-// ClearTasks clears the "tasks" edge to the Task entity.
-func (m *ContestMutation) ClearTasks() {
-	m.clearedtasks = true
-}
-
-// TasksCleared reports if the "tasks" edge to the Task entity was cleared.
-func (m *ContestMutation) TasksCleared() bool {
-	return m.clearedtasks
-}
-
-// RemoveTaskIDs removes the "tasks" edge to the Task entity by IDs.
-func (m *ContestMutation) RemoveTaskIDs(ids ...int) {
-	if m.removedtasks == nil {
-		m.removedtasks = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.tasks, ids[i])
-		m.removedtasks[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTasks returns the removed IDs of the "tasks" edge to the Task entity.
-func (m *ContestMutation) RemovedTasksIDs() (ids []int) {
-	for id := range m.removedtasks {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// TasksIDs returns the "tasks" edge IDs in the mutation.
-func (m *ContestMutation) TasksIDs() (ids []int) {
-	for id := range m.tasks {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetTasks resets all changes to the "tasks" edge.
-func (m *ContestMutation) ResetTasks() {
-	m.tasks = nil
-	m.clearedtasks = false
-	m.removedtasks = nil
-}
-
-// AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by ids.
-func (m *ContestMutation) AddContestUserIDs(ids ...int) {
-	if m.contest_user == nil {
-		m.contest_user = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.contest_user[ids[i]] = struct{}{}
-	}
-}
-
-// ClearContestUser clears the "contest_user" edge to the ContestUser entity.
-func (m *ContestMutation) ClearContestUser() {
-	m.clearedcontest_user = true
-}
-
-// ContestUserCleared reports if the "contest_user" edge to the ContestUser entity was cleared.
-func (m *ContestMutation) ContestUserCleared() bool {
-	return m.clearedcontest_user
-}
-
-// RemoveContestUserIDs removes the "contest_user" edge to the ContestUser entity by IDs.
-func (m *ContestMutation) RemoveContestUserIDs(ids ...int) {
-	if m.removedcontest_user == nil {
-		m.removedcontest_user = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.contest_user, ids[i])
-		m.removedcontest_user[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedContestUser returns the removed IDs of the "contest_user" edge to the ContestUser entity.
-func (m *ContestMutation) RemovedContestUserIDs() (ids []int) {
-	for id := range m.removedcontest_user {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ContestUserIDs returns the "contest_user" edge IDs in the mutation.
-func (m *ContestMutation) ContestUserIDs() (ids []int) {
-	for id := range m.contest_user {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetContestUser resets all changes to the "contest_user" edge.
-func (m *ContestMutation) ResetContestUser() {
-	m.contest_user = nil
-	m.clearedcontest_user = false
-	m.removedcontest_user = nil
-}
-
-// AddContestTaskIDs adds the "contest_task" edge to the ContestTask entity by ids.
-func (m *ContestMutation) AddContestTaskIDs(ids ...int) {
-	if m.contest_task == nil {
-		m.contest_task = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.contest_task[ids[i]] = struct{}{}
-	}
-}
-
-// ClearContestTask clears the "contest_task" edge to the ContestTask entity.
-func (m *ContestMutation) ClearContestTask() {
-	m.clearedcontest_task = true
-}
-
-// ContestTaskCleared reports if the "contest_task" edge to the ContestTask entity was cleared.
-func (m *ContestMutation) ContestTaskCleared() bool {
-	return m.clearedcontest_task
-}
-
-// RemoveContestTaskIDs removes the "contest_task" edge to the ContestTask entity by IDs.
-func (m *ContestMutation) RemoveContestTaskIDs(ids ...int) {
-	if m.removedcontest_task == nil {
-		m.removedcontest_task = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.contest_task, ids[i])
-		m.removedcontest_task[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedContestTask returns the removed IDs of the "contest_task" edge to the ContestTask entity.
-func (m *ContestMutation) RemovedContestTaskIDs() (ids []int) {
-	for id := range m.removedcontest_task {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ContestTaskIDs returns the "contest_task" edge IDs in the mutation.
-func (m *ContestMutation) ContestTaskIDs() (ids []int) {
-	for id := range m.contest_task {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetContestTask resets all changes to the "contest_task" edge.
-func (m *ContestMutation) ResetContestTask() {
-	m.contest_task = nil
-	m.clearedcontest_task = false
-	m.removedcontest_task = nil
-}
-
-// Where appends a list predicates to the ContestMutation builder.
-func (m *ContestMutation) Where(ps ...predicate.Contest) {
+// Where appends a list predicates to the RefreshTokenMutation builder.
+func (m *RefreshTokenMutation) Where(ps ...predicate.RefreshToken) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the ContestMutation builder. Using this method,
+// WhereP appends storage-level predicates to the RefreshTokenMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ContestMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Contest, len(ps))
+func (m *RefreshTokenMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RefreshToken, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -779,48 +277,33 @@ func (m *ContestMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *ContestMutation) Op() Op {
+func (m *RefreshTokenMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *ContestMutation) SetOp(op Op) {
+func (m *RefreshTokenMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (Contest).
-func (m *ContestMutation) Type() string {
+// Type returns the node type of this mutation (RefreshToken).
+func (m *RefreshTokenMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *ContestMutation) Fields() []string {
-	fields := make([]string, 0, 8)
-	if m.name != nil {
-		fields = append(fields, contest.FieldName)
+func (m *RefreshTokenMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.token != nil {
+		fields = append(fields, refreshtoken.FieldToken)
 	}
-	if m.slug != nil {
-		fields = append(fields, contest.FieldSlug)
+	if m.expires_at != nil {
+		fields = append(fields, refreshtoken.FieldExpiresAt)
 	}
-	if m.description != nil {
-		fields = append(fields, contest.FieldDescription)
-	}
-	if m.penalty_seconds != nil {
-		fields = append(fields, contest.FieldPenaltySeconds)
-	}
-	if m.contest_type != nil {
-		fields = append(fields, contest.FieldContestType)
-	}
-	if m.is_public != nil {
-		fields = append(fields, contest.FieldIsPublic)
-	}
-	if m.start_at != nil {
-		fields = append(fields, contest.FieldStartAt)
-	}
-	if m.end_at != nil {
-		fields = append(fields, contest.FieldEndAt)
+	if m.is_dead != nil {
+		fields = append(fields, refreshtoken.FieldIsDead)
 	}
 	return fields
 }
@@ -828,24 +311,14 @@ func (m *ContestMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *ContestMutation) Field(name string) (ent.Value, bool) {
+func (m *RefreshTokenMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case contest.FieldName:
-		return m.Name()
-	case contest.FieldSlug:
-		return m.Slug()
-	case contest.FieldDescription:
-		return m.Description()
-	case contest.FieldPenaltySeconds:
-		return m.PenaltySeconds()
-	case contest.FieldContestType:
-		return m.ContestType()
-	case contest.FieldIsPublic:
-		return m.IsPublic()
-	case contest.FieldStartAt:
-		return m.StartAt()
-	case contest.FieldEndAt:
-		return m.EndAt()
+	case refreshtoken.FieldToken:
+		return m.Token()
+	case refreshtoken.FieldExpiresAt:
+		return m.ExpiresAt()
+	case refreshtoken.FieldIsDead:
+		return m.IsDead()
 	}
 	return nil, false
 }
@@ -853,3177 +326,152 @@ func (m *ContestMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *ContestMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *RefreshTokenMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case contest.FieldName:
-		return m.OldName(ctx)
-	case contest.FieldSlug:
-		return m.OldSlug(ctx)
-	case contest.FieldDescription:
-		return m.OldDescription(ctx)
-	case contest.FieldPenaltySeconds:
-		return m.OldPenaltySeconds(ctx)
-	case contest.FieldContestType:
-		return m.OldContestType(ctx)
-	case contest.FieldIsPublic:
-		return m.OldIsPublic(ctx)
-	case contest.FieldStartAt:
-		return m.OldStartAt(ctx)
-	case contest.FieldEndAt:
-		return m.OldEndAt(ctx)
+	case refreshtoken.FieldToken:
+		return m.OldToken(ctx)
+	case refreshtoken.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
+	case refreshtoken.FieldIsDead:
+		return m.OldIsDead(ctx)
 	}
-	return nil, fmt.Errorf("unknown Contest field %s", name)
+	return nil, fmt.Errorf("unknown RefreshToken field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *ContestMutation) SetField(name string, value ent.Value) error {
+func (m *RefreshTokenMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case contest.FieldName:
+	case refreshtoken.FieldToken:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetName(v)
+		m.SetToken(v)
 		return nil
-	case contest.FieldSlug:
-		v, ok := value.(string)
+	case refreshtoken.FieldExpiresAt:
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSlug(v)
+		m.SetExpiresAt(v)
 		return nil
-	case contest.FieldDescription:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDescription(v)
-		return nil
-	case contest.FieldPenaltySeconds:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPenaltySeconds(v)
-		return nil
-	case contest.FieldContestType:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetContestType(v)
-		return nil
-	case contest.FieldIsPublic:
+	case refreshtoken.FieldIsDead:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIsPublic(v)
-		return nil
-	case contest.FieldStartAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetStartAt(v)
-		return nil
-	case contest.FieldEndAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEndAt(v)
+		m.SetIsDead(v)
 		return nil
 	}
-	return fmt.Errorf("unknown Contest field %s", name)
+	return fmt.Errorf("unknown RefreshToken field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *ContestMutation) AddedFields() []string {
-	var fields []string
-	if m.addpenalty_seconds != nil {
-		fields = append(fields, contest.FieldPenaltySeconds)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ContestMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case contest.FieldPenaltySeconds:
-		return m.AddedPenaltySeconds()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ContestMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case contest.FieldPenaltySeconds:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddPenaltySeconds(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Contest numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ContestMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ContestMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ContestMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Contest nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ContestMutation) ResetField(name string) error {
-	switch name {
-	case contest.FieldName:
-		m.ResetName()
-		return nil
-	case contest.FieldSlug:
-		m.ResetSlug()
-		return nil
-	case contest.FieldDescription:
-		m.ResetDescription()
-		return nil
-	case contest.FieldPenaltySeconds:
-		m.ResetPenaltySeconds()
-		return nil
-	case contest.FieldContestType:
-		m.ResetContestType()
-		return nil
-	case contest.FieldIsPublic:
-		m.ResetIsPublic()
-		return nil
-	case contest.FieldStartAt:
-		m.ResetStartAt()
-		return nil
-	case contest.FieldEndAt:
-		m.ResetEndAt()
-		return nil
-	}
-	return fmt.Errorf("unknown Contest field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ContestMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.submits != nil {
-		edges = append(edges, contest.EdgeSubmits)
-	}
-	if m.users != nil {
-		edges = append(edges, contest.EdgeUsers)
-	}
-	if m.tasks != nil {
-		edges = append(edges, contest.EdgeTasks)
-	}
-	if m.contest_user != nil {
-		edges = append(edges, contest.EdgeContestUser)
-	}
-	if m.contest_task != nil {
-		edges = append(edges, contest.EdgeContestTask)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ContestMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case contest.EdgeSubmits:
-		ids := make([]ent.Value, 0, len(m.submits))
-		for id := range m.submits {
-			ids = append(ids, id)
-		}
-		return ids
-	case contest.EdgeUsers:
-		ids := make([]ent.Value, 0, len(m.users))
-		for id := range m.users {
-			ids = append(ids, id)
-		}
-		return ids
-	case contest.EdgeTasks:
-		ids := make([]ent.Value, 0, len(m.tasks))
-		for id := range m.tasks {
-			ids = append(ids, id)
-		}
-		return ids
-	case contest.EdgeContestUser:
-		ids := make([]ent.Value, 0, len(m.contest_user))
-		for id := range m.contest_user {
-			ids = append(ids, id)
-		}
-		return ids
-	case contest.EdgeContestTask:
-		ids := make([]ent.Value, 0, len(m.contest_task))
-		for id := range m.contest_task {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ContestMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.removedsubmits != nil {
-		edges = append(edges, contest.EdgeSubmits)
-	}
-	if m.removedusers != nil {
-		edges = append(edges, contest.EdgeUsers)
-	}
-	if m.removedtasks != nil {
-		edges = append(edges, contest.EdgeTasks)
-	}
-	if m.removedcontest_user != nil {
-		edges = append(edges, contest.EdgeContestUser)
-	}
-	if m.removedcontest_task != nil {
-		edges = append(edges, contest.EdgeContestTask)
-	}
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ContestMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case contest.EdgeSubmits:
-		ids := make([]ent.Value, 0, len(m.removedsubmits))
-		for id := range m.removedsubmits {
-			ids = append(ids, id)
-		}
-		return ids
-	case contest.EdgeUsers:
-		ids := make([]ent.Value, 0, len(m.removedusers))
-		for id := range m.removedusers {
-			ids = append(ids, id)
-		}
-		return ids
-	case contest.EdgeTasks:
-		ids := make([]ent.Value, 0, len(m.removedtasks))
-		for id := range m.removedtasks {
-			ids = append(ids, id)
-		}
-		return ids
-	case contest.EdgeContestUser:
-		ids := make([]ent.Value, 0, len(m.removedcontest_user))
-		for id := range m.removedcontest_user {
-			ids = append(ids, id)
-		}
-		return ids
-	case contest.EdgeContestTask:
-		ids := make([]ent.Value, 0, len(m.removedcontest_task))
-		for id := range m.removedcontest_task {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ContestMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.clearedsubmits {
-		edges = append(edges, contest.EdgeSubmits)
-	}
-	if m.clearedusers {
-		edges = append(edges, contest.EdgeUsers)
-	}
-	if m.clearedtasks {
-		edges = append(edges, contest.EdgeTasks)
-	}
-	if m.clearedcontest_user {
-		edges = append(edges, contest.EdgeContestUser)
-	}
-	if m.clearedcontest_task {
-		edges = append(edges, contest.EdgeContestTask)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ContestMutation) EdgeCleared(name string) bool {
-	switch name {
-	case contest.EdgeSubmits:
-		return m.clearedsubmits
-	case contest.EdgeUsers:
-		return m.clearedusers
-	case contest.EdgeTasks:
-		return m.clearedtasks
-	case contest.EdgeContestUser:
-		return m.clearedcontest_user
-	case contest.EdgeContestTask:
-		return m.clearedcontest_task
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ContestMutation) ClearEdge(name string) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Contest unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ContestMutation) ResetEdge(name string) error {
-	switch name {
-	case contest.EdgeSubmits:
-		m.ResetSubmits()
-		return nil
-	case contest.EdgeUsers:
-		m.ResetUsers()
-		return nil
-	case contest.EdgeTasks:
-		m.ResetTasks()
-		return nil
-	case contest.EdgeContestUser:
-		m.ResetContestUser()
-		return nil
-	case contest.EdgeContestTask:
-		m.ResetContestTask()
-		return nil
-	}
-	return fmt.Errorf("unknown Contest edge %s", name)
-}
-
-// ContestTaskMutation represents an operation that mutates the ContestTask nodes in the graph.
-type ContestTaskMutation struct {
-	config
-	op             Op
-	typ            string
-	id             *int
-	score          *int
-	addscore       *int
-	_order         *int
-	add_order      *int
-	clearedFields  map[string]struct{}
-	contest        *int
-	clearedcontest bool
-	task           *int
-	clearedtask    bool
-	done           bool
-	oldValue       func(context.Context) (*ContestTask, error)
-	predicates     []predicate.ContestTask
-}
-
-var _ ent.Mutation = (*ContestTaskMutation)(nil)
-
-// contesttaskOption allows management of the mutation configuration using functional options.
-type contesttaskOption func(*ContestTaskMutation)
-
-// newContestTaskMutation creates new mutation for the ContestTask entity.
-func newContestTaskMutation(c config, op Op, opts ...contesttaskOption) *ContestTaskMutation {
-	m := &ContestTaskMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeContestTask,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withContestTaskID sets the ID field of the mutation.
-func withContestTaskID(id int) contesttaskOption {
-	return func(m *ContestTaskMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *ContestTask
-		)
-		m.oldValue = func(ctx context.Context) (*ContestTask, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().ContestTask.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withContestTask sets the old ContestTask of the mutation.
-func withContestTask(node *ContestTask) contesttaskOption {
-	return func(m *ContestTaskMutation) {
-		m.oldValue = func(context.Context) (*ContestTask, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ContestTaskMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m ContestTaskMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of ContestTask entities.
-func (m *ContestTaskMutation) SetID(id int) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *ContestTaskMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *ContestTaskMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().ContestTask.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetScore sets the "score" field.
-func (m *ContestTaskMutation) SetScore(i int) {
-	m.score = &i
-	m.addscore = nil
-}
-
-// Score returns the value of the "score" field in the mutation.
-func (m *ContestTaskMutation) Score() (r int, exists bool) {
-	v := m.score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldScore returns the old "score" field's value of the ContestTask entity.
-// If the ContestTask object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestTaskMutation) OldScore(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldScore: %w", err)
-	}
-	return oldValue.Score, nil
-}
-
-// AddScore adds i to the "score" field.
-func (m *ContestTaskMutation) AddScore(i int) {
-	if m.addscore != nil {
-		*m.addscore += i
-	} else {
-		m.addscore = &i
-	}
-}
-
-// AddedScore returns the value that was added to the "score" field in this mutation.
-func (m *ContestTaskMutation) AddedScore() (r int, exists bool) {
-	v := m.addscore
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetScore resets all changes to the "score" field.
-func (m *ContestTaskMutation) ResetScore() {
-	m.score = nil
-	m.addscore = nil
-}
-
-// SetOrder sets the "order" field.
-func (m *ContestTaskMutation) SetOrder(i int) {
-	m._order = &i
-	m.add_order = nil
-}
-
-// Order returns the value of the "order" field in the mutation.
-func (m *ContestTaskMutation) Order() (r int, exists bool) {
-	v := m._order
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldOrder returns the old "order" field's value of the ContestTask entity.
-// If the ContestTask object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestTaskMutation) OldOrder(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOrder is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOrder requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOrder: %w", err)
-	}
-	return oldValue.Order, nil
-}
-
-// AddOrder adds i to the "order" field.
-func (m *ContestTaskMutation) AddOrder(i int) {
-	if m.add_order != nil {
-		*m.add_order += i
-	} else {
-		m.add_order = &i
-	}
-}
-
-// AddedOrder returns the value that was added to the "order" field in this mutation.
-func (m *ContestTaskMutation) AddedOrder() (r int, exists bool) {
-	v := m.add_order
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetOrder resets all changes to the "order" field.
-func (m *ContestTaskMutation) ResetOrder() {
-	m._order = nil
-	m.add_order = nil
-}
-
-// SetContestID sets the "contest_id" field.
-func (m *ContestTaskMutation) SetContestID(i int) {
-	m.contest = &i
-}
-
-// ContestID returns the value of the "contest_id" field in the mutation.
-func (m *ContestTaskMutation) ContestID() (r int, exists bool) {
-	v := m.contest
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldContestID returns the old "contest_id" field's value of the ContestTask entity.
-// If the ContestTask object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestTaskMutation) OldContestID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldContestID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldContestID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldContestID: %w", err)
-	}
-	return oldValue.ContestID, nil
-}
-
-// ResetContestID resets all changes to the "contest_id" field.
-func (m *ContestTaskMutation) ResetContestID() {
-	m.contest = nil
-}
-
-// SetTaskID sets the "task_id" field.
-func (m *ContestTaskMutation) SetTaskID(i int) {
-	m.task = &i
-}
-
-// TaskID returns the value of the "task_id" field in the mutation.
-func (m *ContestTaskMutation) TaskID() (r int, exists bool) {
-	v := m.task
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTaskID returns the old "task_id" field's value of the ContestTask entity.
-// If the ContestTask object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestTaskMutation) OldTaskID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTaskID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTaskID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTaskID: %w", err)
-	}
-	return oldValue.TaskID, nil
-}
-
-// ResetTaskID resets all changes to the "task_id" field.
-func (m *ContestTaskMutation) ResetTaskID() {
-	m.task = nil
-}
-
-// ClearContest clears the "contest" edge to the Contest entity.
-func (m *ContestTaskMutation) ClearContest() {
-	m.clearedcontest = true
-}
-
-// ContestCleared reports if the "contest" edge to the Contest entity was cleared.
-func (m *ContestTaskMutation) ContestCleared() bool {
-	return m.clearedcontest
-}
-
-// ContestIDs returns the "contest" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ContestID instead. It exists only for internal usage by the builders.
-func (m *ContestTaskMutation) ContestIDs() (ids []int) {
-	if id := m.contest; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetContest resets all changes to the "contest" edge.
-func (m *ContestTaskMutation) ResetContest() {
-	m.contest = nil
-	m.clearedcontest = false
-}
-
-// ClearTask clears the "task" edge to the Task entity.
-func (m *ContestTaskMutation) ClearTask() {
-	m.clearedtask = true
-}
-
-// TaskCleared reports if the "task" edge to the Task entity was cleared.
-func (m *ContestTaskMutation) TaskCleared() bool {
-	return m.clearedtask
-}
-
-// TaskIDs returns the "task" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// TaskID instead. It exists only for internal usage by the builders.
-func (m *ContestTaskMutation) TaskIDs() (ids []int) {
-	if id := m.task; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetTask resets all changes to the "task" edge.
-func (m *ContestTaskMutation) ResetTask() {
-	m.task = nil
-	m.clearedtask = false
-}
-
-// Where appends a list predicates to the ContestTaskMutation builder.
-func (m *ContestTaskMutation) Where(ps ...predicate.ContestTask) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the ContestTaskMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ContestTaskMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.ContestTask, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *ContestTaskMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *ContestTaskMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (ContestTask).
-func (m *ContestTaskMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *ContestTaskMutation) Fields() []string {
-	fields := make([]string, 0, 4)
-	if m.score != nil {
-		fields = append(fields, contesttask.FieldScore)
-	}
-	if m._order != nil {
-		fields = append(fields, contesttask.FieldOrder)
-	}
-	if m.contest != nil {
-		fields = append(fields, contesttask.FieldContestID)
-	}
-	if m.task != nil {
-		fields = append(fields, contesttask.FieldTaskID)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *ContestTaskMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case contesttask.FieldScore:
-		return m.Score()
-	case contesttask.FieldOrder:
-		return m.Order()
-	case contesttask.FieldContestID:
-		return m.ContestID()
-	case contesttask.FieldTaskID:
-		return m.TaskID()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *ContestTaskMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case contesttask.FieldScore:
-		return m.OldScore(ctx)
-	case contesttask.FieldOrder:
-		return m.OldOrder(ctx)
-	case contesttask.FieldContestID:
-		return m.OldContestID(ctx)
-	case contesttask.FieldTaskID:
-		return m.OldTaskID(ctx)
-	}
-	return nil, fmt.Errorf("unknown ContestTask field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ContestTaskMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case contesttask.FieldScore:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetScore(v)
-		return nil
-	case contesttask.FieldOrder:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOrder(v)
-		return nil
-	case contesttask.FieldContestID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetContestID(v)
-		return nil
-	case contesttask.FieldTaskID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTaskID(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ContestTask field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *ContestTaskMutation) AddedFields() []string {
-	var fields []string
-	if m.addscore != nil {
-		fields = append(fields, contesttask.FieldScore)
-	}
-	if m.add_order != nil {
-		fields = append(fields, contesttask.FieldOrder)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ContestTaskMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case contesttask.FieldScore:
-		return m.AddedScore()
-	case contesttask.FieldOrder:
-		return m.AddedOrder()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ContestTaskMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case contesttask.FieldScore:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddScore(v)
-		return nil
-	case contesttask.FieldOrder:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddOrder(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ContestTask numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ContestTaskMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ContestTaskMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ContestTaskMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown ContestTask nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ContestTaskMutation) ResetField(name string) error {
-	switch name {
-	case contesttask.FieldScore:
-		m.ResetScore()
-		return nil
-	case contesttask.FieldOrder:
-		m.ResetOrder()
-		return nil
-	case contesttask.FieldContestID:
-		m.ResetContestID()
-		return nil
-	case contesttask.FieldTaskID:
-		m.ResetTaskID()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestTask field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ContestTaskMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.contest != nil {
-		edges = append(edges, contesttask.EdgeContest)
-	}
-	if m.task != nil {
-		edges = append(edges, contesttask.EdgeTask)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ContestTaskMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case contesttask.EdgeContest:
-		if id := m.contest; id != nil {
-			return []ent.Value{*id}
-		}
-	case contesttask.EdgeTask:
-		if id := m.task; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ContestTaskMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ContestTaskMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ContestTaskMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedcontest {
-		edges = append(edges, contesttask.EdgeContest)
-	}
-	if m.clearedtask {
-		edges = append(edges, contesttask.EdgeTask)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ContestTaskMutation) EdgeCleared(name string) bool {
-	switch name {
-	case contesttask.EdgeContest:
-		return m.clearedcontest
-	case contesttask.EdgeTask:
-		return m.clearedtask
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ContestTaskMutation) ClearEdge(name string) error {
-	switch name {
-	case contesttask.EdgeContest:
-		m.ClearContest()
-		return nil
-	case contesttask.EdgeTask:
-		m.ClearTask()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestTask unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ContestTaskMutation) ResetEdge(name string) error {
-	switch name {
-	case contesttask.EdgeContest:
-		m.ResetContest()
-		return nil
-	case contesttask.EdgeTask:
-		m.ResetTask()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestTask edge %s", name)
-}
-
-// ContestUserMutation represents an operation that mutates the ContestUser nodes in the graph.
-type ContestUserMutation struct {
-	config
-	op             Op
-	typ            string
-	id             *int
-	role           *string
-	clearedFields  map[string]struct{}
-	contest        *int
-	clearedcontest bool
-	user           *int
-	cleareduser    bool
-	done           bool
-	oldValue       func(context.Context) (*ContestUser, error)
-	predicates     []predicate.ContestUser
-}
-
-var _ ent.Mutation = (*ContestUserMutation)(nil)
-
-// contestuserOption allows management of the mutation configuration using functional options.
-type contestuserOption func(*ContestUserMutation)
-
-// newContestUserMutation creates new mutation for the ContestUser entity.
-func newContestUserMutation(c config, op Op, opts ...contestuserOption) *ContestUserMutation {
-	m := &ContestUserMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeContestUser,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withContestUserID sets the ID field of the mutation.
-func withContestUserID(id int) contestuserOption {
-	return func(m *ContestUserMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *ContestUser
-		)
-		m.oldValue = func(ctx context.Context) (*ContestUser, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().ContestUser.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withContestUser sets the old ContestUser of the mutation.
-func withContestUser(node *ContestUser) contestuserOption {
-	return func(m *ContestUserMutation) {
-		m.oldValue = func(context.Context) (*ContestUser, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ContestUserMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m ContestUserMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of ContestUser entities.
-func (m *ContestUserMutation) SetID(id int) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *ContestUserMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *ContestUserMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().ContestUser.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetRole sets the "role" field.
-func (m *ContestUserMutation) SetRole(s string) {
-	m.role = &s
-}
-
-// Role returns the value of the "role" field in the mutation.
-func (m *ContestUserMutation) Role() (r string, exists bool) {
-	v := m.role
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRole returns the old "role" field's value of the ContestUser entity.
-// If the ContestUser object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestUserMutation) OldRole(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRole is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRole requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRole: %w", err)
-	}
-	return oldValue.Role, nil
-}
-
-// ResetRole resets all changes to the "role" field.
-func (m *ContestUserMutation) ResetRole() {
-	m.role = nil
-}
-
-// SetContestID sets the "contest_id" field.
-func (m *ContestUserMutation) SetContestID(i int) {
-	m.contest = &i
-}
-
-// ContestID returns the value of the "contest_id" field in the mutation.
-func (m *ContestUserMutation) ContestID() (r int, exists bool) {
-	v := m.contest
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldContestID returns the old "contest_id" field's value of the ContestUser entity.
-// If the ContestUser object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestUserMutation) OldContestID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldContestID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldContestID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldContestID: %w", err)
-	}
-	return oldValue.ContestID, nil
-}
-
-// ResetContestID resets all changes to the "contest_id" field.
-func (m *ContestUserMutation) ResetContestID() {
-	m.contest = nil
-}
-
-// SetUserID sets the "user_id" field.
-func (m *ContestUserMutation) SetUserID(i int) {
-	m.user = &i
-}
-
-// UserID returns the value of the "user_id" field in the mutation.
-func (m *ContestUserMutation) UserID() (r int, exists bool) {
-	v := m.user
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUserID returns the old "user_id" field's value of the ContestUser entity.
-// If the ContestUser object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContestUserMutation) OldUserID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUserID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
-	}
-	return oldValue.UserID, nil
-}
-
-// ResetUserID resets all changes to the "user_id" field.
-func (m *ContestUserMutation) ResetUserID() {
-	m.user = nil
-}
-
-// ClearContest clears the "contest" edge to the Contest entity.
-func (m *ContestUserMutation) ClearContest() {
-	m.clearedcontest = true
-}
-
-// ContestCleared reports if the "contest" edge to the Contest entity was cleared.
-func (m *ContestUserMutation) ContestCleared() bool {
-	return m.clearedcontest
-}
-
-// ContestIDs returns the "contest" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ContestID instead. It exists only for internal usage by the builders.
-func (m *ContestUserMutation) ContestIDs() (ids []int) {
-	if id := m.contest; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetContest resets all changes to the "contest" edge.
-func (m *ContestUserMutation) ResetContest() {
-	m.contest = nil
-	m.clearedcontest = false
-}
-
-// ClearUser clears the "user" edge to the User entity.
-func (m *ContestUserMutation) ClearUser() {
-	m.cleareduser = true
-}
-
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *ContestUserMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// UserIDs returns the "user" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UserID instead. It exists only for internal usage by the builders.
-func (m *ContestUserMutation) UserIDs() (ids []int) {
-	if id := m.user; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetUser resets all changes to the "user" edge.
-func (m *ContestUserMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-}
-
-// Where appends a list predicates to the ContestUserMutation builder.
-func (m *ContestUserMutation) Where(ps ...predicate.ContestUser) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the ContestUserMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ContestUserMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.ContestUser, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *ContestUserMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *ContestUserMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (ContestUser).
-func (m *ContestUserMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *ContestUserMutation) Fields() []string {
-	fields := make([]string, 0, 3)
-	if m.role != nil {
-		fields = append(fields, contestuser.FieldRole)
-	}
-	if m.contest != nil {
-		fields = append(fields, contestuser.FieldContestID)
-	}
-	if m.user != nil {
-		fields = append(fields, contestuser.FieldUserID)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *ContestUserMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case contestuser.FieldRole:
-		return m.Role()
-	case contestuser.FieldContestID:
-		return m.ContestID()
-	case contestuser.FieldUserID:
-		return m.UserID()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *ContestUserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case contestuser.FieldRole:
-		return m.OldRole(ctx)
-	case contestuser.FieldContestID:
-		return m.OldContestID(ctx)
-	case contestuser.FieldUserID:
-		return m.OldUserID(ctx)
-	}
-	return nil, fmt.Errorf("unknown ContestUser field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ContestUserMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case contestuser.FieldRole:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRole(v)
-		return nil
-	case contestuser.FieldContestID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetContestID(v)
-		return nil
-	case contestuser.FieldUserID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserID(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ContestUser field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *ContestUserMutation) AddedFields() []string {
-	var fields []string
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ContestUserMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ContestUserMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown ContestUser numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ContestUserMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ContestUserMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ContestUserMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown ContestUser nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ContestUserMutation) ResetField(name string) error {
-	switch name {
-	case contestuser.FieldRole:
-		m.ResetRole()
-		return nil
-	case contestuser.FieldContestID:
-		m.ResetContestID()
-		return nil
-	case contestuser.FieldUserID:
-		m.ResetUserID()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestUser field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ContestUserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.contest != nil {
-		edges = append(edges, contestuser.EdgeContest)
-	}
-	if m.user != nil {
-		edges = append(edges, contestuser.EdgeUser)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ContestUserMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case contestuser.EdgeContest:
-		if id := m.contest; id != nil {
-			return []ent.Value{*id}
-		}
-	case contestuser.EdgeUser:
-		if id := m.user; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ContestUserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ContestUserMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ContestUserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedcontest {
-		edges = append(edges, contestuser.EdgeContest)
-	}
-	if m.cleareduser {
-		edges = append(edges, contestuser.EdgeUser)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ContestUserMutation) EdgeCleared(name string) bool {
-	switch name {
-	case contestuser.EdgeContest:
-		return m.clearedcontest
-	case contestuser.EdgeUser:
-		return m.cleareduser
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ContestUserMutation) ClearEdge(name string) error {
-	switch name {
-	case contestuser.EdgeContest:
-		m.ClearContest()
-		return nil
-	case contestuser.EdgeUser:
-		m.ClearUser()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestUser unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ContestUserMutation) ResetEdge(name string) error {
-	switch name {
-	case contestuser.EdgeContest:
-		m.ResetContest()
-		return nil
-	case contestuser.EdgeUser:
-		m.ResetUser()
-		return nil
-	}
-	return fmt.Errorf("unknown ContestUser edge %s", name)
-}
-
-// LanguageMutation represents an operation that mutates the Language nodes in the graph.
-type LanguageMutation struct {
-	config
-	op             Op
-	typ            string
-	id             *int
-	name           *string
-	slug           *string
-	clearedFields  map[string]struct{}
-	submits        map[int]struct{}
-	removedsubmits map[int]struct{}
-	clearedsubmits bool
-	done           bool
-	oldValue       func(context.Context) (*Language, error)
-	predicates     []predicate.Language
-}
-
-var _ ent.Mutation = (*LanguageMutation)(nil)
-
-// languageOption allows management of the mutation configuration using functional options.
-type languageOption func(*LanguageMutation)
-
-// newLanguageMutation creates new mutation for the Language entity.
-func newLanguageMutation(c config, op Op, opts ...languageOption) *LanguageMutation {
-	m := &LanguageMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeLanguage,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withLanguageID sets the ID field of the mutation.
-func withLanguageID(id int) languageOption {
-	return func(m *LanguageMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Language
-		)
-		m.oldValue = func(ctx context.Context) (*Language, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Language.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withLanguage sets the old Language of the mutation.
-func withLanguage(node *Language) languageOption {
-	return func(m *LanguageMutation) {
-		m.oldValue = func(context.Context) (*Language, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m LanguageMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m LanguageMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Language entities.
-func (m *LanguageMutation) SetID(id int) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *LanguageMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *LanguageMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Language.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetName sets the "name" field.
-func (m *LanguageMutation) SetName(s string) {
-	m.name = &s
-}
-
-// Name returns the value of the "name" field in the mutation.
-func (m *LanguageMutation) Name() (r string, exists bool) {
-	v := m.name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldName returns the old "name" field's value of the Language entity.
-// If the Language object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LanguageMutation) OldName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
-	}
-	return oldValue.Name, nil
-}
-
-// ResetName resets all changes to the "name" field.
-func (m *LanguageMutation) ResetName() {
-	m.name = nil
-}
-
-// SetSlug sets the "slug" field.
-func (m *LanguageMutation) SetSlug(s string) {
-	m.slug = &s
-}
-
-// Slug returns the value of the "slug" field in the mutation.
-func (m *LanguageMutation) Slug() (r string, exists bool) {
-	v := m.slug
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSlug returns the old "slug" field's value of the Language entity.
-// If the Language object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LanguageMutation) OldSlug(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSlug requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
-	}
-	return oldValue.Slug, nil
-}
-
-// ResetSlug resets all changes to the "slug" field.
-func (m *LanguageMutation) ResetSlug() {
-	m.slug = nil
-}
-
-// AddSubmitIDs adds the "submits" edge to the Submit entity by ids.
-func (m *LanguageMutation) AddSubmitIDs(ids ...int) {
-	if m.submits == nil {
-		m.submits = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.submits[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSubmits clears the "submits" edge to the Submit entity.
-func (m *LanguageMutation) ClearSubmits() {
-	m.clearedsubmits = true
-}
-
-// SubmitsCleared reports if the "submits" edge to the Submit entity was cleared.
-func (m *LanguageMutation) SubmitsCleared() bool {
-	return m.clearedsubmits
-}
-
-// RemoveSubmitIDs removes the "submits" edge to the Submit entity by IDs.
-func (m *LanguageMutation) RemoveSubmitIDs(ids ...int) {
-	if m.removedsubmits == nil {
-		m.removedsubmits = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.submits, ids[i])
-		m.removedsubmits[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubmits returns the removed IDs of the "submits" edge to the Submit entity.
-func (m *LanguageMutation) RemovedSubmitsIDs() (ids []int) {
-	for id := range m.removedsubmits {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SubmitsIDs returns the "submits" edge IDs in the mutation.
-func (m *LanguageMutation) SubmitsIDs() (ids []int) {
-	for id := range m.submits {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSubmits resets all changes to the "submits" edge.
-func (m *LanguageMutation) ResetSubmits() {
-	m.submits = nil
-	m.clearedsubmits = false
-	m.removedsubmits = nil
-}
-
-// Where appends a list predicates to the LanguageMutation builder.
-func (m *LanguageMutation) Where(ps ...predicate.Language) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the LanguageMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *LanguageMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Language, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *LanguageMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *LanguageMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (Language).
-func (m *LanguageMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *LanguageMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.name != nil {
-		fields = append(fields, language.FieldName)
-	}
-	if m.slug != nil {
-		fields = append(fields, language.FieldSlug)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *LanguageMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case language.FieldName:
-		return m.Name()
-	case language.FieldSlug:
-		return m.Slug()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *LanguageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case language.FieldName:
-		return m.OldName(ctx)
-	case language.FieldSlug:
-		return m.OldSlug(ctx)
-	}
-	return nil, fmt.Errorf("unknown Language field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *LanguageMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case language.FieldName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetName(v)
-		return nil
-	case language.FieldSlug:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSlug(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Language field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *LanguageMutation) AddedFields() []string {
+func (m *RefreshTokenMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *LanguageMutation) AddedField(name string) (ent.Value, bool) {
+func (m *RefreshTokenMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *LanguageMutation) AddField(name string, value ent.Value) error {
+func (m *RefreshTokenMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown Language numeric field %s", name)
+	return fmt.Errorf("unknown RefreshToken numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *LanguageMutation) ClearedFields() []string {
+func (m *RefreshTokenMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *LanguageMutation) FieldCleared(name string) bool {
+func (m *RefreshTokenMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *LanguageMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Language nullable field %s", name)
+func (m *RefreshTokenMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown RefreshToken nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *LanguageMutation) ResetField(name string) error {
+func (m *RefreshTokenMutation) ResetField(name string) error {
 	switch name {
-	case language.FieldName:
-		m.ResetName()
+	case refreshtoken.FieldToken:
+		m.ResetToken()
 		return nil
-	case language.FieldSlug:
-		m.ResetSlug()
+	case refreshtoken.FieldExpiresAt:
+		m.ResetExpiresAt()
+		return nil
+	case refreshtoken.FieldIsDead:
+		m.ResetIsDead()
 		return nil
 	}
-	return fmt.Errorf("unknown Language field %s", name)
+	return fmt.Errorf("unknown RefreshToken field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *LanguageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.submits != nil {
-		edges = append(edges, language.EdgeSubmits)
-	}
+func (m *RefreshTokenMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case language.EdgeSubmits:
-		ids := make([]ent.Value, 0, len(m.submits))
-		for id := range m.submits {
-			ids = append(ids, id)
-		}
-		return ids
-	}
+func (m *RefreshTokenMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *LanguageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedsubmits != nil {
-		edges = append(edges, language.EdgeSubmits)
-	}
+func (m *RefreshTokenMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *LanguageMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case language.EdgeSubmits:
-		ids := make([]ent.Value, 0, len(m.removedsubmits))
-		for id := range m.removedsubmits {
-			ids = append(ids, id)
-		}
-		return ids
-	}
+func (m *RefreshTokenMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *LanguageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedsubmits {
-		edges = append(edges, language.EdgeSubmits)
-	}
+func (m *RefreshTokenMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *LanguageMutation) EdgeCleared(name string) bool {
-	switch name {
-	case language.EdgeSubmits:
-		return m.clearedsubmits
-	}
+func (m *RefreshTokenMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *LanguageMutation) ClearEdge(name string) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Language unique edge %s", name)
+func (m *RefreshTokenMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown RefreshToken unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *LanguageMutation) ResetEdge(name string) error {
-	switch name {
-	case language.EdgeSubmits:
-		m.ResetSubmits()
-		return nil
-	}
-	return fmt.Errorf("unknown Language edge %s", name)
-}
-
-// SubmitMutation represents an operation that mutates the Submit nodes in the graph.
-type SubmitMutation struct {
-	config
-	op                      Op
-	typ                     string
-	id                      *int
-	status                  *string
-	exec_time               *int
-	addexec_time            *int
-	exec_memory             *int
-	addexec_memory          *int
-	score                   *int
-	addscore                *int
-	submitted_at            *time.Time
-	created_at              *time.Time
-	updated_at              *time.Time
-	clearedFields           map[string]struct{}
-	user                    *int
-	cleareduser             bool
-	task                    *int
-	clearedtask             bool
-	language                *int
-	clearedlanguage         bool
-	testcase_results        map[int]struct{}
-	removedtestcase_results map[int]struct{}
-	clearedtestcase_results bool
-	done                    bool
-	oldValue                func(context.Context) (*Submit, error)
-	predicates              []predicate.Submit
-}
-
-var _ ent.Mutation = (*SubmitMutation)(nil)
-
-// submitOption allows management of the mutation configuration using functional options.
-type submitOption func(*SubmitMutation)
-
-// newSubmitMutation creates new mutation for the Submit entity.
-func newSubmitMutation(c config, op Op, opts ...submitOption) *SubmitMutation {
-	m := &SubmitMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeSubmit,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withSubmitID sets the ID field of the mutation.
-func withSubmitID(id int) submitOption {
-	return func(m *SubmitMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Submit
-		)
-		m.oldValue = func(ctx context.Context) (*Submit, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Submit.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withSubmit sets the old Submit of the mutation.
-func withSubmit(node *Submit) submitOption {
-	return func(m *SubmitMutation) {
-		m.oldValue = func(context.Context) (*Submit, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m SubmitMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m SubmitMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Submit entities.
-func (m *SubmitMutation) SetID(id int) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *SubmitMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *SubmitMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Submit.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetStatus sets the "status" field.
-func (m *SubmitMutation) SetStatus(s string) {
-	m.status = &s
-}
-
-// Status returns the value of the "status" field in the mutation.
-func (m *SubmitMutation) Status() (r string, exists bool) {
-	v := m.status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStatus returns the old "status" field's value of the Submit entity.
-// If the Submit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubmitMutation) OldStatus(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
-	}
-	return oldValue.Status, nil
-}
-
-// ClearStatus clears the value of the "status" field.
-func (m *SubmitMutation) ClearStatus() {
-	m.status = nil
-	m.clearedFields[submit.FieldStatus] = struct{}{}
-}
-
-// StatusCleared returns if the "status" field was cleared in this mutation.
-func (m *SubmitMutation) StatusCleared() bool {
-	_, ok := m.clearedFields[submit.FieldStatus]
-	return ok
-}
-
-// ResetStatus resets all changes to the "status" field.
-func (m *SubmitMutation) ResetStatus() {
-	m.status = nil
-	delete(m.clearedFields, submit.FieldStatus)
-}
-
-// SetExecTime sets the "exec_time" field.
-func (m *SubmitMutation) SetExecTime(i int) {
-	m.exec_time = &i
-	m.addexec_time = nil
-}
-
-// ExecTime returns the value of the "exec_time" field in the mutation.
-func (m *SubmitMutation) ExecTime() (r int, exists bool) {
-	v := m.exec_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldExecTime returns the old "exec_time" field's value of the Submit entity.
-// If the Submit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubmitMutation) OldExecTime(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldExecTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldExecTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldExecTime: %w", err)
-	}
-	return oldValue.ExecTime, nil
-}
-
-// AddExecTime adds i to the "exec_time" field.
-func (m *SubmitMutation) AddExecTime(i int) {
-	if m.addexec_time != nil {
-		*m.addexec_time += i
-	} else {
-		m.addexec_time = &i
-	}
-}
-
-// AddedExecTime returns the value that was added to the "exec_time" field in this mutation.
-func (m *SubmitMutation) AddedExecTime() (r int, exists bool) {
-	v := m.addexec_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearExecTime clears the value of the "exec_time" field.
-func (m *SubmitMutation) ClearExecTime() {
-	m.exec_time = nil
-	m.addexec_time = nil
-	m.clearedFields[submit.FieldExecTime] = struct{}{}
-}
-
-// ExecTimeCleared returns if the "exec_time" field was cleared in this mutation.
-func (m *SubmitMutation) ExecTimeCleared() bool {
-	_, ok := m.clearedFields[submit.FieldExecTime]
-	return ok
-}
-
-// ResetExecTime resets all changes to the "exec_time" field.
-func (m *SubmitMutation) ResetExecTime() {
-	m.exec_time = nil
-	m.addexec_time = nil
-	delete(m.clearedFields, submit.FieldExecTime)
-}
-
-// SetExecMemory sets the "exec_memory" field.
-func (m *SubmitMutation) SetExecMemory(i int) {
-	m.exec_memory = &i
-	m.addexec_memory = nil
-}
-
-// ExecMemory returns the value of the "exec_memory" field in the mutation.
-func (m *SubmitMutation) ExecMemory() (r int, exists bool) {
-	v := m.exec_memory
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldExecMemory returns the old "exec_memory" field's value of the Submit entity.
-// If the Submit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubmitMutation) OldExecMemory(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldExecMemory is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldExecMemory requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldExecMemory: %w", err)
-	}
-	return oldValue.ExecMemory, nil
-}
-
-// AddExecMemory adds i to the "exec_memory" field.
-func (m *SubmitMutation) AddExecMemory(i int) {
-	if m.addexec_memory != nil {
-		*m.addexec_memory += i
-	} else {
-		m.addexec_memory = &i
-	}
-}
-
-// AddedExecMemory returns the value that was added to the "exec_memory" field in this mutation.
-func (m *SubmitMutation) AddedExecMemory() (r int, exists bool) {
-	v := m.addexec_memory
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearExecMemory clears the value of the "exec_memory" field.
-func (m *SubmitMutation) ClearExecMemory() {
-	m.exec_memory = nil
-	m.addexec_memory = nil
-	m.clearedFields[submit.FieldExecMemory] = struct{}{}
-}
-
-// ExecMemoryCleared returns if the "exec_memory" field was cleared in this mutation.
-func (m *SubmitMutation) ExecMemoryCleared() bool {
-	_, ok := m.clearedFields[submit.FieldExecMemory]
-	return ok
-}
-
-// ResetExecMemory resets all changes to the "exec_memory" field.
-func (m *SubmitMutation) ResetExecMemory() {
-	m.exec_memory = nil
-	m.addexec_memory = nil
-	delete(m.clearedFields, submit.FieldExecMemory)
-}
-
-// SetScore sets the "score" field.
-func (m *SubmitMutation) SetScore(i int) {
-	m.score = &i
-	m.addscore = nil
-}
-
-// Score returns the value of the "score" field in the mutation.
-func (m *SubmitMutation) Score() (r int, exists bool) {
-	v := m.score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldScore returns the old "score" field's value of the Submit entity.
-// If the Submit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubmitMutation) OldScore(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldScore is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldScore requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldScore: %w", err)
-	}
-	return oldValue.Score, nil
-}
-
-// AddScore adds i to the "score" field.
-func (m *SubmitMutation) AddScore(i int) {
-	if m.addscore != nil {
-		*m.addscore += i
-	} else {
-		m.addscore = &i
-	}
-}
-
-// AddedScore returns the value that was added to the "score" field in this mutation.
-func (m *SubmitMutation) AddedScore() (r int, exists bool) {
-	v := m.addscore
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearScore clears the value of the "score" field.
-func (m *SubmitMutation) ClearScore() {
-	m.score = nil
-	m.addscore = nil
-	m.clearedFields[submit.FieldScore] = struct{}{}
-}
-
-// ScoreCleared returns if the "score" field was cleared in this mutation.
-func (m *SubmitMutation) ScoreCleared() bool {
-	_, ok := m.clearedFields[submit.FieldScore]
-	return ok
-}
-
-// ResetScore resets all changes to the "score" field.
-func (m *SubmitMutation) ResetScore() {
-	m.score = nil
-	m.addscore = nil
-	delete(m.clearedFields, submit.FieldScore)
-}
-
-// SetSubmittedAt sets the "submitted_at" field.
-func (m *SubmitMutation) SetSubmittedAt(t time.Time) {
-	m.submitted_at = &t
-}
-
-// SubmittedAt returns the value of the "submitted_at" field in the mutation.
-func (m *SubmitMutation) SubmittedAt() (r time.Time, exists bool) {
-	v := m.submitted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSubmittedAt returns the old "submitted_at" field's value of the Submit entity.
-// If the Submit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubmitMutation) OldSubmittedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSubmittedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSubmittedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSubmittedAt: %w", err)
-	}
-	return oldValue.SubmittedAt, nil
-}
-
-// ResetSubmittedAt resets all changes to the "submitted_at" field.
-func (m *SubmitMutation) ResetSubmittedAt() {
-	m.submitted_at = nil
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (m *SubmitMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *SubmitMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the Submit entity.
-// If the Submit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubmitMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *SubmitMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *SubmitMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *SubmitMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the Submit entity.
-// If the Submit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubmitMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (m *SubmitMutation) ClearUpdatedAt() {
-	m.updated_at = nil
-	m.clearedFields[submit.FieldUpdatedAt] = struct{}{}
-}
-
-// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
-func (m *SubmitMutation) UpdatedAtCleared() bool {
-	_, ok := m.clearedFields[submit.FieldUpdatedAt]
-	return ok
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *SubmitMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-	delete(m.clearedFields, submit.FieldUpdatedAt)
-}
-
-// SetUserID sets the "user" edge to the User entity by id.
-func (m *SubmitMutation) SetUserID(id int) {
-	m.user = &id
-}
-
-// ClearUser clears the "user" edge to the User entity.
-func (m *SubmitMutation) ClearUser() {
-	m.cleareduser = true
-}
-
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *SubmitMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// UserID returns the "user" edge ID in the mutation.
-func (m *SubmitMutation) UserID() (id int, exists bool) {
-	if m.user != nil {
-		return *m.user, true
-	}
-	return
-}
-
-// UserIDs returns the "user" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UserID instead. It exists only for internal usage by the builders.
-func (m *SubmitMutation) UserIDs() (ids []int) {
-	if id := m.user; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetUser resets all changes to the "user" edge.
-func (m *SubmitMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-}
-
-// SetTaskID sets the "task" edge to the Task entity by id.
-func (m *SubmitMutation) SetTaskID(id int) {
-	m.task = &id
-}
-
-// ClearTask clears the "task" edge to the Task entity.
-func (m *SubmitMutation) ClearTask() {
-	m.clearedtask = true
-}
-
-// TaskCleared reports if the "task" edge to the Task entity was cleared.
-func (m *SubmitMutation) TaskCleared() bool {
-	return m.clearedtask
-}
-
-// TaskID returns the "task" edge ID in the mutation.
-func (m *SubmitMutation) TaskID() (id int, exists bool) {
-	if m.task != nil {
-		return *m.task, true
-	}
-	return
-}
-
-// TaskIDs returns the "task" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// TaskID instead. It exists only for internal usage by the builders.
-func (m *SubmitMutation) TaskIDs() (ids []int) {
-	if id := m.task; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetTask resets all changes to the "task" edge.
-func (m *SubmitMutation) ResetTask() {
-	m.task = nil
-	m.clearedtask = false
-}
-
-// SetLanguageID sets the "language" edge to the Language entity by id.
-func (m *SubmitMutation) SetLanguageID(id int) {
-	m.language = &id
-}
-
-// ClearLanguage clears the "language" edge to the Language entity.
-func (m *SubmitMutation) ClearLanguage() {
-	m.clearedlanguage = true
-}
-
-// LanguageCleared reports if the "language" edge to the Language entity was cleared.
-func (m *SubmitMutation) LanguageCleared() bool {
-	return m.clearedlanguage
-}
-
-// LanguageID returns the "language" edge ID in the mutation.
-func (m *SubmitMutation) LanguageID() (id int, exists bool) {
-	if m.language != nil {
-		return *m.language, true
-	}
-	return
-}
-
-// LanguageIDs returns the "language" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// LanguageID instead. It exists only for internal usage by the builders.
-func (m *SubmitMutation) LanguageIDs() (ids []int) {
-	if id := m.language; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetLanguage resets all changes to the "language" edge.
-func (m *SubmitMutation) ResetLanguage() {
-	m.language = nil
-	m.clearedlanguage = false
-}
-
-// AddTestcaseResultIDs adds the "testcase_results" edge to the TestcaseResult entity by ids.
-func (m *SubmitMutation) AddTestcaseResultIDs(ids ...int) {
-	if m.testcase_results == nil {
-		m.testcase_results = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.testcase_results[ids[i]] = struct{}{}
-	}
-}
-
-// ClearTestcaseResults clears the "testcase_results" edge to the TestcaseResult entity.
-func (m *SubmitMutation) ClearTestcaseResults() {
-	m.clearedtestcase_results = true
-}
-
-// TestcaseResultsCleared reports if the "testcase_results" edge to the TestcaseResult entity was cleared.
-func (m *SubmitMutation) TestcaseResultsCleared() bool {
-	return m.clearedtestcase_results
-}
-
-// RemoveTestcaseResultIDs removes the "testcase_results" edge to the TestcaseResult entity by IDs.
-func (m *SubmitMutation) RemoveTestcaseResultIDs(ids ...int) {
-	if m.removedtestcase_results == nil {
-		m.removedtestcase_results = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.testcase_results, ids[i])
-		m.removedtestcase_results[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTestcaseResults returns the removed IDs of the "testcase_results" edge to the TestcaseResult entity.
-func (m *SubmitMutation) RemovedTestcaseResultsIDs() (ids []int) {
-	for id := range m.removedtestcase_results {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// TestcaseResultsIDs returns the "testcase_results" edge IDs in the mutation.
-func (m *SubmitMutation) TestcaseResultsIDs() (ids []int) {
-	for id := range m.testcase_results {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetTestcaseResults resets all changes to the "testcase_results" edge.
-func (m *SubmitMutation) ResetTestcaseResults() {
-	m.testcase_results = nil
-	m.clearedtestcase_results = false
-	m.removedtestcase_results = nil
-}
-
-// Where appends a list predicates to the SubmitMutation builder.
-func (m *SubmitMutation) Where(ps ...predicate.Submit) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the SubmitMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *SubmitMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Submit, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *SubmitMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *SubmitMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (Submit).
-func (m *SubmitMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *SubmitMutation) Fields() []string {
-	fields := make([]string, 0, 7)
-	if m.status != nil {
-		fields = append(fields, submit.FieldStatus)
-	}
-	if m.exec_time != nil {
-		fields = append(fields, submit.FieldExecTime)
-	}
-	if m.exec_memory != nil {
-		fields = append(fields, submit.FieldExecMemory)
-	}
-	if m.score != nil {
-		fields = append(fields, submit.FieldScore)
-	}
-	if m.submitted_at != nil {
-		fields = append(fields, submit.FieldSubmittedAt)
-	}
-	if m.created_at != nil {
-		fields = append(fields, submit.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, submit.FieldUpdatedAt)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *SubmitMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case submit.FieldStatus:
-		return m.Status()
-	case submit.FieldExecTime:
-		return m.ExecTime()
-	case submit.FieldExecMemory:
-		return m.ExecMemory()
-	case submit.FieldScore:
-		return m.Score()
-	case submit.FieldSubmittedAt:
-		return m.SubmittedAt()
-	case submit.FieldCreatedAt:
-		return m.CreatedAt()
-	case submit.FieldUpdatedAt:
-		return m.UpdatedAt()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *SubmitMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case submit.FieldStatus:
-		return m.OldStatus(ctx)
-	case submit.FieldExecTime:
-		return m.OldExecTime(ctx)
-	case submit.FieldExecMemory:
-		return m.OldExecMemory(ctx)
-	case submit.FieldScore:
-		return m.OldScore(ctx)
-	case submit.FieldSubmittedAt:
-		return m.OldSubmittedAt(ctx)
-	case submit.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case submit.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
-	}
-	return nil, fmt.Errorf("unknown Submit field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *SubmitMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case submit.FieldStatus:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetStatus(v)
-		return nil
-	case submit.FieldExecTime:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetExecTime(v)
-		return nil
-	case submit.FieldExecMemory:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetExecMemory(v)
-		return nil
-	case submit.FieldScore:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetScore(v)
-		return nil
-	case submit.FieldSubmittedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSubmittedAt(v)
-		return nil
-	case submit.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case submit.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Submit field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *SubmitMutation) AddedFields() []string {
-	var fields []string
-	if m.addexec_time != nil {
-		fields = append(fields, submit.FieldExecTime)
-	}
-	if m.addexec_memory != nil {
-		fields = append(fields, submit.FieldExecMemory)
-	}
-	if m.addscore != nil {
-		fields = append(fields, submit.FieldScore)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *SubmitMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case submit.FieldExecTime:
-		return m.AddedExecTime()
-	case submit.FieldExecMemory:
-		return m.AddedExecMemory()
-	case submit.FieldScore:
-		return m.AddedScore()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *SubmitMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case submit.FieldExecTime:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddExecTime(v)
-		return nil
-	case submit.FieldExecMemory:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddExecMemory(v)
-		return nil
-	case submit.FieldScore:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddScore(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Submit numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *SubmitMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(submit.FieldStatus) {
-		fields = append(fields, submit.FieldStatus)
-	}
-	if m.FieldCleared(submit.FieldExecTime) {
-		fields = append(fields, submit.FieldExecTime)
-	}
-	if m.FieldCleared(submit.FieldExecMemory) {
-		fields = append(fields, submit.FieldExecMemory)
-	}
-	if m.FieldCleared(submit.FieldScore) {
-		fields = append(fields, submit.FieldScore)
-	}
-	if m.FieldCleared(submit.FieldUpdatedAt) {
-		fields = append(fields, submit.FieldUpdatedAt)
-	}
-	return fields
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *SubmitMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *SubmitMutation) ClearField(name string) error {
-	switch name {
-	case submit.FieldStatus:
-		m.ClearStatus()
-		return nil
-	case submit.FieldExecTime:
-		m.ClearExecTime()
-		return nil
-	case submit.FieldExecMemory:
-		m.ClearExecMemory()
-		return nil
-	case submit.FieldScore:
-		m.ClearScore()
-		return nil
-	case submit.FieldUpdatedAt:
-		m.ClearUpdatedAt()
-		return nil
-	}
-	return fmt.Errorf("unknown Submit nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *SubmitMutation) ResetField(name string) error {
-	switch name {
-	case submit.FieldStatus:
-		m.ResetStatus()
-		return nil
-	case submit.FieldExecTime:
-		m.ResetExecTime()
-		return nil
-	case submit.FieldExecMemory:
-		m.ResetExecMemory()
-		return nil
-	case submit.FieldScore:
-		m.ResetScore()
-		return nil
-	case submit.FieldSubmittedAt:
-		m.ResetSubmittedAt()
-		return nil
-	case submit.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case submit.FieldUpdatedAt:
-		m.ResetUpdatedAt()
-		return nil
-	}
-	return fmt.Errorf("unknown Submit field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *SubmitMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.user != nil {
-		edges = append(edges, submit.EdgeUser)
-	}
-	if m.task != nil {
-		edges = append(edges, submit.EdgeTask)
-	}
-	if m.language != nil {
-		edges = append(edges, submit.EdgeLanguage)
-	}
-	if m.testcase_results != nil {
-		edges = append(edges, submit.EdgeTestcaseResults)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *SubmitMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case submit.EdgeUser:
-		if id := m.user; id != nil {
-			return []ent.Value{*id}
-		}
-	case submit.EdgeTask:
-		if id := m.task; id != nil {
-			return []ent.Value{*id}
-		}
-	case submit.EdgeLanguage:
-		if id := m.language; id != nil {
-			return []ent.Value{*id}
-		}
-	case submit.EdgeTestcaseResults:
-		ids := make([]ent.Value, 0, len(m.testcase_results))
-		for id := range m.testcase_results {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *SubmitMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.removedtestcase_results != nil {
-		edges = append(edges, submit.EdgeTestcaseResults)
-	}
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *SubmitMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case submit.EdgeTestcaseResults:
-		ids := make([]ent.Value, 0, len(m.removedtestcase_results))
-		for id := range m.removedtestcase_results {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *SubmitMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.cleareduser {
-		edges = append(edges, submit.EdgeUser)
-	}
-	if m.clearedtask {
-		edges = append(edges, submit.EdgeTask)
-	}
-	if m.clearedlanguage {
-		edges = append(edges, submit.EdgeLanguage)
-	}
-	if m.clearedtestcase_results {
-		edges = append(edges, submit.EdgeTestcaseResults)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *SubmitMutation) EdgeCleared(name string) bool {
-	switch name {
-	case submit.EdgeUser:
-		return m.cleareduser
-	case submit.EdgeTask:
-		return m.clearedtask
-	case submit.EdgeLanguage:
-		return m.clearedlanguage
-	case submit.EdgeTestcaseResults:
-		return m.clearedtestcase_results
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *SubmitMutation) ClearEdge(name string) error {
-	switch name {
-	case submit.EdgeUser:
-		m.ClearUser()
-		return nil
-	case submit.EdgeTask:
-		m.ClearTask()
-		return nil
-	case submit.EdgeLanguage:
-		m.ClearLanguage()
-		return nil
-	}
-	return fmt.Errorf("unknown Submit unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *SubmitMutation) ResetEdge(name string) error {
-	switch name {
-	case submit.EdgeUser:
-		m.ResetUser()
-		return nil
-	case submit.EdgeTask:
-		m.ResetTask()
-		return nil
-	case submit.EdgeLanguage:
-		m.ResetLanguage()
-		return nil
-	case submit.EdgeTestcaseResults:
-		m.ResetTestcaseResults()
-		return nil
-	}
-	return fmt.Errorf("unknown Submit edge %s", name)
+func (m *RefreshTokenMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown RefreshToken edge %s", name)
 }
 
 // TaskMutation represents an operation that mutates the Task nodes in the graph.

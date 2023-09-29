@@ -14,16 +14,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Contest is the client for interacting with the Contest builders.
-	Contest *ContestClient
-	// ContestTask is the client for interacting with the ContestTask builders.
-	ContestTask *ContestTaskClient
-	// ContestUser is the client for interacting with the ContestUser builders.
-	ContestUser *ContestUserClient
-	// Language is the client for interacting with the Language builders.
-	Language *LanguageClient
-	// Submit is the client for interacting with the Submit builders.
-	Submit *SubmitClient
+	// RefreshToken is the client for interacting with the RefreshToken builders.
+	RefreshToken *RefreshTokenClient
 	// Task is the client for interacting with the Task builders.
 	Task *TaskClient
 	// Testcase is the client for interacting with the Testcase builders.
@@ -165,11 +157,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Contest = NewContestClient(tx.config)
-	tx.ContestTask = NewContestTaskClient(tx.config)
-	tx.ContestUser = NewContestUserClient(tx.config)
-	tx.Language = NewLanguageClient(tx.config)
-	tx.Submit = NewSubmitClient(tx.config)
+	tx.RefreshToken = NewRefreshTokenClient(tx.config)
 	tx.Task = NewTaskClient(tx.config)
 	tx.Testcase = NewTestcaseClient(tx.config)
 	tx.TestcaseResult = NewTestcaseResultClient(tx.config)
@@ -184,7 +172,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Contest.QueryXXX(), the query will be executed
+// applies a query, for example: RefreshToken.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
