@@ -16,6 +16,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/language"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
@@ -86,6 +87,7 @@ func checkColumn(table, column string) error {
 			contesttask.Table:    contesttask.ValidColumn,
 			contestuser.Table:    contestuser.ValidColumn,
 			language.Table:       language.ValidColumn,
+			refreshtoken.Table:   refreshtoken.ValidColumn,
 			submit.Table:         submit.ValidColumn,
 			task.Table:           task.ValidColumn,
 			testcase.Table:       testcase.ValidColumn,

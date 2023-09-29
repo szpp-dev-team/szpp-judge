@@ -22,6 +22,8 @@ type Tx struct {
 	ContestUser *ContestUserClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
+	// RefreshToken is the client for interacting with the RefreshToken builders.
+	RefreshToken *RefreshTokenClient
 	// Submit is the client for interacting with the Submit builders.
 	Submit *SubmitClient
 	// Task is the client for interacting with the Task builders.
@@ -169,6 +171,7 @@ func (tx *Tx) init() {
 	tx.ContestTask = NewContestTaskClient(tx.config)
 	tx.ContestUser = NewContestUserClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)
+	tx.RefreshToken = NewRefreshTokenClient(tx.config)
 	tx.Submit = NewSubmitClient(tx.config)
 	tx.Task = NewTaskClient(tx.config)
 	tx.Testcase = NewTestcaseClient(tx.config)
