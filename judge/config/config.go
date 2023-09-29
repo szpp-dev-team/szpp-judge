@@ -8,9 +8,9 @@ type Config struct {
 }
 
 func New() (*Config, error) {
-	config := &Config{}
-	if err := envconfig.Process("", config); err != nil {
+	c := &Config{}
+	if err := envconfig.Process("", c); err != nil {
 		return nil, err
 	}
-	return config, nil
+	return c, nil
 }
