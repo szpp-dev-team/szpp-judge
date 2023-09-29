@@ -327,9 +327,9 @@ func (i *Interactor) CreateAnswer(ctx context.Context, req *backendv1.CreateAnsw
             IsMine: true,
             CreatedAt: answerCreatedAt,
             UpdatedAt: answerUpdatedAt,
-        },
-        //IsPublic: clarification.IsPublic,  // ここでIsPublicを返す
-    }, nil
+        }, // ここでIsPublicを返す
+		IsPublic: clarification.IsPublic,
+	}, nil
 }
 
 func (i *Interactor) UpdateAnswer (ctx context.Context, req *backendv1.UpdateAnswerRequest) (*backendv1.UpdateAnswerResponse, error) {
@@ -370,7 +370,6 @@ func (i *Interactor) UpdateAnswer (ctx context.Context, req *backendv1.UpdateAns
 	}, nil
 }
 
-//IDK: 消す時、データベースの中身どうしよう・・・
 func (i *Interactor) DeleteAsnwer (ctx context.Context, req *backendv1.DeleteAnswerRequest) (*backendv1.DeleteAnswerResponse, error) {
 	// 指定されたIDでClarificationエンティティを検索
 	clarification, err := i.entClient.Clarification.Query().Where(clarification.ID(int(req.AnswerId))).Only(ctx)//TODO: AnswerIDはないので、Clarification IDにする必要がある。

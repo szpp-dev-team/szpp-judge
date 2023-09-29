@@ -157,6 +157,7 @@ message CreateAnswerRequest {
 
 message CreateAnswerResponse {
   Clarification.Answer answer = 1;
+  bool is_public = 2;
 }
 
 message UpdateAnswerRequest {

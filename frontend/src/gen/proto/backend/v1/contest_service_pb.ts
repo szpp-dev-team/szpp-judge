@@ -1091,6 +1091,11 @@ export class CreateAnswerResponse extends Message<CreateAnswerResponse> {
    */
   answer?: Clarification_Answer;
 
+  /**
+   * @generated from field: bool is_public = 2;
+   */
+  isPublic = false;
+
   constructor(data?: PartialMessage<CreateAnswerResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1100,6 +1105,7 @@ export class CreateAnswerResponse extends Message<CreateAnswerResponse> {
   static readonly typeName = "backend.v1.CreateAnswerResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "answer", kind: "message", T: Clarification_Answer },
+    { no: 2, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAnswerResponse {
