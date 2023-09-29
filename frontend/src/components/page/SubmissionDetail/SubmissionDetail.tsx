@@ -7,8 +7,6 @@ import {
   CardBody,
   CardHeader,
   Container,
-  Grid,
-  GridItem,
   Heading,
   Table,
   TableContainer,
@@ -19,52 +17,14 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
-import { ReactNode } from "react";
 import { JudgeStatusBadge } from "../../model/judge/JudgeStatusBadge";
+import { SubmissionInfo } from "../../model/judge/SubmissionInfo";
 import { Link } from "../../ui/Link";
 
 const Editor = dynamic(() => import("@/src/components/ui/Editor").then(mod => mod.Editor), {
   loading: () => <p>読み込み中です</p>,
   ssr: false,
 });
-
-type PairProps = {
-  data: [/** key */ string, /** value */ ReactNode];
-  //  gridRow?: GridProps["gridRow"],
-};
-
-const Pair = ({ data }: PairProps): ReactNode => {
-  return (
-    <>
-      <GridItem
-        as="dt"
-        display="flex"
-        py={2}
-        alignItems="center"
-        justifyContent="center"
-        borderBottom="1px"
-        borderRight="1px"
-        borderColor="gray.300"
-        bg="gray.50"
-        fontWeight="bold"
-      >
-        {data[0]}
-      </GridItem>
-      <GridItem
-        as="dd"
-        display="flex"
-        py={2}
-        alignItems="center"
-        justifyContent="center"
-        borderBottom="1px"
-        borderRight="1px"
-        borderColor="gray.300"
-      >
-        {data[1]}
-      </GridItem>
-    </>
-  );
-};
 
 export const SubmissionDetail = () => {
   const idStr = useRouterSubmissionId();
@@ -78,7 +38,7 @@ export const SubmissionDetail = () => {
   if (error) {
     return (
       <>
-        エラーが発生しました <a href="/">トップページへ戻る</a>
+        エラーが発生しました <Link href="/">トップページへ戻る</Link>
       </>
     );
   }
@@ -90,40 +50,14 @@ export const SubmissionDetail = () => {
           <CardHeader>
             <Heading as="h1">提出 #{idStr}</Heading>
           </CardHeader>
+
           <CardBody display="flex" flexDir="column" gap={4}>
             <Heading as="h2" size={["lg", null, "lg"]}>提出情報</Heading>
-            <Grid
-              as="dl"
-              textAlign="center"
-              templateColumns="3fr 5fr"
-              borderTop="1px"
-              borderLeft="1px"
-              borderColor="gray.300"
-              fontSize="sm"
+            <SubmissionInfo
+              submissionDetail={submissionDetail}
               minW="750px"
-            >
-              {/* sv-SE ローケルでのフォーマットは `YYYY-mm-dd HH:MM:SS`*/}
-              <Pair data={["提出日時", submissionDetail?.submittedAt?.toDate().toLocaleString("sv-SE")]} />
-              <Pair data={["問題", <Link href="#">{submissionDetail?.taskTitle}</Link>]} />
-              <Pair
-                data={[
-                  "ユーザ",
-                  <Link href={`/users/${submissionDetail?.username}`}>{submissionDetail?.username}</Link>,
-                ]}
-              />
-              <Pair data={["言語", `${submissionDetail?.execTimeMs} ms`]} />
-              <Pair data={["得点", submissionDetail?.score]} />
-              <Pair
-                data={[
-                  "結果",
-                  <JudgeStatusBadge
-                    status={PbJudgeStatus[submissionDetail?.status ?? 0].toString() as JudgeStatus}
-                  />,
-                ]}
-              />
-              <Pair data={["実行時間", `${submissionDetail?.execTimeMs} ms`]} />
-              <Pair data={["メモリ", `${submissionDetail?.execMemoryKib} KB`]} />
-            </Grid>
+              fontSize="sm"
+            />
 
             <Heading as="h2" size={["md", null, "lg"]}>ジャッジ結果</Heading>
             <TableContainer>
@@ -152,6 +86,7 @@ export const SubmissionDetail = () => {
                 </Tbody>
               </Table>
             </TableContainer>
+
             <Heading as="h2" size={["md", null, "lg"]}>ソースコード</Heading>
             <Editor doc={submissionDetail?.sourceCode} readonly={true} />
           </CardBody>
