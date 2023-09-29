@@ -1,4 +1,4 @@
-# languages
+# refresh_tokens
 
 ## Description
 
@@ -6,12 +6,13 @@
 <summary><strong>Table Definition</strong></summary>
 
 ```sql
-CREATE TABLE `languages` (
+CREATE TABLE `refresh_tokens` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `is_dead` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `slug` (`slug`)
+  UNIQUE KEY `token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
@@ -21,27 +22,28 @@ CREATE TABLE `languages` (
 
 | Name | Type | Default | Nullable | Extra Definition | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | ---------------- | -------- | ------- | ------- |
-| id | bigint(20) |  | false | auto_increment | [submits](submits.md) |  |  |
-| name | varchar(255) |  | false |  |  |  |  |
-| slug | varchar(255) |  | false |  |  |  |  |
+| id | bigint(20) |  | false | auto_increment |  |  |  |
+| token | varchar(255) |  | false |  |  |  |  |
+| expires_at | timestamp | NULL | true |  |  |  |  |
+| is_dead | tinyint(1) |  | false |  |  |  |  |
 
 ## Constraints
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
 | PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
-| slug | UNIQUE | UNIQUE KEY slug (slug) |
+| token | UNIQUE | UNIQUE KEY token (token) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
 | PRIMARY | PRIMARY KEY (id) USING BTREE |
-| slug | UNIQUE KEY slug (slug) USING BTREE |
+| token | UNIQUE KEY token (token) USING BTREE |
 
 ## Relations
 
-![er](languages.svg)
+![er](refresh_tokens.svg)
 
 ---
 

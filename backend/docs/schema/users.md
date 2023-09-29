@@ -13,7 +13,12 @@ CREATE TABLE `users` (
   `encrypted_password` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `hashed_password` blob NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
@@ -23,24 +28,31 @@ CREATE TABLE `users` (
 
 | Name | Type | Default | Nullable | Extra Definition | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | ---------------- | -------- | ------- | ------- |
-| id | bigint(20) |  | false | auto_increment | [tasks](tasks.md) [user_submits](user_submits.md) |  |  |
+| id | bigint(20) |  | false | auto_increment | [contest_users](contest_users.md) [submits](submits.md) [tasks](tasks.md) [user_submits](user_submits.md) |  |  |
 | name | varchar(255) |  | false |  |  |  |  |
 | role | varchar(255) |  | false |  |  |  |  |
 | encrypted_password | varchar(255) |  | false |  |  |  |  |
 | created_at | timestamp | NULL | true |  |  |  |  |
 | updated_at | timestamp | NULL | true |  |  |  |  |
+| username | varchar(255) |  | false |  |  |  |  |
+| email | varchar(255) |  | false |  |  |  |  |
+| hashed_password | blob |  | false |  |  |  |  |
 
 ## Constraints
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
+| email | UNIQUE | UNIQUE KEY email (email) |
 | PRIMARY | PRIMARY KEY | PRIMARY KEY (id) |
+| username | UNIQUE | UNIQUE KEY username (username) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
 | PRIMARY | PRIMARY KEY (id) USING BTREE |
+| email | UNIQUE KEY email (email) USING BTREE |
+| username | UNIQUE KEY username (username) USING BTREE |
 
 ## Relations
 

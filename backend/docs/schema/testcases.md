@@ -12,11 +12,11 @@ CREATE TABLE `testcases` (
   `description` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `task_testcases` bigint(20) DEFAULT NULL,
+  `task_testcases` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `testcase_name_task_testcases` (`name`,`task_testcases`),
   KEY `testcases_tasks_testcases` (`task_testcases`),
-  CONSTRAINT `testcases_tasks_testcases` FOREIGN KEY (`task_testcases`) REFERENCES `tasks` (`id`) ON DELETE SET NULL
+  CONSTRAINT `testcases_tasks_testcases` FOREIGN KEY (`task_testcases`) REFERENCES `tasks` (`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
 ```
 
@@ -26,12 +26,12 @@ CREATE TABLE `testcases` (
 
 | Name | Type | Default | Nullable | Extra Definition | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | ---------------- | -------- | ------- | ------- |
-| id | bigint(20) |  | false | auto_increment | [testcase_set_testcases](testcase_set_testcases.md) |  |  |
+| id | bigint(20) |  | false | auto_increment | [testcase_results](testcase_results.md) [testcase_set_testcases](testcase_set_testcases.md) |  |  |
 | name | varchar(255) |  | false |  |  |  |  |
 | description | varchar(255) | NULL | true |  |  |  |  |
 | created_at | timestamp | NULL | true |  |  |  |  |
 | updated_at | timestamp | NULL | true |  |  |  |  |
-| task_testcases | bigint(20) | NULL | true |  |  | [tasks](tasks.md) |  |
+| task_testcases | bigint(20) |  | false |  |  | [tasks](tasks.md) |  |
 
 ## Constraints
 
