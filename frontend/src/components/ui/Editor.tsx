@@ -46,7 +46,7 @@ export const Editor = ({ doc, readonly = false }: EditorProps) => {
     return () => {
       view.destroy();
     };
-  }, [editor.current]);
+  }, [doc, readonly]);
 
   return <div ref={editor} />;
 };
