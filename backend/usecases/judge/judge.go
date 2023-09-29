@@ -9,7 +9,10 @@ import (
 	"github.com/samber/lo"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
+	ent_contesttask "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
+	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
 	sources_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
@@ -96,9 +99,20 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 				tsq.WithTestcases()
 			})
 		}).
+		WithContest().
 		Where(ent_submit.ID(submitID)).Only(ctx)
 	if err != nil {
 		i.logger.Error("failed to get submit", slog.Any("error", err))
+		return err
+	}
+	contest, err := i.entClient.Contest.Query().
+		WithContestTask(func(ctq *ent.ContestTaskQuery) {
+			ctq.Where(ent_contesttask.HasTaskWith(ent_task.ID(submit.Edges.Task.ID)))
+		}).
+		Where(ent_contest.ID(submit.Edges.Contest.ID)).
+		Only(ctx)
+	if err != nil {
+		i.logger.Error("failed to get contest", slog.Any("error", err))
 		return err
 	}
 
@@ -119,7 +133,7 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 		i.logger.Error("[!!!inconsistency!!!]", slog.Int("submitID", submitID), slog.Int("taskID", submit.Edges.Task.ID), slog.Any("error", err))
 		return err
 	}
-	submit.Score = ratioSum // TODO: fix
+	submit.Score = (contest.Edges.ContestTask[0].Score * ratioSum) / 100
 
 	submit.UpdatedAt = lo.ToPtr(timejst.Now())
 	if _, err := submit.Update().Save(ctx); err != nil {

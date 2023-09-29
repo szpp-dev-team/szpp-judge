@@ -44,7 +44,6 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 			return status.Error(codes.Internal, err.Error())
 		}
 
-		// TODO: SetUser
 		q := tx.Task.Create().
 			SetTitle(req.Task.Title).
 			SetStatement(req.Task.Statement).
@@ -373,7 +372,6 @@ func ToPbTask(t *ent.Task) *backendv1.Task {
 	if t.UpdatedAt != nil {
 		updatedAt = timestamppb.New(*t.UpdatedAt)
 	}
-	// TODO: set contest_ids
 	return &backendv1.Task{
 		Id:              int32(t.ID),
 		Title:           t.Title,
