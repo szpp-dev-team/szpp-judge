@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/samber/lo"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
@@ -34,7 +34,7 @@ func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repositor
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
-	claims := intercepter.GetClaimsFromContext(ctx)
+	claims := interceptor.GetClaimsFromContext(ctx)
 
 	var task *ent.Task
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
@@ -100,7 +100,7 @@ func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest)
 }
 
 func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRequest) (*backendv1.UpdateTaskResponse, error) {
-	claims := intercepter.GetClaimsFromContext(ctx)
+	claims := interceptor.GetClaimsFromContext(ctx)
 
 	var task *ent.Task
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
@@ -195,7 +195,7 @@ func (i *Interactor) GetTestcaseSets(ctx context.Context, req *backendv1.GetTest
 }
 
 func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) (*backendv1.SyncTestcaseSetsResponse, error) {
-	claims := intercepter.GetClaimsFromContext(ctx)
+	claims := interceptor.GetClaimsFromContext(ctx)
 
 	var (
 		testcaseSets []*ent.TestcaseSet

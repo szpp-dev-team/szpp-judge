@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	intercepter "github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
+	interceptor "github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	enttoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"github.com/szpp-dev-team/szpp-judge/backend/test/utils"
@@ -41,7 +41,7 @@ func Test_Login(t *testing.T) {
 			},
 			assert: func(ctx context.Context, t *testing.T, req *backendv1.LoginRequest, resp *backendv1.LoginResponse) {
 				assert.Equal(t, req.Username, resp.User.Username)
-				username := intercepter.GetClaimsFromContext(ctx).Username
+				username := interceptor.GetClaimsFromContext(ctx).Username
 				assert.Equal(t, req.Username, username)
 			},
 		},
@@ -65,7 +65,7 @@ func Test_Login(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: fmt.Sprintf("authTestUser%d", i)})
+			ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: fmt.Sprintf("authTestUser%d", i)})
 			req := &backendv1.LoginRequest{
 				Username: fmt.Sprintf("authTestUser%d", i),
 				Password: "tooreeee",
@@ -125,7 +125,7 @@ func Test_Logout(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: fmt.Sprintf("authLogoutTestUser%d", i)})
+			ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: fmt.Sprintf("authLogoutTestUser%d", i)})
 
 			loginReq := &backendv1.LoginRequest{
 				Username: fmt.Sprintf("authLogoutTestUser%d", i),
@@ -174,7 +174,7 @@ func Test_RefreshAccessToken(t *testing.T) {
 				_, err := q.Save(context.Background())
 				require.NoError(t, err)
 				ctx := context.Background()
-				ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: username})
+				ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: username})
 				loginReq := &backendv1.LoginRequest{
 					Username: username,
 					Password: "tooreeee",
@@ -205,7 +205,7 @@ func Test_RefreshAccessToken(t *testing.T) {
 				_, err := q.Save(context.Background())
 				require.NoError(t, err)
 				ctx := context.Background()
-				ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: username})
+				ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: username})
 				loginReq := &backendv1.LoginRequest{
 					Username: username,
 					Password: "tooreeee",
@@ -229,7 +229,7 @@ func Test_RefreshAccessToken(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: fmt.Sprintf("authTestUser%d", i)})
+			ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: fmt.Sprintf("authTestUser%d", i)})
 
 			refreshToken := ""
 			if test.prepare != nil {
