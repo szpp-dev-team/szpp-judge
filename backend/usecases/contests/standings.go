@@ -1,5 +1,7 @@
 package contests
 
+// ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+
 import (
 	"context"
 	"sort"
@@ -7,7 +9,7 @@ import (
 
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	ent_contest_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
@@ -18,20 +20,21 @@ import (
 )
 
 type TaskDetail struct {
-	task_id       int
-	score         int
-	penalty_count int
-	ac_submit_id  *int           // nil
-	until_ac      *time.Duration // nil
+	taskId              int
+	score               int
+	currentPenaltyCount int            // 今、順位表に最終結果として表示されるペナ(総合順位のペナに書かれる数字)
+	nextPenaltyCount    int            // 次ACしたときに反映される分のペナ(総合順位のペナには足されない数字)
+	acSubmitId          *int           // nil
+	untilAc             *time.Duration // nil
 }
 
 type StandingsRecord struct {
-	rank                int
-	user_name           string
-	total_score         int
-	total_penalty_count int
-	latest_until_ac     *time.Duration // nil
-	task_detail_list    []TaskDetail
+	rank              int
+	userName          string
+	totalScore        int
+	totalPenaltyCount int
+	latestUntilAc     *time.Duration // nil
+	taskDetailList    []TaskDetail
 }
 
 const STATUS_AC = "AC"
@@ -51,8 +54,12 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 
 	// get contest submits
 	submits, err := i.entClient.Submit.Query().
-		Where(ent_submit.ID(int(req.ContestId))).
+		WithUser().
+		WithContest().
+		WithTask().
+		Where(ent_submit.HasContestWith(ent_contest.ID(contest.ID))).
 		All(ctx)
+
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -61,12 +68,12 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	sort.SliceStable(submits, func(i, j int) bool { return submits[i].SubmittedAt.Before(submits[j].SubmittedAt) })
 
 	// get user info
-	user_info, err := separateSubmit(i, ctx, submits, contest)
+	userInfo, err := separateSubmit(i, ctx, submits, contest)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	standings_list := GetStandingsRecordSlice(user_info)
+	standings_list := GetStandingsRecordSlice(userInfo)
 
 	var standings_record []*backendv1.StandingsRecord
 	for _, row := range standings_list {
@@ -78,18 +85,18 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	}, nil
 }
 
-func GetStandingsRecordSlice(user_info map[int]StandingsRecord) []StandingsRecord {
+func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord {
 	result := make([]StandingsRecord, 0)
 
-	for _, value := range user_info {
+	for _, value := range userInfo {
 		result = append(result, value)
 	}
 
-	// sort by total_score and total_penalty
+	// sort by totalScore and total_penalty
 	sort.SliceStable(result, func(i, j int) bool {
-		if result[i].total_score > result[j].total_score {
+		if result[i].totalScore > result[j].totalScore {
 			return true
-		} else if result[i].total_penalty_count < result[j].total_penalty_count {
+		} else if result[i].totalPenaltyCount < result[j].totalPenaltyCount {
 			return true
 		}
 		return false
@@ -107,7 +114,7 @@ func GetStandingsRecordSlice(user_info map[int]StandingsRecord) []StandingsRecor
 * separate submit by user_id
  */
 func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submit, contest *ent.Contest) (map[int]StandingsRecord, error) {
-	user_info := make(map[int]StandingsRecord)
+	userInfo := make(map[int]StandingsRecord)
 
 	for _, submission := range submissions {
 
@@ -116,44 +123,63 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			continue
 		}
 
-		if !isHigherScore(user_info, submission) {
-			continue
-		}
-
 		// initialize
-		err := initializeContestTasksResult(i, ctx, user_info, submission.Edges.User.ID, contest.ID)
+		err := initializeContestTasksResult(i, ctx, userInfo, submission.Edges.User.ID, contest.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		index := getTaskDetailIndex(user_info, submission.Edges.User.ID, submission.Edges.Task.ID)
-		update_user_info := user_info[submission.Edges.User.ID]
-		if *submission.Status == STATUS_AC {
-			until_ac := time.Until(contest.StartAt) * -1
-			update_user_info.task_detail_list[index].ac_submit_id = &submission.ID
-			update_user_info.task_detail_list[index].until_ac = &until_ac
-			update_user_info.task_detail_list[index].score = submission.Score
-			update_user_info.latest_until_ac = &until_ac
-			update_user_info.total_score += update_user_info.task_detail_list[index].score
-			update_user_info.total_penalty_count += update_user_info.task_detail_list[index].penalty_count
-		} else {
-			update_user_info.task_detail_list[index].penalty_count++
+		if !isHigherScore(userInfo, submission) {
+			continue
 		}
 
-		user_info[submission.Edges.User.ID] = update_user_info
+		index := getTaskDetailIndex(userInfo, submission.Edges.User.ID, submission.Edges.Task.ID)
+		updateUserInfo := userInfo[submission.Edges.User.ID]
+		if *submission.Status == STATUS_AC {
+			untilAc := time.Until(contest.StartAt) * -1
+			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
+			updateUserInfo.taskDetailList[index].untilAc = &untilAc
+			updateUserInfo.taskDetailList[index].score = submission.Score
+			updateUserInfo.latestUntilAc = &untilAc
+			updateUserInfo.totalScore += updateUserInfo.taskDetailList[index].score
+
+			// penalty
+			updateUserInfo.taskDetailList[index].currentPenaltyCount += updateUserInfo.taskDetailList[index].nextPenaltyCount
+			updateUserInfo.totalPenaltyCount += updateUserInfo.taskDetailList[index].nextPenaltyCount
+			updateUserInfo.taskDetailList[index].nextPenaltyCount = 0
+		} else {
+			updateUserInfo.taskDetailList[index].nextPenaltyCount++
+		}
+
+		userInfo[submission.Edges.User.ID] = updateUserInfo
 	}
 
-	return user_info, nil
+	return userInfo, nil
+}
+
+func isHigherScore(userInfo map[int]StandingsRecord, submission *ent.Submit) bool {
+
+	specific_user_taskDetailList := userInfo[submission.Edges.User.ID].taskDetailList
+
+	// println("[isHigherScore: parent] ID:" + strconv.Itoa(submission.ID))
+	for _, taskDetail := range specific_user_taskDetailList {
+		if taskDetail.taskId == submission.Edges.Task.ID && taskDetail.score < submission.Score {
+			// user get high score than prev submit
+			return true
+		}
+
+	}
+
+	return false
 }
 
 /*
-* set initial values for user_info task_detail task_id
+* set initial values for userInfo taskDetail taskId
  */
-func initializeContestTasksResult(i *Interactor, ctx context.Context, user_info map[int]StandingsRecord, user_id int, contest_id int) error {
+func initializeContestTasksResult(i *Interactor, ctx context.Context, userInfo map[int]StandingsRecord, user_id int, contest_id int) error {
+	_, initializedFlag := userInfo[user_id]
 
-	_, initialized_flag := user_info[user_id]
-
-	if initialized_flag {
+	if initializedFlag {
 		// already initialized
 		return nil
 	}
@@ -164,65 +190,50 @@ func initializeContestTasksResult(i *Interactor, ctx context.Context, user_info 
 		return status.Error(codes.Internal, err.Error())
 	}
 
-	// get contest_tasks
-	contest_tasks, err := i.entClient.ContestTask.Query().Where(predicate.ContestTask(ent_contest.ID(contest_id))).All(ctx)
+	// get contestTasks
+	contestTasks, err := i.entClient.ContestTask.Query().
+		Where(ent_contest_task.HasContestWith(ent_contest.ID(contest_id))).
+		All(ctx)
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
 
-	task_detail_list := make([]TaskDetail, 0)
-	for _, contest_task := range contest_tasks {
-		task_detail_list = append(task_detail_list, TaskDetail{contest_task.ID, 0, 0, nil, nil})
+	taskDetailList := make([]TaskDetail, 0)
+	for _, contest_task := range contestTasks {
+		taskDetailList = append(taskDetailList, TaskDetail{contest_task.TaskID, 0, 0, 0, nil, nil})
 	}
 
 	// insert initialized variables
-	user_info[user_id] = StandingsRecord{1, user.Username, 0, 0, nil, task_detail_list}
+	userInfo[user_id] = StandingsRecord{1, user.Username, 0, 0, nil, taskDetailList}
 
 	return nil
 }
 
-func getTaskDetailIndex(user_info map[int]StandingsRecord, user_id int, target_task_id int) int {
-	var target_index int = -1
+func getTaskDetailIndex(userInfo map[int]StandingsRecord, user_id int, target_taskId int) int {
+	var targetIndex int = -1
 
-	for index, task_detail := range user_info[user_id].task_detail_list {
-		if task_detail.task_id == target_task_id {
-			target_index = index
+	for index, taskDetail := range userInfo[user_id].taskDetailList {
+		if taskDetail.taskId == target_taskId {
+			targetIndex = index
 			break
 		}
 	}
 
-	return target_index
-}
-
-// そのユーザーの提出の中で最大点の submission か否かを返す。
-func isHigherScore(user_info map[int]StandingsRecord, submission *ent.Submit) bool {
-
-	specific_user_task_detail_list := user_info[submission.Edges.User.ID].task_detail_list
-
-	for _, task_detail := range specific_user_task_detail_list {
-
-		if task_detail.task_id == submission.Edges.Task.ID && task_detail.score < submission.Score {
-			// user get high score than prev submit
-			return true
-		}
-
-	}
-
-	return false
+	return targetIndex
 }
 
 func toStandingsRecord(standings StandingsRecord) *backendv1.StandingsRecord {
 	var taskDetailList []*backendv1.StandingsRecord_TaskDetail
-	for _, row := range standings.task_detail_list {
+	for _, row := range standings.taskDetailList {
 		taskDetailList = append(taskDetailList, toStandingsRecordTaskDetail(row))
 	}
 
 	return &backendv1.StandingsRecord{
 		Rank:              int32(standings.rank),
-		Username:          standings.user_name,
-		TotalScore:        int32(standings.total_score),
-		TotalPenaltyCount: int32(standings.total_penalty_count),
-		LatestAcAt:        toTimestamp(standings.latest_until_ac),
+		Username:          standings.userName,
+		TotalScore:        int32(standings.totalScore),
+		TotalPenaltyCount: int32(standings.totalPenaltyCount),
+		LatestAcAt:        toTimestamp(standings.latestUntilAc),
 		TaskDetailList:    taskDetailList,
 	}
 }
@@ -235,15 +246,21 @@ func toTimestamp(d *time.Duration) *timestamppb.Timestamp {
 
 func toStandingsRecordTaskDetail(td TaskDetail) *backendv1.StandingsRecord_TaskDetail {
 	var acSubmitID int32
-	if td.ac_submit_id != nil {
-		acSubmitID = int32(*td.ac_submit_id)
+	if td.acSubmitId != nil {
+		acSubmitID = int32(*td.acSubmitId)
+	}
+
+	var untilAc *durationpb.Duration
+	untilAc = nil
+	if td.untilAc != nil {
+		untilAc = durationpb.New(*td.untilAc)
 	}
 
 	return &backendv1.StandingsRecord_TaskDetail{
-		TaskId:       int32(td.task_id),
+		TaskId:       int32(td.taskId),
 		Score:        int32(td.score),
-		PenaltyCount: int32(td.penalty_count),
+		PenaltyCount: int32(td.currentPenaltyCount),
 		AcSubmitId:   &acSubmitID,
-		UntilAc:      durationpb.New(*td.until_ac),
+		UntilAc:      untilAc,
 	}
 }
