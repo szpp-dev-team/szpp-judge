@@ -7,15 +7,21 @@ import { decodeJwtPayload } from "@/src/util/jwt";
  * 使用例:
  * ```ts
  * grpcMock(..., async (ctx, res, decodeReq, encodeResp, req) => {
- *    if (isAuthorizationJwtExpired(req.headers)) return res(ctx.status(401));
+ *    // 発行から5秒以上経過したトークンの場合 401 を返す例
+ *    if (isAuthorizationJwtExpired(req.headers, 1000 * 5)) return res(ctx.status(401));
  * })
  * ```
  */
 export const isAuthorizationJwtExpired = (headers: Headers, tokenLifeMilliSec: number): boolean => {
-  const jwt = headers.get("Authorization");
-  if (!jwt) {
+  const value = headers.get("Authorization");
+  if (!value) {
     return false;
   }
+  if (!value.startsWith("Bearer eyJ")) {
+    console.warn("[isAuthorizationJwtExpired] Invalid Bearer JWT format");
+    return false;
+  }
+  const jwt = value.substring("Bearer ".length);
   const { iat } = decodeJwtPayload(jwt) as { iat: number };
   return Date.now() - iat > tokenLifeMilliSec;
 };
