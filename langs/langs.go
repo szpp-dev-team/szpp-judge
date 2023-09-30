@@ -1,5 +1,10 @@
 package langs
 
+import (
+	"fmt"
+	"strings"
+)
+
 type LangID string
 
 // 定数名のフォーマット： `言語名_バージョン_処理系`
@@ -11,6 +16,7 @@ type LangID string
 const (
 	C_11_GCC           = LangID("c/11/gcc")
 	CPP_20_GCC         = LangID("cpp/20/gcc")
+	SCRATCH_3_GCC      = LangID("scratch/3/gcc")
 	JAVA_21_OPENJDK    = LangID("java/21/openjdk")
 	PYTHON_311_CPYTHON = LangID("python/3.11/cpython")
 )
@@ -27,52 +33,60 @@ type Meta struct {
 
 const ImagePrefix = "szpp-judge-image-"
 
+const gccVer = "13.2"
+const gccDockerImage = ImagePrefix + "gcc" + gccVer
+
+func name(langName, langVer, implName, implVer string) string {
+	langName = strings.TrimSpace(langName)
+	langVer = strings.TrimSpace(langVer)
+	implName = strings.TrimSpace(implName)
+	implVer = strings.TrimSpace(implVer)
+
+	pad := ""
+	if implVer != "" {
+		pad = " "
+	}
+	return fmt.Sprintf("%s%s (%s%s%s)", langName, langVer, implName, pad, implVer)
+}
+
+func genCcCompileCmd(compiler, std, file string) []string {
+	return []string{
+		compiler,
+		std,
+		"-I/opt/include",
+		"-lm",
+		"-Wall",
+		"-Wextra",
+		"-DSZPP_JUDGE",
+		"-O2",
+		"-march=native",
+		"-mtune=native",
+		file,
+	}
+}
+
 var LangMetas = []Meta{
 	{
 		ID:          C_11_GCC,
-		Name:        "C11 (GCC 13.2)",
+		Name:        name("C", "11", "GCC", gccVer),
 		Active:      true,
-		DockerImage: ImagePrefix + "gcc13.2",
+		DockerImage: gccDockerImage,
 		SourceFile:  "main.c",
-		CompileCmd: []string{
-			"gcc",
-			"-std=c11",
-			"-I/opt/include",
-			"-lm",
-			"-Wall",
-			"-Wextra",
-			"-DSZPP_JUDGE",
-			"-O2",
-			"-march=native",
-			"-mtune=native",
-			"main.c",
-		},
-		ExecCmd: []string{"./a.out"},
+		CompileCmd:  genCcCompileCmd("gcc", "-std=c11", "main.c"),
+		ExecCmd:     []string{"./a.out"},
 	},
 	{
 		ID:          CPP_20_GCC,
-		Name:        "C++20 (GCC 13.2)",
+		Name:        name("C++", "20", "GCC", gccVer),
 		Active:      true,
-		DockerImage: ImagePrefix + "gcc13.2",
+		DockerImage: gccDockerImage,
 		SourceFile:  "main.cpp",
-		CompileCmd: []string{
-			"g++",
-			"-std=c++20",
-			"-I/opt/include",
-			"-lm",
-			"-Wall",
-			"-Wextra",
-			"-DSZPP_JUDGE",
-			"-O2",
-			"-march=native",
-			"-mtune=native",
-			"main.cpp",
-		},
-		ExecCmd: []string{"./a.out"},
+		CompileCmd:  genCcCompileCmd("g++", "-std=c++20", "main.cpp"),
+		ExecCmd:     []string{"./a.out"},
 	},
 	{
 		ID:          JAVA_21_OPENJDK,
-		Name:        "Java (OpenJDK 21)",
+		Name:        name("Java", "21", "OpenJDK", ""),
 		Active:      true,
 		DockerImage: ImagePrefix + "openjdk21",
 		SourceFile:  "Main.java",
@@ -82,7 +96,7 @@ var LangMetas = []Meta{
 
 	{
 		ID:          PYTHON_311_CPYTHON,
-		Name:        "Python (CPython 3.11)",
+		Name:        name("Python", "3.11", "CPython", ""),
 		Active:      true,
 		DockerImage: ImagePrefix + "cpython3.11",
 		SourceFile:  "main.py",
