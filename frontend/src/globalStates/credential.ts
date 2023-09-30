@@ -20,6 +20,7 @@ const authUser = atom<Readonly<AuthUser> | null>((get) => {
 
 export const useCredentialValue = () => useAtomValue(credential);
 export const useCredentialSetter = () => useSetAtom(credential);
+export const useCredentialValueAndSetter = () => useAtom(credential);
 
 export const useCredentialValueAndEraser = (): [Readonly<Credential>, () => void] => {
   const [cred, setCred] = useAtom(credential);
