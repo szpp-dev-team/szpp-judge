@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	intercepter "github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
+	interceptor "github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	u_user "github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
@@ -25,7 +25,7 @@ func NewInteractor(entClient *ent.Client, secret string) *Interactor {
 }
 
 func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	username := intercepter.GetClaimsFromContext(ctx).Username
+	username := interceptor.GetClaimsFromContext(ctx).Username
 
 	q := i.entClient.User.Query()
 	user, err := q.Where(entuser.Username(username)).Only(ctx)
@@ -69,7 +69,7 @@ func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAcce
 		return nil, status.Error(codes.Unauthenticated, "invalid refresh token")
 	} else {
 		secret := i.Secret
-		username := intercepter.GetClaimsFromContext(ctx).Username
+		username := interceptor.GetClaimsFromContext(ctx).Username
 		accessToken, err := generateAccessToken([]byte(secret), username)
 		if err != nil {
 			return nil, err

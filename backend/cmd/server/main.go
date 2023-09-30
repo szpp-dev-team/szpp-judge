@@ -83,6 +83,7 @@ func main() {
 		grpc_server.WithCloudtasksClient(cloudtasksClient),
 		grpc_server.WithTestcasesRepository(testcasesRepository),
 		grpc_server.WithJudgeClient(judgeClient),
+		grpc_server.WithSecret(config.JWTSecret),
 	)
 	lsnr, err := net.Listen("tcp", "0.0.0.0:"+config.GrpcPort)
 	if err != nil {
