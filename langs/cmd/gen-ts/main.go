@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/szpp-dev-team/szpp-judge/langs"
+	"github.com/szpp-dev-team/szpp-judge/langs/timejst"
 	"github.com/tkrajina/typescriptify-golang-structs/typescriptify"
 )
 
@@ -51,7 +52,7 @@ func writeFileHeadComment(w io.Writer) error {
 		return err
 	}
 
-	fmt.Fprintf(w, "// @generated on %s\n", time.Now().Format(time.RFC1123Z))
+	fmt.Fprintf(w, "// @generated on %s\n", timejst.Now().Format(time.RFC1123Z))
 
 	return nil
 }
