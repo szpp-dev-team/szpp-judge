@@ -31,6 +31,10 @@ export class Duration {
     return this.t / Duration.HOUR | 0;
   }
 
+  seconds(): number {
+    return this.t / Duration.SECOND | 0;
+  }
+
   hms(): [number, number, number] {
     let t = this.t;
     const h = t / Duration.HOUR | 0;
