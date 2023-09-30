@@ -18,8 +18,23 @@ type Claims struct {
 
 var claimsKey struct{}
 var excludeMethodSet = map[string]struct{}{
+	// Task
 	backendv1.TaskService_GetTask_FullMethodName:         {}, // 問題閲覧はゲストでもできるようにする
 	backendv1.TaskService_GetTestcaseSets_FullMethodName: {}, // 入力例閲覧はゲストでもできるようにする
+	// Auth
+	backendv1.AuthService_Login_FullMethodName: {},
+	// User
+	backendv1.UserService_ExistsEmail_FullMethodName:    {},
+	backendv1.UserService_ExistsUsername_FullMethodName: {},
+	backendv1.UserService_GetUser_FullMethodName:        {},
+	backendv1.UserService_CreateUser_FullMethodName:     {},
+	// Contest
+	backendv1.ContestService_GetContest_FullMethodName:   {},
+	backendv1.ContestService_ListContests_FullMethodName: {},
+	backendv1.ContestService_GetStandings_FullMethodName: {},
+	// Judge
+	backendv1.JudgeService_GetSubmissionDetail_FullMethodName: {},
+	backendv1.JudgeService_ListSubmissions_FullMethodName:     {},
 }
 
 func Auth(secret []byte) grpc.UnaryServerInterceptor {
