@@ -12,4 +12,4 @@ export type AccessTokenClaim = Readonly<{
 
   username: string;
   isAdmin: boolean;
-}>
+}>;
