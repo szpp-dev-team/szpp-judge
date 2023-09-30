@@ -78,19 +78,23 @@ var LangMetas = []Meta{
 		SourceFile:  "Main.java",
 		CompileCmd:  []string{"javac", "Main.java"},
 		ExecCmd:     []string{"java", "-Xss1G", "-Xmx1G", "Main"},
-	},
+	} ,
+
 	{
 		ID:          PYTHON_311_CPYTHON,
-		Name:        "Python (CPython 3.11)",
+		Name:     "Python (CPython 3.11)",
 		Active:      true,
 		DockerImage: ImagePrefix + "cpython3.11",
 		SourceFile:  "main.py",
 		CompileCmd:  []string{"python3", "-m", "compileall", "-q", "main.py"},
-		ExecCmd:     []string{"python3", "main.py"},
+		ExecCmd:            []string{"python3", "main.py"},
 	},
 }
 
 var langMetaIndex map[LangID]*Meta
+
+
+
 
 func init() {
 	langMetaIndex = make(map[LangID]*Meta, len(LangMetas))
