@@ -1,4 +1,9 @@
+import { defaultErrorMap } from "@/src/config/zod";
 import { z } from "zod";
+
+// _app.tsx で z.setErrorMap する場合 zod が不要なページでも zod を import することになり、
+// バンドルサイズが大きくなってしまうので個々の zschema/*.ts で読み込むようにしている。
+z.setErrorMap(defaultErrorMap);
 
 const username = z.string()
   .describe("半角英数字・アンダーバー・ハイフンのみ使用可、20文字以内")
