@@ -17,19 +17,19 @@ const generateMockAccessToken = (user: AuthUser, now: Date): string => {
   };
   const header = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // { alg: "HS256", typ: "JWT" } のエンコード文字列
   const payload = Buffer.from(JSON.stringify(payloadObj)).toString("base64");
-  const hash = "hassssh";
+  const hash = "hassssh" + now.toLocaleTimeString();
   return `${header}.${payload}.${hash}`;
 };
 
-const generateMockRefreshToken = (now: Date): string => {
+const generateMockRefreshToken = (username: string, now: Date): string => {
   // sv-SE ローケルでのフォーマットは `YYYY-mm-dd HH:MM:SS`
-  return `${REFRESH_TOKEN_PREFIX}/${now.toLocaleString("sv-SE")}`;
+  return `${REFRESH_TOKEN_PREFIX}/${username}/${now.toLocaleString("sv-SE")}`;
 };
 
 const generateMockCredential = (user: AuthUser): Credential => {
   const now = new Date();
   const accessToken = generateMockAccessToken(user, now);
-  const refreshToken = generateMockRefreshToken(now);
+  const refreshToken = generateMockRefreshToken(user.username, now);
   return { accessToken, refreshToken };
 };
 
@@ -75,6 +75,32 @@ export const authHandlers: RequestHandler[] = [
     return res(
       ctx.delay(500),
       encodeResp({}),
+    );
+  }),
+
+  grpcMock(AuthService, "refreshAccessToken", async (ctx, res, decodeReq, encodeResp) => {
+    const { refreshToken } = await decodeReq();
+
+    // 実際のリフレッシュトークンはスラッシュ区切りではない。
+    // モックでは username の情報を埋め込むためにスラッシュ区切りにしている。
+    const [prefix, username] = refreshToken.split("/");
+    if (prefix !== REFRESH_TOKEN_PREFIX || !username) {
+      return res(
+        ctx.delay(100),
+        ctx.status(401),
+      );
+    }
+
+    const user: AuthUser = {
+      id: 1,
+      username,
+      isAdmin: username === "admin",
+    };
+
+    const accessToken = generateMockAccessToken(user, new Date());
+    return res(
+      ctx.delay(100),
+      encodeResp({ accessToken }),
     );
   }),
 ];
