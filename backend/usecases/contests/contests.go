@@ -394,7 +394,6 @@ func (i *Interactor) CreateAnswer(ctx context.Context, req *backendv1.CreateAnsw
 	now := time.Now()
 	// 回答内容を設定
 	clarification, err = clarification.Update().
-		SetIsPublic(req.IsPublic).
 		SetAnswerContent(req.Content).
 		SetUpdatedAt(now).
 		SetAnswerCreatedAt(now).
