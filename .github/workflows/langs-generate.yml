@@ -1,14 +1,10 @@
-name: langs lint
+name: langs generate
 on:
   push:
-    branches:
-      - develop
-    paths:
-      - .github/workflows/langs.yml
-      - langs/**/*.go
-      - langs/go.*
-  pull_request:
-    branches:
+    # 原則として main と develop では generate を行わない (参考: buf-generate.yml)
+    # 生成済みのコードを PR を通して merge するという運用にする
+    branches-ignore:
+      - main
       - develop
     paths:
       - .github/workflows/langs.yml
@@ -18,8 +14,7 @@ defaults:
   run:
     working-directory: ./langs
 jobs:
-  lint-test-format:
-    name: "Lint & Test & Format"
+  generate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -34,10 +29,10 @@ jobs:
       - name: test
         run: make test
 
-      - name: format
-        run: make fmt
+      - name: generate
+        run: make __gen
 
-      - name: commit format changes
+      - name: commit generated code
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "style(langs): [bot] apply code formatter changes"
+          commit_message: "chore(langs): [bot] generate language meta codes"
