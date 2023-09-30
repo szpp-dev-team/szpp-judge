@@ -96,7 +96,7 @@ func GetStandingsRecordSlice(user_info map[int]StandingsRecord) []StandingsRecor
 	})
 
 	// allocate rank
-	for index, _ := range result {
+	for index := range result {
 		result[index].rank = index + 1
 	}
 
@@ -128,7 +128,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 		index := getTaskDetailIndex(user_info, submission.Edges.User.ID, submission.Edges.Task.ID)
 		update_user_info := user_info[submission.Edges.User.ID]
 		if *submission.Status == STATUS_AC {
-			until_ac := contest.StartAt.Sub(time.Now())
+			until_ac := time.Until(contest.StartAt) * -1
 			update_user_info.task_detail_list[index].ac_submit_id = &submission.ID
 			update_user_info.task_detail_list[index].until_ac = &until_ac
 			update_user_info.latest_until_ac = &until_ac
