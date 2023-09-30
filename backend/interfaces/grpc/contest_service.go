@@ -47,9 +47,8 @@ func (s *contestServiceServer) GetMySubmissionStatuses(ctx context.Context, req 
 	return s.interactor.GetMySubmissionStatuses(ctx, req)
 }
 
-// GetStandings implements backendv1.ContestServiceServer.
-func (*contestServiceServer) GetStandings(context.Context, *backendv1.GetStandingsRequest) (*backendv1.GetStandingsResponse, error) {
-	panic("unimplemented")
+func (s *contestServiceServer) GetStandings(ctx context.Context, req *backendv1.GetStandingsRequest) (*backendv1.GetStandingsResponse, error) {
+	return s.interactor.GetStandings(ctx, req)
 }
 
 func (s *contestServiceServer) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRequest) (*backendv1.RegisterMeResponse, error) {
