@@ -189,7 +189,7 @@ func initializeContestTasksResult(i *Interactor, ctx context.Context, user_info 
 
 	task_detail_list := make([]TaskDetail, 0)
 	for _, contest_task := range contest_tasks {
-		task_detail_list = append(task_detail_list, TaskDetail{contest_task.ID, 0, 0, nil, nil})
+		task_detail_list = append(task_detail_list, TaskDetail{contest_task.ID, 0, 0, 0, nil, nil})
 	}
 
 	// insert initialized variables
