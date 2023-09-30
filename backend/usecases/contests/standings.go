@@ -115,7 +115,8 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 		if submission.SubmittedAt.Before(contest.StartAt) || contest.EndAt.After(submission.SubmittedAt) {
 			continue
 		}
-		if isTaskAlreadySolved(user_info, submission.Edges.User.ID, submission.Edges.Task.ID) {
+
+		if !isHigherScore(user_info, submission) {
 			continue
 		}
 
@@ -131,6 +132,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			until_ac := time.Until(contest.StartAt) * -1
 			update_user_info.task_detail_list[index].ac_submit_id = &submission.ID
 			update_user_info.task_detail_list[index].until_ac = &until_ac
+			update_user_info.task_detail_list[index].score = submission.Score
 			update_user_info.latest_until_ac = &until_ac
 			update_user_info.total_score += update_user_info.task_detail_list[index].score
 			update_user_info.total_penalty_count += update_user_info.task_detail_list[index].penalty_count
@@ -170,7 +172,7 @@ func initializeContestTasksResult(i *Interactor, ctx context.Context, user_info 
 
 	task_detail_list := make([]TaskDetail, 0)
 	for _, contest_task := range contest_tasks {
-		task_detail_list = append(task_detail_list, TaskDetail{contest_task.ID, contest_task.Score, 0, nil, nil})
+		task_detail_list = append(task_detail_list, TaskDetail{contest_task.ID, 0, 0, nil, nil})
 	}
 
 	// insert initialized variables
@@ -192,14 +194,15 @@ func getTaskDetailIndex(user_info map[int]StandingsRecord, user_id int, target_t
 	return target_index
 }
 
-func isTaskAlreadySolved(user_info map[int]StandingsRecord, user_id int, task_id int) bool {
+// そのユーザーの提出の中で最大点の submission か否かを返す。
+func isHigherScore(user_info map[int]StandingsRecord, submission *ent.Submit) bool {
 
-	specific_user_task_detail_list := user_info[user_id].task_detail_list
+	specific_user_task_detail_list := user_info[submission.Edges.User.ID].task_detail_list
 
 	for _, task_detail := range specific_user_task_detail_list {
 
-		if task_detail.task_id == task_id && task_detail.ac_submit_id != nil {
-			// user already solved this task
+		if task_detail.task_id == submission.Edges.Task.ID && task_detail.score < submission.Score {
+			// user get high score than prev submit
 			return true
 		}
 
