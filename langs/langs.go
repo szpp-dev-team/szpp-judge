@@ -85,6 +85,15 @@ var LangMetas = []Meta{
 		ExecCmd:     []string{"./a.out"},
 	},
 	{
+		ID:          SCRATCH_3_GCC,
+		Name:        name("Scratch", "3.0", "convert to C++20; GCC", gccVer),
+		Active:      true,
+		DockerImage: gccDockerImage,
+		SourceFile:  "main.cpp",
+		CompileCmd:  genCcCompileCmd("g++", "-std=c++20", "main.cpp"),
+		ExecCmd:     []string{"./a.out"},
+	},
+	{
 		ID:          JAVA_21_OPENJDK,
 		Name:        name("Java", "21", "OpenJDK", ""),
 		Active:      true,
