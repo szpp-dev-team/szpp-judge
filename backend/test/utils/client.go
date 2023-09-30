@@ -17,11 +17,14 @@ import (
 func NewTestClient(t *testing.T) *ent.Client {
 	t.Helper()
 
+	println("!!!!!!!!!!!!!!!!!!!!!!!!!")
+	println(os.Getenv("MYSQL_DATABASE"))
+
 	mysqlConfig := &mysql.Config{
-		DBName:               "szpp-judge-test-db",
-		User:                 "root",
-		Passwd:               "root",
-		Addr:                 "0.0.0.0:" + os.Getenv("TEST_MYSQL_PORT"),
+		DBName:               os.Getenv("MYSQL_DATABASE"),
+		User:                 os.Getenv("MYSQL_USER"),
+		Passwd:               os.Getenv("MYSQL_ROOT_PASSWORD"),
+		Addr:                 os.Getenv("addr") + os.Getenv("TEST_MYSQL_PORT"),
 		Net:                  "tcp",
 		ParseTime:            true,
 		AllowNativePasswords: true,
