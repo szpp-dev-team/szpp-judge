@@ -13,8 +13,8 @@ type judgeServiceServer struct {
 	interactor *judge.Interactor
 }
 
-func NewJudgeServiceServer() pb.JudgeServiceServer {
-	return &judgeServiceServer{}
+func NewJudgeServiceServer(interactor *judge.Interactor) pb.JudgeServiceServer {
+	return &judgeServiceServer{interactor}
 }
 
 func (s *judgeServiceServer) Judge(req *pb.JudgeRequest, stream pb.JudgeService_JudgeServer) error {
