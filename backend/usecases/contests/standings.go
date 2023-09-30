@@ -117,6 +117,10 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			continue
 		}
 
+		if !isHigherScore(user_info, submission) {
+			continue
+		}
+
 		// initialize
 		err := initializeContestTasksResult(i, ctx, user_info, submission.Edges.User.ID, contest.ID)
 		if err != nil {
