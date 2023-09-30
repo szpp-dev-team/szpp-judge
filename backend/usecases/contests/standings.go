@@ -18,11 +18,12 @@ import (
 )
 
 type TaskDetail struct {
-	task_id       int
-	score         int
-	penalty_count int
-	ac_submit_id  *int           // nil
-	until_ac      *time.Duration // nil
+	task_id               int
+	score                 int
+	current_penalty_count int            // 今、順位表に最終結果として表示されるペナ(総合順位のペナに書かれる数字)
+	next_penalty_count    int            // 次ACしたときに反映される分のペナ(総合順位のペナには足されない数字)
+	ac_submit_id          *int           // nil
+	until_ac              *time.Duration // nil
 }
 
 type StandingsRecord struct {
@@ -116,10 +117,6 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			continue
 		}
 
-		if !isHigherScore(user_info, submission) {
-			continue
-		}
-
 		// initialize
 		err := initializeContestTasksResult(i, ctx, user_info, submission.Edges.User.ID, contest.ID)
 		if err != nil {
@@ -135,15 +132,35 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			update_user_info.task_detail_list[index].score = submission.Score
 			update_user_info.latest_until_ac = &until_ac
 			update_user_info.total_score += update_user_info.task_detail_list[index].score
-			update_user_info.total_penalty_count += update_user_info.task_detail_list[index].penalty_count
+
+			// penalty
+			update_user_info.task_detail_list[index].current_penalty_count += update_user_info.task_detail_list[index].next_penalty_count
+			update_user_info.total_penalty_count += update_user_info.task_detail_list[index].next_penalty_count
+			update_user_info.task_detail_list[index].next_penalty_count = 0
 		} else {
-			update_user_info.task_detail_list[index].penalty_count++
+			update_user_info.task_detail_list[index].next_penalty_count++
 		}
 
 		user_info[submission.Edges.User.ID] = update_user_info
 	}
 
 	return user_info, nil
+}
+
+func isHigherScore(user_info map[int]StandingsRecord, submission *ent.Submit) bool {
+
+	specific_user_task_detail_list := user_info[submission.Edges.User.ID].task_detail_list
+
+	for _, task_detail := range specific_user_task_detail_list {
+
+		if task_detail.task_id == submission.Edges.Task.ID && task_detail.score < submission.Score {
+			// user get high score than prev submit
+			return true
+		}
+
+	}
+
+	return false
 }
 
 /*
@@ -194,23 +211,6 @@ func getTaskDetailIndex(user_info map[int]StandingsRecord, user_id int, target_t
 	return target_index
 }
 
-// そのユーザーの提出の中で最大点の submission か否かを返す。
-func isHigherScore(user_info map[int]StandingsRecord, submission *ent.Submit) bool {
-
-	specific_user_task_detail_list := user_info[submission.Edges.User.ID].task_detail_list
-
-	for _, task_detail := range specific_user_task_detail_list {
-
-		if task_detail.task_id == submission.Edges.Task.ID && task_detail.score < submission.Score {
-			// user get high score than prev submit
-			return true
-		}
-
-	}
-
-	return false
-}
-
 func toStandingsRecord(standings StandingsRecord) *backendv1.StandingsRecord {
 	var taskDetailList []*backendv1.StandingsRecord_TaskDetail
 	for _, row := range standings.task_detail_list {
@@ -242,7 +242,7 @@ func toStandingsRecordTaskDetail(td TaskDetail) *backendv1.StandingsRecord_TaskD
 	return &backendv1.StandingsRecord_TaskDetail{
 		TaskId:       int32(td.task_id),
 		Score:        int32(td.score),
-		PenaltyCount: int32(td.penalty_count),
+		PenaltyCount: int32(td.current_penalty_count),
 		AcSubmitId:   &acSubmitID,
 		UntilAc:      durationpb.New(*td.until_ac),
 	}
