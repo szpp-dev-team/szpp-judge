@@ -15,6 +15,7 @@ type Config struct {
 	HttpPort  string `envconfig:"BACKEND_HTTP_PORT" default:"8080"`
 	ModeDev   bool   `envconfig:"MODE_DEV" default:"true"`
 	JudgeAddr string `envconfig:"BACKEND_JUDGE_ADDR" required:"true"`
+	JWTSecret string `envconfig:"JWT_SECRET" required:"true"`
 }
 
 func New() (*Config, error) {

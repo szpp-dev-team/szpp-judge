@@ -6,7 +6,9 @@ import (
 	"log/slog"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/interceptor"
 	grpc_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/grpc"
+	"github.com/szpp-dev-team/szpp-judge/backend/usecases/auth"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/contests"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/judge"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
@@ -27,6 +29,7 @@ func New(opts ...optionFunc) *grpc.Server {
 	serverOptions = append(serverOptions,
 		grpc.ChainUnaryInterceptor(logging.UnaryServerInterceptor(interceptorLogger(opt.Logger))),
 		grpc.ChainStreamInterceptor(logging.StreamServerInterceptor(interceptorLogger(opt.Logger))),
+		grpc.UnaryInterceptor(interceptor.Auth([]byte(opt.Secret))),
 	)
 
 	srv := grpc.NewServer(serverOptions...)
@@ -46,6 +49,8 @@ func New(opts ...optionFunc) *grpc.Server {
 	contestInteractor := contests.NewInteractor(opt.EntClient)
 	contetSrv := grpc_interfaces.NewContestServiceServer(contestInteractor)
 	pb.RegisterContestServiceServer(srv, contetSrv)
+	authSrv := grpc_interfaces.NewAuthServiceServer(auth.NewInteractor(opt.EntClient, opt.Secret))
+	pb.RegisterAuthServiceServer(srv, authSrv)
 
 	return srv
 }

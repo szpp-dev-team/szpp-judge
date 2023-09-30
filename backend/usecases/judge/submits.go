@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/samber/lo"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
@@ -151,7 +151,7 @@ func (i *Interactor) GetSubmissionDetail(ctx context.Context, req *backendv1.Get
 func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSubmissionsRequest) (*backendv1.ListSubmissionsResponse, error) {
 	now := timejst.Now()
 
-	claims := intercepter.GetClaimsFromContext(ctx)
+	claims := interceptor.GetClaimsFromContext(ctx)
 	isAdmin := false
 	if claims != nil {
 		user, err := i.entClient.User.Query().Where(ent_user.Username(claims.Username)).Only(ctx)
