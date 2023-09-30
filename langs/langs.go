@@ -27,7 +27,7 @@ type Meta struct {
 
 const ImagePrefix = "szpp-judge-image-"
 
-var langMetas = []Meta{
+var LangMetas = []Meta{
 	{
 		ID:          C_11_GCC,
 		Name:        "C11 (GCC 13.2)",
@@ -93,11 +93,11 @@ var langMetas = []Meta{
 var langMetaIndex map[LangID]*Meta
 
 func init() {
-	langMetaIndex = make(map[LangID]*Meta, len(langMetas))
+	langMetaIndex = make(map[LangID]*Meta, len(LangMetas))
 
 	// create langMetaIndex
-	for i := range langMetas {
-		langMetaIndex[langMetas[i].ID] = &langMetas[i]
+	for i := range LangMetas {
+		langMetaIndex[LangMetas[i].ID] = &LangMetas[i]
 	}
 }
 
