@@ -116,16 +116,18 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 			ExecTimeMs:    uint32(res.ExecTime.Milliseconds()),
 			ExecMemoryKib: uint32(res.ExecMemory / unit.KiB),
 		}
-		if res.ExitCode != 0 {
+
+		switch {
+		case res.ExitCode != 0:
 			i.logger.Error("RE occurred", slog.Any("exitCode", res.ExitCode), slog.Any("stderr", res.Stderr))
 			judgeResp.Status = judgev1.JudgeStatus_RE
-		} else if res.ExecTime > time.Duration(req.ExecTimeLimitMs)*time.Millisecond {
+		case res.ExecTime > time.Duration(req.ExecTimeLimitMs)*time.Millisecond:
 			judgeResp.Status = judgev1.JudgeStatus_TLE
-		} else if res.ExecMemory > unit.Byte(req.ExecMemoryLimitMib) {
+		case res.ExecMemory > unit.Byte(req.ExecMemoryLimitMib):
 			judgeResp.Status = judgev1.JudgeStatus_MLE
-		} else if res.StdoutOverflowed {
+		case res.StdoutOverflowed:
 			judgeResp.Status = judgev1.JudgeStatus_OLE
-		} else {
+		default:
 			checker := &Checker{
 				Output:       res.Stdout,
 				ExpectOutput: string(testcase.Output),

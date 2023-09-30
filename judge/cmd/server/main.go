@@ -38,10 +38,8 @@ func main() {
 	// GCS Client
 	gcsClient, err := storage.NewClient(ctx)
 	if err != nil {
-		gcsClient.Close()
 		log.Fatal(err)
 	}
-	defer gcsClient.Close()
 
 	srv := grpc_server.New(
 		grpc_server.WithLogger(logger),
@@ -53,9 +51,11 @@ func main() {
 
 	lsnr, err := net.Listen("tcp", ":"+cfg.GrpcPort)
 	if err != nil {
+		gcsClient.Close()
 		dockerClient.Close()
 		log.Fatal(err)
 	}
+	defer gcsClient.Close()
 	defer dockerClient.Close()
 	defer lsnr.Close()
 	go func() {
