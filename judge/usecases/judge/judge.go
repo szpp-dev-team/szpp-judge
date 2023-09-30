@@ -105,7 +105,7 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 			MemoryLimit: unit.Byte(req.ExecMemoryLimitMib) * unit.MiB,
 		})
 		if err != nil {
-			i.logger.Error("error occured while exec", slog.Any("error", err))
+			i.logger.Error("error occurred while exec", slog.Any("error", err))
 			return status.Error(codes.Internal, err.Error())
 		}
 
@@ -117,7 +117,7 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 			ExecMemoryKib: uint32(res.ExecMemory / unit.KiB),
 		}
 		if res.ExitCode != 0 {
-			i.logger.Error("RE occured", slog.Any("exitCode", res.ExitCode), slog.Any("stderr", res.Stderr))
+			i.logger.Error("RE occurred", slog.Any("exitCode", res.ExitCode), slog.Any("stderr", res.Stderr))
 			judgeResp.Status = judgev1.JudgeStatus_RE
 		} else if res.ExecTime > time.Duration(req.ExecTimeLimitMs)*time.Millisecond {
 			judgeResp.Status = judgev1.JudgeStatus_TLE
@@ -171,7 +171,7 @@ func (i *Interactor) compile(ctx context.Context, langMeta *langs.Meta, sb *sand
 		FileWriteLimit: unit.MiB,
 	})
 	if err != nil {
-		i.logger.Error("error occured while compile", slog.Any("error", err))
+		i.logger.Error("error occurred while compile", slog.Any("error", err))
 		return false, "", status.Error(codes.Internal, err.Error())
 	}
 	return res.ExitCode == 0, res.Stderr, nil
