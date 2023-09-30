@@ -4,7 +4,7 @@ import { TransportProvider } from "@connectrpc/connect-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
 import { createBackendGrpcTransport } from "../config/grpc";
-import { useCredentialValue } from "../globalStates/credential";
+import { useAccessTokenClaimValue, useCredentialValue } from "../globalStates/credential";
 import { useRefreshAccessTokenWithoutQueryClient } from "../usecases/auth";
 
 import("../mocks").catch((reason) => console.error(reason));
@@ -13,9 +13,11 @@ const queryClient = new QueryClient();
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const cred = useCredentialValue();
+  const claim = useAccessTokenClaimValue();
   const { refreshAccessToken } = useRefreshAccessTokenWithoutQueryClient();
   const transport = createBackendGrpcTransport({
     cred,
+    accessTokenExpireAt: claim?.exp,
     refreshAccessToken: async () => (await refreshAccessToken()).accessToken,
   });
 

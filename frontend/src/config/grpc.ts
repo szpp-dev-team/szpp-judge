@@ -14,6 +14,7 @@ const REFRESH_ACCESS_TOKEN_URL_PATH = AuthService.typeName + "/" + AuthService.m
 
 type AuthInterceptorOptions = {
   cred: Readonly<Credential>;
+  accessTokenExpireAt?: number;
   refreshAccessToken: () => Promise<string>;
 };
 
@@ -24,6 +25,7 @@ type AuthInterceptorOptions = {
  */
 const authInterceptor = ({
   cred: { accessToken, refreshToken },
+  accessTokenExpireAt,
   refreshAccessToken,
 }: AuthInterceptorOptions): Interceptor =>
 (next) =>
@@ -32,7 +34,12 @@ async (req) => {
     return await next(req);
   }
 
-  req.header.set("Authorization", `Bearer ${accessToken}`);
+  if (accessTokenExpireAt && Date.now() > accessTokenExpireAt) {
+    const newAccessToken = await refreshAccessToken();
+    req.header.set("Authorization", `Bearer ${newAccessToken}`);
+  } else {
+    req.header.set("Authorization", `Bearer ${accessToken}`);
+  }
 
   try {
     return await next(req);
