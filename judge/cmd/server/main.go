@@ -38,6 +38,7 @@ func main() {
 	// GCS Client
 	gcsClient, err := storage.NewClient(ctx)
 	if err != nil {
+		gcsClient.Close()
 		log.Fatal(err)
 	}
 	defer gcsClient.Close()
