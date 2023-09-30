@@ -1,0 +1,46 @@
+name: Langs
+on:
+  push:
+    # 原則として main と develop では generate を行わない
+    # 生成済みのコードを PR を通して merge するという運用にする
+    branches-ignore:
+      - main
+      - develop
+    paths:
+      - .github/workflows/langs.yml
+      - langs/*.go
+      - langs/go.*
+defaults:
+  run:
+    working-directory: ./langs
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: judge/go.mod
+
+      - name: lint
+        run: make lint
+
+      - name: test
+        run: make test
+
+      - name: format
+        run: make fmt
+
+      - name: commit format changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "style(langs): [bot] apply code formatter changes"
+
+      - name: generate
+        run: make __gen
+
+      - name: commit generated code
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore(langs): [bot] generate language meta codes"
