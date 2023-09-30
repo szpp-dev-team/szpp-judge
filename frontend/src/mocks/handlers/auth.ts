@@ -1,6 +1,6 @@
 import { AuthService } from "@/src/gen/proto/backend/v1/auth_service-AuthService_connectquery";
 import type { LoginResponse } from "@/src/gen/proto/backend/v1/auth_service_pb";
-import type { AuthUser } from "@/src/model/user";
+import type { AuthUser } from "@/src/model/auth";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { grpcMock } from "../grpc";

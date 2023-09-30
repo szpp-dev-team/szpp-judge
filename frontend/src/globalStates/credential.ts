@@ -1,14 +1,9 @@
-import type { AuthUser } from "@/src/model/user";
+import type { AuthUser, Credential } from "@/src/model/auth";
 import { decodeJwtPayload } from "@/src/util/jwt";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomWithStorage, RESET } from "jotai/utils";
 
-interface ICredential {
-  accessToken: string;
-  refreshToken: string;
-}
-
-const credential = atomWithStorage<Readonly<ICredential>>("szp_tkn", { accessToken: "", refreshToken: "" });
+const credential = atomWithStorage<Readonly<Credential>>("szp_tkn", { accessToken: "", refreshToken: "" });
 
 const authUser = atom<Readonly<AuthUser> | null>((get) => {
   const jwt = get(credential).accessToken;
@@ -26,7 +21,7 @@ const authUser = atom<Readonly<AuthUser> | null>((get) => {
 export const useCredentialValue = () => useAtomValue(credential);
 export const useCredentialSetter = () => useSetAtom(credential);
 
-export const useCredentialValueAndEraser = (): [Readonly<ICredential>, () => void] => {
+export const useCredentialValueAndEraser = (): [Readonly<Credential>, () => void] => {
   const [cred, setCred] = useAtom(credential);
   return [cred, () => setCred(RESET)];
 };
