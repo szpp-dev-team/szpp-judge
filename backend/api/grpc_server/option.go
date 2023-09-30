@@ -16,6 +16,7 @@ type option struct {
 	UseReflection       bool
 	TestcasesRepository testcases.Repository
 	JudgeClient         judgev1.JudgeServiceClient
+	Secret              string
 }
 
 func defaultOption() *option {
@@ -60,5 +61,11 @@ func WithTestcasesRepository(r testcases.Repository) optionFunc {
 func WithJudgeClient(c judgev1.JudgeServiceClient) optionFunc {
 	return func(o *option) {
 		o.JudgeClient = c
+	}
+}
+
+func WithSecret(secret string) optionFunc {
+	return func(o *option) {
+		o.Secret = secret
 	}
 }
