@@ -28,6 +28,12 @@ func (rtc *RefreshTokenCreate) SetToken(s string) *RefreshTokenCreate {
 	return rtc
 }
 
+// SetUsername sets the "username" field.
+func (rtc *RefreshTokenCreate) SetUsername(s string) *RefreshTokenCreate {
+	rtc.mutation.SetUsername(s)
+	return rtc
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (rtc *RefreshTokenCreate) SetExpiresAt(t time.Time) *RefreshTokenCreate {
 	rtc.mutation.SetExpiresAt(t)
@@ -77,6 +83,9 @@ func (rtc *RefreshTokenCreate) check() error {
 	if _, ok := rtc.mutation.Token(); !ok {
 		return &ValidationError{Name: "token", err: errors.New(`ent: missing required field "RefreshToken.token"`)}
 	}
+	if _, ok := rtc.mutation.Username(); !ok {
+		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "RefreshToken.username"`)}
+	}
 	if _, ok := rtc.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expires_at", err: errors.New(`ent: missing required field "RefreshToken.expires_at"`)}
 	}
@@ -113,6 +122,10 @@ func (rtc *RefreshTokenCreate) createSpec() (*RefreshToken, *sqlgraph.CreateSpec
 	if value, ok := rtc.mutation.Token(); ok {
 		_spec.SetField(refreshtoken.FieldToken, field.TypeString, value)
 		_node.Token = value
+	}
+	if value, ok := rtc.mutation.Username(); ok {
+		_spec.SetField(refreshtoken.FieldUsername, field.TypeString, value)
+		_node.Username = value
 	}
 	if value, ok := rtc.mutation.ExpiresAt(); ok {
 		_spec.SetField(refreshtoken.FieldExpiresAt, field.TypeTime, value)
@@ -183,6 +196,18 @@ func (u *RefreshTokenUpsert) SetToken(v string) *RefreshTokenUpsert {
 // UpdateToken sets the "token" field to the value that was provided on create.
 func (u *RefreshTokenUpsert) UpdateToken() *RefreshTokenUpsert {
 	u.SetExcluded(refreshtoken.FieldToken)
+	return u
+}
+
+// SetUsername sets the "username" field.
+func (u *RefreshTokenUpsert) SetUsername(v string) *RefreshTokenUpsert {
+	u.Set(refreshtoken.FieldUsername, v)
+	return u
+}
+
+// UpdateUsername sets the "username" field to the value that was provided on create.
+func (u *RefreshTokenUpsert) UpdateUsername() *RefreshTokenUpsert {
+	u.SetExcluded(refreshtoken.FieldUsername)
 	return u
 }
 
@@ -261,6 +286,20 @@ func (u *RefreshTokenUpsertOne) SetToken(v string) *RefreshTokenUpsertOne {
 func (u *RefreshTokenUpsertOne) UpdateToken() *RefreshTokenUpsertOne {
 	return u.Update(func(s *RefreshTokenUpsert) {
 		s.UpdateToken()
+	})
+}
+
+// SetUsername sets the "username" field.
+func (u *RefreshTokenUpsertOne) SetUsername(v string) *RefreshTokenUpsertOne {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.SetUsername(v)
+	})
+}
+
+// UpdateUsername sets the "username" field to the value that was provided on create.
+func (u *RefreshTokenUpsertOne) UpdateUsername() *RefreshTokenUpsertOne {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.UpdateUsername()
 	})
 }
 
@@ -502,6 +541,20 @@ func (u *RefreshTokenUpsertBulk) SetToken(v string) *RefreshTokenUpsertBulk {
 func (u *RefreshTokenUpsertBulk) UpdateToken() *RefreshTokenUpsertBulk {
 	return u.Update(func(s *RefreshTokenUpsert) {
 		s.UpdateToken()
+	})
+}
+
+// SetUsername sets the "username" field.
+func (u *RefreshTokenUpsertBulk) SetUsername(v string) *RefreshTokenUpsertBulk {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.SetUsername(v)
+	})
+}
+
+// UpdateUsername sets the "username" field to the value that was provided on create.
+func (u *RefreshTokenUpsertBulk) UpdateUsername() *RefreshTokenUpsertBulk {
+	return u.Update(func(s *RefreshTokenUpsert) {
+		s.UpdateUsername()
 	})
 }
 
