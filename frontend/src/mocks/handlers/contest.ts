@@ -161,8 +161,12 @@ export const contestHandlers: RequestHandler[] = [
   }),
   grpcMock(ContestService, "getContestTask", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug, taskId } = await decodeReq();
+
+    // FIXME: decodeReq の処理が不完全なのかわからないが taskId の値がリクエスト内容と異なってしまう
+    // (例えばリクエストで taskId=1000 としてもここで得られる値は 15687663 になってしまう)
+    console.log(`[mock] [getContestTask]`, contestSlug, taskId);
     const contest = generateContest(contestSlug);
-    const task = dummyTasks.find((t) => t.id === taskId);
+    const task = dummyTasks[0];
 
     if (contest == null || task == null) {
       return res(
