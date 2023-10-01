@@ -7,7 +7,9 @@ import { createBackendGrpcTransport } from "../config/grpc";
 import { useAccessTokenClaimValue, useCredentialValue } from "../globalStates/credential";
 import { useRefreshAccessTokenWithoutQueryClient } from "../usecases/auth";
 
-import("../mocks").catch((reason) => console.error(reason));
+if (["1", "true", "yes"].includes(process.env.MOCK_ENABLED || "")) {
+  import("../mocks").catch((reason) => console.error(reason));
+}
 
 const queryClient = new QueryClient();
 
