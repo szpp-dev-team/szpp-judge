@@ -119,61 +119,64 @@ export const Standings = () => {
 
   return (
     <Container maxW="container.lg">
-      <Card px={3} py={4} h="10%" borderRadius={0}>
+      <Card px={3} py={4} h="100%" borderRadius={0}>
         <CardHeader>
           <Heading as="h1">順位表</Heading>
         </CardHeader>
 
         <CardBody>
-          <TableContainer>
-            <Table variant="bordered-narrow">
-              <Thead>
-                <Tr>
-                  <Th key="th-rank" textAlign="center">順位</Th>
-                  <Th key="th-user" textAlign="center">ユーザ</Th>
-                  <Th key="th-totalscore" textAlign="center">得点</Th>
-                  {tasks.map((_task, seq, allTask) => (
-                    <Th key={seq} textAlign="center">
-                      <Link href={`/contests/${contestSlug}/tasks/${seq}`}>{calcNthTaskSeq(seq, allTask.length)}</Link>
-                    </Th>
-                  ))}
-                </Tr>
-              </Thead>
-
-              <Tbody>
-                {standingsList?.map((record, i) => {
-                  const taskDetailList = record.taskDetailList;
-                  return (
-                    <Tr key={i}>
-                      <Td key={`${i}-rank`} textAlign="center">{record.rank}</Td>
-                      <Td key={`${i}-user`} textAlign="center">{record.username}</Td>
-                      <Td key={`${i}-totalscore`} textAlign="center">
-                        <TotalScore
-                          score={record.totalScore}
-                          penaltyCount={record.totalPenaltyCount}
-                          untilAc={1800000} // TODO: ペナルティを加味した untilAc 的な指標をバックエンドからもらう
-                        />
-                      </Td>
-                      {taskDetailList.map((task, j) => (
-                        <Td key={`${i}-task${j}`} textAlign="center">
-                          <TaskScore
-                            score={task.score}
-                            penaltyCount={task.penaltyCount}
-                            untilAc={task.untilAc ? task.untilAc.seconds * BigInt(Duration.SECOND) : undefined}
-                            acSubmitId={task?.acSubmitId}
-                            href={typeof isContestClosed === "boolean" && isContestClosed
-                                && typeof task.acSubmitId !== "undefined"
-                              ? `/contests/${contestSlug}/submissions/${task.acSubmitId}`
-                              : undefined}
-                          />
-                        </Td>
+          {standingsList && standingsList.length
+            ? (
+              <TableContainer>
+                <Table variant="bordered-narrow">
+                  <Thead>
+                    <Tr>
+                      <Th key="th-rank" textAlign="center">順位</Th>
+                      <Th key="th-user" textAlign="center">ユーザ</Th>
+                      <Th key="th-totalscore" textAlign="center">得点</Th>
+                      {tasks.map((_task, seq, allTask) => (
+                        <Th key={seq} textAlign="center">
+                          <Link href={`/contests/${contestSlug}/tasks/${seq}`}>
+                            {calcNthTaskSeq(seq, allTask.length)}
+                          </Link>
+                        </Th>
                       ))}
                     </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </TableContainer>
+                  </Thead>
+
+                  <Tbody>
+                    {standingsList.map((record, i) => (
+                      <Tr key={i}>
+                        <Td key={`${i}-rank`} textAlign="center">{record.rank}</Td>
+                        <Td key={`${i}-user`} textAlign="center">{record.username}</Td>
+                        <Td key={`${i}-totalscore`} textAlign="center">
+                          <TotalScore
+                            score={record.totalScore}
+                            penaltyCount={record.totalPenaltyCount}
+                            untilAc={1800000} // TODO: ペナルティを加味した untilAc 的な指標をバックエンドからもらう
+                          />
+                        </Td>
+                        {tasks.map((task, j) => (
+                          <Td key={`${i}-task${j}`} textAlign="center">
+                            <TaskScore
+                              score={task.score}
+                              penaltyCount={task.penaltyCount}
+                              untilAc={task.untilAc ? task.untilAc.seconds * BigInt(Duration.SECOND) : undefined}
+                              acSubmitId={task?.acSubmitId}
+                              href={typeof isContestClosed === "boolean" && isContestClosed
+                                  && typeof task.acSubmitId !== "undefined"
+                                ? `/contests/${contestSlug}/submissions/${task.acSubmitId}`
+                                : undefined}
+                            />
+                          </Td>
+                        ))}
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            )
+            : <Text>順位表はまだありません</Text>}
         </CardBody>
       </Card>
     </Container>
