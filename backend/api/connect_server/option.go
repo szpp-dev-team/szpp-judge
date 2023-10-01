@@ -19,6 +19,7 @@ type option struct {
 	judgeQueue          judge_queue.JudgeQueue
 	JudgeClient         judgev1.JudgeServiceClient
 	Secret              string
+	FrontendURL         string
 }
 
 func defaultOption() *option {
@@ -68,5 +69,11 @@ func WithJudgeClient(c judgev1.JudgeServiceClient) optionFunc {
 func WithSecret(secret string) optionFunc {
 	return func(o *option) {
 		o.Secret = secret
+	}
+}
+
+func WithFrontendURL(url string) optionFunc {
+	return func(o *option) {
+		o.FrontendURL = url
 	}
 }

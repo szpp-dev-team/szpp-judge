@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
+	"github.com/rs/cors"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	connect_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/auth"
@@ -45,8 +46,14 @@ func New(addr string, opts ...optionFunc) *http.Server {
 	authSrv := connect_interfaces.NewAuthServiceServer(auth.NewInteractor(opt.EntClient, opt.Secret))
 	mux.Handle(backendv1connect.NewAuthServiceHandler(authSrv, interceptors))
 
+	handler := h2c.NewHandler(mux, &http2.Server{})
+
+	corsConfig := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:5000", "http://localhost:3000", opt.FrontendURL},
+	})
+
 	return &http.Server{
 		Addr:    addr,
-		Handler: h2c.NewHandler(mux, &http2.Server{}),
+		Handler: corsConfig.Handler(handler),
 	}
 }

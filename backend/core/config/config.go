@@ -18,6 +18,7 @@ type Config struct {
 	CloudTasksProjectID  string `envconfig:"CLOUD_TASKS_PROJECT_ID" required:"true"`
 	CloudTasksLocationID string `envconfig:"CLOUD_TASKS_LOCATION_ID" required:"true"`
 	CloudTasksQueueID    string `envconfig:"CLOUD_TASKS_QUEUE_ID" required:"true"`
+	FrontendURL          string `envconfig:"FRONTEND_URL" required:"false"`
 }
 
 func New() (*Config, error) {

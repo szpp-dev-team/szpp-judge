@@ -13,6 +13,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/uuid v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/rs/cors v1.10.1
 	github.com/samber/lo v1.38.1
 	github.com/stretchr/testify v1.8.2
 	github.com/szpp-dev-team/szpp-judge/proto-gen/go v0.0.0-00010101000000-000000000000

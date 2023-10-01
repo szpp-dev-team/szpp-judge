@@ -89,6 +89,7 @@ func main() {
 		connect_server.WithJudgeQueue(judgeQueue),
 		connect_server.WithJudgeClient(judgeClient),
 		connect_server.WithSecret(config.JWTSecret),
+		connect_server.WithFrontendURL(config.FrontendURL),
 	)
 
 	go func() {
