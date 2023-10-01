@@ -1,4 +1,4 @@
-import { backendGrpcTransportWithOnlyBaseUrl } from "@/src/config/grpc";
+import { backendTransportWithOnlyBaseUrl } from "@/src/config/grpc";
 import { HealthcheckService } from "@/src/gen/proto/backend/v1/healthcheck_service-HealthcheckService_connectquery";
 import { createPromiseClient } from "@bufbuild/connect";
 import { Button, Container } from "@chakra-ui/react";
@@ -8,7 +8,7 @@ import { useState } from "react";
 const Page: NextPage = () => {
   const cli = createPromiseClient(
     HealthcheckService,
-    backendGrpcTransportWithOnlyBaseUrl,
+    backendTransportWithOnlyBaseUrl,
   );
 
   const [waitingPing, setWaitingPing] = useState(false);

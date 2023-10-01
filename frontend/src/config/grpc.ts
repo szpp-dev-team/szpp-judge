@@ -1,12 +1,12 @@
 import { AuthService } from "@/src/gen/proto/backend/v1/auth_service-AuthService_connectquery";
 import type { Credential } from "@/src/model/auth";
 import { Code, ConnectError, Interceptor } from "@bufbuild/connect";
-import { createGrpcWebTransport } from "@bufbuild/connect-web";
+import { createConnectTransport } from "@bufbuild/connect-web";
 
-export const backendGrpcBaseUrl = process.env.NEXT_PUBLIC_ENVOY_BASE_URL!;
+export const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL!;
 
-export const backendGrpcTransportWithOnlyBaseUrl = createGrpcWebTransport({
-  baseUrl: backendGrpcBaseUrl,
+export const backendTransportWithOnlyBaseUrl = createConnectTransport({
+  baseUrl: backendBaseUrl,
 });
 
 const LOGIN_URL_PATH = AuthService.typeName + "/" + AuthService.methods.login.name;
@@ -57,10 +57,10 @@ async (req) => {
   }
 };
 
-export const createBackendGrpcTransport = (
+export const createBackendTransport = (
   authInterceptorOpt: AuthInterceptorOptions,
 ) =>
-  createGrpcWebTransport({
-    baseUrl: backendGrpcBaseUrl,
+  createConnectTransport({
+    baseUrl: backendBaseUrl,
     interceptors: [authInterceptor(authInterceptorOpt)],
   });
