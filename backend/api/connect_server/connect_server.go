@@ -36,7 +36,7 @@ func New(addr string, opts ...optionFunc) *http.Server {
 	taskInteractor := tasks.NewInteractor(opt.EntClient, opt.TestcasesRepository)
 	taskSrv := connect_interfaces.NewTaskServiceServer(taskInteractor)
 	mux.Handle(backendv1connect.NewTaskServiceHandler(taskSrv, interceptors))
-	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient)
+	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient, opt.SourcesRepository, opt.judgeQueue)
 	judgeSrv := connect_interfaces.NewJudgeServiceServer(judgeInteractor)
 	mux.Handle(backendv1connect.NewJudgeServiceHandler(judgeSrv, interceptors))
 	contestInteractor := contests.NewInteractor(opt.EntClient)
