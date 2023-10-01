@@ -90,11 +90,11 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 		result = append(result, value)
 	}
 
-	// sort by totalScore and total_penalty
+	// sort by totalScore and latestUntilAc
 	sort.SliceStable(result, func(i, j int) bool {
 		if result[i].totalScore > result[j].totalScore {
 			return true
-		} else if result[i].totalPenaltyCount < result[j].totalPenaltyCount {
+		} else if *result[i].latestUntilAc < *result[j].latestUntilAc {
 			return true
 		}
 		return false
@@ -138,13 +138,16 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
 			updateUserInfo.taskDetailList[index].untilAc = &untilAc
 			updateUserInfo.taskDetailList[index].score = submission.Score
-			updateUserInfo.latestUntilAc = &untilAc
 			updateUserInfo.totalScore += updateUserInfo.taskDetailList[index].score
 
 			// penalty
 			updateUserInfo.taskDetailList[index].currentPenaltyCount += updateUserInfo.taskDetailList[index].nextPenaltyCount
 			updateUserInfo.totalPenaltyCount += updateUserInfo.taskDetailList[index].nextPenaltyCount
 			updateUserInfo.taskDetailList[index].nextPenaltyCount = 0
+
+			// Until AC
+			updateUserInfo.latestUntilAc = &untilAc
+			*updateUserInfo.latestUntilAc += time.Duration(updateUserInfo.totalPenaltyCount * contest.PenaltySeconds)
 		} else {
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
 		}
