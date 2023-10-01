@@ -3,6 +3,9 @@ import type { Credential } from "@/src/model/auth";
 import { Code, ConnectError, Interceptor } from "@bufbuild/connect";
 import { createConnectTransport } from "@bufbuild/connect-web";
 
+if (!process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+  console.error("NEXT_PUBLIC_BACKEND_BASE_URL is empty");
+}
 export const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL!;
 
 export const backendTransportWithOnlyBaseUrl = createConnectTransport({
