@@ -50,4 +50,16 @@ export class Duration {
     const ss = s.toString().padStart(2, "0");
     return `${paddedHour}:${mm}:${ss}`;
   }
+
+  static fromNumber(dur: bigint | number): Duration {
+    if (typeof dur === "bigint") {
+      if (dur > Number.MAX_SAFE_INTEGER) {
+        throw new Error("cannot handle too big interger: " + dur);
+      } else {
+        dur = Number(dur);
+      }
+    }
+    const now = new Date();
+    return new Duration(now, new Date(now.getTime() + dur));
+  }
 }

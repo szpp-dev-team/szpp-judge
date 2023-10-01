@@ -2,6 +2,7 @@ import {
   getContest,
   getContestTask,
   getMySubmissionStatuses,
+  getStandings,
   listContests,
   listContestTasks,
 } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
@@ -9,6 +10,7 @@ import type {
   GetContestRequest,
   GetContestTaskRequest,
   GetMySubmissionStatusesRequest,
+  GetStandingsRequest,
   ListContestsRequest,
   ListContestTasksRequest,
 } from "@/src/gen/proto/backend/v1/contest_service_pb";
@@ -44,6 +46,15 @@ export const useRouterContestSlug = () => {
 export const useRouterSubmissionId = () => {
   const { query } = useRouter();
   return query.submission_id as string;
+};
+
+// endAt がない場合は undefined が返ることに注意
+export const useIsContestClosed = (...param: Parameters<typeof useGetContest>) => {
+  const { contest, error } = useGetContest(...param);
+  if (!contest || typeof contest.endAt === "undefined" || error) {
+    return undefined;
+  }
+  return contest.endAt.toDate() <= new Date();
 };
 
 export const useListContests = (input?: PlainMessage<ListContestsRequest>) => {
@@ -87,4 +98,10 @@ export const useGetMySubmissionStatuses = (input?: PlainMessage<GetMySubmissionS
   });
   const submissionStatuses = data?.submissionStatuses;
   return { submissionStatuses, error, isLoading };
+};
+
+export const useStandings = (input?: PlainMessage<GetStandingsRequest>) => {
+  const { data, error, isLoading } = useQuery(getStandings.useQuery(input));
+  const standingsList = data?.standingsList;
+  return { standingsList, error, isLoading };
 };

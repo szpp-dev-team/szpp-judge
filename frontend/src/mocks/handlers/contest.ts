@@ -1,4 +1,10 @@
-import { type Contest, type ContestTask, ContestType } from "@/src/gen/proto/backend/v1/contest_resources_pb";
+import {
+  type Contest,
+  type ContestTask,
+  ContestType,
+  StandingsRecord,
+  StandingsRecord_TaskDetail,
+} from "@/src/gen/proto/backend/v1/contest_resources_pb";
 import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
 import { Duration } from "@/src/util/time";
 import { type PlainMessage, Timestamp } from "@bufbuild/protobuf";
@@ -36,6 +42,27 @@ Bob, Alice, Benjamin
 const now = new Date();
 const beforeNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() - dur));
 const afterNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() + dur));
+
+// StandingsRecord_TaskDetail.untilAc を作るため
+const duration = (/** ミリ秒 */ dur: number): PlainMessage<import("@bufbuild/protobuf").Duration> => ({
+  seconds: BigInt(Math.trunc(dur / Duration.SECOND)),
+  nanos: 0,
+});
+
+const groupBy = <K extends PropertyKey, T>(
+  objectArray: readonly T[],
+  propAsKey: (t: T) => K,
+): [Partial<Record<K, T[]>>, ReadonlySet<K>] => {
+  const groupKeys = new Set<K>();
+  const resultObj = objectArray.reduce<Partial<Record<K, T[]>>>((groups, item) => {
+    const key = propAsKey(item); // T[K] extends PropertyKey を保証できないので propAsKey に任せる
+    groupKeys.add(key);
+    const curGroup = groups[key] ?? [];
+    return { ...groups, [key]: [...curGroup, item] };
+  }, {});
+
+  return [resultObj, groupKeys];
+};
 
 const isTasksViewable = (contest: PlainMessage<Contest>, now: Date): boolean => {
   const startAt = contest.startAt! as Timestamp;
@@ -117,6 +144,99 @@ const contests: PlainMessage<Contest>[] = [
   generateContest("sbc004")!,
   generateContest("sbc005")!,
 ];
+
+const generateStandings = (participantsSize: number, taskSize: number) => {
+  taskSize = Math.min(taskSize, contestTasks.length); // contestTasks.length 以上のタスクは作れない
+
+  const AC_SUBMIT_ID = 1; // モックなのでどの提出にも同じ ID を振る
+
+  const standingsNoRank: Omit<PlainMessage<StandingsRecord>, "rank">[] = [];
+
+  for (let user = 0; user < participantsSize; user++) {
+    const taskDetailList: PlainMessage<StandingsRecord_TaskDetail>[] = [];
+
+    // 参加者ごとに提出を作る
+    for (let j = 0; j < taskSize; j++) {
+      const t = contestTasks[j];
+      const submissionCount = 1 + Math.floor(Math.random() * 5); // 同じタスクにN回提出してる想定{N|1<=N<=5}
+
+      if (Math.random() < 0.25) { // true ならこのタスクは未提出
+        taskDetailList.push({
+          penaltyCount: 0,
+          score: 0,
+          taskId: t.id,
+          acSubmitId: undefined,
+          untilAc: undefined,
+        });
+        continue;
+      }
+
+      const rnd = Math.random();
+      const acCount = rnd < 0.5 || submissionCount === 1
+        ? submissionCount // 一発 AC または AC してもまた AC 提出するパターン(あまりない)
+        : rnd < 0.8
+        ? Math.max(1, Math.floor(Math.random() * submissionCount / 2)) // 3回 WA で 4回目に AC したくらいの正答率たぶん
+        : 0; // 未 AC
+      const penaltyCount = submissionCount - acCount;
+
+      taskDetailList.push({
+        penaltyCount,
+        score: acCount > 0 ? t.score : 0, // モックなので部分点はなし. 0, 100
+        taskId: t.id,
+        acSubmitId: acCount > 0 ? AC_SUBMIT_ID : undefined,
+        untilAc: acCount > 0
+          ? duration(Math.random() * Duration.HOUR * 2)
+          : undefined,
+      });
+    }
+
+    standingsNoRank.push({
+      username: `user${user}`,
+      totalScore: taskDetailList.reduce((accum, item) => accum + item.score, 0),
+      totalPenaltyCount: taskDetailList.reduce((accum, item) => accum + item.penaltyCount, 0),
+      latestAcAt: undefined, // TODO: 削除?
+      taskDetailList,
+    });
+  }
+
+  // 満点を超えていないことを確かめる
+  const perfect = contestTasks.slice(0, taskSize).reduce((accum, t) => accum + t.score, 0);
+  for (const row of standingsNoRank) {
+    if (row.totalScore > perfect) {
+      throw new Error(
+        "one record of standings exceeded perfect(=max) score ! (perfect="
+          + perfect + "but acctual=" + row.totalScore + ")",
+      );
+    }
+  }
+
+  const [rowsGroupedByScore, groupKeys] = groupBy(standingsNoRank, s => s.totalScore); // 得点でグループ化
+  const standings = Array.from(groupKeys.values()).sort((a, b) => b - a) // 得点の高い順に処理するb ? 1 : 0
+    .map(key => {
+      rowsGroupedByScore[key]!.sort((a, b) => a.totalPenaltyCount - b.totalPenaltyCount);
+      return rowsGroupedByScore[key]!;
+    }) // 同点はペナルティ少がランク高
+    .flat(1)
+    .map<PlainMessage<StandingsRecord>>((record, i) => ({
+      rank: i + 1,
+      ...record,
+    }));
+
+  // standings.length が参加人数と同じことを確かめる
+  if (standings.length !== participantsSize) {
+    throw new Error("standings.length does not match with participantsSize");
+  }
+
+  return standings;
+};
+
+const standingsMap: Map<string, PlainMessage<StandingsRecord>[]> = new Map([
+  ["1", generateStandings(0, 9)], // 開始2日前ver
+  ["2", generateStandings(0, 9)], // 開始5秒前ver
+  ["3", generateStandings(5, 9)], // 開催中ver
+  ["4", generateStandings(20, 9)], // 終了5秒前ver
+  ["5", generateStandings(50, 9)], // 終了後ver
+]);
 
 export const contestHandlers: RequestHandler[] = [
   grpcMock(ContestService, "listContests", async (ctx, res, _, encodeResp) => {
@@ -216,5 +336,18 @@ export const contestHandlers: RequestHandler[] = [
       ctx.delay(500),
       encodeResp({ submissionStatuses }),
     );
+  }),
+  grpcMock(ContestService, "getStandings", async (ctx, res, decodeReq, encodeResp) => {
+    const { contestId } = await decodeReq(); // TODO: proto 更新して contest_slug にしたい
+    const standingsList = standingsMap.get(String(contestId));
+
+    if (!standingsList) {
+      return res(ctx.status(404));
+    } else {
+      return res(
+        ctx.delay(500),
+        encodeResp({ standingsList }),
+      );
+    }
   }),
 ];
