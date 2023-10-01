@@ -25,7 +25,7 @@ func NewInteractor(entClient *ent.Client, secret string) *Interactor {
 }
 
 func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	username := interceptor.GetClaimsFromContext(ctx).Username
+	username := req.Username
 
 	q := i.entClient.User.Query()
 	user, err := q.Where(entuser.Username(username)).Only(ctx)
