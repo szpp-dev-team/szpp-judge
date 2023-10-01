@@ -111,7 +111,7 @@ message GetMySubmissionStatusesResponse {
 }
 
 message GetStandingsRequest {
-  int32 contest_id = 1;
+  int32 contest_slug = 1;
 }
 
 message GetStandingsResponse {
