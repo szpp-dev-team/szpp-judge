@@ -43,7 +43,7 @@ func New(opts ...optionFunc) *grpc.Server {
 	taskInteractor := tasks.NewInteractor(opt.EntClient, opt.TestcasesRepository)
 	taskSrv := grpc_interfaces.NewTaskServiceServer(taskInteractor)
 	pb.RegisterTaskServiceServer(srv, taskSrv)
-	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient)
+	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient, opt.SourcesRepository, opt.judgeQueue)
 	judgeSrv := grpc_interfaces.NewJudgeServiceServer(judgeInteractor)
 	pb.RegisterJudgeServiceServer(srv, judgeSrv)
 	contestInteractor := contests.NewInteractor(opt.EntClient)

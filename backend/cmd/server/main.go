@@ -16,6 +16,8 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"google.golang.org/grpc"
@@ -66,6 +68,8 @@ func main() {
 	}
 	defer storageClient.Close()
 	testcasesRepository := testcases.NewRepository(storageClient)
+	sourcesRepository := sources.NewRepository(storageClient)
+	judgeQueue := judge_queue.New(cloudtasksClient, config.CloudTasksProjectID, config.CloudTasksLocationID, config.CloudTasksQueueID)
 	conn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
@@ -80,8 +84,9 @@ func main() {
 		grpc_server.WithLogger(logger),
 		grpc_server.WithEntClient(entClient),
 		grpc_server.WithReflection(config.ModeDev),
-		grpc_server.WithCloudtasksClient(cloudtasksClient),
+		grpc_server.WithSourcesRepository(sourcesRepository),
 		grpc_server.WithTestcasesRepository(testcasesRepository),
+		grpc_server.WithJudgeQueue(judgeQueue),
 		grpc_server.WithJudgeClient(judgeClient),
 		grpc_server.WithSecret(config.JWTSecret),
 	)
