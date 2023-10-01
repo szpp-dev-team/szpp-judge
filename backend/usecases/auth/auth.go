@@ -2,8 +2,10 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
+	"connectrpc.com/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entrefreshtoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
@@ -31,13 +33,13 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 	user, err := q.Where(entuser.Username(username)).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "user not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("user not found"))
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	if err = u_user.VerifyPassword(user.HashedPassword, req.Password); err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
+		return nil, connect.NewError(connect.CodeUnauthenticated, err)
 	}
 
 	secret := i.Secret
@@ -66,7 +68,7 @@ func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAcce
 		return nil, err
 	}
 	if !isTokenValid {
-		return nil, status.Error(codes.Unauthenticated, "invalid refresh token")
+		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("invalid refresh token"))
 	} else {
 		secret := i.Secret
 		q := i.entClient.RefreshToken.Query()

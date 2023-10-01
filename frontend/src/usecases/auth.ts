@@ -1,6 +1,6 @@
 import { Code, ConnectError, createPromiseClient } from "@bufbuild/connect";
 import { useMutation } from "@tanstack/react-query";
-import { backendGrpcTransportWithOnlyBaseUrl } from "../config/grpc";
+import { backendTransportWithOnlyBaseUrl } from "../config/grpc";
 import { AuthService, login, logout } from "../gen/proto/backend/v1/auth_service-AuthService_connectquery";
 import { RefreshAccessTokenResponse } from "../gen/proto/backend/v1/auth_service_pb";
 import {
@@ -79,7 +79,7 @@ export const useRefreshAccessTokenWithoutQueryClient = () => {
   let lastReqAt = new Date(0);
   let response: null | Promise<RefreshAccessTokenResponse> = null;
 
-  const cli = createPromiseClient(AuthService, backendGrpcTransportWithOnlyBaseUrl);
+  const cli = createPromiseClient(AuthService, backendTransportWithOnlyBaseUrl);
 
   const refreshAccessToken = async (): Promise<RefreshAccessTokenResponse> => {
     const now = new Date();

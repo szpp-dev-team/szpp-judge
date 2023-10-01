@@ -2,13 +2,12 @@ package interceptor
 
 import (
 	"context"
+	"errors"
+	"strings"
 
+	"connectrpc.com/connect"
 	"github.com/golang-jwt/jwt/v5"
-	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type Claims struct {
@@ -38,27 +37,23 @@ var excludeMethodSet = map[string]struct{}{
 	backendv1.JudgeService_ListSubmissions_FullMethodName:     {},
 }
 
-func Auth(secret []byte) grpc.UnaryServerInterceptor {
-	return grpc_auth.UnaryServerInterceptor(func(ctx context.Context) (context.Context, error) {
-		method, ok := grpc.Method(ctx)
-		if !ok {
-			return nil, status.Error(codes.InvalidArgument, "failed to get method name from context")
-		}
-		// skip authentication
-		if _, ok := excludeMethodSet[method]; ok {
-			return ctx, nil
-		}
+func Auth(secret []byte) connect.UnaryInterceptorFunc {
+	return func(next connect.UnaryFunc) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			// skip authentication
+			if _, ok := excludeMethodSet[req.Spec().Procedure]; ok {
+				return next(ctx, req)
+			}
 
-		accessToken, err := grpc_auth.AuthFromMD(ctx, "bearer")
-		if err != nil {
-			return nil, err
+			accessToken := req.Header().Get("Authorization")
+			claims, err := GetClaimsFromToken(strings.TrimPrefix(accessToken, "Bearer"), secret)
+			if err != nil {
+				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("failed to parse jwt"))
+			}
+			ctx = context.WithValue(ctx, claimsKey, claims)
+			return next(ctx, req)
 		}
-		claims, err := GetClaimsFromToken(accessToken, secret)
-		if err != nil {
-			return nil, status.Error(codes.Unauthenticated, "failed to parse jwt")
-		}
-		return context.WithValue(ctx, claimsKey, claims), nil
-	})
+	}
 }
 
 func GetClaimsFromContext(ctx context.Context) *Claims {

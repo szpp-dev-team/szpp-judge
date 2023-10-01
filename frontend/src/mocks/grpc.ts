@@ -1,4 +1,4 @@
-import { backendGrpcBaseUrl } from "@/src/config/grpc";
+import { backendBaseUrl } from "@/src/config/grpc";
 import { createAsyncIterable, encodeEnvelope, readAllBytes, UniversalServerResponse } from "@bufbuild/connect/protocol";
 import { grpcStatusOk, trailerFlag, trailerSerialize } from "@bufbuild/connect/protocol-grpc-web";
 import { Message, type MethodInfo, type PlainMessage } from "@bufbuild/protobuf";
@@ -89,7 +89,7 @@ export const grpcMock = <
   resolver: ResponseResolver<TReq, PlainMessage<TResp>>,
 ) => {
   const method = service.methods[methodName];
-  return msw.rest.post(`${backendGrpcBaseUrl}/${service.typeName}/${method.name}`, (req, res, ctx) => {
+  return msw.rest.post(`${backendBaseUrl}/${service.typeName}/${method.name}`, (req, res, ctx) => {
     const decodeReq = async () => {
       const a = await req.arrayBuffer();
       return method.I.fromBinary(new Uint8Array(a.slice(5))) as TReq; // 先頭5バイトのマジックコードを削除

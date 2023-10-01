@@ -1,4 +1,4 @@
-package grpc_server
+package connect_server
 
 import (
 	"log/slog"
@@ -32,13 +32,6 @@ type optionFunc func(*option)
 func WithLogger(logger *slog.Logger) optionFunc {
 	return func(o *option) {
 		o.Logger = logger
-	}
-}
-
-// publish grpc server information(method, service, etc.)
-func WithReflection(b bool) optionFunc {
-	return func(o *option) {
-		o.UseReflection = b
 	}
 }
 

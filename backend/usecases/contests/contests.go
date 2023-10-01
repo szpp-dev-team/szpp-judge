@@ -2,9 +2,11 @@ package contests
 
 import (
 	"context"
+	"errors"
 	"log"
 	"log/slog"
 
+	"connectrpc.com/connect"
 	"github.com/samber/lo"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
@@ -15,8 +17,6 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slices"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -43,10 +43,10 @@ func (i *Interactor) CreateContest(ctx context.Context, req *backendv1.CreateCon
 		Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, status.Error(codes.AlreadyExists, "the contest has already existed")
+			return nil, connect.NewError(connect.CodeAlreadyExists, errors.New("the contest has already existed"))
 		}
 		i.logger.Error("failed to create contest", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to create contest")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to create contest"))
 	}
 	return &backendv1.CreateContestResponse{
 		Contest: toPbContest(contest),
@@ -57,10 +57,10 @@ func (i *Interactor) GetContest(ctx context.Context, req *backendv1.GetContestRe
 	contest, err := i.entClient.Contest.Query().Where(ent_contest.Slug(req.Slug)).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the contest was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
 		}
 		i.logger.Error("failed to get contest", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to get contest")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
 	return &backendv1.GetContestResponse{
 		Contest: toPbContest(contest),
@@ -80,10 +80,10 @@ func (i *Interactor) UpdateContest(ctx context.Context, req *backendv1.UpdateCon
 		Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, status.Error(codes.AlreadyExists, "the slug has been already used")
+			return nil, connect.NewError(connect.CodeAlreadyExists, errors.New("the slug has been already used"))
 		}
 		i.logger.Error("failed to update contest", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to update contest")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to update contest"))
 	}
 	return &backendv1.UpdateContestResponse{
 		Contest: toPbContest(contest),
@@ -94,10 +94,10 @@ func (i *Interactor) ListContests(ctx context.Context, req *backendv1.ListContes
 	contests, err := i.entClient.Contest.Query().All(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the contest was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
 		}
 		i.logger.Error("failed to get contest", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to get contest")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
 	return &backendv1.ListContestsResponse{
 		Contests: lo.Map(contests, func(c *ent.Contest, _ int) *backendv1.Contest {
@@ -115,10 +115,10 @@ func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListCo
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the contest was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
 		}
 		i.logger.Error("failed to get contest", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to get contest")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
 	return &backendv1.ListContestTasksResponse{
 		Tasks: lo.Map(contest.Edges.ContestTask, func(t *ent.ContestTask, _ int) *backendv1.ContestTask {
@@ -136,10 +136,10 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the contest was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
 		}
 		i.logger.Error("failed to get contest", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to get contest")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
 	return &backendv1.GetContestTaskResponse{
 		Task: tasks.ToPbTask(task),
@@ -154,14 +154,14 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 			Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
-				return status.Error(codes.NotFound, err.Error())
+				return connect.NewError(connect.CodeNotFound, err)
 			}
 			i.logger.Error("failed to get contest", slog.Any("error", err), slog.String("slug", req.ContestSlug))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 		if _, err := i.entClient.Contest.UpdateOne(contest).ClearTasks().Save(ctx); err != nil {
 			i.logger.Error("failed to clear tasks which are related with the contest", slog.Any("error", err))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 
 		for order, task := range req.Tasks {
@@ -173,7 +173,7 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 				Save(ctx)
 			if err != nil {
 				i.logger.Error("failed to create contest task", slog.Any("error", err))
-				return status.Error(codes.Internal, "failed to create contest task")
+				return connect.NewError(connect.CodeInternal, errors.New("failed to create contest task"))
 			}
 			contestTaskIDs = append(contestTaskIDs, contestTask.ID)
 		}
@@ -192,7 +192,7 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 		All(ctx)
 	if err != nil {
 		i.logger.Error("failed to get contest tasks", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to get contest tasks")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest tasks"))
 	}
 
 	slices.SortFunc(contestTasks, func(a, b *ent.ContestTask) int {
@@ -214,10 +214,10 @@ func (i *Interactor) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRe
 	contest, err := i.entClient.Contest.Query().Where(ent_contest.Slug(req.ContestSlug)).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the contest was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
 		}
 		i.logger.Error("failed to get contest", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to get contest")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
 
 	if _, err := i.entClient.ContestUser.Create().
@@ -226,10 +226,10 @@ func (i *Interactor) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRe
 		// SetUserID().
 		Save(ctx); err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, status.Error(codes.AlreadyExists, "the user has already registered")
+			return nil, connect.NewError(connect.CodeAlreadyExists, errors.New("the user has already registered"))
 		}
 		i.logger.Error("failed to register user", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, "failed to register user")
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to register user"))
 	}
 
 	return &backendv1.RegisterMeResponse{}, nil
