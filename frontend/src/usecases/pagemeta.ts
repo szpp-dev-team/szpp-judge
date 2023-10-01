@@ -1,4 +1,11 @@
-import { useGetContest, useRouterContestSlug, useRouterSubmissionId } from "./contest";
+import {
+  calcNthTaskSeq,
+  useGetContest,
+  useGetContestTaskResolvingTaskSeq,
+  useRouterContestSlug,
+  useRouterContestTaskSeq,
+  useRouterSubmissionId,
+} from "./contest";
 
 const TITLE_SUFFIX = "SZPP Judge";
 
@@ -15,6 +22,25 @@ export const useContestPageTitle = (prefix: string): string => {
   } else {
     return `${prefix} | ${TITLE_SUFFIX}`;
   }
+};
+
+export const useContestTaskDetailPageTitle = (): string => {
+  const contestSlug = useRouterContestSlug();
+  const taskSeq = useRouterContestTaskSeq();
+
+  const { contest, tasks, task } = useGetContestTaskResolvingTaskSeq({ contestSlug, taskSeq });
+  const seqCode = calcNthTaskSeq(taskSeq - 1, tasks?.length ?? 0);
+
+  const contestName = contest?.name;
+  const taskTitle = task?.title;
+
+  if (contestName == null) {
+    return TITLE_SUFFIX;
+  }
+  if (taskTitle == null) {
+    return `${seqCode} - ${contestName} | ${TITLE_SUFFIX}`;
+  }
+  return `${seqCode} - ${taskTitle} - ${contestName} | ${TITLE_SUFFIX}`;
 };
 
 export const useSubmissionDetailPageTitle = (prefix: string = "提出 #"): string => {

@@ -41,6 +41,16 @@ export const useRouterContestSlug = () => {
 };
 
 /**
+ * URL から contest_task_seq を取得
+ * URL に [contest_task_seq] が含まれていないページでは undefined になるので注意
+ * contest_task_seq が非数値の場合は NaN になりえるので注意
+ */
+export const useRouterContestTaskSeq = () => {
+  const { query } = useRouter();
+  return Number.parseInt(query.contest_task_seq as string, 10);
+};
+
+/**
  * URL から 提出 ID を取得
  * URL に [submission_id] が含まれていないページでは undefined になるので注意
  */
@@ -87,6 +97,24 @@ export const useGetContestTask = (input?: PlainMessage<GetContestTaskRequest>, o
   });
   const task = data?.task;
   return { task, error, isLoading };
+};
+
+export const useGetContestTaskResolvingTaskSeq = ({ contestSlug, taskSeq }: {
+  contestSlug: string;
+  taskSeq: number;
+}) => {
+  const { contest } = useGetContest({ slug: contestSlug });
+
+  const isContestStarted = contest != null && contest.startAt!.toDate()! < new Date();
+  const { tasks } = useListContestTasks({ contestSlug }, { enabled: isContestStarted });
+
+  const taskId = tasks?.[taskSeq - 1].id;
+  const { task } = useGetContestTask(
+    { contestSlug, taskId: taskId! },
+    { enabled: taskId != null },
+  );
+
+  return { contest, tasks, task, isContestStarted };
 };
 
 export const useGetMySubmissionStatuses = (
