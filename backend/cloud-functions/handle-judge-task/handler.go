@@ -50,7 +50,7 @@ func init() {
 		log.Fatal(err)
 	}
 	defer entClient.Close()
-	interactor := judge.NewInteractor(judgeClient, entClient)
+	interactor := judge.NewInteractor(judgeClient, entClient, nil, nil)
 	functions.HTTP("HandleJudgeTask", HandleJudgeTask(interactor))
 }
 
