@@ -3,6 +3,7 @@ module github.com/szpp-dev-team/szpp-judge/proto-gen/go
 go 1.20
 
 require (
+	connectrpc.com/connect v1.11.1
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 )
