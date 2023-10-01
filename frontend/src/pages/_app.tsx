@@ -7,7 +7,7 @@ import { createBackendTransport } from "../config/grpc";
 import { useAccessTokenClaimValue, useCredentialValue } from "../globalStates/credential";
 import { useRefreshAccessTokenWithoutQueryClient } from "../usecases/auth";
 
-if (["1", "true", "yes"].includes(process.env.MOCK_ENABLED || "")) {
+if (["1", "true", "yes"].includes(process.env.NEXT_PUBLIC_MOCK_ENABLED || "")) {
   import("../mocks").catch((reason) => console.error(reason));
 }
 
