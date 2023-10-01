@@ -1,7 +1,5 @@
 package contests
 
-// ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
-
 import (
 	"context"
 	"sort"
@@ -43,11 +41,11 @@ const STATUS_WA = "WA"
 func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandingsRequest) (*backendv1.GetStandingsResponse, error) {
 	// get contest info
 	contest, err := i.entClient.Contest.Query().
-		Where(ent_contest.ID(int(req.ContestId))).
+		Where(ent_contest.Slug(req.ContestSlug)).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "the contest(id: %d) is not found", req.ContestId)
+			return nil, status.Errorf(codes.NotFound, "the contest(slug: %s) is not found", req.ContestSlug)
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
