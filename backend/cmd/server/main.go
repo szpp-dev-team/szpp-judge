@@ -80,7 +80,6 @@ func main() {
 		fmt.Sprintf("0.0.0.0:%s", config.ConnectPort),
 		connect_server.WithLogger(logger),
 		connect_server.WithEntClient(entClient),
-		connect_server.WithReflection(config.ModeDev),
 		connect_server.WithCloudtasksClient(cloudtasksClient),
 		connect_server.WithTestcasesRepository(testcasesRepository),
 		connect_server.WithJudgeClient(judgeClient),

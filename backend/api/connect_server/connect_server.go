@@ -5,7 +5,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
-	grpc_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/grpc"
+	connect_interfaces "github.com/szpp-dev-team/szpp-judge/backend/interfaces/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/auth"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/contests"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/judge"
@@ -29,20 +29,20 @@ func New(addr string, opts ...optionFunc) *http.Server {
 
 	mux := http.NewServeMux()
 
-	healthcheckSrv := grpc_interfaces.NewHealthcheckServiceServer()
+	healthcheckSrv := connect_interfaces.NewHealthcheckServiceServer()
 	mux.Handle(backendv1connect.NewHealthcheckServiceHandler(healthcheckSrv))
-	userSrv := grpc_interfaces.NewUserServiceServer(user.NewInteractor(opt.EntClient))
+	userSrv := connect_interfaces.NewUserServiceServer(user.NewInteractor(opt.EntClient))
 	mux.Handle(backendv1connect.NewUserServiceHandler(userSrv, interceptors))
 	taskInteractor := tasks.NewInteractor(opt.EntClient, opt.TestcasesRepository)
-	taskSrv := grpc_interfaces.NewTaskServiceServer(taskInteractor)
+	taskSrv := connect_interfaces.NewTaskServiceServer(taskInteractor)
 	mux.Handle(backendv1connect.NewTaskServiceHandler(taskSrv, interceptors))
 	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient)
-	judgeSrv := grpc_interfaces.NewJudgeServiceServer(judgeInteractor)
+	judgeSrv := connect_interfaces.NewJudgeServiceServer(judgeInteractor)
 	mux.Handle(backendv1connect.NewJudgeServiceHandler(judgeSrv, interceptors))
 	contestInteractor := contests.NewInteractor(opt.EntClient)
-	contestSrv := grpc_interfaces.NewContestServiceServer(contestInteractor)
+	contestSrv := connect_interfaces.NewContestServiceServer(contestInteractor)
 	mux.Handle(backendv1connect.NewContestServiceHandler(contestSrv, interceptors))
-	authSrv := grpc_interfaces.NewAuthServiceServer(auth.NewInteractor(opt.EntClient, opt.Secret))
+	authSrv := connect_interfaces.NewAuthServiceServer(auth.NewInteractor(opt.EntClient, opt.Secret))
 	mux.Handle(backendv1connect.NewAuthServiceHandler(authSrv, interceptors))
 
 	return &http.Server{

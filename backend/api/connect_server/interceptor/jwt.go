@@ -8,7 +8,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/golang-jwt/jwt/v5"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	"google.golang.org/grpc/codes"
 )
 
 type Claims struct {
@@ -48,7 +47,7 @@ func Auth(secret []byte) connect.UnaryInterceptorFunc {
 			accessToken := req.Header().Get("Authorization")
 			claims, err := GetClaimsFromToken(strings.TrimPrefix(accessToken, "Bearer"), secret)
 			if err != nil {
-				return nil, connect.NewError(connect.Code(codes.Unauthenticated), errors.New("failed to parse jwt"))
+				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("failed to parse jwt"))
 			}
 			ctx = context.WithValue(ctx, claimsKey, claims)
 			return next(ctx, req)

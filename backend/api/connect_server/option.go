@@ -33,13 +33,6 @@ func WithLogger(logger *slog.Logger) optionFunc {
 	}
 }
 
-// publish grpc server information(method, service, etc.)
-func WithReflection(b bool) optionFunc {
-	return func(o *option) {
-		o.UseReflection = b
-	}
-}
-
 func WithEntClient(c *ent.Client) optionFunc {
 	return func(o *option) {
 		o.EntClient = c
