@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Clarification is the predicate function for clarification builders.
+type Clarification func(*sql.Selector)
+
 // Contest is the predicate function for contest builders.
 type Contest func(*sql.Selector)
 

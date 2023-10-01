@@ -41,13 +41,17 @@ type UserEdges struct {
 	Tasks []*Task `json:"tasks,omitempty"`
 	// Submits holds the value of the submits edge.
 	Submits []*Submit `json:"submits,omitempty"`
+	// Clarifications holds the value of the clarifications edge.
+	Clarifications []*Clarification `json:"clarifications,omitempty"`
+	// AnsweredClarifications holds the value of the answered_clarifications edge.
+	AnsweredClarifications []*Clarification `json:"answered_clarifications,omitempty"`
 	// Contests holds the value of the contests edge.
 	Contests []*Contest `json:"contests,omitempty"`
 	// ContestUser holds the value of the contest_user edge.
 	ContestUser []*ContestUser `json:"contest_user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [6]bool
 }
 
 // TasksOrErr returns the Tasks value or an error if the edge
@@ -68,10 +72,28 @@ func (e UserEdges) SubmitsOrErr() ([]*Submit, error) {
 	return nil, &NotLoadedError{edge: "submits"}
 }
 
+// ClarificationsOrErr returns the Clarifications value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ClarificationsOrErr() ([]*Clarification, error) {
+	if e.loadedTypes[2] {
+		return e.Clarifications, nil
+	}
+	return nil, &NotLoadedError{edge: "clarifications"}
+}
+
+// AnsweredClarificationsOrErr returns the AnsweredClarifications value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) AnsweredClarificationsOrErr() ([]*Clarification, error) {
+	if e.loadedTypes[3] {
+		return e.AnsweredClarifications, nil
+	}
+	return nil, &NotLoadedError{edge: "answered_clarifications"}
+}
+
 // ContestsOrErr returns the Contests value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) ContestsOrErr() ([]*Contest, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[4] {
 		return e.Contests, nil
 	}
 	return nil, &NotLoadedError{edge: "contests"}
@@ -80,7 +102,7 @@ func (e UserEdges) ContestsOrErr() ([]*Contest, error) {
 // ContestUserOrErr returns the ContestUser value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) ContestUserOrErr() ([]*ContestUser, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[5] {
 		return e.ContestUser, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_user"}
@@ -177,6 +199,16 @@ func (u *User) QueryTasks() *TaskQuery {
 // QuerySubmits queries the "submits" edge of the User entity.
 func (u *User) QuerySubmits() *SubmitQuery {
 	return NewUserClient(u.config).QuerySubmits(u)
+}
+
+// QueryClarifications queries the "clarifications" edge of the User entity.
+func (u *User) QueryClarifications() *ClarificationQuery {
+	return NewUserClient(u.config).QueryClarifications(u)
+}
+
+// QueryAnsweredClarifications queries the "answered_clarifications" edge of the User entity.
+func (u *User) QueryAnsweredClarifications() *ClarificationQuery {
+	return NewUserClient(u.config).QueryAnsweredClarifications(u)
 }
 
 // QueryContests queries the "contests" edge of the User entity.

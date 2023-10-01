@@ -554,6 +554,29 @@ func HasTasksWith(preds ...predicate.Task) predicate.Contest {
 	})
 }
 
+// HasClarifications applies the HasEdge predicate on the "clarifications" edge.
+func HasClarifications() predicate.Contest {
+	return predicate.Contest(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ClarificationsTable, ClarificationsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClarificationsWith applies the HasEdge predicate on the "clarifications" edge with a given conditions (other predicates).
+func HasClarificationsWith(preds ...predicate.Clarification) predicate.Contest {
+	return predicate.Contest(func(s *sql.Selector) {
+		step := newClarificationsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasContestUser applies the HasEdge predicate on the "contest_user" edge.
 func HasContestUser() predicate.Contest {
 	return predicate.Contest(func(s *sql.Selector) {

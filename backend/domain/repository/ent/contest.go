@@ -47,13 +47,15 @@ type ContestEdges struct {
 	Users []*User `json:"users,omitempty"`
 	// Tasks holds the value of the tasks edge.
 	Tasks []*Task `json:"tasks,omitempty"`
+	// Clarifications holds the value of the clarifications edge.
+	Clarifications []*Clarification `json:"clarifications,omitempty"`
 	// ContestUser holds the value of the contest_user edge.
 	ContestUser []*ContestUser `json:"contest_user,omitempty"`
 	// ContestTask holds the value of the contest_task edge.
 	ContestTask []*ContestTask `json:"contest_task,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // SubmitsOrErr returns the Submits value or an error if the edge
@@ -83,10 +85,19 @@ func (e ContestEdges) TasksOrErr() ([]*Task, error) {
 	return nil, &NotLoadedError{edge: "tasks"}
 }
 
+// ClarificationsOrErr returns the Clarifications value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContestEdges) ClarificationsOrErr() ([]*Clarification, error) {
+	if e.loadedTypes[3] {
+		return e.Clarifications, nil
+	}
+	return nil, &NotLoadedError{edge: "clarifications"}
+}
+
 // ContestUserOrErr returns the ContestUser value or an error if the edge
 // was not loaded in eager-loading.
 func (e ContestEdges) ContestUserOrErr() ([]*ContestUser, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.ContestUser, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_user"}
@@ -95,7 +106,7 @@ func (e ContestEdges) ContestUserOrErr() ([]*ContestUser, error) {
 // ContestTaskOrErr returns the ContestTask value or an error if the edge
 // was not loaded in eager-loading.
 func (e ContestEdges) ContestTaskOrErr() ([]*ContestTask, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		return e.ContestTask, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_task"}
@@ -209,6 +220,11 @@ func (c *Contest) QueryUsers() *UserQuery {
 // QueryTasks queries the "tasks" edge of the Contest entity.
 func (c *Contest) QueryTasks() *TaskQuery {
 	return NewContestClient(c.config).QueryTasks(c)
+}
+
+// QueryClarifications queries the "clarifications" edge of the Contest entity.
+func (c *Contest) QueryClarifications() *ClarificationQuery {
+	return NewContestClient(c.config).QueryClarifications(c)
 }
 
 // QueryContestUser queries the "contest_user" edge of the Contest entity.

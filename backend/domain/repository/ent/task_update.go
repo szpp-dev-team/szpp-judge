@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
@@ -222,6 +223,21 @@ func (tu *TaskUpdate) AddSubmits(s ...*Submit) *TaskUpdate {
 	return tu.AddSubmitIDs(ids...)
 }
 
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by IDs.
+func (tu *TaskUpdate) AddClarificationIDs(ids ...int) *TaskUpdate {
+	tu.mutation.AddClarificationIDs(ids...)
+	return tu
+}
+
+// AddClarifications adds the "clarifications" edges to the Clarification entity.
+func (tu *TaskUpdate) AddClarifications(c ...*Clarification) *TaskUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tu.AddClarificationIDs(ids...)
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tu *TaskUpdate) SetUserID(id int) *TaskUpdate {
 	tu.mutation.SetUserID(id)
@@ -329,6 +345,27 @@ func (tu *TaskUpdate) RemoveSubmits(s ...*Submit) *TaskUpdate {
 		ids[i] = s[i].ID
 	}
 	return tu.RemoveSubmitIDs(ids...)
+}
+
+// ClearClarifications clears all "clarifications" edges to the Clarification entity.
+func (tu *TaskUpdate) ClearClarifications() *TaskUpdate {
+	tu.mutation.ClearClarifications()
+	return tu
+}
+
+// RemoveClarificationIDs removes the "clarifications" edge to Clarification entities by IDs.
+func (tu *TaskUpdate) RemoveClarificationIDs(ids ...int) *TaskUpdate {
+	tu.mutation.RemoveClarificationIDs(ids...)
+	return tu
+}
+
+// RemoveClarifications removes "clarifications" edges to Clarification entities.
+func (tu *TaskUpdate) RemoveClarifications(c ...*Clarification) *TaskUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tu.RemoveClarificationIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -613,6 +650,51 @@ func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tu.mutation.ClarificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   task.ClarificationsTable,
+			Columns: task.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedClarificationsIDs(); len(nodes) > 0 && !tu.mutation.ClarificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   task.ClarificationsTable,
+			Columns: task.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.ClarificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   task.ClarificationsTable,
+			Columns: task.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -947,6 +1029,21 @@ func (tuo *TaskUpdateOne) AddSubmits(s ...*Submit) *TaskUpdateOne {
 	return tuo.AddSubmitIDs(ids...)
 }
 
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by IDs.
+func (tuo *TaskUpdateOne) AddClarificationIDs(ids ...int) *TaskUpdateOne {
+	tuo.mutation.AddClarificationIDs(ids...)
+	return tuo
+}
+
+// AddClarifications adds the "clarifications" edges to the Clarification entity.
+func (tuo *TaskUpdateOne) AddClarifications(c ...*Clarification) *TaskUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tuo.AddClarificationIDs(ids...)
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (tuo *TaskUpdateOne) SetUserID(id int) *TaskUpdateOne {
 	tuo.mutation.SetUserID(id)
@@ -1054,6 +1151,27 @@ func (tuo *TaskUpdateOne) RemoveSubmits(s ...*Submit) *TaskUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return tuo.RemoveSubmitIDs(ids...)
+}
+
+// ClearClarifications clears all "clarifications" edges to the Clarification entity.
+func (tuo *TaskUpdateOne) ClearClarifications() *TaskUpdateOne {
+	tuo.mutation.ClearClarifications()
+	return tuo
+}
+
+// RemoveClarificationIDs removes the "clarifications" edge to Clarification entities by IDs.
+func (tuo *TaskUpdateOne) RemoveClarificationIDs(ids ...int) *TaskUpdateOne {
+	tuo.mutation.RemoveClarificationIDs(ids...)
+	return tuo
+}
+
+// RemoveClarifications removes "clarifications" edges to Clarification entities.
+func (tuo *TaskUpdateOne) RemoveClarifications(c ...*Clarification) *TaskUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tuo.RemoveClarificationIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -1368,6 +1486,51 @@ func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.ClarificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   task.ClarificationsTable,
+			Columns: task.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedClarificationsIDs(); len(nodes) > 0 && !tuo.mutation.ClarificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   task.ClarificationsTable,
+			Columns: task.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.ClarificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   task.ClarificationsTable,
+			Columns: task.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
@@ -133,6 +134,21 @@ func (cu *ContestUpdate) AddTasks(t ...*Task) *ContestUpdate {
 	return cu.AddTaskIDs(ids...)
 }
 
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by IDs.
+func (cu *ContestUpdate) AddClarificationIDs(ids ...int) *ContestUpdate {
+	cu.mutation.AddClarificationIDs(ids...)
+	return cu
+}
+
+// AddClarifications adds the "clarifications" edges to the Clarification entity.
+func (cu *ContestUpdate) AddClarifications(c ...*Clarification) *ContestUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddClarificationIDs(ids...)
+}
+
 // AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by IDs.
 func (cu *ContestUpdate) AddContestUserIDs(ids ...int) *ContestUpdate {
 	cu.mutation.AddContestUserIDs(ids...)
@@ -229,6 +245,27 @@ func (cu *ContestUpdate) RemoveTasks(t ...*Task) *ContestUpdate {
 		ids[i] = t[i].ID
 	}
 	return cu.RemoveTaskIDs(ids...)
+}
+
+// ClearClarifications clears all "clarifications" edges to the Clarification entity.
+func (cu *ContestUpdate) ClearClarifications() *ContestUpdate {
+	cu.mutation.ClearClarifications()
+	return cu
+}
+
+// RemoveClarificationIDs removes the "clarifications" edge to Clarification entities by IDs.
+func (cu *ContestUpdate) RemoveClarificationIDs(ids ...int) *ContestUpdate {
+	cu.mutation.RemoveClarificationIDs(ids...)
+	return cu
+}
+
+// RemoveClarifications removes "clarifications" edges to Clarification entities.
+func (cu *ContestUpdate) RemoveClarifications(c ...*Clarification) *ContestUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveClarificationIDs(ids...)
 }
 
 // ClearContestUser clears all "contest_user" edges to the ContestUser entity.
@@ -471,6 +508,51 @@ func (cu *ContestUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.ClarificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contest.ClarificationsTable,
+			Columns: []string{contest.ClarificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedClarificationsIDs(); len(nodes) > 0 && !cu.mutation.ClarificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contest.ClarificationsTable,
+			Columns: []string{contest.ClarificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ClarificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contest.ClarificationsTable,
+			Columns: []string{contest.ClarificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if cu.mutation.ContestUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -681,6 +763,21 @@ func (cuo *ContestUpdateOne) AddTasks(t ...*Task) *ContestUpdateOne {
 	return cuo.AddTaskIDs(ids...)
 }
 
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by IDs.
+func (cuo *ContestUpdateOne) AddClarificationIDs(ids ...int) *ContestUpdateOne {
+	cuo.mutation.AddClarificationIDs(ids...)
+	return cuo
+}
+
+// AddClarifications adds the "clarifications" edges to the Clarification entity.
+func (cuo *ContestUpdateOne) AddClarifications(c ...*Clarification) *ContestUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddClarificationIDs(ids...)
+}
+
 // AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by IDs.
 func (cuo *ContestUpdateOne) AddContestUserIDs(ids ...int) *ContestUpdateOne {
 	cuo.mutation.AddContestUserIDs(ids...)
@@ -777,6 +874,27 @@ func (cuo *ContestUpdateOne) RemoveTasks(t ...*Task) *ContestUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return cuo.RemoveTaskIDs(ids...)
+}
+
+// ClearClarifications clears all "clarifications" edges to the Clarification entity.
+func (cuo *ContestUpdateOne) ClearClarifications() *ContestUpdateOne {
+	cuo.mutation.ClearClarifications()
+	return cuo
+}
+
+// RemoveClarificationIDs removes the "clarifications" edge to Clarification entities by IDs.
+func (cuo *ContestUpdateOne) RemoveClarificationIDs(ids ...int) *ContestUpdateOne {
+	cuo.mutation.RemoveClarificationIDs(ids...)
+	return cuo
+}
+
+// RemoveClarifications removes "clarifications" edges to Clarification entities.
+func (cuo *ContestUpdateOne) RemoveClarifications(c ...*Clarification) *ContestUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveClarificationIDs(ids...)
 }
 
 // ClearContestUser clears all "contest_user" edges to the ContestUser entity.
@@ -1042,6 +1160,51 @@ func (cuo *ContestUpdateOne) sqlSave(ctx context.Context) (_node *Contest, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.ClarificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contest.ClarificationsTable,
+			Columns: []string{contest.ClarificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedClarificationsIDs(); len(nodes) > 0 && !cuo.mutation.ClarificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contest.ClarificationsTable,
+			Columns: []string{contest.ClarificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ClarificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contest.ClarificationsTable,
+			Columns: []string{contest.ClarificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

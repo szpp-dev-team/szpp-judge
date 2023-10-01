@@ -14,6 +14,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Clarification is the client for interacting with the Clarification builders.
+	Clarification *ClarificationClient
 	// Contest is the client for interacting with the Contest builders.
 	Contest *ContestClient
 	// ContestTask is the client for interacting with the ContestTask builders.
@@ -167,6 +169,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Clarification = NewClarificationClient(tx.config)
 	tx.Contest = NewContestClient(tx.config)
 	tx.ContestTask = NewContestTaskClient(tx.config)
 	tx.ContestUser = NewContestUserClient(tx.config)
@@ -187,7 +190,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Contest.QueryXXX(), the query will be executed
+// applies a query, for example: Clarification.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

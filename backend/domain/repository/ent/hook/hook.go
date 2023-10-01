@@ -9,6 +9,18 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 )
 
+// The ClarificationFunc type is an adapter to allow the use of ordinary
+// function as Clarification mutator.
+type ClarificationFunc func(context.Context, *ent.ClarificationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ClarificationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ClarificationMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClarificationMutation", m)
+}
+
 // The ContestFunc type is an adapter to allow the use of ordinary
 // function as Contest mutator.
 type ContestFunc func(context.Context, *ent.ContestMutation) (ent.Value, error)

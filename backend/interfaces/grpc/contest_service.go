@@ -39,48 +39,45 @@ func (s *contestServiceServer) GetContestTask(ctx context.Context, req *backendv
 	return s.interactor.GetContestTask(ctx, req)
 }
 
-func (s *contestServiceServer) SyncContestTasks(ctx context.Context, req *backendv1.SyncContestTasksRequest) (*backendv1.SyncContestTasksResponse, error) {
-	return s.interactor.SyncContestTasks(ctx, req)
+func (s *contestServiceServer) CreateClarification(ctx context.Context, req *backendv1.CreateClarificationRequest) (*backendv1.CreateClarificationResponse, error) {
+	return s.interactor.CreateClarification(ctx, req)
 }
 
-func (s *contestServiceServer) GetMySubmissionStatuses(ctx context.Context, req *backendv1.GetMySubmissionStatusesRequest) (*backendv1.GetMySubmissionStatusesResponse, error) {
-	return s.interactor.GetMySubmissionStatuses(ctx, req)
+func (s *contestServiceServer) ListClarifications(ctx context.Context, req *backendv1.ListClarificationsRequest) (*backendv1.ListClarificationsResponse, error) {
+	return s.interactor.ListClarifications(ctx, req)
+}
+
+func (s *contestServiceServer) DeleteClarification(ctx context.Context, req *backendv1.DeleteClarificationRequest) (*backendv1.DeleteClarificationResponse, error) {
+	return s.interactor.DeleteClarification(ctx, req)
+}
+
+func (s *contestServiceServer) CreateAnswer(ctx context.Context, req *backendv1.CreateAnswerRequest) (*backendv1.CreateAnswerResponse, error) {
+	return s.interactor.CreateAnswer(ctx, req)
+}
+
+func (s *contestServiceServer) UpdateAnswer(ctx context.Context, req *backendv1.UpdateAnswerRequest) (*backendv1.UpdateAnswerResponse, error) {
+	return s.interactor.UpdateAnswer(ctx, req)
+}
+
+func (s *contestServiceServer) DeleteAnswer(ctx context.Context, req *backendv1.DeleteAnswerRequest) (*backendv1.DeleteAnswerResponse, error) {
+	return s.interactor.DeleteAnswer(ctx, req)
+}
+
+// GetMySubmissionStatuses implements backendv1.ContestServiceServer.
+func (*contestServiceServer) GetMySubmissionStatuses(context.Context, *backendv1.GetMySubmissionStatusesRequest) (*backendv1.GetMySubmissionStatusesResponse, error) {
+	panic("unimplemented")
 }
 
 func (s *contestServiceServer) GetStandings(ctx context.Context, req *backendv1.GetStandingsRequest) (*backendv1.GetStandingsResponse, error) {
 	return s.interactor.GetStandings(ctx, req)
 }
 
-func (s *contestServiceServer) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRequest) (*backendv1.RegisterMeResponse, error) {
-	return s.interactor.RegisterMe(ctx, req)
-}
-
-// UpdateAnswer implements backendv1.ContestServiceServer.
-func (*contestServiceServer) UpdateAnswer(context.Context, *backendv1.UpdateAnswerRequest) (*backendv1.UpdateAnswerResponse, error) {
+// RegisterMe implements backendv1.ContestServiceServer.
+func (*contestServiceServer) RegisterMe(context.Context, *backendv1.RegisterMeRequest) (*backendv1.RegisterMeResponse, error) {
 	panic("unimplemented")
 }
 
-// CreateAnswer implements backendv1.ContestServiceServer.
-func (*contestServiceServer) CreateAnswer(context.Context, *backendv1.CreateAnswerRequest) (*backendv1.CreateAnswerResponse, error) {
-	panic("unimplemented")
-}
-
-// CreateClarification implements backendv1.ContestServiceServer.
-func (*contestServiceServer) CreateClarification(context.Context, *backendv1.CreateClarificationRequest) (*backendv1.CreateClarificationResponse, error) {
-	panic("unimplemented")
-}
-
-// DeleteAnswer implements backendv1.ContestServiceServer.
-func (*contestServiceServer) DeleteAnswer(context.Context, *backendv1.DeleteAnswerRequest) (*backendv1.DeleteAnswerResponse, error) {
-	panic("unimplemented")
-}
-
-// DeleteClarification implements backendv1.ContestServiceServer.
-func (*contestServiceServer) DeleteClarification(context.Context, *backendv1.DeleteClarificationRequest) (*backendv1.DeleteClarificationResponse, error) {
-	panic("unimplemented")
-}
-
-// ListClarifications implements backendv1.ContestServiceServer.
-func (*contestServiceServer) ListClarifications(context.Context, *backendv1.ListClarificationsRequest) (*backendv1.ListClarificationsResponse, error) {
+// SyncContestTasks implements backendv1.ContestServiceServer.
+func (*contestServiceServer) SyncContestTasks(context.Context, *backendv1.SyncContestTasksRequest) (*backendv1.SyncContestTasksResponse, error) {
 	panic("unimplemented")
 }

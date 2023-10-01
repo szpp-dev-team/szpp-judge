@@ -34,6 +34,8 @@ const (
 	EdgeUsers = "users"
 	// EdgeTasks holds the string denoting the tasks edge name in mutations.
 	EdgeTasks = "tasks"
+	// EdgeClarifications holds the string denoting the clarifications edge name in mutations.
+	EdgeClarifications = "clarifications"
 	// EdgeContestUser holds the string denoting the contest_user edge name in mutations.
 	EdgeContestUser = "contest_user"
 	// EdgeContestTask holds the string denoting the contest_task edge name in mutations.
@@ -57,6 +59,13 @@ const (
 	// TasksInverseTable is the table name for the Task entity.
 	// It exists in this package in order to avoid circular dependency with the "task" package.
 	TasksInverseTable = "tasks"
+	// ClarificationsTable is the table that holds the clarifications relation/edge.
+	ClarificationsTable = "clarifications"
+	// ClarificationsInverseTable is the table name for the Clarification entity.
+	// It exists in this package in order to avoid circular dependency with the "clarification" package.
+	ClarificationsInverseTable = "clarifications"
+	// ClarificationsColumn is the table column denoting the clarifications relation/edge.
+	ClarificationsColumn = "contest_clarifications"
 	// ContestUserTable is the table that holds the contest_user relation/edge.
 	ContestUserTable = "contest_users"
 	// ContestUserInverseTable is the table name for the ContestUser entity.
@@ -195,6 +204,20 @@ func ByTasks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByClarificationsCount orders the results by clarifications count.
+func ByClarificationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newClarificationsStep(), opts...)
+	}
+}
+
+// ByClarifications orders the results by clarifications terms.
+func ByClarifications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClarificationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByContestUserCount orders the results by contest_user count.
 func ByContestUserCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -241,6 +264,13 @@ func newTasksStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TasksInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, TasksTable, TasksPrimaryKey...),
+	)
+}
+func newClarificationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClarificationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ClarificationsTable, ClarificationsColumn),
 	)
 }
 func newContestUserStep() *sqlgraph.Step {

@@ -55,6 +55,8 @@ type TaskEdges struct {
 	Testcases []*Testcase `json:"testcases,omitempty"`
 	// Submits holds the value of the submits edge.
 	Submits []*Submit `json:"submits,omitempty"`
+	// Clarifications holds the value of the clarifications edge.
+	Clarifications []*Clarification `json:"clarifications,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// Contests holds the value of the contests edge.
@@ -63,7 +65,7 @@ type TaskEdges struct {
 	ContestTask []*ContestTask `json:"contest_task,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 }
 
 // TestcaseSetsOrErr returns the TestcaseSets value or an error if the edge
@@ -93,10 +95,19 @@ func (e TaskEdges) SubmitsOrErr() ([]*Submit, error) {
 	return nil, &NotLoadedError{edge: "submits"}
 }
 
+// ClarificationsOrErr returns the Clarifications value or an error if the edge
+// was not loaded in eager-loading.
+func (e TaskEdges) ClarificationsOrErr() ([]*Clarification, error) {
+	if e.loadedTypes[3] {
+		return e.Clarifications, nil
+	}
+	return nil, &NotLoadedError{edge: "clarifications"}
+}
+
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e TaskEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -109,7 +120,7 @@ func (e TaskEdges) UserOrErr() (*User, error) {
 // ContestsOrErr returns the Contests value or an error if the edge
 // was not loaded in eager-loading.
 func (e TaskEdges) ContestsOrErr() ([]*Contest, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		return e.Contests, nil
 	}
 	return nil, &NotLoadedError{edge: "contests"}
@@ -118,7 +129,7 @@ func (e TaskEdges) ContestsOrErr() ([]*Contest, error) {
 // ContestTaskOrErr returns the ContestTask value or an error if the edge
 // was not loaded in eager-loading.
 func (e TaskEdges) ContestTaskOrErr() ([]*ContestTask, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[6] {
 		return e.ContestTask, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_task"}
@@ -263,6 +274,11 @@ func (t *Task) QueryTestcases() *TestcaseQuery {
 // QuerySubmits queries the "submits" edge of the Task entity.
 func (t *Task) QuerySubmits() *SubmitQuery {
 	return NewTaskClient(t.config).QuerySubmits(t)
+}
+
+// QueryClarifications queries the "clarifications" edge of the Task entity.
+func (t *Task) QueryClarifications() *ClarificationQuery {
+	return NewTaskClient(t.config).QueryClarifications(t)
 }
 
 // QueryUser queries the "user" edge of the Task entity.

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
@@ -175,6 +176,21 @@ func (tc *TaskCreate) AddSubmits(s ...*Submit) *TaskCreate {
 		ids[i] = s[i].ID
 	}
 	return tc.AddSubmitIDs(ids...)
+}
+
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by IDs.
+func (tc *TaskCreate) AddClarificationIDs(ids ...int) *TaskCreate {
+	tc.mutation.AddClarificationIDs(ids...)
+	return tc
+}
+
+// AddClarifications adds the "clarifications" edges to the Clarification entity.
+func (tc *TaskCreate) AddClarifications(c ...*Clarification) *TaskCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tc.AddClarificationIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -399,6 +415,22 @@ func (tc *TaskCreate) createSpec() (*Task, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.ClarificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   task.ClarificationsTable,
+			Columns: task.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

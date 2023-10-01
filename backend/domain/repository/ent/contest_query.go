@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
@@ -23,15 +24,16 @@ import (
 // ContestQuery is the builder for querying Contest entities.
 type ContestQuery struct {
 	config
-	ctx             *QueryContext
-	order           []contest.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Contest
-	withSubmits     *SubmitQuery
-	withUsers       *UserQuery
-	withTasks       *TaskQuery
-	withContestUser *ContestUserQuery
-	withContestTask *ContestTaskQuery
+	ctx                *QueryContext
+	order              []contest.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Contest
+	withSubmits        *SubmitQuery
+	withUsers          *UserQuery
+	withTasks          *TaskQuery
+	withClarifications *ClarificationQuery
+	withContestUser    *ContestUserQuery
+	withContestTask    *ContestTaskQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -127,6 +129,28 @@ func (cq *ContestQuery) QueryTasks() *TaskQuery {
 			sqlgraph.From(contest.Table, contest.FieldID, selector),
 			sqlgraph.To(task.Table, task.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, contest.TasksTable, contest.TasksPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryClarifications chains the current query on the "clarifications" edge.
+func (cq *ContestQuery) QueryClarifications() *ClarificationQuery {
+	query := (&ClarificationClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contest.Table, contest.FieldID, selector),
+			sqlgraph.To(clarification.Table, clarification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contest.ClarificationsTable, contest.ClarificationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -365,16 +389,17 @@ func (cq *ContestQuery) Clone() *ContestQuery {
 		return nil
 	}
 	return &ContestQuery{
-		config:          cq.config,
-		ctx:             cq.ctx.Clone(),
-		order:           append([]contest.OrderOption{}, cq.order...),
-		inters:          append([]Interceptor{}, cq.inters...),
-		predicates:      append([]predicate.Contest{}, cq.predicates...),
-		withSubmits:     cq.withSubmits.Clone(),
-		withUsers:       cq.withUsers.Clone(),
-		withTasks:       cq.withTasks.Clone(),
-		withContestUser: cq.withContestUser.Clone(),
-		withContestTask: cq.withContestTask.Clone(),
+		config:             cq.config,
+		ctx:                cq.ctx.Clone(),
+		order:              append([]contest.OrderOption{}, cq.order...),
+		inters:             append([]Interceptor{}, cq.inters...),
+		predicates:         append([]predicate.Contest{}, cq.predicates...),
+		withSubmits:        cq.withSubmits.Clone(),
+		withUsers:          cq.withUsers.Clone(),
+		withTasks:          cq.withTasks.Clone(),
+		withClarifications: cq.withClarifications.Clone(),
+		withContestUser:    cq.withContestUser.Clone(),
+		withContestTask:    cq.withContestTask.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -411,6 +436,17 @@ func (cq *ContestQuery) WithTasks(opts ...func(*TaskQuery)) *ContestQuery {
 		opt(query)
 	}
 	cq.withTasks = query
+	return cq
+}
+
+// WithClarifications tells the query-builder to eager-load the nodes that are connected to
+// the "clarifications" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ContestQuery) WithClarifications(opts ...func(*ClarificationQuery)) *ContestQuery {
+	query := (&ClarificationClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withClarifications = query
 	return cq
 }
 
@@ -514,10 +550,11 @@ func (cq *ContestQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	var (
 		nodes       = []*Contest{}
 		_spec       = cq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			cq.withSubmits != nil,
 			cq.withUsers != nil,
 			cq.withTasks != nil,
+			cq.withClarifications != nil,
 			cq.withContestUser != nil,
 			cq.withContestTask != nil,
 		}
@@ -558,6 +595,13 @@ func (cq *ContestQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 		if err := cq.loadTasks(ctx, query, nodes,
 			func(n *Contest) { n.Edges.Tasks = []*Task{} },
 			func(n *Contest, e *Task) { n.Edges.Tasks = append(n.Edges.Tasks, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withClarifications; query != nil {
+		if err := cq.loadClarifications(ctx, query, nodes,
+			func(n *Contest) { n.Edges.Clarifications = []*Clarification{} },
+			func(n *Contest, e *Clarification) { n.Edges.Clarifications = append(n.Edges.Clarifications, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -728,6 +772,37 @@ func (cq *ContestQuery) loadTasks(ctx context.Context, query *TaskQuery, nodes [
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (cq *ContestQuery) loadClarifications(ctx context.Context, query *ClarificationQuery, nodes []*Contest, init func(*Contest), assign func(*Contest, *Clarification)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contest)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Clarification(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contest.ClarificationsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.contest_clarifications
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "contest_clarifications" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "contest_clarifications" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

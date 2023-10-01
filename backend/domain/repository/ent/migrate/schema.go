@@ -8,6 +8,32 @@ import (
 )
 
 var (
+	// ClarificationsColumns holds the columns for the "clarifications" table.
+	ClarificationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "content", Type: field.TypeString},
+		{Name: "is_public", Type: field.TypeBool},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "answer_content", Type: field.TypeString, Nullable: true},
+		{Name: "answer_created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "answer_updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "contest_clarifications", Type: field.TypeInt},
+	}
+	// ClarificationsTable holds the schema information for the "clarifications" table.
+	ClarificationsTable = &schema.Table{
+		Name:       "clarifications",
+		Columns:    ClarificationsColumns,
+		PrimaryKey: []*schema.Column{ClarificationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "clarifications_contests_clarifications",
+				Columns:    []*schema.Column{ClarificationsColumns[8]},
+				RefColumns: []*schema.Column{ContestsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// ContestsColumns holds the columns for the "contests" table.
 	ContestsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -304,6 +330,31 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// TaskClarificationsColumns holds the columns for the "task_clarifications" table.
+	TaskClarificationsColumns = []*schema.Column{
+		{Name: "task_id", Type: field.TypeInt},
+		{Name: "clarification_id", Type: field.TypeInt},
+	}
+	// TaskClarificationsTable holds the schema information for the "task_clarifications" table.
+	TaskClarificationsTable = &schema.Table{
+		Name:       "task_clarifications",
+		Columns:    TaskClarificationsColumns,
+		PrimaryKey: []*schema.Column{TaskClarificationsColumns[0], TaskClarificationsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "task_clarifications_task_id",
+				Columns:    []*schema.Column{TaskClarificationsColumns[0]},
+				RefColumns: []*schema.Column{TasksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "task_clarifications_clarification_id",
+				Columns:    []*schema.Column{TaskClarificationsColumns[1]},
+				RefColumns: []*schema.Column{ClarificationsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// TestcaseSetTestcasesColumns holds the columns for the "testcase_set_testcases" table.
 	TestcaseSetTestcasesColumns = []*schema.Column{
 		{Name: "testcase_set_id", Type: field.TypeInt},
@@ -329,8 +380,59 @@ var (
 			},
 		},
 	}
+	// UserClarificationsColumns holds the columns for the "user_clarifications" table.
+	UserClarificationsColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "clarification_id", Type: field.TypeInt},
+	}
+	// UserClarificationsTable holds the schema information for the "user_clarifications" table.
+	UserClarificationsTable = &schema.Table{
+		Name:       "user_clarifications",
+		Columns:    UserClarificationsColumns,
+		PrimaryKey: []*schema.Column{UserClarificationsColumns[0], UserClarificationsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_clarifications_user_id",
+				Columns:    []*schema.Column{UserClarificationsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_clarifications_clarification_id",
+				Columns:    []*schema.Column{UserClarificationsColumns[1]},
+				RefColumns: []*schema.Column{ClarificationsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// UserAnsweredClarificationsColumns holds the columns for the "user_answered_clarifications" table.
+	UserAnsweredClarificationsColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "clarification_id", Type: field.TypeInt},
+	}
+	// UserAnsweredClarificationsTable holds the schema information for the "user_answered_clarifications" table.
+	UserAnsweredClarificationsTable = &schema.Table{
+		Name:       "user_answered_clarifications",
+		Columns:    UserAnsweredClarificationsColumns,
+		PrimaryKey: []*schema.Column{UserAnsweredClarificationsColumns[0], UserAnsweredClarificationsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_answered_clarifications_user_id",
+				Columns:    []*schema.Column{UserAnsweredClarificationsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_answered_clarifications_clarification_id",
+				Columns:    []*schema.Column{UserAnsweredClarificationsColumns[1]},
+				RefColumns: []*schema.Column{ClarificationsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		ClarificationsTable,
 		ContestsTable,
 		ContestTasksTable,
 		ContestUsersTable,
@@ -342,11 +444,15 @@ var (
 		TestcaseResultsTable,
 		TestcaseSetsTable,
 		UsersTable,
+		TaskClarificationsTable,
 		TestcaseSetTestcasesTable,
+		UserClarificationsTable,
+		UserAnsweredClarificationsTable,
 	}
 )
 
 func init() {
+	ClarificationsTable.ForeignKeys[0].RefTable = ContestsTable
 	ContestTasksTable.ForeignKeys[0].RefTable = ContestsTable
 	ContestTasksTable.ForeignKeys[1].RefTable = TasksTable
 	ContestUsersTable.ForeignKeys[0].RefTable = ContestsTable
@@ -360,6 +466,12 @@ func init() {
 	TestcaseResultsTable.ForeignKeys[0].RefTable = SubmitsTable
 	TestcaseResultsTable.ForeignKeys[1].RefTable = TestcasesTable
 	TestcaseSetsTable.ForeignKeys[0].RefTable = TasksTable
+	TaskClarificationsTable.ForeignKeys[0].RefTable = TasksTable
+	TaskClarificationsTable.ForeignKeys[1].RefTable = ClarificationsTable
 	TestcaseSetTestcasesTable.ForeignKeys[0].RefTable = TestcaseSetsTable
 	TestcaseSetTestcasesTable.ForeignKeys[1].RefTable = TestcasesTable
+	UserClarificationsTable.ForeignKeys[0].RefTable = UsersTable
+	UserClarificationsTable.ForeignKeys[1].RefTable = ClarificationsTable
+	UserAnsweredClarificationsTable.ForeignKeys[0].RefTable = UsersTable
+	UserAnsweredClarificationsTable.ForeignKeys[1].RefTable = ClarificationsTable
 }

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
@@ -22,14 +23,16 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx             *QueryContext
-	order           []user.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.User
-	withTasks       *TaskQuery
-	withSubmits     *SubmitQuery
-	withContests    *ContestQuery
-	withContestUser *ContestUserQuery
+	ctx                        *QueryContext
+	order                      []user.OrderOption
+	inters                     []Interceptor
+	predicates                 []predicate.User
+	withTasks                  *TaskQuery
+	withSubmits                *SubmitQuery
+	withClarifications         *ClarificationQuery
+	withAnsweredClarifications *ClarificationQuery
+	withContests               *ContestQuery
+	withContestUser            *ContestUserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -103,6 +106,50 @@ func (uq *UserQuery) QuerySubmits() *SubmitQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(submit.Table, submit.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.SubmitsTable, user.SubmitsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryClarifications chains the current query on the "clarifications" edge.
+func (uq *UserQuery) QueryClarifications() *ClarificationQuery {
+	query := (&ClarificationClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(clarification.Table, clarification.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.ClarificationsTable, user.ClarificationsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAnsweredClarifications chains the current query on the "answered_clarifications" edge.
+func (uq *UserQuery) QueryAnsweredClarifications() *ClarificationQuery {
+	query := (&ClarificationClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(clarification.Table, clarification.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.AnsweredClarificationsTable, user.AnsweredClarificationsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -341,15 +388,17 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:          uq.config,
-		ctx:             uq.ctx.Clone(),
-		order:           append([]user.OrderOption{}, uq.order...),
-		inters:          append([]Interceptor{}, uq.inters...),
-		predicates:      append([]predicate.User{}, uq.predicates...),
-		withTasks:       uq.withTasks.Clone(),
-		withSubmits:     uq.withSubmits.Clone(),
-		withContests:    uq.withContests.Clone(),
-		withContestUser: uq.withContestUser.Clone(),
+		config:                     uq.config,
+		ctx:                        uq.ctx.Clone(),
+		order:                      append([]user.OrderOption{}, uq.order...),
+		inters:                     append([]Interceptor{}, uq.inters...),
+		predicates:                 append([]predicate.User{}, uq.predicates...),
+		withTasks:                  uq.withTasks.Clone(),
+		withSubmits:                uq.withSubmits.Clone(),
+		withClarifications:         uq.withClarifications.Clone(),
+		withAnsweredClarifications: uq.withAnsweredClarifications.Clone(),
+		withContests:               uq.withContests.Clone(),
+		withContestUser:            uq.withContestUser.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -375,6 +424,28 @@ func (uq *UserQuery) WithSubmits(opts ...func(*SubmitQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withSubmits = query
+	return uq
+}
+
+// WithClarifications tells the query-builder to eager-load the nodes that are connected to
+// the "clarifications" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithClarifications(opts ...func(*ClarificationQuery)) *UserQuery {
+	query := (&ClarificationClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withClarifications = query
+	return uq
+}
+
+// WithAnsweredClarifications tells the query-builder to eager-load the nodes that are connected to
+// the "answered_clarifications" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithAnsweredClarifications(opts ...func(*ClarificationQuery)) *UserQuery {
+	query := (&ClarificationClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withAnsweredClarifications = query
 	return uq
 }
 
@@ -478,9 +549,11 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [6]bool{
 			uq.withTasks != nil,
 			uq.withSubmits != nil,
+			uq.withClarifications != nil,
+			uq.withAnsweredClarifications != nil,
 			uq.withContests != nil,
 			uq.withContestUser != nil,
 		}
@@ -514,6 +587,22 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadSubmits(ctx, query, nodes,
 			func(n *User) { n.Edges.Submits = []*Submit{} },
 			func(n *User, e *Submit) { n.Edges.Submits = append(n.Edges.Submits, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withClarifications; query != nil {
+		if err := uq.loadClarifications(ctx, query, nodes,
+			func(n *User) { n.Edges.Clarifications = []*Clarification{} },
+			func(n *User, e *Clarification) { n.Edges.Clarifications = append(n.Edges.Clarifications, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withAnsweredClarifications; query != nil {
+		if err := uq.loadAnsweredClarifications(ctx, query, nodes,
+			func(n *User) { n.Edges.AnsweredClarifications = []*Clarification{} },
+			func(n *User, e *Clarification) {
+				n.Edges.AnsweredClarifications = append(n.Edges.AnsweredClarifications, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -593,6 +682,128 @@ func (uq *UserQuery) loadSubmits(ctx context.Context, query *SubmitQuery, nodes 
 			return fmt.Errorf(`unexpected referenced foreign-key "user_submits" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadClarifications(ctx context.Context, query *ClarificationQuery, nodes []*User, init func(*User), assign func(*User, *Clarification)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.ClarificationsTable)
+		s.Join(joinT).On(s.C(clarification.FieldID), joinT.C(user.ClarificationsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.ClarificationsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.ClarificationsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Clarification](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "clarifications" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadAnsweredClarifications(ctx context.Context, query *ClarificationQuery, nodes []*User, init func(*User), assign func(*User, *Clarification)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.AnsweredClarificationsTable)
+		s.Join(joinT).On(s.C(clarification.FieldID), joinT.C(user.AnsweredClarificationsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.AnsweredClarificationsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.AnsweredClarificationsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Clarification](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "answered_clarifications" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

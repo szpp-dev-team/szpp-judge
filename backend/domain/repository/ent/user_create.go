@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/clarification"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
@@ -104,6 +105,36 @@ func (uc *UserCreate) AddSubmits(s ...*Submit) *UserCreate {
 		ids[i] = s[i].ID
 	}
 	return uc.AddSubmitIDs(ids...)
+}
+
+// AddClarificationIDs adds the "clarifications" edge to the Clarification entity by IDs.
+func (uc *UserCreate) AddClarificationIDs(ids ...int) *UserCreate {
+	uc.mutation.AddClarificationIDs(ids...)
+	return uc
+}
+
+// AddClarifications adds the "clarifications" edges to the Clarification entity.
+func (uc *UserCreate) AddClarifications(c ...*Clarification) *UserCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddClarificationIDs(ids...)
+}
+
+// AddAnsweredClarificationIDs adds the "answered_clarifications" edge to the Clarification entity by IDs.
+func (uc *UserCreate) AddAnsweredClarificationIDs(ids ...int) *UserCreate {
+	uc.mutation.AddAnsweredClarificationIDs(ids...)
+	return uc
+}
+
+// AddAnsweredClarifications adds the "answered_clarifications" edges to the Clarification entity.
+func (uc *UserCreate) AddAnsweredClarifications(c ...*Clarification) *UserCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddAnsweredClarificationIDs(ids...)
 }
 
 // AddContestIDs adds the "contests" edge to the Contest entity by IDs.
@@ -267,6 +298,38 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submit.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.ClarificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.ClarificationsTable,
+			Columns: user.ClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.AnsweredClarificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.AnsweredClarificationsTable,
+			Columns: user.AnsweredClarificationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(clarification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
