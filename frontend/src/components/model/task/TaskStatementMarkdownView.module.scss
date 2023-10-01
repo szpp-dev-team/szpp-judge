@@ -1,0 +1,100 @@
+.TaskStatementMarkdownView {
+  color: #1d4044;
+
+  h1 {
+    font-size: 3rem;
+    color: red;
+    &::after {
+      content: "問題文ではh1タグを使わないでください";
+      color: red;
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: bold;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  h4 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin-top: 1em;
+  }
+
+  a {
+    color: #2b6cb0;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  ul, ol {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-left: 2em;
+  }
+
+  li > :is(ul, ol) {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  em {
+    font-style: italic;
+  }
+  strong {
+    font-style: bold;
+  }
+  del {
+    text-decoration: line-through;
+  }
+
+  code {
+    color: #e052a8;
+  }
+
+  pre > code {
+    display: block;
+    padding: 0.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    color: #000;
+    background: #f0f0f6;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+  }
+
+  summary {
+    margin-top: 1em;
+    cursor: pointer;
+  }
+
+  $table-border-color: #ddd;
+  $table-border-style: 1px solid $table-border-color;
+
+  table {
+    margin: 1.5rem auto;
+    border-top: $table-border-style;
+    border-left: $table-border-style;
+  }
+
+  td, th {
+    padding: .25em .75em;
+    border-bottom: $table-border-style;
+    border-right: $table-border-style;
+  }
+  th {
+    background: #f9f9f9;
+    border-bottom: 2px solid $table-border-color;
+  }
+}
