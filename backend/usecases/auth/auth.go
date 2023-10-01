@@ -6,11 +6,13 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	entrefreshtoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	u_user "github.com/szpp-dev-team/szpp-judge/backend/usecases/user"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Interactor struct {
@@ -69,7 +71,12 @@ func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAcce
 		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("invalid refresh token"))
 	} else {
 		secret := i.Secret
-		username := interceptor.GetClaimsFromContext(ctx).Username
+		q := i.entClient.RefreshToken.Query()
+		refreshToken, err := q.Where(entrefreshtoken.Token(req.RefreshToken)).Only(ctx)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		username := refreshToken.Username
 		accessToken, err := generateAccessToken([]byte(secret), username)
 		if err != nil {
 			return nil, err

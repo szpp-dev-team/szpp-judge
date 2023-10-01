@@ -27,7 +27,7 @@ func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, u
 	if err != nil {
 		return Tokens{}, connect.NewError(connect.CodeInternal, err)
 	}
-	refreshToken, err := generateRefreshToken(ctx, entClient)
+	refreshToken, err := generateRefreshToken(ctx, entClient, username)
 	if err != nil {
 		return Tokens{}, connect.NewError(connect.CodeInternal, err)
 	}
@@ -48,13 +48,14 @@ func generateAccessToken(secret []byte, username string) (string, error) {
 	return accessToken.SignedString(secret)
 }
 
-func generateRefreshToken(ctx context.Context, entClient *ent.Client) (string, error) {
+func generateRefreshToken(ctx context.Context, entClient *ent.Client, username string) (string, error) {
 	uuidObj, _ := uuid.NewRandom()
 	token := uuidObj.String()
 	expiresAt := timejst.Now().Add(time.Hour * 24 * 30)
 
 	q := entClient.RefreshToken.Create().
 		SetToken(token).
+		SetUsername(username).
 		SetExpiresAt(expiresAt).
 		SetIsDead(false)
 
