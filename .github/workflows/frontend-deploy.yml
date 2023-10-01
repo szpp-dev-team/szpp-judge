@@ -9,6 +9,7 @@ on:
       - frontend/**
       - '!frontend/src/gen/**'
       - .github/workflows/frontend-deploy.yml
+  workflow_dispatch:
 defaults:
   run:
     working-directory: ./frontend
