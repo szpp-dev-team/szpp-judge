@@ -18,8 +18,17 @@ export const ContestLayout = ({ children }: ContestLayoutProps) => {
   const slug = useRouterContestSlug();
 
   const { contest } = useGetContest({ slug });
-  const { tasks } = useListContestTasks({ contestSlug: slug });
-  const { submissionStatuses } = useGetMySubmissionStatuses({ contestSlug: slug });
+
+  const isContestStarted = contest != null && contest.startAt!.toDate() < new Date();
+
+  const { tasks } = useListContestTasks(
+    { contestSlug: slug },
+    { enabled: isContestStarted },
+  );
+  const { submissionStatuses } = useGetMySubmissionStatuses(
+    { contestSlug: slug },
+    { enabled: isContestStarted },
+  );
 
   const unifiedTasks = useMemo((): ContestSidebarProps["tasks"] => {
     if (tasks == null || submissionStatuses == null) return [];

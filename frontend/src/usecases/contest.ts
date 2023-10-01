@@ -49,6 +49,10 @@ export const useRouterSubmissionId = () => {
   return query.submission_id as string;
 };
 
+type UseQueryOption = {
+  enabled?: boolean;
+};
+
 export const useListContests = (input?: PlainMessage<ListContestsRequest>) => {
   const { data, error, isLoading } = useQuery(listContests.useQuery(input));
   const contests = data?.contests;
@@ -65,28 +69,34 @@ export const useGetContest = (input?: PlainMessage<GetContestRequest>) => {
   return { contest, error, isLoading };
 };
 
-export const useListContestTasks = (input?: PlainMessage<ListContestTasksRequest>) => {
+export const useListContestTasks = (input?: PlainMessage<ListContestTasksRequest>, opt?: UseQueryOption) => {
   const { data, error, isLoading } = useQuery({
     ...listContestTasks.useQuery(input),
     staleTime: 5 * Duration.MINUTE,
+    ...opt,
   });
   const tasks = data?.tasks;
   return { tasks, error, isLoading };
 };
 
-export const useGetContestTask = (input?: PlainMessage<GetContestTaskRequest>) => {
+export const useGetContestTask = (input?: PlainMessage<GetContestTaskRequest>, opt?: UseQueryOption) => {
   const { data, error, isLoading } = useQuery({
     ...getContestTask.useQuery(input),
     staleTime: 5 * Duration.MINUTE,
+    ...opt,
   });
   const task = data?.task;
   return { task, error, isLoading };
 };
 
-export const useGetMySubmissionStatuses = (input?: PlainMessage<GetMySubmissionStatusesRequest>) => {
+export const useGetMySubmissionStatuses = (
+  input?: PlainMessage<GetMySubmissionStatusesRequest>,
+  opt?: UseQueryOption,
+) => {
   const { data, error, isLoading } = useQuery({
     ...getMySubmissionStatuses.useQuery(input),
     staleTime: Duration.MINUTE,
+    ...opt,
   });
   const submissionStatuses = data?.submissionStatuses;
   return { submissionStatuses, error, isLoading };
