@@ -31,9 +31,12 @@ export const calcNthTaskSeq = (i: number, numTotalTasks: number): string => {
   return String(i + 1);
 };
 
+/**
+ * URL から contest_slug を取得
+ * URL に [contest_slug] が含まれていないページでは undefined になるので注意
+ */
 export const useRouterContestSlug = () => {
   const { query } = useRouter();
-  /// URLに [contest_slug] が含まれていないページでは undefined になるので注意
   return query.contest_slug as string;
 };
 
