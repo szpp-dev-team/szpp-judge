@@ -1,4 +1,4 @@
-package grpc_server
+package connect_server
 
 import (
 	"log/slog"

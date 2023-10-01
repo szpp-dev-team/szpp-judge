@@ -3,34 +3,56 @@ package grpc
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
+	"github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1/backendv1connect"
 )
 
 type taskServiceServer struct {
 	interactor *tasks.Interactor
 }
 
-func NewTaskServiceServer(interactor *tasks.Interactor) backendv1.TaskServiceServer {
+func NewTaskServiceServer(interactor *tasks.Interactor) backendv1connect.TaskServiceHandler {
 	return &taskServiceServer{interactor}
 }
 
-func (s *taskServiceServer) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
-	return s.interactor.CreateTask(ctx, req)
+func (s *taskServiceServer) CreateTask(ctx context.Context, req *connect.Request[backendv1.CreateTaskRequest]) (*connect.Response[backendv1.CreateTaskResponse], error) {
+	resp, err := s.interactor.CreateTask(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *taskServiceServer) GetTask(ctx context.Context, req *backendv1.GetTaskRequest) (*backendv1.GetTaskResponse, error) {
-	return s.interactor.GetTask(ctx, req)
+func (s *taskServiceServer) GetTask(ctx context.Context, req *connect.Request[backendv1.GetTaskRequest]) (*connect.Response[backendv1.GetTaskResponse], error) {
+	resp, err := s.interactor.GetTask(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *taskServiceServer) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRequest) (*backendv1.UpdateTaskResponse, error) {
-	return s.interactor.UpdateTask(ctx, req)
+func (s *taskServiceServer) UpdateTask(ctx context.Context, req *connect.Request[backendv1.UpdateTaskRequest]) (*connect.Response[backendv1.UpdateTaskResponse], error) {
+	resp, err := s.interactor.UpdateTask(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *taskServiceServer) GetTestcaseSets(ctx context.Context, req *backendv1.GetTestcaseSetsRequest) (*backendv1.GetTestcaseSetsResponse, error) {
-	return s.interactor.GetTestcaseSets(ctx, req)
+func (s *taskServiceServer) GetTestcaseSets(ctx context.Context, req *connect.Request[backendv1.GetTestcaseSetsRequest]) (*connect.Response[backendv1.GetTestcaseSetsResponse], error) {
+	resp, err := s.interactor.GetTestcaseSets(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *taskServiceServer) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) (*backendv1.SyncTestcaseSetsResponse, error) {
-	return s.interactor.SyncTestcaseSets(ctx, req)
+func (s *taskServiceServer) SyncTestcaseSets(ctx context.Context, req *connect.Request[backendv1.SyncTestcaseSetsRequest]) (*connect.Response[backendv1.SyncTestcaseSetsResponse], error) {
+	resp, err := s.interactor.SyncTestcaseSets(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }

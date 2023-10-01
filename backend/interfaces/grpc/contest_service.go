@@ -3,84 +3,126 @@ package grpc
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/contests"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
+	"github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1/backendv1connect"
 )
 
 type contestServiceServer struct {
 	interactor *contests.Interactor
 }
 
-func NewContestServiceServer(interactor *contests.Interactor) backendv1.ContestServiceServer {
+func NewContestServiceServer(interactor *contests.Interactor) backendv1connect.ContestServiceHandler {
 	return &contestServiceServer{interactor}
 }
 
-func (s *contestServiceServer) CreateContest(ctx context.Context, req *backendv1.CreateContestRequest) (*backendv1.CreateContestResponse, error) {
-	return s.interactor.CreateContest(ctx, req)
+func (s *contestServiceServer) CreateContest(ctx context.Context, req *connect.Request[backendv1.CreateContestRequest]) (*connect.Response[backendv1.CreateContestResponse], error) {
+	resp, err := s.interactor.CreateContest(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) GetContest(ctx context.Context, req *backendv1.GetContestRequest) (*backendv1.GetContestResponse, error) {
-	return s.interactor.GetContest(ctx, req)
+func (s *contestServiceServer) GetContest(ctx context.Context, req *connect.Request[backendv1.GetContestRequest]) (*connect.Response[backendv1.GetContestResponse], error) {
+	resp, err := s.interactor.GetContest(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) UpdateContest(ctx context.Context, req *backendv1.UpdateContestRequest) (*backendv1.UpdateContestResponse, error) {
-	return s.interactor.UpdateContest(ctx, req)
+func (s *contestServiceServer) UpdateContest(ctx context.Context, req *connect.Request[backendv1.UpdateContestRequest]) (*connect.Response[backendv1.UpdateContestResponse], error) {
+	resp, err := s.interactor.UpdateContest(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) ListContests(ctx context.Context, req *backendv1.ListContestsRequest) (*backendv1.ListContestsResponse, error) {
-	return s.interactor.ListContests(ctx, req)
+func (s *contestServiceServer) ListContests(ctx context.Context, req *connect.Request[backendv1.ListContestsRequest]) (*connect.Response[backendv1.ListContestsResponse], error) {
+	resp, err := s.interactor.ListContests(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) ListContestTasks(ctx context.Context, req *backendv1.ListContestTasksRequest) (*backendv1.ListContestTasksResponse, error) {
-	return s.interactor.ListContestTasks(ctx, req)
+func (s *contestServiceServer) ListContestTasks(ctx context.Context, req *connect.Request[backendv1.ListContestTasksRequest]) (*connect.Response[backendv1.ListContestTasksResponse], error) {
+	resp, err := s.interactor.ListContestTasks(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) GetContestTask(ctx context.Context, req *backendv1.GetContestTaskRequest) (*backendv1.GetContestTaskResponse, error) {
-	return s.interactor.GetContestTask(ctx, req)
+func (s *contestServiceServer) GetContestTask(ctx context.Context, req *connect.Request[backendv1.GetContestTaskRequest]) (*connect.Response[backendv1.GetContestTaskResponse], error) {
+	resp, err := s.interactor.GetContestTask(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) SyncContestTasks(ctx context.Context, req *backendv1.SyncContestTasksRequest) (*backendv1.SyncContestTasksResponse, error) {
-	return s.interactor.SyncContestTasks(ctx, req)
+func (s *contestServiceServer) SyncContestTasks(ctx context.Context, req *connect.Request[backendv1.SyncContestTasksRequest]) (*connect.Response[backendv1.SyncContestTasksResponse], error) {
+	resp, err := s.interactor.SyncContestTasks(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) GetMySubmissionStatuses(ctx context.Context, req *backendv1.GetMySubmissionStatusesRequest) (*backendv1.GetMySubmissionStatusesResponse, error) {
-	return s.interactor.GetMySubmissionStatuses(ctx, req)
+func (s *contestServiceServer) GetMySubmissionStatuses(ctx context.Context, req *connect.Request[backendv1.GetMySubmissionStatusesRequest]) (*connect.Response[backendv1.GetMySubmissionStatusesResponse], error) {
+	resp, err := s.interactor.GetMySubmissionStatuses(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) GetStandings(ctx context.Context, req *backendv1.GetStandingsRequest) (*backendv1.GetStandingsResponse, error) {
-	return s.interactor.GetStandings(ctx, req)
+func (s *contestServiceServer) GetStandings(ctx context.Context, req *connect.Request[backendv1.GetStandingsRequest]) (*connect.Response[backendv1.GetStandingsResponse], error) {
+	resp, err := s.interactor.GetStandings(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
-func (s *contestServiceServer) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRequest) (*backendv1.RegisterMeResponse, error) {
-	return s.interactor.RegisterMe(ctx, req)
+func (s *contestServiceServer) RegisterMe(ctx context.Context, req *connect.Request[backendv1.RegisterMeRequest]) (*connect.Response[backendv1.RegisterMeResponse], error) {
+	resp, err := s.interactor.RegisterMe(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
 }
 
 // UpdateAnswer implements backendv1.ContestServiceServer.
-func (*contestServiceServer) UpdateAnswer(context.Context, *backendv1.UpdateAnswerRequest) (*backendv1.UpdateAnswerResponse, error) {
+func (*contestServiceServer) UpdateAnswer(ctx context.Context, req *connect.Request[backendv1.UpdateAnswerRequest]) (*connect.Response[backendv1.UpdateAnswerResponse], error) {
 	panic("unimplemented")
 }
 
 // CreateAnswer implements backendv1.ContestServiceServer.
-func (*contestServiceServer) CreateAnswer(context.Context, *backendv1.CreateAnswerRequest) (*backendv1.CreateAnswerResponse, error) {
+func (*contestServiceServer) CreateAnswer(ctx context.Context, req *connect.Request[backendv1.CreateAnswerRequest]) (*connect.Response[backendv1.CreateAnswerResponse], error) {
 	panic("unimplemented")
 }
 
 // CreateClarification implements backendv1.ContestServiceServer.
-func (*contestServiceServer) CreateClarification(context.Context, *backendv1.CreateClarificationRequest) (*backendv1.CreateClarificationResponse, error) {
+func (*contestServiceServer) CreateClarification(ctx context.Context, req *connect.Request[backendv1.CreateClarificationRequest]) (*connect.Response[backendv1.CreateClarificationResponse], error) {
 	panic("unimplemented")
 }
 
 // DeleteAnswer implements backendv1.ContestServiceServer.
-func (*contestServiceServer) DeleteAnswer(context.Context, *backendv1.DeleteAnswerRequest) (*backendv1.DeleteAnswerResponse, error) {
+func (*contestServiceServer) DeleteAnswer(ctx context.Context, req *connect.Request[backendv1.DeleteAnswerRequest]) (*connect.Response[backendv1.DeleteAnswerResponse], error) {
 	panic("unimplemented")
 }
 
 // DeleteClarification implements backendv1.ContestServiceServer.
-func (*contestServiceServer) DeleteClarification(context.Context, *backendv1.DeleteClarificationRequest) (*backendv1.DeleteClarificationResponse, error) {
+func (*contestServiceServer) DeleteClarification(ctx context.Context, req *connect.Request[backendv1.DeleteClarificationRequest]) (*connect.Response[backendv1.DeleteClarificationResponse], error) {
 	panic("unimplemented")
 }
 
 // ListClarifications implements backendv1.ContestServiceServer.
-func (*contestServiceServer) ListClarifications(context.Context, *backendv1.ListClarificationsRequest) (*backendv1.ListClarificationsResponse, error) {
+func (*contestServiceServer) ListClarifications(ctx context.Context, req *connect.Request[backendv1.ListClarificationsRequest]) (*connect.Response[backendv1.ListClarificationsResponse], error) {
 	panic("unimplemented")
 }

@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	interceptor "github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/interceptor"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	enttoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"github.com/szpp-dev-team/szpp-judge/backend/test/utils"
