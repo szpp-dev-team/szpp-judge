@@ -1,3 +1,5 @@
+import { Difficulty as PbDifficulty } from "@/src/gen/proto/backend/v1/task_resources_pb";
+
 export const DifficultyValues = [
   "beginner",
   "easy",
@@ -7,6 +9,30 @@ export const DifficultyValues = [
 ] as const;
 
 export type Difficulty = (typeof DifficultyValues)[number];
+
+export const Difficulty = {
+  fromPb(d: PbDifficulty): Difficulty {
+    switch (d) {
+      case PbDifficulty.DIFFICULTY_UNSPECIFIED: {
+        throw new Error(`Got a DIFFICULTY_UNSPECIFIED`);
+      }
+      case PbDifficulty.BEGINNER:
+        return "beginner";
+      case PbDifficulty.EASY:
+        return "easy";
+      case PbDifficulty.MEDIUM:
+        return "medium";
+      case PbDifficulty.HARD:
+        return "hard";
+      case PbDifficulty.IMPOSSIBLE:
+        return "impossible";
+      default: {
+        const exhaustiveCheck: never = d;
+        throw new Error(`Invlid pb difficulty: ${exhaustiveCheck}`);
+      }
+    }
+  },
+};
 
 export const ScoreStatusValues = [
   undefined,
