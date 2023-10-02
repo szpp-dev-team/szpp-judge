@@ -145,6 +145,34 @@ const contests: PlainMessage<Contest>[] = [
   generateContest("sbc005")!,
 ];
 
+/**
+ * 重み付き抽選器
+ * @param table key=抽選対象のプロパティ(string),val=割合(number)
+ * @returns 選ばれたプロパティ
+ * @example
+ * ```js
+ * weightedPick({ a: 10, b: 20, c: 20 }) // -> a: 20%, b: 40%, c: 40%
+ * ```
+ */
+const weightedPick = <T extends Record<string, number>>(table: T): keyof T => {
+  const totalWeight = Object.values(table).reduce((accum, val) => accum + val, 0);
+  const sorted = Object.entries(table)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .sort(([_k1, a], [_k2, b]) => a - b)
+    .reduce<Readonly<Record<string, number>>>((accum, [key, val]) => ({ ...accum, [key]: val }), {});
+
+  const r = 1 + Math.floor(Math.random() * totalWeight);
+  let cursor = 0;
+
+  for (const k in sorted) {
+    cursor += sorted[k];
+    if (r <= cursor) {
+      return k;
+    }
+  }
+  return "";
+};
+
 const generateStandings = (participantsSize: number, taskSize: number) => {
   taskSize = Math.min(taskSize, contestTasks.length); // contestTasks.length 以上のタスクは作れない
 
@@ -158,9 +186,8 @@ const generateStandings = (participantsSize: number, taskSize: number) => {
     // 参加者ごとに提出を作る
     for (let j = 0; j < taskSize; j++) {
       const t = contestTasks[j];
-      const submissionCount = 1 + Math.floor(Math.random() * 5); // 同じタスクにN回提出してる想定{N|1<=N<=5}
 
-      if (Math.random() < 0.25) { // true ならこのタスクは未提出
+      if (t.difficulty > 4 && Math.random() < 0.05) { // true ならこのタスクは未提出
         taskDetailList.push({
           penaltyCount: 0,
           score: 0,
@@ -171,12 +198,23 @@ const generateStandings = (participantsSize: number, taskSize: number) => {
         continue;
       }
 
-      const rnd = Math.random();
-      const acCount = rnd < 0.5 || submissionCount === 1
-        ? submissionCount // 一発 AC または AC してもまた AC 提出するパターン(あまりない)
-        : rnd < 0.8
-        ? Math.max(1, Math.floor(Math.random() * submissionCount / 2)) // 3回 WA で 4回目に AC したくらいの正答率たぶん
-        : 0; // 未 AC
+      const [submissionCount, acCount] = (function calcOnDifficulty(diff: typeof t.difficulty): [number, number] {
+        const hasAc = weightedPick(diff <= 3 ? { ac: 6, wa: 4 } : { ac: 2, wa: 8 }) === "ac";
+        if (hasAc) {
+          const key = weightedPick(
+            diff <= 3
+              ? { oneSubmitOneAc: 6, manySubmitManyAc: 1, manySubmitOneAc: 3 }
+              : { oneSubmitOneAc: 8, manySubmitManyAc: 1, manySubmitOneAC: 1 },
+          );
+          const submissionCount = key === "oneSubmitOneAc" ? 1 : 1 + Math.floor(Math.random() * 3);
+          const acCount = key === "manySubmitManyAc" ? 1 + Math.floor(Math.random() * submissionCount) : 1;
+          return [submissionCount, acCount];
+        } else {
+          const submissionCount = 1 + Math.floor(Math.random() * 3);
+          return [submissionCount, 0];
+        }
+      })(t.difficulty);
+
       const penaltyCount = submissionCount - acCount;
 
       taskDetailList.push({
@@ -211,18 +249,14 @@ const generateStandings = (participantsSize: number, taskSize: number) => {
   }
 
   const [rowsGroupedByScore, groupKeys] = groupBy(standingsNoRank, s => s.totalScore); // 得点でグループ化
-  const standings = Array.from(groupKeys.values()).sort((a, b) => b - a) // 得点の高い順に処理するb ? 1 : 0
-    .map(key => {
-      rowsGroupedByScore[key]!.sort((a, b) => a.totalPenaltyCount - b.totalPenaltyCount);
-      return rowsGroupedByScore[key]!;
-    }) // 同点はペナルティ少がランク高
-    .flat(1)
+  const standings = Array.from(groupKeys.values()).sort((a, b) => b - a) // 得点の降順に処理する
+    .flatMap(key => rowsGroupedByScore[key]!.sort((a, b) => a.totalPenaltyCount - b.totalPenaltyCount)) // 同点はペナ少がランク高
     .map<PlainMessage<StandingsRecord>>((record, i) => ({
       rank: i + 1,
       ...record,
     }));
 
-  // standings.length が参加人数と同じことを確かめる
+  // flat() できていることを確かめるために standings.length が参加人数と同じかどうかを確認する
   if (standings.length !== participantsSize) {
     throw new Error("standings.length does not match with participantsSize");
   }
