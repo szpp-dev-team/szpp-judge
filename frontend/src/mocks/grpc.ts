@@ -3,7 +3,7 @@ import { Message, type MethodInfo, type PlainMessage } from "@bufbuild/protobuf"
 import * as msw from "msw";
 
 // gen/**/services_connect.ts 内の各サービスを表現し、同時に methods の型をキャプチャするための型
-export type GrpcService<T extends Readonly<Record<string, Readonly<MethodInfo>>>> = Readonly<{
+export type ProtobufService<T extends Readonly<Record<string, Readonly<MethodInfo>>>> = Readonly<{
   typeName: string;
   methods: T;
 }>;
@@ -33,7 +33,7 @@ export const grpcMock = <
   // @ts-expect-error InstanceType<...> は Message<...> に代入できないと怒られる
   TResp extends Message<TResp> = InstanceType<T[K]["O"]>,
 >(
-  service: GrpcService<T>,
+  service: ProtobufService<T>,
   methodName: K,
   resolver: ResponseResolver<TReq, PlainMessage<TResp>>,
 ) => {
