@@ -43,7 +43,6 @@ export const grpcMock = <
       return req.json<TReq>();
     };
     const encodeResp = (m: PlainMessage<TResp>) => {
-      ctx.set({ "Content-Type": "application/connect+json" });
       return ctx.json(m);
     };
     return resolver(ctx, res, decodeReq, encodeResp, req);
