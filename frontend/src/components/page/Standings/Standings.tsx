@@ -42,7 +42,7 @@ type TotalScoreProps = {
  * 順位表のテーブルのセルに入れるための得点コンポーネント(総得点)
  */
 const TotalScore = ({ score, penaltyCount, untilAc }: TotalScoreProps) => {
-  /** 1つ以上の AC を提出しているかどうか */
+  /** 1つ以上の AC を提出しているかどうか(提出があっても AC でなければだめ) */
   const hasAc = typeof score === "number" && score > 0;
   if (!hasAc) {
     return <Text as="span" color="gray.400">-</Text>;
@@ -65,6 +65,7 @@ const TotalScore = ({ score, penaltyCount, untilAc }: TotalScoreProps) => {
  * 順位表のテーブルのセルに入れるための得点コンポーネント(タスク毎)
  */
 const TaskScore = ({ score, penaltyCount, untilAc, href }: TaskScoreProps) => {
+  /** 1つ以上の AC を提出しているかどうか(提出があっても AC でなければだめ) */
   const hasAc = typeof score === "number" && score > 0;
   if (!hasAc) {
     return <Text as="span" color="gray.400">-</Text>;
@@ -157,7 +158,7 @@ export const Standings = () => {
                             untilAc={1800000} // TODO: ペナルティを加味した untilAc 的な指標をバックエンドからもらう
                           />
                         </Td>
-                        {tasks.map((task, j) => (
+                        {record.taskDetailList.map((task, j) => (
                           <Td key={`${i}-task${j}`} textAlign="center">
                             <TaskScore
                               score={task.score}
