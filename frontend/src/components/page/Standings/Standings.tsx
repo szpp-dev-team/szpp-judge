@@ -94,7 +94,7 @@ export const Standings = () => {
   } catch { /* empty */ }
 
   const { standingsList, error, isLoading } = useStandings({ contestId });
-  const tasks = standingsList ? standingsList[0].taskDetailList : [];
+  const tasks = standingsList?.length ? standingsList[0].taskDetailList : [];
 
   const { contest, error: cError, isLoading: cIsLoading } = useGetContest({ slug: contestSlug });
   // REVIEW: コンテスト終了間際にページを開いてコンテスト終了後リロードせずに true に変わってほしいができてるか？
