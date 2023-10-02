@@ -5,7 +5,7 @@ import {
   useRouterContestTaskSeq,
 } from "@/src/usecases/contest";
 import { Box, Card, Heading, Text } from "@chakra-ui/react";
-import dynamic from "next/dynamic";
+import { TaskDetailCommon } from "../../model/task/TaskDetailCommon";
 
 export const ContestTaskDetail = () => {
   const contestSlug = useRouterContestSlug();
@@ -21,21 +21,9 @@ export const ContestTaskDetail = () => {
     return <Text>読み込み中...</Text>;
   }
 
-  const TaskStatementMarkdownView = dynamic(
-    () =>
-      import("@/src/components/model/task/TaskStatementMarkdownView")
-        .then(mod => mod.TaskStatementMarkdownView),
-    {
-      ssr: false,
-    },
-  );
-
   return (
     <Box px={16} h="100%">
-      <Card px={6} py={4} h="100%">
-        <Heading as="h1">{seqCode} - {task.title}</Heading>
-        <TaskStatementMarkdownView markdown={task.statement} />
-      </Card>
+      <TaskDetailCommon task={task} seqCode={seqCode} />
     </Box>
   );
 };
