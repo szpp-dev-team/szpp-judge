@@ -1,5 +1,5 @@
 import { Link } from "@/src/components/ui/Link";
-import { calcNthTaskSeq, useIsContestClosed, useRouterContestSlug, useStandings } from "@/src/usecases/contest";
+import { calcNthTaskSeq, useGetContest, useRouterContestSlug, useStandings } from "@/src/usecases/contest";
 import { Duration } from "@/src/util/time";
 import {
   Box,
@@ -102,13 +102,22 @@ export const Standings = () => {
       return standingsList[0].taskDetailList;
     }
   }, [standingsList]);
-  const isContestClosed = useIsContestClosed({ slug: contestSlug });
 
-  if (isLoading) {
+  const { contest, error: cError, isLoading: cIsLoading } = useGetContest({ slug: contestSlug });
+  // REVIEW: コンテスト終了間際にページを開いてコンテスト終了後リロードせずに true に変わってほしいができてるか？
+  const isSubmissionVisible = ((c: typeof contest) => {
+    if (!c) return undefined
+    const now = new Date()
+    const { startAt, endAt } = c
+    return startAt && endAt && startAt.toDate() < now && endAt.toDate() < now
+  })(contest)
+
+  // HACK: 本来は useStandings だけ面倒見ればいいのに useGetContest の方もハンドリングするの微妙
+  if (isLoading || cIsLoading) {
     return <>読み込み中です...</>;
   }
 
-  if (error) {
+  if (error || cError) {
     return (
       <>
         エラーが発生しました <Link href="/">トップページへ戻る</Link>
@@ -161,7 +170,7 @@ export const Standings = () => {
                               score={task.score}
                               penaltyCount={task.penaltyCount}
                               untilAc={task.untilAc ? task.untilAc.seconds * BigInt(Duration.SECOND) : undefined}
-                              href={typeof isContestClosed === "boolean" && isContestClosed
+                              href={typeof isSubmissionVisible === "boolean" && isSubmissionVisible
                                   && typeof task.acSubmitId !== "undefined"
                                 ? `/contests/${contestSlug}/submissions/${task.acSubmitId}`
                                 : undefined}

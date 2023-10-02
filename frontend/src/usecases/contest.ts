@@ -48,15 +48,6 @@ export const useRouterSubmissionId = () => {
   return query.submission_id as string;
 };
 
-// endAt がない場合は undefined が返ることに注意
-export const useIsContestClosed = (...param: Parameters<typeof useGetContest>) => {
-  const { contest, error } = useGetContest(...param);
-  if (!contest || typeof contest.endAt === "undefined" || error) {
-    return undefined;
-  }
-  return contest.endAt.toDate() <= new Date();
-};
-
 export const useListContests = (input?: PlainMessage<ListContestsRequest>) => {
   const { data, error, isLoading } = useQuery(listContests.useQuery(input));
   const contests = data?.contests;
