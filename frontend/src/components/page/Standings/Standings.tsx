@@ -94,16 +94,16 @@ export const Standings = () => {
   } catch { /* empty */ }
 
   const { standingsList, error, isLoading } = useStandings({ contestId });
-  const tasks = standingsList ? standingsList[0].taskDetailList : []
+  const tasks = standingsList ? standingsList[0].taskDetailList : [];
 
   const { contest, error: cError, isLoading: cIsLoading } = useGetContest({ slug: contestSlug });
   // REVIEW: コンテスト終了間際にページを開いてコンテスト終了後リロードせずに true に変わってほしいができてるか？
   const isSubmissionVisible = ((c: typeof contest) => {
-    if (!c) return undefined
-    const now = new Date()
-    const { startAt, endAt } = c
-    return startAt && endAt && startAt.toDate() < now && endAt.toDate() < now
-  })(contest)
+    if (!c) return undefined;
+    const now = new Date();
+    const { startAt, endAt } = c;
+    return startAt && endAt && startAt.toDate() < now && endAt.toDate() < now;
+  })(contest);
 
   // HACK: 本来は useStandings だけ面倒見ればいいのに useGetContest の方もハンドリングするの微妙
   if (isLoading || cIsLoading) {
