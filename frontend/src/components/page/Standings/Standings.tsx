@@ -25,7 +25,6 @@ type TaskScoreProps = {
   score?: number;
   penaltyCount?: number;
   untilAc?: number | bigint;
-  acSubmitId?: number;
   /**
    * AC した提出へのリンク
    * (渡されると表示しちゃうのでコンテスト開催中は渡さないようにする)
@@ -43,7 +42,7 @@ type TotalScoreProps = {
 /**
  * 順位表のテーブルのセルに入れるための得点コンポーネント(総得点)
  */
-const TotalScore = ({ score, penaltyCount, untilAc, ...rest }: TotalScoreProps) => {
+const TotalScore = ({ score, penaltyCount, untilAc }: TotalScoreProps) => {
   /** 1つ以上の AC を提出しているかどうか */
   const hasAc = typeof score === "number" && score > 0;
   if (!hasAc) {
@@ -51,7 +50,7 @@ const TotalScore = ({ score, penaltyCount, untilAc, ...rest }: TotalScoreProps) 
   }
 
   return (
-    <VStack gap={0} {...rest}>
+    <VStack gap={0}>
       <Box as="p">
         <Text as="span" color="blue.500" fontWeight="bold">{score}</Text>
         {penaltyCount
@@ -66,7 +65,7 @@ const TotalScore = ({ score, penaltyCount, untilAc, ...rest }: TotalScoreProps) 
 /**
  * 順位表のテーブルのセルに入れるための得点コンポーネント(タスク毎)
  */
-const TaskScore = ({ score, penaltyCount, untilAc, href, ...rest }: TaskScoreProps) => {
+const TaskScore = ({ score, penaltyCount, untilAc, href }: TaskScoreProps) => {
   const hasAc = typeof score === "number" && score > 0;
   if (!hasAc) {
     return <Text as="span" color="gray.400">-</Text>;
@@ -78,7 +77,7 @@ const TaskScore = ({ score, penaltyCount, untilAc, href, ...rest }: TaskScorePro
   };
 
   return (
-    <VStack gap={0} {...rest}>
+    <VStack gap={0}>
       <Box as="p">
         {href ? <Link href={href} {...sharedProps}>{score}</Link> : <Text as="span" {...sharedProps}>{score}</Text>}
         {penaltyCount ? <Text as="span" fontWeight="bold" color="pink.400">({penaltyCount})</Text> : null}
@@ -162,7 +161,6 @@ export const Standings = () => {
                               score={task.score}
                               penaltyCount={task.penaltyCount}
                               untilAc={task.untilAc ? task.untilAc.seconds * BigInt(Duration.SECOND) : undefined}
-                              acSubmitId={task?.acSubmitId}
                               href={typeof isContestClosed === "boolean" && isContestClosed
                                   && typeof task.acSubmitId !== "undefined"
                                 ? `/contests/${contestSlug}/submissions/${task.acSubmitId}`
