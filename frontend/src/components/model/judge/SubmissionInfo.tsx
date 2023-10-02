@@ -35,7 +35,7 @@ export const SubmissionInfo = (props: GridProps & { submissionDetail?: Submissio
           </Link>,
         ]}
       />
-      <Pair data={["言語", `${submissionDetail.execTimeMs} ms`]} />
+      <Pair data={["言語", submissionDetail.langId]} />
       <Pair data={["得点", submissionDetail.score]} />
       <Pair
         data={[
