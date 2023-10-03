@@ -1,3 +1,4 @@
+import { LangID } from "@/src/gen/langs";
 import type { JudgeProgress, SubmissionDetail } from "@/src/gen/proto/backend/v1/judge_resources_pb";
 import { JudgeService } from "@/src/gen/proto/backend/v1/judge_service-JudgeService_connectquery";
 import { JudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
@@ -34,7 +35,7 @@ const dummySubmissionDetails: PlainMessage<SubmissionDetail>[] = [
     taskId: 1,
     taskTitle: "すずっぴー君のおつかい",
     score: 100,
-    langId: "C++",
+    langId: "cpp/20/gcc" satisfies LangID,
     sourceCode: sourcecodeAc,
     status: JudgeStatus.AC,
     execTimeMs: 1,
