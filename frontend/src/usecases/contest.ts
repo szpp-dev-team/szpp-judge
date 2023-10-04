@@ -4,6 +4,7 @@ import {
   getMySubmissionStatuses,
   listContests,
   listContestTasks,
+  registerMe,
 } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
 import type {
   GetContestRequest,
@@ -11,9 +12,11 @@ import type {
   GetMySubmissionStatusesRequest,
   ListContestsRequest,
   ListContestTasksRequest,
+  RegisterMeRequest,
+  RegisterMeResponse,
 } from "@/src/gen/proto/backend/v1/contest_service_pb";
 import { PlainMessage } from "@bufbuild/protobuf";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { Duration } from "../util/time";
 
@@ -87,4 +90,9 @@ export const useGetMySubmissionStatuses = (input?: PlainMessage<GetMySubmissionS
   });
   const submissionStatuses = data?.submissionStatuses;
   return { submissionStatuses, error, isLoading };
+};
+
+export const useRegisterMe = () => {
+    const { error, isLoading, mutate } = useMutation(registerMe.useMutation());
+    return { error, isLoading, mutate };
 };
