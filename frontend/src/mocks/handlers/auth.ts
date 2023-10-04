@@ -4,7 +4,7 @@ import type { AccessTokenClaim } from "@/src/model/auth";
 import { Duration } from "@/src/util/time";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../grpc";
+import { grpcMock } from "../connectRpc";
 
 const REFRESH_TOKEN_PREFIX = "refreeeeesh";
 

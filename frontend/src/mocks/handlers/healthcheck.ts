@@ -1,6 +1,6 @@
 import { HealthcheckService } from "@/src/gen/proto/backend/v1/healthcheck_service-HealthcheckService_connectquery";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../grpc";
+import { grpcMock } from "../connectRpc";
 
 export const healthcheckHandlers: RequestHandler[] = [
   grpcMock(HealthcheckService, "ping", async (ctx, res, decodeReq, encodeResp) => {

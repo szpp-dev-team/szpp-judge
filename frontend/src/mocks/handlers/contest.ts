@@ -3,7 +3,7 @@ import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-Conte
 import { Duration } from "@/src/util/time";
 import { type PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../grpc";
+import { grpcMock } from "../connectRpc";
 import { dummyTasks } from "./task";
 
 const contestTasks: PlainMessage<ContestTask>[] = [

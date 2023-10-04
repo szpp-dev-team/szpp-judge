@@ -3,7 +3,7 @@ import { JudgeService } from "@/src/gen/proto/backend/v1/judge_service-JudgeServ
 import { JudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../grpc";
+import { grpcMock } from "../connectRpc";
 
 const sourcecodeAc = String.raw`#include <iostream>
 using namespace std;

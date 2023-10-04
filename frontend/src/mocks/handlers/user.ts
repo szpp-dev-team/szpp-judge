@@ -1,7 +1,7 @@
 import { UserService } from "@/src/gen/proto/backend/v1/user_service-UserService_connectquery";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../grpc";
+import { grpcMock } from "../connectRpc";
 
 export const userHandlers: RequestHandler[] = [
   grpcMock(UserService, "createUser", async (ctx, res, decodeReq, encodeResp) => {
