@@ -50,6 +50,7 @@ func New(addr string, opts ...optionFunc) *http.Server {
 
 	corsConfig := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:5000", "http://localhost:3000", opt.FrontendURL},
+		AllowedHeaders: []string{"Connect-Protocol-Version", "Content-Type"},
 	})
 
 	return &http.Server{
