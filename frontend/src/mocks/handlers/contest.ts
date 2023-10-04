@@ -3,7 +3,7 @@ import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-Conte
 import { Duration } from "@/src/util/time";
 import { type PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../grpc";
+import { connectMock } from "../connectRpc";
 import { dummyTasks } from "./task";
 
 const contestTasks: PlainMessage<ContestTask>[] = [
@@ -119,13 +119,13 @@ const contests: PlainMessage<Contest>[] = [
 ];
 
 export const contestHandlers: RequestHandler[] = [
-  grpcMock(ContestService, "listContests", async (ctx, res, _, encodeResp) => {
+  connectMock(ContestService, "listContests", async (ctx, res, _, encodeResp) => {
     return res(
       ctx.delay(500),
       encodeResp({ contests }),
     );
   }),
-  grpcMock(ContestService, "getContest", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(ContestService, "getContest", async (ctx, res, decodeReq, encodeResp) => {
     const { slug } = await decodeReq();
     const contest = generateContest(slug);
     if (contest == null) {
@@ -139,7 +139,7 @@ export const contestHandlers: RequestHandler[] = [
       encodeResp({ contest }),
     );
   }),
-  grpcMock(ContestService, "listContestTasks", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(ContestService, "listContestTasks", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug } = await decodeReq();
     const contest = generateContest(contestSlug);
     if (contest == null) {
@@ -159,7 +159,7 @@ export const contestHandlers: RequestHandler[] = [
       encodeResp({ tasks: contestTasks }),
     );
   }),
-  grpcMock(ContestService, "getContestTask", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(ContestService, "getContestTask", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug, taskId } = await decodeReq();
     const contest = generateContest(contestSlug);
     const task = dummyTasks.find((t) => t.id === taskId);
@@ -181,7 +181,7 @@ export const contestHandlers: RequestHandler[] = [
       encodeResp({ task }),
     );
   }),
-  grpcMock(ContestService, "getMySubmissionStatuses", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(ContestService, "getMySubmissionStatuses", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug } = await decodeReq();
     const contest = generateContest(contestSlug);
     if (contest == null) {

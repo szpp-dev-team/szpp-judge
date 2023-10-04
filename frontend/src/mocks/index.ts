@@ -1,4 +1,4 @@
-import { backendBaseUrl } from "../config/grpc";
+import { backendBaseUrl } from "../config/connectRpc";
 
 /** https://github.com/mswjs/msw/discussions/1231 */
 const ignoredPathnames = [

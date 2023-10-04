@@ -4,7 +4,7 @@ import { JudgeService } from "@/src/gen/proto/backend/v1/judge_service-JudgeServ
 import { JudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../grpc";
+import { connectMock } from "../connectRpc";
 
 const sourcecodeAc = String.raw`#include <iostream>
 using namespace std;
@@ -60,7 +60,7 @@ const dummyJudgeProgress: Record<"inProgress" | "ac" | "wa" | "ce", PlainMessage
 };
 
 export const judgeHandlers: RequestHandler[] = [
-  grpcMock(JudgeService, "getSubmissionDetail", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(JudgeService, "getSubmissionDetail", async (ctx, res, decodeReq, encodeResp) => {
     const { id } = await decodeReq();
 
     const submissionDetail = dummySubmissionDetails.filter(submission => submission.id === id);
@@ -70,7 +70,7 @@ export const judgeHandlers: RequestHandler[] = [
       return res(ctx.status(404));
     }
   }),
-  grpcMock(JudgeService, "getJudgeProgress", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(JudgeService, "getJudgeProgress", async (ctx, res, decodeReq, encodeResp) => {
     const { submissionId } = await decodeReq();
 
     // モックでは submissions は 100 件しかないとする

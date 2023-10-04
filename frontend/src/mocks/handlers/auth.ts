@@ -4,7 +4,7 @@ import type { AccessTokenClaim } from "@/src/model/auth";
 import { Duration } from "@/src/util/time";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../grpc";
+import { connectMock } from "../connectRpc";
 
 const REFRESH_TOKEN_PREFIX = "refreeeeesh";
 
@@ -36,7 +36,7 @@ const generateMockCredential = (username: string): Credential => {
 };
 
 export const authHandlers: RequestHandler[] = [
-  grpcMock(AuthService, "login", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(AuthService, "login", async (ctx, res, decodeReq, encodeResp) => {
     const { username, password } = await decodeReq();
     const ok = (username === "user" || username === "admin") && password === "pass";
     if (!ok) {
@@ -60,7 +60,7 @@ export const authHandlers: RequestHandler[] = [
     );
   }),
 
-  grpcMock(AuthService, "logout", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(AuthService, "logout", async (ctx, res, decodeReq, encodeResp) => {
     const { refreshToken } = await decodeReq();
 
     const ok = refreshToken.startsWith(REFRESH_TOKEN_PREFIX);
@@ -76,7 +76,7 @@ export const authHandlers: RequestHandler[] = [
     );
   }),
 
-  grpcMock(AuthService, "refreshAccessToken", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(AuthService, "refreshAccessToken", async (ctx, res, decodeReq, encodeResp) => {
     const { refreshToken } = await decodeReq();
 
     // 実際のリフレッシュトークンはスラッシュ区切りではない。
