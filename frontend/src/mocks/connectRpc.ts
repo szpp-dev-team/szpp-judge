@@ -1,4 +1,4 @@
-import { backendBaseUrl } from "@/src/config/grpc";
+import { backendBaseUrl } from "@/src/config/connectRpc";
 import { Message, type MethodInfo, type PlainMessage } from "@bufbuild/protobuf";
 import * as msw from "msw";
 

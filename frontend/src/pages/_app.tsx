@@ -3,7 +3,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { TransportProvider } from "@connectrpc/connect-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
-import { createBackendTransport } from "../config/grpc";
+import { createBackendTransport } from "../config/connectRpc";
 import { useAccessTokenClaimValue, useCredentialValue } from "../globalStates/credential";
 import { useRefreshAccessTokenWithoutQueryClient } from "../usecases/auth";
 

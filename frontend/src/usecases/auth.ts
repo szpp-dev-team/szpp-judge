@@ -1,6 +1,6 @@
 import { Code, ConnectError, createPromiseClient } from "@bufbuild/connect";
 import { useMutation } from "@tanstack/react-query";
-import { backendTransportWithOnlyBaseUrl } from "../config/grpc";
+import { backendTransportWithOnlyBaseUrl } from "../config/connectRpc";
 import { AuthService, login, logout } from "../gen/proto/backend/v1/auth_service-AuthService_connectquery";
 import { RefreshAccessTokenResponse } from "../gen/proto/backend/v1/auth_service_pb";
 import {
