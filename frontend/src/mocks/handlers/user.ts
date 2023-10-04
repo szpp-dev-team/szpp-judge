@@ -1,10 +1,10 @@
 import { UserService } from "@/src/gen/proto/backend/v1/user_service-UserService_connectquery";
 import { Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
-import { grpcMock } from "../connectRpc";
+import { connectMock } from "../connectRpc";
 
 export const userHandlers: RequestHandler[] = [
-  grpcMock(UserService, "createUser", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(UserService, "createUser", async (ctx, res, decodeReq, encodeResp) => {
     const { username, password, email } = await decodeReq();
     const ok = (username === "user" || username === "admin") && password === "Pass.w0rd" && email === "user@hoge.test";
     if (!ok) {

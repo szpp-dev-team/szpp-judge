@@ -6,7 +6,7 @@ import { decodeJwtPayload } from "@/src/util/jwt";
  *
  * 使用例:
  * ```ts
- * grpcMock(..., async (ctx, res, decodeReq, encodeResp, req) => {
+ * connectMock(..., async (ctx, res, decodeReq, encodeResp, req) => {
  *    // 発行から5秒以上経過したトークンの場合 401 を返す例
  *    if (isAuthorizationJwtExpired(req.headers, 1000 * 5)) return res(ctx.status(401));
  * })

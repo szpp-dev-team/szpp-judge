@@ -25,7 +25,7 @@ export type ResponseResolver<
 ) => msw.AsyncResponseResolverReturnType<msw.MockedResponse<ResponseBody_3>>;
 
 // 使用例は mocks/handlers/auth.ts などを参照
-export const grpcMock = <
+export const connectMock = <
   T extends Readonly<Record<string, Readonly<MethodInfo>>>,
   K extends keyof T,
   // @ts-expect-error InstanceType<...> は Message<...> に代入できないと怒られる
