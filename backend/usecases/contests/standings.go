@@ -4,17 +4,17 @@ package contests
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	ent_contest_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -47,9 +47,9 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "the contest(id: %d) is not found", req.ContestId)
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("the contest(id: %d) is not found", req.ContestId))
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	// get contest submits
@@ -61,7 +61,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		All(ctx)
 
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	// sort submissions by submit_at (asc)
@@ -70,7 +70,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	// get user info
 	userInfo, err := separateSubmit(i, ctx, submits, contest)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	standings_list := GetStandingsRecordSlice(userInfo)
@@ -187,7 +187,7 @@ func initializeContestTasksResult(i *Interactor, ctx context.Context, userInfo m
 	// get user info
 	user, err := i.entClient.User.Query().Where(ent_user.ID(user_id)).Only(ctx)
 	if err != nil {
-		return status.Error(codes.Internal, err.Error())
+		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	// get contestTasks
@@ -195,7 +195,7 @@ func initializeContestTasksResult(i *Interactor, ctx context.Context, userInfo m
 		Where(ent_contest_task.HasContestWith(ent_contest.ID(contest_id))).
 		All(ctx)
 	if err != nil {
-		return status.Error(codes.Internal, err.Error())
+		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	taskDetailList := make([]TaskDetail, 0)

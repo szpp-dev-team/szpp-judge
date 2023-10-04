@@ -1,0 +1,4 @@
+FROM envoy:v1.27-latest
+
+COPY ./envoy_production.yaml /etc/envoy/envoy.yaml
+RUN chmod go+r /etc/envoy/envoy.yaml

@@ -2,11 +2,10 @@ package mock
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type mockImpl struct {
@@ -22,7 +21,7 @@ func NewMock() testcases.Repository {
 func (i *mockImpl) DownloadTestcase(ctx context.Context, taskID int, name string) (*testcases.Testcase, error) {
 	testcase, ok := i.testcaseMap[generateKey(taskID, name)]
 	if !ok {
-		return nil, status.Error(codes.NotFound, "")
+		return nil, errors.New("testcase not found")
 	}
 	return testcase, nil
 }

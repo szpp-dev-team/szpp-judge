@@ -1,3 +1,4 @@
+import { LangID, langMetasBrief } from "@/src/gen/langs";
 import type { SubmissionDetail } from "@/src/gen/proto/backend/v1/judge_resources_pb";
 import { JudgeStatus as PbJudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { JudgeStatus } from "@/src/model/judge";
@@ -35,7 +36,7 @@ export const SubmissionInfo = (props: GridProps & { submissionDetail?: Submissio
           </Link>,
         ]}
       />
-      <Pair data={["言語", `${submissionDetail.execTimeMs} ms`]} />
+      <Pair data={["言語", langMetasBrief[submissionDetail.langId as LangID]?.name ?? "不明"]} />
       <Pair data={["得点", submissionDetail.score]} />
       <Pair
         data={[

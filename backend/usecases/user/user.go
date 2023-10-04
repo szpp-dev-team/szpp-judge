@@ -2,14 +2,14 @@ package user
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
+	"connectrpc.com/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	entuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	pb "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -28,9 +28,9 @@ func (i *Interactor) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.G
 	user, err := q.Where(entuser.Username(req.Username)).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "user not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("user not found"))
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	return &pb.GetUserResponse{
 		User: ToPbUser(user),
@@ -49,9 +49,9 @@ func (i *Interactor) CreateUser(ctx context.Context, req *pb.CreateUserRequest) 
 	user, err := q.Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, status.Error(codes.AlreadyExists, "username or email already exists")
+			return nil, connect.NewError(connect.CodeAlreadyExists, errors.New("username or email already exists"))
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	return &pb.CreateUserResponse{
 		User: ToPbUser(user),
@@ -62,7 +62,7 @@ func (i *Interactor) ExistsUsername(ctx context.Context, req *pb.ExistsUsernameR
 	q := i.entClient.User.Query()
 	exist, err := q.Where(entuser.Username(req.Username)).Exist(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	return &pb.ExistsUsernameResponse{
 		Exists: exist,
@@ -73,7 +73,7 @@ func (i *Interactor) ExistsEmail(ctx context.Context, req *pb.ExistsEmailRequest
 	q := i.entClient.User.Query()
 	exist, err := q.Where(entuser.Email(req.Email)).Exist(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	return &pb.ExistsEmailResponse{
 		Exists: exist,

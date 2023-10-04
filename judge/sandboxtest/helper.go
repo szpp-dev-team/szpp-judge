@@ -103,9 +103,9 @@ func DetectLang(t *testing.T, filepath string) langs.LangID {
 
 	switch path.Ext(filepath) {
 	case ".c":
-		return langs.C_11_GCC13
+		return langs.C_11_GCC
 	case ".cpp":
-		return langs.CPP_20_GCC13
+		return langs.CPP_20_GCC
 	case ".java":
 		return langs.JAVA_21_OPENJDK
 	case ".py":
