@@ -45,7 +45,7 @@ export const TaskCollection = () => {
     return <>エラーが発生しました</>;
   }
 
-  const totalScore = submissionStatuses?.reduce((prev, s) => prev + (s?.score ?? 0), 0) || 0;
+  const totalScore = submissionStatuses?.reduce((prev, s) => prev + (s.score ?? 0), 0) || 0;
   const penaltyMinutes = typeof contest?.penaltySeconds === "number" ? Math.round(contest.penaltySeconds / 60) : "?";
 
   return (
