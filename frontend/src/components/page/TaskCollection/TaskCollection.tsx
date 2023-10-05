@@ -8,10 +8,10 @@ import {
 } from "@/src/usecases/contest";
 import { QuestionIcon } from "@chakra-ui/icons";
 import {
-  Box,
   Card,
   CardBody,
   CardHeader,
+  Container,
   Flex,
   Heading,
   Table,
@@ -52,7 +52,7 @@ export const TaskCollection = () => {
   const penaltyMinutes = typeof contest?.penaltySeconds === "number" ? Math.round(contest.penaltySeconds / 60) : "?";
 
   return (
-    <Box px={16} h="100%">
+    <Container h="100%" maxW="container.lg">
       <Card px={3} py={4} h="100%" borderRadius={0}>
         <CardHeader>
           <Heading as="h1">問題一覧 / 得点状況</Heading>
@@ -97,6 +97,6 @@ export const TaskCollection = () => {
           </TableContainer>
         </CardBody>
       </Card>
-    </Box>
+    </Container>
   );
 };
