@@ -1,4 +1,3 @@
-import { JudgeStatusBadge } from "@/src/components/model/judge/JudgeStatusBadge";
 import { DifficultyBadge } from "@/src/components/model/task/DifficultyBadge";
 import { taskConverter } from "@/src/model/converter/taskConverter";
 import {
@@ -26,6 +25,9 @@ import {
 } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { Link } from "../../ui/Link";
+import { ScoreStatus } from "@/src/model/task";
+
+const getBgColorFromScoreStatus = (s: ScoreStatus): string => s == null ? "initial" : s === "perfect" ? "#c3e6cb" : "#ffeeba";
 
 export const TaskCollection = () => {
   const contestSlug = useRouterContestSlug();
@@ -38,6 +40,7 @@ export const TaskCollection = () => {
     return tasks.map((t, seq) => ({
       ...t,
       submissionScore: submissionStatuses[seq].score,
+      scoreStatus: ScoreStatus.fromScore(t.score, submissionStatuses[seq].score),
     }));
   }, [tasks, submissionStatuses]);
 
@@ -70,13 +73,12 @@ export const TaskCollection = () => {
                   <Th textAlign="center">難易度</Th>
                   <Th textAlign="center">配点</Th>
                   <Th textAlign="left">問題名</Th>
-                  <Th textAlign="center">自分の結果</Th>
                   <Th textAlign="center">得点</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {tasksWithScore.map((t, seq) => (
-                  <Tr key={t.id}>
+                  <Tr key={t.id} backgroundColor={getBgColorFromScoreStatus(t.scoreStatus)}>
                     <Td textAlign="center">
                       <Link href={`/contests/${contestSlug}/tasks/${seq + 1}`}>{seq + 1}</Link>
                     </Td>
@@ -86,10 +88,6 @@ export const TaskCollection = () => {
                     <Td textAlign="center">{t.score}</Td>
                     <Td textAlign="left" whiteSpace="normal" minW={56}>
                       <Link href={`/contests/${contestSlug}/tasks/${seq + 1}`}>{t.title}</Link>
-                    </Td>
-                    <Td textAlign="center">
-                      {/* TODO: get judge status (or progress) from server */}
-                      <JudgeStatusBadge status={"WJ"} />
                     </Td>
                     <Td textAlign="center">{t.submissionScore}{/* undefined だと空欄になる */}</Td>
                   </Tr>
