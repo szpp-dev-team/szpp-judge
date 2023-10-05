@@ -91,7 +91,7 @@ export const TaskCollection = () => {
                       {/* TODO: get judge status (or progress) from server */}
                       <JudgeStatusBadge status={"WJ"} />
                     </Td>
-                    <Td textAlign="center">{t.submissionScore}</Td> {/* undefined だと空欄になる */}
+                    <Td textAlign="center">{t.submissionScore}{/* undefined だと空欄になる */}</Td>
                   </Tr>
                 ))}
               </Tbody>
