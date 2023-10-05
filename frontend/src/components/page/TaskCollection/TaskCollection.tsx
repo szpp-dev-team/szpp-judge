@@ -1,5 +1,6 @@
 import { DifficultyBadge } from "@/src/components/model/task/DifficultyBadge";
 import { taskConverter } from "@/src/model/converter/taskConverter";
+import { ScoreStatus } from "@/src/model/task";
 import {
   useGetContest,
   useGetMySubmissionStatuses,
@@ -25,9 +26,9 @@ import {
 } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { Link } from "../../ui/Link";
-import { ScoreStatus } from "@/src/model/task";
 
-const getBgColorFromScoreStatus = (s: ScoreStatus): string => s == null ? "initial" : s === "perfect" ? "#c3e6cb" : "#ffeeba";
+const getBgColorFromScoreStatus = (s: ScoreStatus): string =>
+  s == null ? "initial" : s === "perfect" ? "#c3e6cb" : "#ffeeba";
 
 export const TaskCollection = () => {
   const contestSlug = useRouterContestSlug();
