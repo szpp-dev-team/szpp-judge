@@ -1,6 +1,7 @@
 package connect_server
 
 import (
+	"log"
 	"net/http"
 
 	"connectrpc.com/connect"
@@ -47,6 +48,8 @@ func New(addr string, opts ...optionFunc) *http.Server {
 	mux.Handle(backendv1connect.NewAuthServiceHandler(authSrv, interceptors))
 
 	handler := h2c.NewHandler(mux, &http2.Server{})
+
+	log.Println(opt.FrontendURL)
 
 	// https://connectrpc.com/docs/go/deployment/#cors
 	corsHandler := cors.New(cors.Options{
