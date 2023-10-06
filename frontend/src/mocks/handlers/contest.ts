@@ -3,8 +3,8 @@ import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-Conte
 import { Duration } from "@/src/util/time";
 import { type PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
+import { connectMock } from "../connectRpc";
 import { dummyTasks } from "../fixtures/tasks";
-import { grpcMock } from "../grpc";
 
 const contestTasks: PlainMessage<ContestTask>[] = [
   { ...dummyTasks[0], score: 100 },
@@ -119,13 +119,13 @@ const contests: PlainMessage<Contest>[] = [
 ];
 
 export const contestHandlers: RequestHandler[] = [
-  grpcMock(ContestService, "listContests", async (ctx, res, _, encodeResp) => {
+  connectMock(ContestService, "listContests", async (ctx, res, _, encodeResp) => {
     return res(
       ctx.delay(500),
       encodeResp({ contests }),
     );
   }),
-  grpcMock(ContestService, "getContest", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(ContestService, "getContest", async (ctx, res, decodeReq, encodeResp) => {
     const { slug } = await decodeReq();
     const contest = generateContest(slug);
     if (contest == null) {
@@ -139,7 +139,7 @@ export const contestHandlers: RequestHandler[] = [
       encodeResp({ contest }),
     );
   }),
-  grpcMock(ContestService, "listContestTasks", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(ContestService, "listContestTasks", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug } = await decodeReq();
     const contest = generateContest(contestSlug);
     if (contest == null) {
@@ -159,14 +159,10 @@ export const contestHandlers: RequestHandler[] = [
       encodeResp({ tasks: contestTasks }),
     );
   }),
-  grpcMock(ContestService, "getContestTask", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(ContestService, "getContestTask", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug, taskId } = await decodeReq();
-
-    // FIXME: decodeReq の処理が不完全なのかわからないが taskId の値がリクエスト内容と異なってしまう
-    // (例えばリクエストで taskId=1000 としてもここで得られる値は 15687663 になってしまう)
-    console.log(`[mock] [getContestTask]`, contestSlug, taskId);
     const contest = generateContest(contestSlug);
-    const task = dummyTasks[0];
+    const task = dummyTasks.find((t) => t.id === taskId);
 
     if (contest == null || task == null) {
       return res(
@@ -185,7 +181,7 @@ export const contestHandlers: RequestHandler[] = [
       encodeResp({ task }),
     );
   }),
-  grpcMock(ContestService, "getMySubmissionStatuses", async (ctx, res, decodeReq, encodeResp) => {
+  connectMock(ContestService, "getMySubmissionStatuses", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug } = await decodeReq();
     const contest = generateContest(contestSlug);
     if (contest == null) {

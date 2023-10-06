@@ -1,4 +1,4 @@
-import { backendGrpcBaseUrl } from "../config/grpc";
+import { backendBaseUrl } from "../config/connectRpc";
 
 /** https://github.com/mswjs/msw/discussions/1231 */
 const ignoredPathnames = [
@@ -14,7 +14,7 @@ async function initMocks() {
     const { worker } = await import("./browser");
     worker.start({
       onUnhandledRequest: (req, print) => {
-        if (!req.url.toString().startsWith(backendGrpcBaseUrl)) {
+        if (!req.url.toString().startsWith(backendBaseUrl)) {
           return;
         }
         if (ignoredPathnames.some(pathname => req.url.pathname.startsWith(pathname))) {

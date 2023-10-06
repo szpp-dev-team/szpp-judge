@@ -7,7 +7,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/interceptor"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"

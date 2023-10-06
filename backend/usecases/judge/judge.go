@@ -27,12 +27,19 @@ type Interactor struct {
 	judgeQueue  judge_queue.JudgeQueue
 }
 
-func NewInteractor(judgeClient judgev1.JudgeServiceClient, entClient *ent.Client) *Interactor {
+func NewInteractor(
+	judgeClient judgev1.JudgeServiceClient,
+	entClient *ent.Client,
+	sourceRepo sources_repo.Repository,
+	judgeQueue judge_queue.JudgeQueue,
+) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "judge"))
 	return &Interactor{
 		logger:      logger,
 		judgeClient: judgeClient,
 		entClient:   entClient,
+		sourcesRepo: sourceRepo,
+		judgeQueue:  judgeQueue,
 	}
 }
 

@@ -9,6 +9,7 @@ on:
       - frontend/**
       - '!frontend/src/gen/**'
       - .github/workflows/frontend-deploy.yml
+  workflow_dispatch:
 defaults:
   run:
     working-directory: ./frontend
@@ -45,7 +46,7 @@ jobs:
       - name: Build with lint
         run: pnpm build
         env:
-          NEXT_PUBLIC_ENVOY_BASE_URL: ${{ secrets.NEXT_PUBLIC_ENVOY_BASE_URL }}
+          NEXT_PUBLIC_BACKEND_BASE_URL: ${{ secrets.NEXT_PUBLIC_BACKEND_BASE_URL }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           entryPoint: frontend
