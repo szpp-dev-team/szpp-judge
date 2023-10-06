@@ -46,14 +46,38 @@ func New(addr string, opts ...optionFunc) *http.Server {
 	authSrv := connect_interfaces.NewAuthServiceServer(auth.NewInteractor(opt.EntClient, opt.Secret))
 	mux.Handle(backendv1connect.NewAuthServiceHandler(authSrv, interceptors))
 
-	handler := h2c.NewHandler(mux, &http2.Server{})
-
-	corsConfig := cors.New(cors.Options{
+	// https://connectrpc.com/docs/go/deployment/#cors
+	corsHandler := cors.New(cors.Options{
+		AllowedMethods: []string{
+			http.MethodGet,
+			http.MethodPost,
+		},
 		AllowedOrigins: []string{"http://localhost:5000", "http://localhost:3000", opt.FrontendURL},
+		AllowedHeaders: []string{
+			"Accept-Encoding",
+			"Content-Encoding",
+			"Content-Type",
+			"Connect-Protocol-Version",
+			"Connect-Timeout-Ms",
+			"Connect-Accept-Encoding",  // Unused in web browsers, but added for future-proofing
+			"Connect-Content-Encoding", // Unused in web browsers, but added for future-proofing
+			"Grpc-Timeout",             // Used for gRPC-web
+			"X-Grpc-Web",               // Used for gRPC-web
+			"X-User-Agent",             // Used for gRPC-web
+		},
+		ExposedHeaders: []string{
+			"Content-Encoding",         // Unused in web browsers, but added for future-proofing
+			"Connect-Content-Encoding", // Unused in web browsers, but added for future-proofing
+			"Grpc-Status",              // Required for gRPC-web
+			"Grpc-Message",             // Required for gRPC-web
+		},
 	})
 
 	return &http.Server{
-		Addr:    addr,
-		Handler: corsConfig.Handler(handler),
+		Addr: addr,
+		Handler: h2c.NewHandler(
+			corsHandler.Handler(mux),
+			&http2.Server{},
+		),
 	}
 }
