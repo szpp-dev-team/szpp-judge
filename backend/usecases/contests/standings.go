@@ -52,9 +52,6 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	log.Print("Standings contest: ")
-	log.Println(contest)
-
 	// get contest submits
 	submits, err := i.entClient.Submit.Query().
 		WithUser().
@@ -67,9 +64,6 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	log.Print("Standings submit: ")
-	log.Println(submits)
-
 	// sort submissions by submit_at (asc)
 	sort.SliceStable(submits, func(i, j int) bool { return submits[i].SubmittedAt.Before(submits[j].SubmittedAt) })
 
@@ -80,6 +74,9 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	}
 
 	standings_list := GetStandingsRecordSlice(userInfo)
+
+	log.Print("standings_list: ")
+	log.Println(standings_list)
 
 	var standings_record []*backendv1.StandingsRecord
 	for _, row := range standings_list {
