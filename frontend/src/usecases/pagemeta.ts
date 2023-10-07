@@ -1,10 +1,12 @@
 import {
-  calcNthTaskSeq,
   useGetContest,
-  useGetContestTaskResolvingTaskSeq,
+  useGetContestTask,
+  useIsContestStarted,
+  useListContestTasks,
   useRouterContestSlug,
   useRouterContestTaskSeq,
   useRouterSubmissionId,
+  useTaskSeqCode,
 } from "./contest";
 
 const TITLE_SUFFIX = "SZPP Judge";
@@ -28,7 +30,12 @@ export const useContestTaskDetailPageTitle = (): string => {
   const contestSlug = useRouterContestSlug();
   const taskSeq = useRouterContestTaskSeq();
 
-  const { contest, tasks, task } = useGetContestTaskResolvingTaskSeq({ contestSlug, taskSeq });
+  const { contest } = useGetContest({ slug: contestSlug });
+  const isContestStarted = useIsContestStarted({ contestSlug, now: new Date() });
+  const { tasks } = useListContestTasks({ contestSlug }, { isContestStarted });
+  const taskId = tasks?.[taskSeq - 1]?.id;
+  const { task } = useGetContestTask({ contestSlug, taskId }, { isContestStarted });
+
   const seqCode = useTaskSeqCode(taskSeq, tasks?.length);
 
   const contestName = contest?.name;

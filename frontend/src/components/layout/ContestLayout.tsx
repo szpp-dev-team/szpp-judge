@@ -2,6 +2,7 @@ import { ScoreStatus } from "@/src/model/task";
 import {
   useGetContest,
   useGetMySubmissionStatuses,
+  useIsContestStarted,
   useListContestTasks,
   useRouterContestSlug,
 } from "@/src/usecases/contest";
@@ -15,40 +16,32 @@ export type ContestLayoutProps = {
 };
 
 export const ContestLayout = ({ children }: ContestLayoutProps) => {
-  const slug = useRouterContestSlug();
+  const contestSlug = useRouterContestSlug();
 
-  const { contest } = useGetContest({ slug });
-
-  const isContestStarted = contest != null && contest.startAt!.toDate() < new Date();
-
-  const { tasks } = useListContestTasks(
-    { contestSlug: slug },
-    { enabled: isContestStarted },
-  );
-  const { submissionStatuses } = useGetMySubmissionStatuses(
-    { contestSlug: slug },
-    { enabled: isContestStarted },
-  );
+  const { contest } = useGetContest({ slug: contestSlug });
+  const isContestStarted = useIsContestStarted({ contestSlug, now: new Date() });
+  const { tasks } = useListContestTasks({ contestSlug }, { isContestStarted });
+  const { submissionStatuses } = useGetMySubmissionStatuses({ contestSlug }, { isContestStarted });
 
   const unifiedTasks = useMemo((): ContestSidebarProps["tasks"] => {
     if (tasks == null || submissionStatuses == null) return [];
     return submissionStatuses.map((s, i) => ({
       id: s.taskId,
-      title: tasks[i].title,
-      scoreStatus: ScoreStatus.fromScore(tasks[i].score, s.score),
+      title: tasks[i]!.title,
+      scoreStatus: ScoreStatus.fromScore(tasks[i]!.score, s.score),
     }));
   }, [tasks, submissionStatuses]);
 
   return (
     <WithHeaderFooter
-      headerProps={{ contestSlug: slug, contestTitle: contest?.name }}
+      headerProps={{ contestSlug, contestTitle: contest?.name }}
       leftChildren={
         <ContestSidebar
           top={GLOBAL_HEADER_H}
           startAt={contest?.startAt?.toDate()}
           endAt={contest?.endAt?.toDate()}
           now={new Date()}
-          slug={slug}
+          slug={contestSlug}
           tasks={unifiedTasks}
         />
       }

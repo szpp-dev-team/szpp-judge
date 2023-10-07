@@ -7,7 +7,6 @@ import {
 } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
 import type {
   GetContestRequest,
-  GetContestTaskRequest,
   GetMySubmissionStatusesRequest,
   ListContestsRequest,
   ListContestTasksRequest,
@@ -75,9 +74,18 @@ export const useRouterSubmissionId = () => {
   return query.submission_id as string;
 };
 
-type UseQueryOption = {
-  enabled?: boolean;
-};
+const STALE_TIME = {
+  // 運営側がコンテストの終了を延長したり問題を追加したりする可能性があるので長すぎない値に
+  getContest: Duration.MINUTE,
+  listContestTasks: Duration.MINUTE,
+  // 自分の提出状況は submit の useMutation によって最新の値にできるが、それはそのWebブラウザのタブ内での話である。
+  // 問題ごとにブラウザタブを開いている場合もあるので、例えば問題Aへ提出後に別の問題Bのタブへ切り替えたとき、
+  // 提出結果をリフェッチしたいので、短めの値に設定。
+  getMySubmissionStatuses: Duration.SECOND * 30,
+
+  // NOTE: 問題文は滅多に変わらないことを仮定している。
+  getContestTask: Duration.MINUTE * 30,
+} as const;
 
 export const useListContests = (input?: PlainMessage<ListContestsRequest>) => {
   const { data, error, isLoading } = useQuery(listContests.useQuery(input));
@@ -88,60 +96,59 @@ export const useListContests = (input?: PlainMessage<ListContestsRequest>) => {
 export const useGetContest = (input?: PlainMessage<GetContestRequest>) => {
   const { data, error, isLoading } = useQuery({
     ...getContest.useQuery(input),
-    // 運営側がコンテストの終了を延長する可能性があるので長過ぎない値に
-    staleTime: Duration.MINUTE,
+    staleTime: STALE_TIME.getContest,
   });
   const contest = data?.contest;
   return { contest, error, isLoading };
 };
 
-export const useListContestTasks = (input?: PlainMessage<ListContestTasksRequest>, opt?: UseQueryOption) => {
+export const useIsContestStarted = ({ contestSlug, now }: { contestSlug: string; now: Date }): boolean => {
+  const { data } = useQuery({
+    ...getContest.useQuery({ slug: contestSlug }),
+    staleTime: STALE_TIME.getContest,
+    select: (({ contest }) => contest != null && contest.startAt!.toDate() < now),
+  });
+  return data ?? false;
+};
+
+export const useListContestTasks = (
+  input: PlainMessage<ListContestTasksRequest>,
+  opt: { isContestStarted: boolean },
+) => {
   const { data, error, isLoading } = useQuery({
     ...listContestTasks.useQuery(input),
-    staleTime: 5 * Duration.MINUTE,
-    ...opt,
+    staleTime: STALE_TIME.listContestTasks,
+    enabled: opt.isContestStarted,
   });
   const tasks = data?.tasks;
   return { tasks, error, isLoading };
 };
 
-export const useGetContestTask = (input?: PlainMessage<GetContestTaskRequest>, opt?: UseQueryOption) => {
-  const { data, error, isLoading } = useQuery({
-    ...getContestTask.useQuery(input),
-    staleTime: 5 * Duration.MINUTE,
-    ...opt,
-  });
-  const task = data?.task;
-  return { task, error, isLoading };
-};
-
-export const useGetContestTaskResolvingTaskSeq = ({ contestSlug, taskSeq }: {
-  contestSlug: string;
-  taskSeq: number;
-}) => {
-  const { contest } = useGetContest({ slug: contestSlug });
-
-  const isContestStarted = contest != null && contest.startAt!.toDate()! < new Date();
-  const { tasks } = useListContestTasks({ contestSlug }, { enabled: isContestStarted });
-
-  const taskId = tasks?.[taskSeq - 1].id;
-  const { task } = useGetContestTask(
-    { contestSlug, taskId: taskId! },
-    { enabled: taskId != null },
-  );
-
-  return { contest, tasks, task, isContestStarted };
-};
-
 export const useGetMySubmissionStatuses = (
-  input?: PlainMessage<GetMySubmissionStatusesRequest>,
-  opt?: UseQueryOption,
+  input: PlainMessage<GetMySubmissionStatusesRequest>,
+  opt: { isContestStarted: boolean },
 ) => {
   const { data, error, isLoading } = useQuery({
     ...getMySubmissionStatuses.useQuery(input),
-    staleTime: Duration.MINUTE,
-    ...opt,
+    staleTime: STALE_TIME.getMySubmissionStatuses,
+    enabled: opt.isContestStarted,
   });
   const submissionStatuses = data?.submissionStatuses;
   return { submissionStatuses, error, isLoading };
+};
+
+/** `taskId != null && isContestStarted` の場合に限り useQuery を有効化する */
+export const useGetContestTask = (
+  input: { contestSlug: string; taskId: number | undefined },
+  opt: { isContestStarted: boolean },
+) => {
+  const { contestSlug, taskId } = input;
+
+  const { data, error, isLoading } = useQuery({
+    ...getContestTask.useQuery({ contestSlug, taskId }),
+    staleTime: STALE_TIME.getContestTask,
+    enabled: opt.isContestStarted && taskId != null,
+  });
+  const task = data?.task;
+  return { task, error, isLoading };
 };

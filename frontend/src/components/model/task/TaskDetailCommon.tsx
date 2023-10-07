@@ -23,7 +23,7 @@ export const TaskDetailCommon = ({
     { ssr: false },
   );
   return (
-    <Card px={6} py={4} h="100%">
+    <Card px={6} py={4} h="100%" rounded={"none"}>
       <Heading as="h1">{seqCode} - {task.title}</Heading>
       <Box>
         {/* TODO: 良いカンジに表示する */}
