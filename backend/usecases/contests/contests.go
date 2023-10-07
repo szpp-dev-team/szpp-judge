@@ -3,6 +3,7 @@ package contests
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"connectrpc.com/connect"
 	"github.com/samber/lo"
@@ -254,5 +255,4 @@ func toPbContestTask(ct *ent.ContestTask) *backendv1.ContestTask {
 		Difficulty:      backendv1.Difficulty(backendv1.Difficulty_value[ct.Edges.Task.Difficulty]),
 		Score:           int32(ct.Score),
 	}
-}
 }
