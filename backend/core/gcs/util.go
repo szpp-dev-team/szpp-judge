@@ -8,18 +8,25 @@ import (
 	"cloud.google.com/go/storage"
 )
 
-func DownloadFile(ctx context.Context, bucketHandle *storage.BucketHandle, name string) ([]byte, error) {
-	r, err := bucketHandle.Object(name).NewReader(ctx)
+func DownloadFile(ctx context.Context, bucketHandle *storage.BucketHandle, name string) (b []byte, err error) {
+	var r *storage.Reader
+	r, err = bucketHandle.Object(name).NewReader(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer r.Close()
+	defer func() {
+		if err = r.Close(); err != nil {
+			b = nil
+		}
+	}()
 	return io.ReadAll(r)
 }
 
-func UploadFile(ctx context.Context, bucketHandle *storage.BucketHandle, name string, b []byte) error {
+func UploadFile(ctx context.Context, bucketHandle *storage.BucketHandle, name string, b []byte) (err error) {
 	w := bucketHandle.Object(name).NewWriter(ctx)
-	defer w.Close()
+	defer func() {
+		err = w.Close()
+	}()
 	if _, err := io.Copy(w, bytes.NewReader(b)); err != nil {
 		return err
 	}
