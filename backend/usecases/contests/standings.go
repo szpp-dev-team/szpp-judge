@@ -2,6 +2,7 @@ package contests
 
 import (
 	"context"
+	"log"
 	"sort"
 	"time"
 
@@ -62,6 +63,8 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+
+	log.Println(submits)
 
 	// sort submissions by submit_at (asc)
 	sort.SliceStable(submits, func(i, j int) bool { return submits[i].SubmittedAt.Before(submits[j].SubmittedAt) })
