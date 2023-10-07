@@ -37,7 +37,7 @@ export const connectMock = <
   methodName: K,
   resolver: ResponseResolver<TReq, PlainMessage<TResp>>,
 ) => {
-  const method = service.methods[methodName];
+  const method = service.methods[methodName]!;
   return msw.rest.post(`${backendBaseUrl}/${service.typeName}/${method.name}`, (req, res, ctx) => {
     const decodeReq = () => {
       return req.json<TReq>();

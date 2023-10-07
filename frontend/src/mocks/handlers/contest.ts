@@ -7,15 +7,15 @@ import { connectMock } from "../connectRpc";
 import { dummyTasks } from "../fixtures/tasks";
 
 const contestTasks: PlainMessage<ContestTask>[] = [
-  { ...dummyTasks[0], score: 100 },
-  { ...dummyTasks[1], score: 200 },
-  { ...dummyTasks[2], score: 314 },
-  { ...dummyTasks[3], score: 400 },
-  { ...dummyTasks[4], score: 450 },
-  { ...dummyTasks[5], score: 500 },
-  { ...dummyTasks[6], score: 600 },
-  { ...dummyTasks[7], score: 700 },
-  { ...dummyTasks[8], score: 1333 },
+  { ...dummyTasks[0]!, score: 100 },
+  { ...dummyTasks[1]!, score: 200 },
+  { ...dummyTasks[2]!, score: 314 },
+  { ...dummyTasks[3]!, score: 400 },
+  { ...dummyTasks[4]!, score: 450 },
+  { ...dummyTasks[5]!, score: 500 },
+  { ...dummyTasks[6]!, score: 600 },
+  { ...dummyTasks[7]!, score: 700 },
+  { ...dummyTasks[8]!, score: 1333 },
 ];
 
 const contestTaskIds = contestTasks.map((task) => task.id);
@@ -208,10 +208,10 @@ export const contestHandlers: RequestHandler[] = [
       };
     });
     // 最初の4問は全パターン網羅
-    submissionStatuses[0].score = undefined;
-    submissionStatuses[1].score = 0;
-    submissionStatuses[2].score = 50;
-    submissionStatuses[3].score = contestTasks[3].score;
+    submissionStatuses[0]!.score = undefined;
+    submissionStatuses[1]!.score = 0;
+    submissionStatuses[2]!.score = 50;
+    submissionStatuses[3]!.score = contestTasks[3]!.score;
     return res(
       ctx.delay(500),
       encodeResp({ submissionStatuses }),

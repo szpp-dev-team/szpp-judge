@@ -43,7 +43,7 @@ export const SubmissionInfo = (props: GridProps & { submissionDetail?: Submissio
           "結果",
           <JudgeStatusBadge
             key={submissionDetail.status}
-            status={PbJudgeStatus[submissionDetail.status ?? 0].toString() as JudgeStatus}
+            status={PbJudgeStatus[submissionDetail.status ?? 0]!.toString() as JudgeStatus}
           />,
         ]}
       />
