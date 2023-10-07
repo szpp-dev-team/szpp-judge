@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"sort"
+	"strconv"
 	"time"
 
 	"connectrpc.com/connect"
@@ -138,6 +139,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 		index := getTaskDetailIndex(userInfo, submission.Edges.User.ID, submission.Edges.Task.ID)
 		updateUserInfo := userInfo[submission.Edges.User.ID]
 		if *submission.Status == STATUS_AC {
+			log.Println("State AC")
 			untilAc := time.Until(contest.StartAt) * -1
 			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
 			updateUserInfo.taskDetailList[index].untilAc = &untilAc
@@ -153,9 +155,11 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			updateUserInfo.latestUntilAc = &untilAc
 			*updateUserInfo.latestUntilAc += time.Duration(updateUserInfo.totalPenaltyCount * contest.PenaltySeconds)
 		} else {
+			log.Println("State WA")
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
 		}
 
+		log.Println("Update:" + strconv.Itoa(submission.Edges.User.ID))
 		userInfo[submission.Edges.User.ID] = updateUserInfo
 	}
 
