@@ -15,20 +15,36 @@ import type {
 import { PlainMessage } from "@bufbuild/protobuf";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 import { Duration } from "../util/time";
 
 const CHAR_CODE_A = "A".charCodeAt(0);
 
 /**
- * コンテストの問題数に応じて問題番号をアルファベットまたは整数で生成する。
- * @param i 問題の添字 (0-indexed)
- * @param numTotalTasks コンテストの問題数
+ * コンテストの問題数に応じて問題番号コードをアルファベットまたは整数で生成する。
+ * @param seq 問題の連番 **(1-indexed)**
+ * @param numContestTasks コンテストの問題数
  */
-export const calcNthTaskSeq = (i: number, numTotalTasks: number): string => {
-  if (numTotalTasks < 26) {
-    return String.fromCharCode(CHAR_CODE_A + i);
-  }
-  return String(i + 1);
+export const useTaskSeqCode = (seq: number, numContestTasks: number | undefined): string => {
+  return useMemo(() => {
+    if (1 <= seq && seq <= 26 && numContestTasks != null && numContestTasks <= 26) {
+      return String.fromCharCode(CHAR_CODE_A + seq - 1); // seq は 1-indexed なので -1 する
+    }
+    return String(seq);
+  }, [seq, numContestTasks]);
+};
+
+/**
+ * コンテストの問題数に応じて問題番号コードの配列をアルファベットまたは整数で生成する。
+ * @param numContestTasks コンテストの問題数
+ */
+export const useTaskSeqCodes = (numContestTasks: number): string[] => {
+  return useMemo(() => {
+    if (numContestTasks <= 26) {
+      return [...Array(numContestTasks)].map((_, i) => String.fromCharCode(CHAR_CODE_A + i));
+    }
+    return [...Array(numContestTasks)].map((_, i) => String(i + 1));
+  }, [numContestTasks]);
 };
 
 /**

@@ -29,7 +29,7 @@ export const useContestTaskDetailPageTitle = (): string => {
   const taskSeq = useRouterContestTaskSeq();
 
   const { contest, tasks, task } = useGetContestTaskResolvingTaskSeq({ contestSlug, taskSeq });
-  const seqCode = calcNthTaskSeq(taskSeq - 1, tasks?.length ?? 0);
+  const seqCode = useTaskSeqCode(taskSeq, tasks?.length);
 
   const contestName = contest?.name;
   const taskTitle = task?.title;

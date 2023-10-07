@@ -1,5 +1,5 @@
 import { ScoreStatus } from "@/src/model/task";
-import { calcNthTaskSeq } from "@/src/usecases/contest";
+import { useTaskSeqCodes } from "@/src/usecases/contest";
 import { Duration, fmtDatetime } from "@/src/util/time";
 import { Box, FormControl, FormLabel, Icon, Link, Switch, Text } from "@chakra-ui/react";
 import type { BoxProps, LinkProps } from "@chakra-ui/react";
@@ -119,6 +119,7 @@ const SidebarMainPane = ({
   const contestRootPath = `/contests/${slug}`;
   const contestStarted = startAt ? now >= startAt : false;
   const contestFinished = endAt ? now >= endAt : false;
+  const seqCodes = useTaskSeqCodes(tasks.length);
 
   return (
     <Box
@@ -172,7 +173,7 @@ const SidebarMainPane = ({
                     leftElem={
                       <>
                         <ScoreStatusIcon status={t.scoreStatus} mr={1} />
-                        <TaskSeqBadge seq={calcNthTaskSeq(i, tasks.length)} />
+                        <TaskSeqBadge seq={seqCodes[i]!} />
                       </>
                     }
                     key={t.id}
