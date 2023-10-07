@@ -78,6 +78,8 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 
 	standings_list := GetStandingsRecordSlice(userInfo)
 
+	log.Println("GetStandingsRecordSlice DONE!")
+
 	var standings_record []*backendv1.StandingsRecord
 	for _, row := range standings_list {
 		standings_record = append(standings_record, toStandingsRecord(row))
