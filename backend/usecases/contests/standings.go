@@ -52,6 +52,9 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	log.Print("Standings contest: ")
+	log.Println(contest)
+
 	// get contest submits
 	submits, err := i.entClient.Submit.Query().
 		WithUser().
