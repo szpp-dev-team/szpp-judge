@@ -24,13 +24,13 @@ export const WithHeaderFooter = ({
   return (
     <>
       <GlobalHeader username={user?.username} {...headerProps} behindFillColor={bg} />
-      <Flex minW="100%" bg={bg}>
+      <Flex minW="100%" maxW="100%" w="100%" bg={bg}>
         {leftChildren}
         {
           // 子要素で height=100% がうまく機能するためには、親要素で height が auto になってはならない
           // そこで、適当に height=1px を設定することで非 auto にするというトリックを施している
         }
-        <Flex flexDirection="column" minH="100vh" h="1px" pt={GLOBAL_HEADER_H} flexGrow={1}>
+        <Flex flexDirection="column" minH="100vh" h="1px" pt={GLOBAL_HEADER_H} flex={1} w="1px">
           <Box as="main" bg={bg} flexGrow={1}>{children}</Box>
           <GlobalFooter {...footerProps} />
         </Flex>
