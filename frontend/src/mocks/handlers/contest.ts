@@ -4,6 +4,7 @@ import { Duration } from "@/src/util/time";
 import { type PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { connectMock } from "../connectRpc";
+import { dummySampleCases } from "../fixtures/sampleCases";
 import { dummyTasks } from "../fixtures/tasks";
 
 const contestTasks: PlainMessage<ContestTask>[] = [
@@ -174,9 +175,10 @@ export const contestHandlers: RequestHandler[] = [
         ctx.status(403),
       );
     }
+    const samples = [...dummySampleCases];
     return res(
       ctx.delay(500),
-      encodeResp({ task }),
+      encodeResp({ task, samples }),
     );
   }),
   connectMock(ContestService, "getMySubmissionStatuses", async (ctx, res, decodeReq, encodeResp) => {

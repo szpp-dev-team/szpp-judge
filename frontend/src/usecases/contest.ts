@@ -150,5 +150,6 @@ export const useGetContestTask = (
     enabled: opt.isContestStarted && taskId != null,
   });
   const task = data?.task;
-  return { task, error, isLoading };
+  const sampleCases = data?.samples;
+  return { task, sampleCases, error, isLoading };
 };
