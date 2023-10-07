@@ -64,6 +64,7 @@ func New(addr string, opts ...optionFunc) *http.Server {
 			"Grpc-Timeout",             // Used for gRPC-web
 			"X-Grpc-Web",               // Used for gRPC-web
 			"X-User-Agent",             // Used for gRPC-web
+			"Authorization",
 		},
 		ExposedHeaders: []string{
 			"Content-Encoding",         // Unused in web browsers, but added for future-proofing
