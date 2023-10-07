@@ -122,7 +122,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 	for _, submission := range submissions {
 
 		// exception handling
-		if submission.SubmittedAt.Before(contest.StartAt) || contest.EndAt.After(submission.SubmittedAt) {
+		if submission.SubmittedAt.Before(contest.StartAt) || submission.SubmittedAt.After(contest.EndAt) {
 			continue
 		}
 
