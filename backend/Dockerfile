@@ -17,6 +17,7 @@ FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         tzdata \
+        ca-cerificates \
     && rm -rf /var/lib/apt/lists/*
 ENV TZ Asia/Tokyo
 
