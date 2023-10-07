@@ -1,10 +1,7 @@
 package contests
 
-// ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
-
 import (
 	"context"
-	"fmt"
 	"sort"
 	"time"
 
@@ -15,6 +12,8 @@ import (
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -43,11 +42,11 @@ const STATUS_WA = "WA"
 func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandingsRequest) (*backendv1.GetStandingsResponse, error) {
 	// get contest info
 	contest, err := i.entClient.Contest.Query().
-		Where(ent_contest.ID(int(req.ContestId))).
+		Where(ent_contest.Slug(req.ContestSlug)).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("the contest(id: %d) is not found", req.ContestId))
+			return nil, status.Errorf(codes.NotFound, "the contest(slug: %s) is not found", req.ContestSlug)
 		}
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -92,11 +91,11 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 		result = append(result, value)
 	}
 
-	// sort by totalScore and total_penalty
+	// sort by totalScore and latestUntilAc
 	sort.SliceStable(result, func(i, j int) bool {
 		if result[i].totalScore > result[j].totalScore {
 			return true
-		} else if result[i].totalPenaltyCount < result[j].totalPenaltyCount {
+		} else if *result[i].latestUntilAc < *result[j].latestUntilAc {
 			return true
 		}
 		return false
@@ -140,13 +139,16 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
 			updateUserInfo.taskDetailList[index].untilAc = &untilAc
 			updateUserInfo.taskDetailList[index].score = submission.Score
-			updateUserInfo.latestUntilAc = &untilAc
 			updateUserInfo.totalScore += updateUserInfo.taskDetailList[index].score
 
 			// penalty
 			updateUserInfo.taskDetailList[index].currentPenaltyCount += updateUserInfo.taskDetailList[index].nextPenaltyCount
 			updateUserInfo.totalPenaltyCount += updateUserInfo.taskDetailList[index].nextPenaltyCount
 			updateUserInfo.taskDetailList[index].nextPenaltyCount = 0
+
+			// Until AC
+			updateUserInfo.latestUntilAc = &untilAc
+			*updateUserInfo.latestUntilAc += time.Duration(updateUserInfo.totalPenaltyCount * contest.PenaltySeconds)
 		} else {
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
 		}

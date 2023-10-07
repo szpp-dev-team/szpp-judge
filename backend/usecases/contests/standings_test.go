@@ -16,7 +16,7 @@ func Test_GetStandings(t *testing.T) {
 
 	ctx := context.Background()
 	resp, err := interactor.GetStandings(ctx, &backendv1.GetStandingsRequest{
-		ContestId: 1,
+		ContestSlug: "szpc002",
 	})
 	require.NoError(t, err)
 

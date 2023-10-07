@@ -666,9 +666,9 @@ export class GetMySubmissionStatusesResponse extends Message<GetMySubmissionStat
  */
 export class GetStandingsRequest extends Message<GetStandingsRequest> {
   /**
-   * @generated from field: int32 contest_id = 1;
+   * @generated from field: string contest_slug = 1;
    */
-  contestId = 0;
+  contestSlug = "";
 
   constructor(data?: PartialMessage<GetStandingsRequest>) {
     super();
@@ -678,7 +678,7 @@ export class GetStandingsRequest extends Message<GetStandingsRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.GetStandingsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetStandingsRequest {
