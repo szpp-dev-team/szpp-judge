@@ -26,6 +26,13 @@
 .h4 { @include h4(); }
 
 .markdownWrapper {
+  & > *:first-child {
+    margin-top: 0 !important;
+  }
+  & > *:last-child {
+    margin-bottom: 0 !important;
+  }
+
   h1 {
     font-size: 3rem;
     color: red;
