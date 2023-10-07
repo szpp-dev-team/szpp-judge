@@ -25,7 +25,6 @@ const (
 	ContestService_ListContests_FullMethodName            = "/backend.v1.ContestService/ListContests"
 	ContestService_ListContestTasks_FullMethodName        = "/backend.v1.ContestService/ListContestTasks"
 	ContestService_GetContestTask_FullMethodName          = "/backend.v1.ContestService/GetContestTask"
-	ContestService_GetSamples_FullMethodName              = "/backend.v1.ContestService/GetSamples"
 	ContestService_SyncContestTasks_FullMethodName        = "/backend.v1.ContestService/SyncContestTasks"
 	ContestService_GetMySubmissionStatuses_FullMethodName = "/backend.v1.ContestService/GetMySubmissionStatuses"
 	ContestService_GetStandings_FullMethodName            = "/backend.v1.ContestService/GetStandings"
@@ -54,8 +53,6 @@ type ContestServiceClient interface {
 	ListContestTasks(ctx context.Context, in *ListContestTasksRequest, opts ...grpc.CallOption) (*ListContestTasksResponse, error)
 	// コンテストに紐づく問題を取得する
 	GetContestTask(ctx context.Context, in *GetContestTaskRequest, opts ...grpc.CallOption) (*GetContestTaskResponse, error)
-	// コンテストに紐づく問題の入出力例を取得する
-	GetSamples(ctx context.Context, in *GetSamplesRequest, opts ...grpc.CallOption) (*GetSamplesResponse, error)
 	// 問題をコンテストに紐づかせる
 	SyncContestTasks(ctx context.Context, in *SyncContestTasksRequest, opts ...grpc.CallOption) (*SyncContestTasksResponse, error)
 	// 自分の問題ごとの結果情報を取得する
@@ -134,15 +131,6 @@ func (c *contestServiceClient) ListContestTasks(ctx context.Context, in *ListCon
 func (c *contestServiceClient) GetContestTask(ctx context.Context, in *GetContestTaskRequest, opts ...grpc.CallOption) (*GetContestTaskResponse, error) {
 	out := new(GetContestTaskResponse)
 	err := c.cc.Invoke(ctx, ContestService_GetContestTask_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *contestServiceClient) GetSamples(ctx context.Context, in *GetSamplesRequest, opts ...grpc.CallOption) (*GetSamplesResponse, error) {
-	out := new(GetSamplesResponse)
-	err := c.cc.Invoke(ctx, ContestService_GetSamples_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -255,8 +243,6 @@ type ContestServiceServer interface {
 	ListContestTasks(context.Context, *ListContestTasksRequest) (*ListContestTasksResponse, error)
 	// コンテストに紐づく問題を取得する
 	GetContestTask(context.Context, *GetContestTaskRequest) (*GetContestTaskResponse, error)
-	// コンテストに紐づく問題の入出力例を取得する
-	GetSamples(context.Context, *GetSamplesRequest) (*GetSamplesResponse, error)
 	// 問題をコンテストに紐づかせる
 	SyncContestTasks(context.Context, *SyncContestTasksRequest) (*SyncContestTasksResponse, error)
 	// 自分の問題ごとの結果情報を取得する
@@ -300,9 +286,6 @@ func (UnimplementedContestServiceServer) ListContestTasks(context.Context, *List
 }
 func (UnimplementedContestServiceServer) GetContestTask(context.Context, *GetContestTaskRequest) (*GetContestTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContestTask not implemented")
-}
-func (UnimplementedContestServiceServer) GetSamples(context.Context, *GetSamplesRequest) (*GetSamplesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSamples not implemented")
 }
 func (UnimplementedContestServiceServer) SyncContestTasks(context.Context, *SyncContestTasksRequest) (*SyncContestTasksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SyncContestTasks not implemented")
@@ -450,24 +433,6 @@ func _ContestService_GetContestTask_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContestServiceServer).GetContestTask(ctx, req.(*GetContestTaskRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ContestService_GetSamples_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSamplesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContestServiceServer).GetSamples(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ContestService_GetSamples_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContestServiceServer).GetSamples(ctx, req.(*GetSamplesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -682,10 +647,6 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetContestTask",
 			Handler:    _ContestService_GetContestTask_Handler,
-		},
-		{
-			MethodName: "GetSamples",
-			Handler:    _ContestService_GetSamples_Handler,
 		},
 		{
 			MethodName: "SyncContestTasks",
