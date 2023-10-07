@@ -1,7 +1,6 @@
 import { useAccessTokenClaimValue } from "@/src/globalStates/credential";
 import { useGetContest, useRegisterMe, useRouterContestSlug } from "@/src/usecases/contest";
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Heading, useToast } from "@chakra-ui/react";
-import { Router, useRouter } from "next/router";
+import { Box, Button, Card, CardBody, CardHeader, Heading, useToast } from "@chakra-ui/react";
 import { useTimer } from "react-timer-hook";
 
 export const ContestTop = () => {
@@ -10,7 +9,6 @@ export const ContestTop = () => {
   const user = useAccessTokenClaimValue();
 
   // コンテスト開始まで or 終了までのタイマー
-  // 現状うまく動かない　現在時刻基準で 10 秒後にセットとかすると問題なく動くが、contest::endAt とかを突っ込むと一生 {0, 0, 0, 0} が返る
   let expiryTimestamp: Date;
   const now = new Date();
   let isUpcomingOrRunning = false;
