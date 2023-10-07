@@ -161,7 +161,6 @@ func isHigherScore(userInfo map[int]StandingsRecord, submission *ent.Submit) boo
 
 	specific_user_taskDetailList := userInfo[submission.Edges.User.ID].taskDetailList
 
-	// println("[isHigherScore: parent] ID:" + strconv.Itoa(submission.ID))
 	for _, taskDetail := range specific_user_taskDetailList {
 		if taskDetail.taskId == submission.Edges.Task.ID && taskDetail.score < submission.Score {
 			// user get high score than prev submit

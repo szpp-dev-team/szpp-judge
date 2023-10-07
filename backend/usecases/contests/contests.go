@@ -3,8 +3,6 @@ package contests
 import (
 	"context"
 	"errors"
-	"log"
-	"log/slog"
 
 	"connectrpc.com/connect"
 	"github.com/samber/lo"
@@ -198,7 +196,6 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 	slices.SortFunc(contestTasks, func(a, b *ent.ContestTask) int {
 		return a.Order - b.Order
 	})
-	log.Println("result", contestTasks, contestTaskIDs)
 	return &backendv1.SyncContestTasksResponse{
 		Tasks: lo.Map(contestTasks, func(ct *ent.ContestTask, _ int) *backendv1.Task {
 			return tasks.ToPbTask(ct.Edges.Task)
@@ -257,4 +254,5 @@ func toPbContestTask(ct *ent.ContestTask) *backendv1.ContestTask {
 		Difficulty:      backendv1.Difficulty(backendv1.Difficulty_value[ct.Edges.Task.Difficulty]),
 		Score:           int32(ct.Score),
 	}
+}
 }
