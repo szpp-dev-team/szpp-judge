@@ -3,7 +3,6 @@ package contests
 import (
 	"context"
 	"errors"
-	"log"
 	"log/slog"
 
 	"connectrpc.com/connect"
@@ -198,7 +197,6 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 	slices.SortFunc(contestTasks, func(a, b *ent.ContestTask) int {
 		return a.Order - b.Order
 	})
-	log.Println("result", contestTasks, contestTaskIDs)
 	return &backendv1.SyncContestTasksResponse{
 		Tasks: lo.Map(contestTasks, func(ct *ent.ContestTask, _ int) *backendv1.Task {
 			return tasks.ToPbTask(ct.Edges.Task)

@@ -18,6 +18,8 @@ service ContestService {
   rpc ListContestTasks(ListContestTasksRequest) returns (ListContestTasksResponse);
   // コンテストに紐づく問題を取得する
   rpc GetContestTask(GetContestTaskRequest) returns (GetContestTaskResponse);
+  // コンテストに紐づく問題の入出力例を取得する
+  rpc GetSamples(GetSamplesRequest) returns (GetSamplesResponse);
   // 問題をコンテストに紐づかせる
   rpc SyncContestTasks(SyncContestTasksRequest) returns (SyncContestTasksResponse);
   // 自分の問題ごとの結果情報を取得する
@@ -98,6 +100,15 @@ message SyncContestTasksRequest {
   }
 }
 
+message GetSamplesRequest {
+  string contest_slug = 1;
+  int32 task_id = 2;
+}
+
+message GetSamplesResponse {
+  repeated Testcase testcases = 1;
+}
+
 message SyncContestTasksResponse {
   repeated Task tasks = 1; // コンテストに紐づく問題一覧
 }
@@ -111,7 +122,7 @@ message GetMySubmissionStatusesResponse {
 }
 
 message GetStandingsRequest {
-  int32 contest_id = 1;
+  string contest_slug = 1;
 }
 
 message GetStandingsResponse {
