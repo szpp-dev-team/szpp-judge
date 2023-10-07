@@ -242,12 +242,19 @@ func toStandingsRecord(standings StandingsRecord) *backendv1.StandingsRecord {
 		taskDetailList = append(taskDetailList, toStandingsRecordTaskDetail(row))
 	}
 
+	var latestAcAt *timestamppb.Timestamp
+	latestAcAt = nil
+
+	if standings.latestUntilAc != nil {
+		latestAcAt = toTimestamp(standings.latestUntilAc)
+	}
+
 	return &backendv1.StandingsRecord{
 		Rank:              int32(standings.rank),
 		Username:          standings.userName,
 		TotalScore:        int32(standings.totalScore),
 		TotalPenaltyCount: int32(standings.totalPenaltyCount),
-		LatestAcAt:        toTimestamp(standings.latestUntilAc),
+		LatestAcAt:        latestAcAt,
 		TaskDetailList:    taskDetailList,
 	}
 }
