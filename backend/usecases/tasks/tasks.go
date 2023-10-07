@@ -178,7 +178,7 @@ func (i *Interactor) GetTestcaseSets(ctx context.Context, req *backendv1.GetTest
 				i.logger.Error("failed to download testcase", slog.Int("task_id", int(req.TaskId)), slog.String("testcase_name", t.Name))
 				return nil, connect.NewError(connect.CodeInternal, err)
 			}
-			testcaseByName[t.Name] = toPbTestcase(t, testcase.In, testcase.Out)
+			testcaseByName[t.Name] = ToPbTestcase(t, testcase.In, testcase.Out)
 		}
 	}
 
@@ -248,7 +248,7 @@ func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTe
 			return toPbTestcaseSet(ts)
 		}),
 		Testcases: lo.Map(testcases, func(t *ent.Testcase, _ int) *backendv1.Testcase {
-			return toPbTestcase(t, nil, nil)
+			return ToPbTestcase(t, nil, nil)
 		}),
 	}, nil
 }
@@ -440,7 +440,7 @@ func toPbTestcaseSet(t *ent.TestcaseSet) *backendv1.TestcaseSet {
 	}
 }
 
-func toPbTestcase(t *ent.Testcase, input, output []byte) *backendv1.Testcase {
+func ToPbTestcase(t *ent.Testcase, input, output []byte) *backendv1.Testcase {
 	var updatedAt *timestamppb.Timestamp
 	if t.UpdatedAt != nil {
 		updatedAt = timestamppb.New(*t.UpdatedAt)

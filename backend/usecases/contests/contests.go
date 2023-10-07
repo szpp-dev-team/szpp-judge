@@ -15,7 +15,9 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	ent_testcaseset "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
+	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slices"
@@ -23,13 +25,14 @@ import (
 )
 
 type Interactor struct {
-	entClient *ent.Client
-	logger    *slog.Logger
+	entClient     *ent.Client
+	logger        *slog.Logger
+	testcasesRepo testcases_repo.Repository
 }
 
-func NewInteractor(entClient *ent.Client) *Interactor {
+func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repository) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "contests"))
-	return &Interactor{entClient, logger}
+	return &Interactor{entClient, logger, testcasesRepo}
 }
 
 func (i *Interactor) CreateContest(ctx context.Context, req *backendv1.CreateContestRequest) (*backendv1.CreateContestResponse, error) {
@@ -131,6 +134,11 @@ func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListCo
 
 func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetContestTaskRequest) (*backendv1.GetContestTaskResponse, error) {
 	task, err := i.entClient.Task.Query().
+		WithTestcases(func(tq *ent.TestcaseQuery) {
+			tq.WithTestcaseSets(func(tsq *ent.TestcaseSetQuery) {
+				tsq.Where(ent_testcaseset.IsSample(true))
+			}).WithTask()
+		}).
 		Where(
 			ent_task.HasContestsWith(ent_contest.Slug(req.ContestSlug)),
 			ent_task.ID(int(req.TaskId)),
@@ -143,8 +151,22 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 		i.logger.Error("failed to get contest", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
+
+	testcases := make([]*testcases_repo.Testcase, 0, len(task.Edges.Testcases))
+	for _, tc := range task.Edges.Testcases {
+		testcase, err := i.testcasesRepo.DownloadTestcase(ctx, tc.Edges.Task.ID, tc.Name)
+		if err != nil {
+			i.logger.Error("failed to download testcase", slog.Any("error", err))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("failed to download testcase"))
+		}
+		testcases = append(testcases, testcase)
+	}
+
 	return &backendv1.GetContestTaskResponse{
 		Task: tasks.ToPbTask(task),
+		Samples: lo.Map(task.Edges.Testcases, func(tc *ent.Testcase, i int) *backendv1.Testcase {
+			return tasks.ToPbTestcase(tc, testcases[i].In, testcases[i].Out)
+		}),
 	}, nil
 }
 

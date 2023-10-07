@@ -40,7 +40,7 @@ func New(addr string, opts ...optionFunc) *http.Server {
 	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient, opt.SourcesRepository, opt.judgeQueue)
 	judgeSrv := connect_interfaces.NewJudgeServiceServer(judgeInteractor)
 	mux.Handle(backendv1connect.NewJudgeServiceHandler(judgeSrv, interceptors))
-	contestInteractor := contests.NewInteractor(opt.EntClient)
+	contestInteractor := contests.NewInteractor(opt.EntClient, opt.TestcasesRepository)
 	contestSrv := connect_interfaces.NewContestServiceServer(contestInteractor)
 	mux.Handle(backendv1connect.NewContestServiceHandler(contestSrv, interceptors))
 	authSrv := connect_interfaces.NewAuthServiceServer(auth.NewInteractor(opt.EntClient, opt.Secret))
