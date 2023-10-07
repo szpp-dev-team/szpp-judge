@@ -18,8 +18,6 @@ const contestTasks: PlainMessage<ContestTask>[] = [
   { ...dummyTasks[8]!, score: 1333 },
 ];
 
-const contestTaskIds = contestTasks.map((task) => task.id);
-
 const contestDescription = String.raw`
 ## SZPP Beginners Contest とは？
 説明説明説明説明説明説明説明説明
@@ -53,7 +51,7 @@ const generateContest = (slug: string): PlainMessage<Contest> | null => {
         startAt: afterNow(Duration.DAY * 2),
         endAt: afterNow(Duration.DAY * 2 + Duration.MINUTE * 90),
         penaltySeconds: 300,
-        taskIds: contestTaskIds,
+        numTasks: contestTasks.length,
         description: contestDescription,
       };
     case "sbc002":
@@ -65,7 +63,7 @@ const generateContest = (slug: string): PlainMessage<Contest> | null => {
         startAt: afterNow(Duration.SECOND * 5),
         endAt: afterNow(Duration.MINUTE * 90),
         penaltySeconds: 300,
-        taskIds: contestTaskIds,
+        numTasks: contestTasks.length,
         description: contestDescription,
       };
     case "sbc003":
@@ -77,7 +75,7 @@ const generateContest = (slug: string): PlainMessage<Contest> | null => {
         startAt: Timestamp.fromDate(new Date()),
         endAt: afterNow(Duration.MINUTE * 90),
         penaltySeconds: 300,
-        taskIds: contestTaskIds,
+        numTasks: contestTasks.length,
         description: contestDescription,
       };
     case "sbc004":
@@ -89,7 +87,7 @@ const generateContest = (slug: string): PlainMessage<Contest> | null => {
         startAt: beforeNow(Duration.MINUTE * 90),
         endAt: afterNow(Duration.SECOND * 5),
         penaltySeconds: 300,
-        taskIds: contestTaskIds,
+        numTasks: contestTasks.length,
         description: contestDescription,
       };
     case "sbc005":
@@ -101,7 +99,7 @@ const generateContest = (slug: string): PlainMessage<Contest> | null => {
         startAt: beforeNow(Duration.DAY * 2),
         endAt: beforeNow(Duration.DAY * 2 - Duration.MINUTE * 90),
         penaltySeconds: 300,
-        taskIds: contestTaskIds,
+        numTasks: contestTasks.length,
         description: contestDescription,
       };
     default:
