@@ -233,6 +233,7 @@ func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTe
 	}
 
 	for _, testcase := range req.Testcases {
+		i.logger.Info("uploading testcase", slog.String("testcase", testcase.Slug), slog.Int("task_id", int(req.TaskId)))
 		if err := i.testcasesRepo.UpsertTestcase(ctx, int(req.TaskId), &testcases_repo.Testcase{
 			Name: testcase.Slug,
 			In:   []byte(testcase.Input),

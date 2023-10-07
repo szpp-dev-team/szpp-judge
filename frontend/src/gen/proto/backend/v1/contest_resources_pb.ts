@@ -125,29 +125,29 @@ export class Contest extends Message<Contest> {
   description = "";
 
   /**
-   * @generated from field: repeated int32 task_ids = 5;
-   */
-  taskIds: number[] = [];
-
-  /**
-   * @generated from field: int32 penalty_seconds = 6;
+   * @generated from field: int32 penalty_seconds = 5;
    */
   penaltySeconds = 0;
 
   /**
-   * @generated from field: google.protobuf.Timestamp start_at = 7;
+   * @generated from field: google.protobuf.Timestamp start_at = 6;
    */
   startAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp end_at = 8;
+   * @generated from field: google.protobuf.Timestamp end_at = 7;
    */
   endAt?: Timestamp;
 
   /**
-   * @generated from field: backend.v1.ContestType contest_type = 9;
+   * @generated from field: backend.v1.ContestType contest_type = 8;
    */
   contestType = ContestType.CONTEST_TYPE_UNSPECIFIED;
+
+  /**
+   * @generated from field: int32 num_tasks = 9;
+   */
+  numTasks = 0;
 
   constructor(data?: PartialMessage<Contest>) {
     super();
@@ -161,11 +161,11 @@ export class Contest extends Message<Contest> {
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "task_ids", kind: "scalar", T: 5 /* ScalarType.INT32 */, repeated: true },
-    { no: 6, name: "penalty_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 7, name: "start_at", kind: "message", T: Timestamp },
-    { no: 8, name: "end_at", kind: "message", T: Timestamp },
-    { no: 9, name: "contest_type", kind: "enum", T: proto3.getEnumType(ContestType) },
+    { no: 5, name: "penalty_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "start_at", kind: "message", T: Timestamp },
+    { no: 7, name: "end_at", kind: "message", T: Timestamp },
+    { no: 8, name: "contest_type", kind: "enum", T: proto3.getEnumType(ContestType) },
+    { no: 9, name: "num_tasks", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Contest {
