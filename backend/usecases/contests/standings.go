@@ -73,6 +73,8 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	log.Println("separateSubmit DONE!")
+
 	standings_list := GetStandingsRecordSlice(userInfo)
 
 	var standings_record []*backendv1.StandingsRecord
@@ -116,17 +118,12 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submit, contest *ent.Contest) (map[int]StandingsRecord, error) {
 	userInfo := make(map[int]StandingsRecord)
 
-	log.Print("submissions: ")
-	log.Println(submissions)
-
 	for _, submission := range submissions {
 
 		// exception handling
 		if submission.SubmittedAt.Before(contest.StartAt) || submission.SubmittedAt.After(contest.EndAt) {
 			continue
 		}
-
-		log.Println("LOOP")
 
 		// initialize
 		err := initializeContestTasksResult(i, ctx, userInfo, submission.Edges.User.ID, contest.ID)
