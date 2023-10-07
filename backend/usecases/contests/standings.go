@@ -73,10 +73,10 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	standings_list := GetStandingsRecordSlice(userInfo)
+	log.Print("userInfo: ")
+	log.Println(userInfo)
 
-	log.Print("standings_list: ")
-	log.Println(standings_list)
+	standings_list := GetStandingsRecordSlice(userInfo)
 
 	var standings_record []*backendv1.StandingsRecord
 	for _, row := range standings_list {
@@ -94,6 +94,9 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 	for _, value := range userInfo {
 		result = append(result, value)
 	}
+
+	log.Print("result: ")
+	log.Println(result)
 
 	// sort by totalScore and latestUntilAc
 	sort.SliceStable(result, func(i, j int) bool {
