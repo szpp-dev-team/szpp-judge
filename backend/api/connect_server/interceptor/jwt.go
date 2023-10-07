@@ -48,7 +48,6 @@ func Auth(secret []byte) connect.UnaryInterceptorFunc {
 			accessToken := req.Header().Get("Authorization")
 			claims, err := GetClaimsFromToken(strings.TrimPrefix(accessToken, "Bearer"), secret)
 			if err != nil {
-				log.Println(err)
 				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("failed to parse jwt"))
 			}
 			ctx = context.WithValue(ctx, claimsKey, claims)
