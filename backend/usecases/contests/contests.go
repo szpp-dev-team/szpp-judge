@@ -7,12 +7,15 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/samber/lo"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	ent_contesttask "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slices"
@@ -205,7 +208,44 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 }
 
 func (i *Interactor) GetMySubmissionStatuses(ctx context.Context, req *backendv1.GetMySubmissionStatusesRequest) (*backendv1.GetMySubmissionStatusesResponse, error) {
-	panic("not implemented")
+	claims := interceptor.GetClaimsFromContext(ctx)
+
+	contest, err := i.entClient.Contest.Query().
+		WithSubmits(func(sq *ent.SubmitQuery) {
+			sq.WithTask().
+				Where(ent_submit.HasUserWith(ent_user.Username(claims.Username)))
+		}).
+		Where(ent_contest.Slug(req.ContestSlug)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
+		}
+		i.logger.Error("failed to get contest", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
+	}
+
+	submissionStatusByTaskID := make(map[int]*backendv1.SubmissionStatus)
+	for _, submit := range contest.Edges.Submits {
+		if _, ok := submissionStatusByTaskID[submit.Edges.Task.ID]; !ok {
+			submissionStatusByTaskID[submit.Edges.Task.ID] = &backendv1.SubmissionStatus{
+				TaskId: int32(submit.Edges.Task.ID),
+				Score:  lo.ToPtr(int32(submit.Score)),
+			}
+		}
+		if int32(submit.Score) > *submissionStatusByTaskID[submit.Edges.Task.ID].Score {
+			submissionStatusByTaskID[submit.Edges.Task.ID].Score = lo.ToPtr(int32(submit.Score))
+		}
+	}
+
+	submissionStatuses := make([]*backendv1.SubmissionStatus, 0, len(submissionStatusByTaskID))
+	for _, submissionStatus := range submissionStatusByTaskID {
+		submissionStatuses = append(submissionStatuses, submissionStatus)
+	}
+
+	return &backendv1.GetMySubmissionStatusesResponse{
+		SubmissionStatuses: submissionStatuses,
+	}, nil
 }
 
 func (i *Interactor) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRequest) (*backendv1.RegisterMeResponse, error) {
