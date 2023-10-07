@@ -64,6 +64,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	log.Print("Standings submit: ")
 	log.Println(submits)
 
 	// sort submissions by submit_at (asc)
