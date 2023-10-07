@@ -111,6 +111,7 @@ var (
 	RefreshTokensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "token", Type: field.TypeString, Unique: true},
+		{Name: "username", Type: field.TypeString},
 		{Name: "expires_at", Type: field.TypeTime},
 		{Name: "is_dead", Type: field.TypeBool},
 	}

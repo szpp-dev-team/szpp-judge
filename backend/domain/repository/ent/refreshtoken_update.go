@@ -34,6 +34,12 @@ func (rtu *RefreshTokenUpdate) SetToken(s string) *RefreshTokenUpdate {
 	return rtu
 }
 
+// SetUsername sets the "username" field.
+func (rtu *RefreshTokenUpdate) SetUsername(s string) *RefreshTokenUpdate {
+	rtu.mutation.SetUsername(s)
+	return rtu
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (rtu *RefreshTokenUpdate) SetExpiresAt(t time.Time) *RefreshTokenUpdate {
 	rtu.mutation.SetExpiresAt(t)
@@ -90,6 +96,9 @@ func (rtu *RefreshTokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := rtu.mutation.Token(); ok {
 		_spec.SetField(refreshtoken.FieldToken, field.TypeString, value)
 	}
+	if value, ok := rtu.mutation.Username(); ok {
+		_spec.SetField(refreshtoken.FieldUsername, field.TypeString, value)
+	}
 	if value, ok := rtu.mutation.ExpiresAt(); ok {
 		_spec.SetField(refreshtoken.FieldExpiresAt, field.TypeTime, value)
 	}
@@ -119,6 +128,12 @@ type RefreshTokenUpdateOne struct {
 // SetToken sets the "token" field.
 func (rtuo *RefreshTokenUpdateOne) SetToken(s string) *RefreshTokenUpdateOne {
 	rtuo.mutation.SetToken(s)
+	return rtuo
+}
+
+// SetUsername sets the "username" field.
+func (rtuo *RefreshTokenUpdateOne) SetUsername(s string) *RefreshTokenUpdateOne {
+	rtuo.mutation.SetUsername(s)
 	return rtuo
 }
 
@@ -207,6 +222,9 @@ func (rtuo *RefreshTokenUpdateOne) sqlSave(ctx context.Context) (_node *RefreshT
 	}
 	if value, ok := rtuo.mutation.Token(); ok {
 		_spec.SetField(refreshtoken.FieldToken, field.TypeString, value)
+	}
+	if value, ok := rtuo.mutation.Username(); ok {
+		_spec.SetField(refreshtoken.FieldUsername, field.TypeString, value)
 	}
 	if value, ok := rtuo.mutation.ExpiresAt(); ok {
 		_spec.SetField(refreshtoken.FieldExpiresAt, field.TypeTime, value)

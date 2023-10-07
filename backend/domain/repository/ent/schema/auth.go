@@ -12,6 +12,7 @@ type RefreshToken struct {
 func (RefreshToken) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("token").Unique(),
+		field.String("username"),
 		field.Time("expires_at"),
 		field.Bool("is_dead"),
 	}

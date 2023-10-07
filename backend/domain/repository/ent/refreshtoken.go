@@ -19,6 +19,8 @@ type RefreshToken struct {
 	ID int `json:"id,omitempty"`
 	// Token holds the value of the "token" field.
 	Token string `json:"token,omitempty"`
+	// Username holds the value of the "username" field.
+	Username string `json:"username,omitempty"`
 	// ExpiresAt holds the value of the "expires_at" field.
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// IsDead holds the value of the "is_dead" field.
@@ -35,7 +37,7 @@ func (*RefreshToken) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case refreshtoken.FieldID:
 			values[i] = new(sql.NullInt64)
-		case refreshtoken.FieldToken:
+		case refreshtoken.FieldToken, refreshtoken.FieldUsername:
 			values[i] = new(sql.NullString)
 		case refreshtoken.FieldExpiresAt:
 			values[i] = new(sql.NullTime)
@@ -65,6 +67,12 @@ func (rt *RefreshToken) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
 			} else if value.Valid {
 				rt.Token = value.String
+			}
+		case refreshtoken.FieldUsername:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field username", values[i])
+			} else if value.Valid {
+				rt.Username = value.String
 			}
 		case refreshtoken.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -116,6 +124,9 @@ func (rt *RefreshToken) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", rt.ID))
 	builder.WriteString("token=")
 	builder.WriteString(rt.Token)
+	builder.WriteString(", ")
+	builder.WriteString("username=")
+	builder.WriteString(rt.Username)
 	builder.WriteString(", ")
 	builder.WriteString("expires_at=")
 	builder.WriteString(rt.ExpiresAt.Format(time.ANSIC))

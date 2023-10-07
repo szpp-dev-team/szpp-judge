@@ -1,0 +1,43 @@
+name: langs lint
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - .github/workflows/langs.yml
+      - langs/**/*.go
+      - langs/go.*
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - .github/workflows/langs.yml
+      - langs/**/*.go
+      - langs/go.*
+defaults:
+  run:
+    working-directory: ./langs
+jobs:
+  lint-test-format:
+    name: "Lint & Test & Format"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: judge/go.mod
+
+      - name: lint
+        run: make lint
+
+      - name: test
+        run: make test
+
+      - name: format
+        run: make fmt
+
+      - name: commit format changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "style(langs): [bot] apply code formatter changes"

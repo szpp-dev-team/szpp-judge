@@ -5,6 +5,7 @@ import (
 	"sort"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	ent_contest_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
@@ -47,7 +48,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		if ent.IsNotFound(err) {
 			return nil, status.Errorf(codes.NotFound, "the contest(slug: %s) is not found", req.ContestSlug)
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	// get contest submits
@@ -59,7 +60,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		All(ctx)
 
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	// sort submissions by submit_at (asc)
@@ -68,7 +69,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	// get user info
 	userInfo, err := separateSubmit(i, ctx, submits, contest)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	standings_list := GetStandingsRecordSlice(userInfo)
@@ -162,7 +163,6 @@ func isHigherScore(userInfo map[int]StandingsRecord, submission *ent.Submit) boo
 
 	specific_user_taskDetailList := userInfo[submission.Edges.User.ID].taskDetailList
 
-	// println("[isHigherScore: parent] ID:" + strconv.Itoa(submission.ID))
 	for _, taskDetail := range specific_user_taskDetailList {
 		if taskDetail.taskId == submission.Edges.Task.ID && taskDetail.score < submission.Score {
 			// user get high score than prev submit
@@ -188,7 +188,7 @@ func initializeContestTasksResult(i *Interactor, ctx context.Context, userInfo m
 	// get user info
 	user, err := i.entClient.User.Query().Where(ent_user.ID(user_id)).Only(ctx)
 	if err != nil {
-		return status.Error(codes.Internal, err.Error())
+		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	// get contestTasks
@@ -196,7 +196,7 @@ func initializeContestTasksResult(i *Interactor, ctx context.Context, userInfo m
 		Where(ent_contest_task.HasContestWith(ent_contest.ID(contest_id))).
 		All(ctx)
 	if err != nil {
-		return status.Error(codes.Internal, err.Error())
+		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	taskDetailList := make([]TaskDetail, 0)
