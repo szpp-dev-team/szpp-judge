@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { Clarification, Clarification_Answer, Contest, ContestTask, MutationContest, StandingsRecord, SubmissionStatus } from "./contest_resources_pb";
-import { Task } from "./task_resources_pb";
+import { Task, Testcase } from "./task_resources_pb";
 
 /**
  * @generated from message backend.v1.CreateContestRequest
@@ -545,6 +545,86 @@ export class SyncContestTasksRequest_Task extends Message<SyncContestTasksReques
 
   static equals(a: SyncContestTasksRequest_Task | PlainMessage<SyncContestTasksRequest_Task> | undefined, b: SyncContestTasksRequest_Task | PlainMessage<SyncContestTasksRequest_Task> | undefined): boolean {
     return proto3.util.equals(SyncContestTasksRequest_Task, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetSamplesRequest
+ */
+export class GetSamplesRequest extends Message<GetSamplesRequest> {
+  /**
+   * @generated from field: string contest_slug = 1;
+   */
+  contestSlug = "";
+
+  /**
+   * @generated from field: int32 task_id = 2;
+   */
+  taskId = 0;
+
+  constructor(data?: PartialMessage<GetSamplesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetSamplesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "task_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSamplesRequest {
+    return new GetSamplesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSamplesRequest {
+    return new GetSamplesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSamplesRequest {
+    return new GetSamplesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSamplesRequest | PlainMessage<GetSamplesRequest> | undefined, b: GetSamplesRequest | PlainMessage<GetSamplesRequest> | undefined): boolean {
+    return proto3.util.equals(GetSamplesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetSamplesResponse
+ */
+export class GetSamplesResponse extends Message<GetSamplesResponse> {
+  /**
+   * @generated from field: repeated backend.v1.Testcase testcases = 1;
+   */
+  testcases: Testcase[] = [];
+
+  constructor(data?: PartialMessage<GetSamplesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetSamplesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "testcases", kind: "message", T: Testcase, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSamplesResponse {
+    return new GetSamplesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSamplesResponse {
+    return new GetSamplesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSamplesResponse {
+    return new GetSamplesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSamplesResponse | PlainMessage<GetSamplesResponse> | undefined, b: GetSamplesResponse | PlainMessage<GetSamplesResponse> | undefined): boolean {
+    return proto3.util.equals(GetSamplesResponse, a, b);
   }
 }
 

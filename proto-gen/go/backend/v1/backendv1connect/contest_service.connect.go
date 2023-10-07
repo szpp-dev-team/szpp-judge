@@ -51,6 +51,9 @@ const (
 	// ContestServiceGetContestTaskProcedure is the fully-qualified name of the ContestService's
 	// GetContestTask RPC.
 	ContestServiceGetContestTaskProcedure = "/backend.v1.ContestService/GetContestTask"
+	// ContestServiceGetSamplesProcedure is the fully-qualified name of the ContestService's GetSamples
+	// RPC.
+	ContestServiceGetSamplesProcedure = "/backend.v1.ContestService/GetSamples"
 	// ContestServiceSyncContestTasksProcedure is the fully-qualified name of the ContestService's
 	// SyncContestTasks RPC.
 	ContestServiceSyncContestTasksProcedure = "/backend.v1.ContestService/SyncContestTasks"
@@ -97,6 +100,8 @@ type ContestServiceClient interface {
 	ListContestTasks(context.Context, *connect.Request[v1.ListContestTasksRequest]) (*connect.Response[v1.ListContestTasksResponse], error)
 	// コンテストに紐づく問題を取得する
 	GetContestTask(context.Context, *connect.Request[v1.GetContestTaskRequest]) (*connect.Response[v1.GetContestTaskResponse], error)
+	// コンテストに紐づく問題の入出力例を取得する
+	GetSamples(context.Context, *connect.Request[v1.GetSamplesRequest]) (*connect.Response[v1.GetSamplesResponse], error)
 	// 問題をコンテストに紐づかせる
 	SyncContestTasks(context.Context, *connect.Request[v1.SyncContestTasksRequest]) (*connect.Response[v1.SyncContestTasksResponse], error)
 	// 自分の問題ごとの結果情報を取得する
@@ -157,6 +162,11 @@ func NewContestServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 		getContestTask: connect.NewClient[v1.GetContestTaskRequest, v1.GetContestTaskResponse](
 			httpClient,
 			baseURL+ContestServiceGetContestTaskProcedure,
+			opts...,
+		),
+		getSamples: connect.NewClient[v1.GetSamplesRequest, v1.GetSamplesResponse](
+			httpClient,
+			baseURL+ContestServiceGetSamplesProcedure,
 			opts...,
 		),
 		syncContestTasks: connect.NewClient[v1.SyncContestTasksRequest, v1.SyncContestTasksResponse](
@@ -220,6 +230,7 @@ type contestServiceClient struct {
 	listContests            *connect.Client[v1.ListContestsRequest, v1.ListContestsResponse]
 	listContestTasks        *connect.Client[v1.ListContestTasksRequest, v1.ListContestTasksResponse]
 	getContestTask          *connect.Client[v1.GetContestTaskRequest, v1.GetContestTaskResponse]
+	getSamples              *connect.Client[v1.GetSamplesRequest, v1.GetSamplesResponse]
 	syncContestTasks        *connect.Client[v1.SyncContestTasksRequest, v1.SyncContestTasksResponse]
 	getMySubmissionStatuses *connect.Client[v1.GetMySubmissionStatusesRequest, v1.GetMySubmissionStatusesResponse]
 	getStandings            *connect.Client[v1.GetStandingsRequest, v1.GetStandingsResponse]
@@ -260,6 +271,11 @@ func (c *contestServiceClient) ListContestTasks(ctx context.Context, req *connec
 // GetContestTask calls backend.v1.ContestService.GetContestTask.
 func (c *contestServiceClient) GetContestTask(ctx context.Context, req *connect.Request[v1.GetContestTaskRequest]) (*connect.Response[v1.GetContestTaskResponse], error) {
 	return c.getContestTask.CallUnary(ctx, req)
+}
+
+// GetSamples calls backend.v1.ContestService.GetSamples.
+func (c *contestServiceClient) GetSamples(ctx context.Context, req *connect.Request[v1.GetSamplesRequest]) (*connect.Response[v1.GetSamplesResponse], error) {
+	return c.getSamples.CallUnary(ctx, req)
 }
 
 // SyncContestTasks calls backend.v1.ContestService.SyncContestTasks.
@@ -326,6 +342,8 @@ type ContestServiceHandler interface {
 	ListContestTasks(context.Context, *connect.Request[v1.ListContestTasksRequest]) (*connect.Response[v1.ListContestTasksResponse], error)
 	// コンテストに紐づく問題を取得する
 	GetContestTask(context.Context, *connect.Request[v1.GetContestTaskRequest]) (*connect.Response[v1.GetContestTaskResponse], error)
+	// コンテストに紐づく問題の入出力例を取得する
+	GetSamples(context.Context, *connect.Request[v1.GetSamplesRequest]) (*connect.Response[v1.GetSamplesResponse], error)
 	// 問題をコンテストに紐づかせる
 	SyncContestTasks(context.Context, *connect.Request[v1.SyncContestTasksRequest]) (*connect.Response[v1.SyncContestTasksResponse], error)
 	// 自分の問題ごとの結果情報を取得する
@@ -382,6 +400,11 @@ func NewContestServiceHandler(svc ContestServiceHandler, opts ...connect.Handler
 	contestServiceGetContestTaskHandler := connect.NewUnaryHandler(
 		ContestServiceGetContestTaskProcedure,
 		svc.GetContestTask,
+		opts...,
+	)
+	contestServiceGetSamplesHandler := connect.NewUnaryHandler(
+		ContestServiceGetSamplesProcedure,
+		svc.GetSamples,
 		opts...,
 	)
 	contestServiceSyncContestTasksHandler := connect.NewUnaryHandler(
@@ -448,6 +471,8 @@ func NewContestServiceHandler(svc ContestServiceHandler, opts ...connect.Handler
 			contestServiceListContestTasksHandler.ServeHTTP(w, r)
 		case ContestServiceGetContestTaskProcedure:
 			contestServiceGetContestTaskHandler.ServeHTTP(w, r)
+		case ContestServiceGetSamplesProcedure:
+			contestServiceGetSamplesHandler.ServeHTTP(w, r)
 		case ContestServiceSyncContestTasksProcedure:
 			contestServiceSyncContestTasksHandler.ServeHTTP(w, r)
 		case ContestServiceGetMySubmissionStatusesProcedure:
@@ -499,6 +524,10 @@ func (UnimplementedContestServiceHandler) ListContestTasks(context.Context, *con
 
 func (UnimplementedContestServiceHandler) GetContestTask(context.Context, *connect.Request[v1.GetContestTaskRequest]) (*connect.Response[v1.GetContestTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("backend.v1.ContestService.GetContestTask is not implemented"))
+}
+
+func (UnimplementedContestServiceHandler) GetSamples(context.Context, *connect.Request[v1.GetSamplesRequest]) (*connect.Response[v1.GetSamplesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("backend.v1.ContestService.GetSamples is not implemented"))
 }
 
 func (UnimplementedContestServiceHandler) SyncContestTasks(context.Context, *connect.Request[v1.SyncContestTasksRequest]) (*connect.Response[v1.SyncContestTasksResponse], error) {
