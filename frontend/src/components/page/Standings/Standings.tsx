@@ -1,5 +1,5 @@
 import { Link } from "@/src/components/ui/Link";
-import { calcNthTaskSeq, useGetContest, useRouterContestSlug, useStandings } from "@/src/usecases/contest";
+import { useGetContest, useRouterContestSlug, useStandings, useTaskSeqCodes } from "@/src/usecases/contest";
 import { Duration } from "@/src/util/time";
 import {
   Box,
@@ -91,7 +91,9 @@ export const Standings = () => {
   const contestSlug = useRouterContestSlug();
 
   const { standingsList, error, isLoading } = useStandings({ contestSlug });
-  const tasks = standingsList?.length ? standingsList[0].taskDetailList : [];
+  const tasks = standingsList?.length ? standingsList[0]!.taskDetailList : [];
+
+  const seqCodes = useTaskSeqCodes(tasks.length);
 
   const { contest, error: cError, isLoading: cIsLoading } = useGetContest({ slug: contestSlug });
   // REVIEW: コンテスト終了間際にページを開いてコンテスト終了後リロードせずに true に変わってほしいができてるか？
@@ -132,10 +134,10 @@ export const Standings = () => {
                       <Th key="th-rank" textAlign="center">順位</Th>
                       <Th key="th-user" textAlign="center">ユーザ</Th>
                       <Th key="th-totalscore" textAlign="center">得点</Th>
-                      {tasks.map((_task, seq, allTask) => (
-                        <Th key={seq} textAlign="center">
-                          <Link href={`/contests/${contestSlug}/tasks/${seq}`}>
-                            {calcNthTaskSeq(seq, allTask.length)}
+                      {tasks.map((_task, i) => (
+                        <Th key={i} textAlign="center">
+                          <Link href={`/contests/${contestSlug}/tasks/${i + 1}`}>
+                            {seqCodes[i]}
                           </Link>
                         </Th>
                       ))}

@@ -2,6 +2,7 @@ import {
   getJudgeProgress,
   getSubmissionDetail,
   listSubmissions,
+  submit,
 } from "@/src/gen/proto/backend/v1/judge_service-JudgeService_connectquery";
 import {
   GetJudgeProgressRequest,
@@ -10,7 +11,7 @@ import {
 } from "@/src/gen/proto/backend/v1/judge_service_pb";
 import { JudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { PlainMessage } from "@bufbuild/protobuf";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Duration } from "../util/time";
 
@@ -18,6 +19,11 @@ export const useGetSubmissionDetail = (input?: PlainMessage<GetSubmissionDetailR
   const { data, error, isLoading } = useQuery(getSubmissionDetail.useQuery(input));
   const submissionDetail = data?.submissionDetail;
   return { submissionDetail, error, isLoading };
+};
+
+export const useSubmit = () => {
+  const { mutate, data, error, isLoading } = useMutation(submit.useMutation());
+  return { mutate, data, error, isLoading };
 };
 
 export const useListSubmissions = (input?: PlainMessage<ListSubmissionsRequest>) => {

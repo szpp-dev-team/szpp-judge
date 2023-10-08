@@ -1,3 +1,5 @@
+import { JudgeStatus as PbJudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
+
 export type JudgeTestcaseProgress = {
   done: number;
   total: number;
@@ -18,6 +20,9 @@ export const JudgeStatusValues = [
 export type JudgeStatus = (typeof JudgeStatusValues)[number];
 
 export const JudgeStatus = {
+  fromPb(s: PbJudgeStatus): JudgeStatus {
+    return PbJudgeStatus[s].toString() as JudgeStatus;
+  },
   toJapanese(s: JudgeStatus): string {
     return judgeStatusJaDict[s];
   },

@@ -71,6 +71,9 @@ const reqCountMap = new Map<number, number>();
 const fixedResultMap = new Map<number, PlainMessage<JudgeProgress>>();
 
 export const judgeHandlers: RequestHandler[] = [
+  connectMock(JudgeService, "submit", async (ctx, res, _, encodeResp) => {
+    return res(ctx.delay(500), encodeResp({ submissionId: 1 }));
+  }),
   connectMock(JudgeService, "getSubmissionDetail", async (ctx, res, decodeReq, encodeResp) => {
     const { id } = await decodeReq();
 
