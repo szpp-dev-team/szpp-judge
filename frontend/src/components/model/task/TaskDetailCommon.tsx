@@ -10,6 +10,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { DifficultyBadge } from "../../model/task/DifficultyBadge";
 import { TestcaseView } from "./TestcaseView";
+import { MAX_SOURCE_CODE_SIZE } from "@/src/config/submission";
 
 export type TaskDetailCommonProps = {
   task: Task;
@@ -124,7 +125,7 @@ export const TaskDetailCommon = ({
         </Box>
       ))}
 
-      <h2 className={taskDetailStyle.h2}>提出</h2>
+      <h2 className={taskDetailStyle.h2}>解答プログラム</h2>
       <Text mt={2}>ソースコード長の上限は {MAX_SOURCE_CODE_SIZE >> 10} KiB です。</Text>
       <form>
         <SubmissionEditor
