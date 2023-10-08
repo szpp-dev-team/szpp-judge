@@ -46,7 +46,7 @@ message SubmissionSummary {
   // submission
   string lang_id = 8;
   // judge
-  optional judge.v1.JudgeStatus judge_status = 9; // ジャッジ中はnull
+  judge.v1.JudgeStatus status = 9; // ジャッジ中は judge.v1.JudgeStatus.WJ
   optional uint32 exec_time_ms = 10; // ジャッジ中はnull
   optional uint32 exec_memory_kib = 11; // ジャッジ中はnull
   // timestamp
