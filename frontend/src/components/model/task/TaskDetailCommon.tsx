@@ -47,9 +47,9 @@ export const TaskDetailCommon = ({
       return;
     }
 
-    if (sourceCode.length > 512 * 1024) {
+    if (sourceCode.length > MAX_SOURCE_CODE_SIZE) {
       toast({
-        title: "ソースコード長の上限は512KiBです。",
+        title: `ソースコード長の上限は ${MAX_SOURCE_CODE_SIZE} KiBです。`,
         description: `あなたのソースコードの長さ: ${sourceCode.length} Byte (${sourceCode.length >> 10} KiB)`,
         status: "error",
         duration: 5000,
@@ -125,7 +125,7 @@ export const TaskDetailCommon = ({
       ))}
 
       <h2 className={taskDetailStyle.h2}>提出</h2>
-      <Text mt={2}>ソースコード長の上限は 512 KiB です。</Text>
+      <Text mt={2}>ソースコード長の上限は {MAX_SOURCE_CODE_SIZE >> 10} KiB です。</Text>
       <form>
         <SubmissionEditor
           sourceCode={sourceCode}
