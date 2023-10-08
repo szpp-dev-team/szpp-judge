@@ -6,7 +6,7 @@ const TimerComponent = (props: { expiryTimestamp: Date, timerHeader: string}) =>
   const onExpire = () => window.location.reload();
   const timer = useTimer({ expiryTimestamp: props.expiryTimestamp, onExpire });
   // leading zero を追加する処理
-  let seq = [
+  const seq = [
     timer.days.toLocaleString(),
     timer.hours.toLocaleString(),
     timer.minutes.toLocaleString(),
@@ -29,11 +29,11 @@ export const ContestTop = () => {
   const now = new Date();
   let isUpcomingOrRunning = false;
   let timerHeader = "";
-  if (contest?.startAt != undefined && now < contest.startAt.toDate()) {
+  if (contest?.startAt && now < contest.startAt.toDate()) {
     expiryTimestamp = contest.startAt.toDate();
     isUpcomingOrRunning = true;
     timerHeader = "開始まで ";
-  } else if (contest?.endAt != undefined && now <= contest.endAt.toDate()) {
+  } else if (contest?.endAt && now <= contest.endAt.toDate()) {
     expiryTimestamp = contest.endAt.toDate();
     isUpcomingOrRunning = true;
     timerHeader = "終了まで ";
