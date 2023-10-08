@@ -93,6 +93,6 @@ export const useGetMySubmissionStatuses = (input?: PlainMessage<GetMySubmissionS
 };
 
 export const useRegisterMe = () => {
-    const { error, isLoading, mutate } = useMutation(registerMe.useMutation());
-    return { error, isLoading, mutate };
+  const { error, isLoading, mutate } = useMutation(registerMe.useMutation());
+  return { error, isLoading, mutate };
 };

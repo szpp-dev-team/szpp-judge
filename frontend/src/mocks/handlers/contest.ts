@@ -221,7 +221,7 @@ export const contestHandlers: RequestHandler[] = [
   connectMock(ContestService, "registerMe", async (ctx, res) => {
     return res(
       ctx.delay(500),
-      ctx.status(200)
+      ctx.status(200),
     );
-  })
+  }),
 ];

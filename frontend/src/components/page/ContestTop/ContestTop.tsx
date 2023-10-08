@@ -2,7 +2,7 @@ import { useGetContest, useRegisterMe, useRouterContestSlug } from "@/src/usecas
 import { Box, Button, Card, CardBody, CardHeader, Heading, useToast } from "@chakra-ui/react";
 import { useTimer } from "react-timer-hook";
 
-const TimerComponent = (props: { expiryTimestamp: Date, timerHeader: string}) => {
+const TimerComponent = (props: { expiryTimestamp: Date; timerHeader: string }) => {
   const onExpire = () => window.location.reload();
   const timer = useTimer({ expiryTimestamp: props.expiryTimestamp, onExpire });
   // leading zero を追加する処理
@@ -15,10 +15,12 @@ const TimerComponent = (props: { expiryTimestamp: Date, timerHeader: string}) =>
   for (let i = 0; i < 4; i++) {
     if (seq[i].length == 1) seq[i] = "0" + seq[i];
   }
-  return <span>
-    {props.timerHeader + seq[0] + ":" + seq[1] + ":" + seq[2] + ":" + seq[3]}
-  </span>
-}
+  return (
+    <span>
+      {props.timerHeader + seq[0] + ":" + seq[1] + ":" + seq[2] + ":" + seq[3]}
+    </span>
+  );
+};
 
 export const ContestTop = () => {
   const slug = useRouterContestSlug();
@@ -42,14 +44,16 @@ export const ContestTop = () => {
   }
 
   const { isLoading, mutate } = useRegisterMe();
-  const toast = useToast({position: "bottom"});
+  const toast = useToast({ position: "bottom" });
   const handleClick = () => {
     console.info("button clicked");
     mutate(
-      {contestSlug:slug},
-      {onSuccess: () => {
-        toast({title: "参加登録しました", status: "success"});
-      }}
+      { contestSlug: slug },
+      {
+        onSuccess: () => {
+          toast({ title: "参加登録しました", status: "success" });
+        },
+      },
     );
   };
 
@@ -60,16 +64,17 @@ export const ContestTop = () => {
           <Heading as="h1" mb={4}>{contest?.name}</Heading>
           <p>開催期間: {contest?.startAt?.toDate().toLocaleString()} - {contest?.endAt?.toDate().toLocaleString()}</p>
           {contest && isUpcomingOrRunning
-            ? <div>
+            ? (
+              <div>
                 <Button colorScheme="teal" onClick={handleClick} isLoading={isLoading} margin={4}>
                   参加登録
                 </Button>
                 <p>
-                  <TimerComponent expiryTimestamp={expiryTimestamp} timerHeader={timerHeader}/>
+                  <TimerComponent expiryTimestamp={expiryTimestamp} timerHeader={timerHeader} />
                 </p>
               </div>
-            : <></>
-          }
+            )
+            : <></>}
         </CardHeader>
         <CardBody>{contest?.description}</CardBody>
       </Card>
