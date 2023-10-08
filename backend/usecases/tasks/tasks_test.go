@@ -7,7 +7,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -49,7 +49,7 @@ func Test_CreateTask(t *testing.T) {
 
 			ctx := context.Background()
 			user := fixture.CreateUser(t, entClient, "hofds", "ADMIN")
-			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
+			ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: user.Username})
 
 			if test.modify != nil {
 				ctx = test.modify(ctx, req)
@@ -105,7 +105,7 @@ func Test_UpdateTask(t *testing.T) {
 
 			ctx := context.Background()
 			user := fixture.CreateUser(t, entClient, "hoge", "ADMIN")
-			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
+			ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: user.Username})
 
 			if test.modify != nil {
 				test.modify(req)
@@ -380,7 +380,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 		"permission denied": {
 			modify: func(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) context.Context {
 				user := fixture.CreateUser(t, entClient, "fuga", "ADMIN")
-				return intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
+				return interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: user.Username})
 			},
 			wantErr: true,
 		},
@@ -392,7 +392,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 
 			ctx := context.Background()
 			user := fixture.CreateUser(t, entClient, name, "ADMIN")
-			ctx = intercepter.SetClaimsToContext(ctx, &intercepter.Claims{Username: user.Username})
+			ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: user.Username})
 
 			task := fixture.CreateTask(t, entClient, "a", ent_task.JudgeTypeNormal, int(user.ID), nil)
 

@@ -13,6 +13,8 @@ const (
 	FieldID = "id"
 	// FieldToken holds the string denoting the token field in the database.
 	FieldToken = "token"
+	// FieldUsername holds the string denoting the username field in the database.
+	FieldUsername = "username"
 	// FieldExpiresAt holds the string denoting the expires_at field in the database.
 	FieldExpiresAt = "expires_at"
 	// FieldIsDead holds the string denoting the is_dead field in the database.
@@ -25,6 +27,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldToken,
+	FieldUsername,
 	FieldExpiresAt,
 	FieldIsDead,
 }
@@ -50,6 +53,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByToken orders the results by the token field.
 func ByToken(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldToken, opts...).ToFunc()
+}
+
+// ByUsername orders the results by the username field.
+func ByUsername(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUsername, opts...).ToFunc()
 }
 
 // ByExpiresAt orders the results by the expires_at field.

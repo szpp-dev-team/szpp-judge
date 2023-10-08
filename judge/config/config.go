@@ -3,8 +3,9 @@ package config
 import "github.com/kelseyhightower/envconfig"
 
 type Config struct {
-	GrpcPort string `envconfig:"JUDGE_GRPC_PORT" default:"50052"`
-	ModeDev  bool   `envconfig:"MODE_DEV" default:"true"`
+	GrpcPort    string `envconfig:"JUDGE_GRPC_PORT" default:"50052"`
+	ModeDev     bool   `envconfig:"MODE_DEV" default:"true"`
+	WorkdirRoot string `envconfig:"WORKDIR_ROOT" require:"true"`
 }
 
 func New() (*Config, error) {

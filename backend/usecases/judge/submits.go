@@ -2,11 +2,13 @@ package judge
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
+	"connectrpc.com/connect"
 	"github.com/samber/lo"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
@@ -19,8 +21,6 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -28,18 +28,18 @@ func (i *Interactor) PostSubmit(ctx context.Context, req *backendv1.SubmitReques
 	task, err := i.entClient.Task.Query().WithTestcases().Where(ent_task.ID(int(req.TaskId))).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the task was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the task was not found"))
 		}
 		i.logger.Error("failed to get the task", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	langID, err := i.entClient.Language.Query().Where(ent_language.SlugEQ(req.LangId)).OnlyID(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the task was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the task was not found"))
 		}
 		i.logger.Error("failed to get the language", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	var submit *ent.Submit
@@ -53,22 +53,22 @@ func (i *Interactor) PostSubmit(ctx context.Context, req *backendv1.SubmitReques
 			Save(ctx)
 		if err != nil {
 			i.logger.Error("failed to get create a submit", slog.Any("error", err))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 
 		if err := i.sourcesRepo.UploadSource(ctx, submit.ID, []byte(req.SourceCode)); err != nil {
 			i.logger.Error("failed to upload source code to the storage", slog.Any("error", err))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 
 		req, err := buildJudgeRequest(submit.ID, req.LangId, task)
 		if err != nil {
 			i.logger.Error("[CRETICAL ERROR] inconsistency was found through building JudgeRequest", slog.Any("error", err), slog.Int("taskID", task.ID))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 		if err := i.judgeQueue.Push(ctx, submit.ID, req); err != nil {
 			i.logger.Error("failed to push a judge task to the queue", slog.Any("error", err))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 		return nil
 	}); err != nil {
@@ -93,15 +93,15 @@ func (i *Interactor) GetSubmissionDetail(ctx context.Context, req *backendv1.Get
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the submission was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the submission was not found"))
 		}
 		i.logger.Error("failed to get the submission", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	source, err := i.sourcesRepo.DownloadSource(ctx, submit.ID)
 	if err != nil {
 		i.logger.Error("failed to download source code from the storage", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	var submissionDetail *backendv1.SubmissionDetail
@@ -151,12 +151,12 @@ func (i *Interactor) GetSubmissionDetail(ctx context.Context, req *backendv1.Get
 func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSubmissionsRequest) (*backendv1.ListSubmissionsResponse, error) {
 	now := timejst.Now()
 
-	claims := intercepter.GetClaimsFromContext(ctx)
+	claims := interceptor.GetClaimsFromContext(ctx)
 	isAdmin := false
 	if claims != nil {
 		user, err := i.entClient.User.Query().Where(ent_user.Username(claims.Username)).Only(ctx)
 		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 		isAdmin = user.Role == backendv1.Role_ADMIN.String()
 	}
@@ -169,10 +169,10 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "the contest was not found")
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
 		}
 		i.logger.Error("failed to get the contest", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	// admin もしくはコンテスト終了後は全ての提出の閲覧が可能
 	if isAdmin || now.After(contest.EndAt) {
@@ -184,7 +184,7 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 	}
 	// コンテスト開始前は permissionDenied として扱う
 	if now.Before(contest.StartAt) {
-		return nil, status.Error(codes.PermissionDenied, "contest is not held")
+		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("contest is not held"))
 	}
 
 	// 未ログインの場合は空を返す

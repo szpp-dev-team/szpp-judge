@@ -8,7 +8,7 @@ import (
 func TestLangIDShouldBeUnique(t *testing.T) {
 	ids := map[LangID]struct{}{}
 
-	for _, m := range langMetas {
+	for _, m := range LangMetas {
 		if _, used := ids[m.ID]; used {
 			t.Fatalf("Dupulicated LangID: %q", m.ID)
 		}
@@ -19,7 +19,7 @@ func TestLangIDShouldBeUnique(t *testing.T) {
 func TestLangNameShouldBeUnique(t *testing.T) {
 	ids := map[string]struct{}{}
 
-	for _, m := range langMetas {
+	for _, m := range LangMetas {
 		if _, used := ids[m.Name]; used {
 			t.Fatalf("Dupulicated Name: %q", m.Name)
 		}
@@ -28,7 +28,7 @@ func TestLangNameShouldBeUnique(t *testing.T) {
 }
 
 func TestLangIDFormat(t *testing.T) {
-	for _, m := range langMetas {
+	for _, m := range LangMetas {
 		if strings.Count(string(m.ID), "/") != 2 {
 			t.Fatalf("Format of LangID must be '{languageName}/{version}/{implementation}', but got %q", m.ID)
 		}
@@ -36,7 +36,7 @@ func TestLangIDFormat(t *testing.T) {
 }
 
 func TestDockerImageName(t *testing.T) {
-	for _, m := range langMetas {
+	for _, m := range LangMetas {
 		if !strings.HasPrefix(string(m.DockerImage), ImagePrefix) {
 			t.Fatalf("DockerImage of %s must have prefix %q", m.ID, ImagePrefix)
 		}
@@ -57,7 +57,7 @@ func TestNonEmptyField(t *testing.T) {
 		}
 	}
 
-	for _, m := range langMetas {
+	for _, m := range LangMetas {
 		checkStringField(t, m.ID, string(m.ID), "ID")
 		checkStringField(t, m.ID, string(m.Name), "Name")
 		checkStringField(t, m.ID, string(m.DockerImage), "DockerImage")

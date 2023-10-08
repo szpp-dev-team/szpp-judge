@@ -23,6 +23,15 @@ lint:
 	go vet ./...
 
 
+.PHONY:	gen
+gen: lint test __gen
+
+
+.PHONY:	__gen
+__gen:
+	go run ./cmd/gen-ts/main.go -out ../frontend/src/gen/langs.ts
+
+
 .PHONY:	docker/build/szpprun
 docker/build/szpprun:
 	./build-image.sh _docker/_szpprun

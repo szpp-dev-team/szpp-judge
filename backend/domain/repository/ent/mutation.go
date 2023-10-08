@@ -2906,6 +2906,7 @@ type RefreshTokenMutation struct {
 	typ           string
 	id            *int
 	token         *string
+	username      *string
 	expires_at    *time.Time
 	is_dead       *bool
 	clearedFields map[string]struct{}
@@ -3048,6 +3049,42 @@ func (m *RefreshTokenMutation) ResetToken() {
 	m.token = nil
 }
 
+// SetUsername sets the "username" field.
+func (m *RefreshTokenMutation) SetUsername(s string) {
+	m.username = &s
+}
+
+// Username returns the value of the "username" field in the mutation.
+func (m *RefreshTokenMutation) Username() (r string, exists bool) {
+	v := m.username
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUsername returns the old "username" field's value of the RefreshToken entity.
+// If the RefreshToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RefreshTokenMutation) OldUsername(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUsername is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUsername requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUsername: %w", err)
+	}
+	return oldValue.Username, nil
+}
+
+// ResetUsername resets all changes to the "username" field.
+func (m *RefreshTokenMutation) ResetUsername() {
+	m.username = nil
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (m *RefreshTokenMutation) SetExpiresAt(t time.Time) {
 	m.expires_at = &t
@@ -3154,9 +3191,12 @@ func (m *RefreshTokenMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RefreshTokenMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.token != nil {
 		fields = append(fields, refreshtoken.FieldToken)
+	}
+	if m.username != nil {
+		fields = append(fields, refreshtoken.FieldUsername)
 	}
 	if m.expires_at != nil {
 		fields = append(fields, refreshtoken.FieldExpiresAt)
@@ -3174,6 +3214,8 @@ func (m *RefreshTokenMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case refreshtoken.FieldToken:
 		return m.Token()
+	case refreshtoken.FieldUsername:
+		return m.Username()
 	case refreshtoken.FieldExpiresAt:
 		return m.ExpiresAt()
 	case refreshtoken.FieldIsDead:
@@ -3189,6 +3231,8 @@ func (m *RefreshTokenMutation) OldField(ctx context.Context, name string) (ent.V
 	switch name {
 	case refreshtoken.FieldToken:
 		return m.OldToken(ctx)
+	case refreshtoken.FieldUsername:
+		return m.OldUsername(ctx)
 	case refreshtoken.FieldExpiresAt:
 		return m.OldExpiresAt(ctx)
 	case refreshtoken.FieldIsDead:
@@ -3208,6 +3252,13 @@ func (m *RefreshTokenMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetToken(v)
+		return nil
+	case refreshtoken.FieldUsername:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUsername(v)
 		return nil
 	case refreshtoken.FieldExpiresAt:
 		v, ok := value.(time.Time)
@@ -3274,6 +3325,9 @@ func (m *RefreshTokenMutation) ResetField(name string) error {
 	switch name {
 	case refreshtoken.FieldToken:
 		m.ResetToken()
+		return nil
+	case refreshtoken.FieldUsername:
+		m.ResetUsername()
 		return nil
 	case refreshtoken.FieldExpiresAt:
 		m.ResetExpiresAt()

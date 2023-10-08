@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log/slog"
 
+	"connectrpc.com/connect"
 	"github.com/samber/lo"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server/intercepter"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
@@ -17,8 +18,6 @@ import (
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -34,14 +33,14 @@ func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repositor
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
-	claims := intercepter.GetClaimsFromContext(ctx)
+	claims := interceptor.GetClaimsFromContext(ctx)
 
 	var task *ent.Task
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
 		userID, err := tx.User.Query().Where(ent_user.Username(claims.Username)).OnlyID(ctx)
 		if err != nil {
 			i.logger.Error("[!!!inconsistency!!!] failed to get user", slog.Any("error", err), slog.String("username", claims.Username))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 
 		q := tx.Task.Create().
@@ -75,7 +74,7 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 		return nil
 	}); err != nil {
 		i.logger.Error("failed to register task information", slog.Any("error", err))
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	i.logger.Info("succeeded to register task information", slog.Int("task_id", task.ID))
@@ -89,9 +88,9 @@ func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest)
 	task, err := i.entClient.Task.Get(ctx, int(req.TaskId))
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("the task(id: %d) is not found", req.TaskId))
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	return &backendv1.GetTaskResponse{
@@ -100,20 +99,20 @@ func (i *Interactor) GetTask(ctx context.Context, req *backendv1.GetTaskRequest)
 }
 
 func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRequest) (*backendv1.UpdateTaskResponse, error) {
-	claims := intercepter.GetClaimsFromContext(ctx)
+	claims := interceptor.GetClaimsFromContext(ctx)
 
 	var task *ent.Task
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) (err error) {
 		task, err = tx.Task.Query().WithUser().Where(ent_task.ID(int(req.TaskId))).Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
-				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+				return connect.NewError(connect.CodeNotFound, fmt.Errorf("the task(id: %d) is not found", req.TaskId))
 			}
 			i.logger.Error("failed to get task", slog.Any("error", err), slog.Int("task_id", int(req.TaskId)))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 		if claims.Username != task.Edges.User.Username {
-			return status.Errorf(codes.PermissionDenied, "the task(id: %d) is not yours", req.TaskId)
+			return connect.NewError(connect.CodePermissionDenied, fmt.Errorf("the task(id: %d) is not yours", req.TaskId))
 		}
 
 		q := tx.Task.UpdateOneID(int(req.TaskId)).
@@ -142,9 +141,9 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 		task, err = q.Save(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
-				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+				return connect.NewError(connect.CodeNotFound, fmt.Errorf("the task(id: %d) is not found", req.TaskId))
 			}
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 
 		return nil
@@ -165,7 +164,7 @@ func (i *Interactor) GetTestcaseSets(ctx context.Context, req *backendv1.GetTest
 		Where(ent_testcaseset.HasTaskWith(ent_task.ID(int(req.TaskId)))).
 		All(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	testcaseByName := make(map[string]*backendv1.Testcase)
@@ -177,7 +176,7 @@ func (i *Interactor) GetTestcaseSets(ctx context.Context, req *backendv1.GetTest
 			testcase, err := i.testcasesRepo.DownloadTestcase(ctx, int(req.TaskId), t.Name)
 			if err != nil {
 				i.logger.Error("failed to download testcase", slog.Int("task_id", int(req.TaskId)), slog.String("testcase_name", t.Name))
-				return nil, status.Error(codes.Internal, err.Error())
+				return nil, connect.NewError(connect.CodeInternal, err)
 			}
 			testcaseByName[t.Name] = toPbTestcase(t, testcase.In, testcase.Out)
 		}
@@ -195,7 +194,7 @@ func (i *Interactor) GetTestcaseSets(ctx context.Context, req *backendv1.GetTest
 }
 
 func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTestcaseSetsRequest) (*backendv1.SyncTestcaseSetsResponse, error) {
-	claims := intercepter.GetClaimsFromContext(ctx)
+	claims := interceptor.GetClaimsFromContext(ctx)
 
 	var (
 		testcaseSets []*ent.TestcaseSet
@@ -205,13 +204,13 @@ func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTe
 		task, err := tx.Task.Query().WithUser().Where(ent_task.ID(int(req.TaskId))).Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
-				return status.Errorf(codes.NotFound, "the task(id: %d) is not found", req.TaskId)
+				return connect.NewError(connect.CodeNotFound, fmt.Errorf("the task(id: %d) is not found", req.TaskId))
 			}
 			i.logger.Error("failed to get task", slog.Any("error", err), slog.Int("task_id", int(req.TaskId)))
-			return status.Error(codes.Internal, err.Error())
+			return connect.NewError(connect.CodeInternal, err)
 		}
 		if claims.Username != task.Edges.User.Username {
-			return status.Errorf(codes.PermissionDenied, "the task(id: %d) is not yours", req.TaskId)
+			return connect.NewError(connect.CodePermissionDenied, fmt.Errorf("the task(id: %d) is not yours", req.TaskId))
 		}
 
 		// Testcase
@@ -230,7 +229,7 @@ func (i *Interactor) SyncTestcaseSets(ctx context.Context, req *backendv1.SyncTe
 
 		return nil
 	}); err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	for _, testcase := range req.Testcases {

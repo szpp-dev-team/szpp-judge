@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"log/slog"
-	"net"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,9 +13,11 @@ import (
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/storage"
 	"github.com/go-sql-driver/mysql"
-	"github.com/szpp-dev-team/szpp-judge/backend/api/grpc_server"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"google.golang.org/grpc"
@@ -66,6 +68,8 @@ func main() {
 	}
 	defer storageClient.Close()
 	testcasesRepository := testcases.NewRepository(storageClient)
+	sourcesRepository := sources.NewRepository(storageClient)
+	judgeQueue := judge_queue.New(cloudtasksClient, config.CloudTasksProjectID, config.CloudTasksLocationID, config.CloudTasksQueueID)
 	conn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
@@ -76,22 +80,21 @@ func main() {
 	// logger
 	logger := slog.Default()
 
-	srv := grpc_server.New(
-		grpc_server.WithLogger(logger),
-		grpc_server.WithEntClient(entClient),
-		grpc_server.WithReflection(config.ModeDev),
-		grpc_server.WithCloudtasksClient(cloudtasksClient),
-		grpc_server.WithTestcasesRepository(testcasesRepository),
-		grpc_server.WithJudgeClient(judgeClient),
+	srv := connect_server.New(
+		fmt.Sprintf("0.0.0.0:%s", config.ConnectPort),
+		connect_server.WithLogger(logger),
+		connect_server.WithEntClient(entClient),
+		connect_server.WithSourcesRepository(sourcesRepository),
+		connect_server.WithTestcasesRepository(testcasesRepository),
+		connect_server.WithJudgeQueue(judgeQueue),
+		connect_server.WithJudgeClient(judgeClient),
+		connect_server.WithSecret(config.JWTSecret),
+		connect_server.WithFrontendURL(config.FrontendURL),
 	)
-	lsnr, err := net.Listen("tcp", "0.0.0.0:"+config.GrpcPort)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer lsnr.Close()
+
 	go func() {
-		logger.Info("server launched", slog.String("port", config.GrpcPort))
-		if err := srv.Serve(lsnr); err != nil {
+		logger.Info("server launched", slog.String("port", config.ConnectPort))
+		if err := srv.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}
 	}()
@@ -99,5 +102,9 @@ func main() {
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	<-sigCh
 	logger.Info("server is being stopped")
-	srv.GracefulStop()
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		log.Fatal(err)
+	}
 }
