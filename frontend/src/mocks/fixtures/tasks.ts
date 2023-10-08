@@ -1,4 +1,4 @@
-import { Difficulty, Task, Testcase } from "@/src/gen/proto/backend/v1/task_resources_pb";
+import { Difficulty, Task } from "@/src/gen/proto/backend/v1/task_resources_pb";
 import type { PlainMessage } from "@bufbuild/protobuf";
 import { DUMMY_TASK1_STATEMENT } from "../fixtures/task1-statement";
 import { DUMMY_TASK2_STATEMENT } from "../fixtures/task2-statement";
