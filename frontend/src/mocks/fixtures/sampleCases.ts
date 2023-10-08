@@ -25,7 +25,7 @@ export const dummySampleCases: Readonly<PlainMessage<Testcase>[]> = [
     description: String.raw`横長テストです。`,
   },
   {
-    id: 2,
+    id: 3,
     slug: "sample_2",
     taskId: 1,
     input: `
