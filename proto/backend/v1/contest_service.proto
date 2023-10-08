@@ -86,6 +86,7 @@ message GetContestTaskRequest {
 
 message GetContestTaskResponse {
   Task task = 1;
+  repeated Testcase samples = 2;
 }
 
 message SyncContestTasksRequest {
@@ -111,7 +112,7 @@ message GetMySubmissionStatusesResponse {
 }
 
 message GetStandingsRequest {
-  int32 contest_id = 1;
+  string contest_slug = 1;
 }
 
 message GetStandingsResponse {

@@ -12,6 +12,7 @@ import (
 
 type Claims struct {
 	Username string `json:"username"`
+	UserID   int    `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
@@ -46,7 +47,7 @@ func Auth(secret []byte) connect.UnaryInterceptorFunc {
 			}
 
 			accessToken := req.Header().Get("Authorization")
-			claims, err := GetClaimsFromToken(strings.TrimPrefix(accessToken, "Bearer"), secret)
+			claims, err := GetClaimsFromToken(strings.TrimPrefix(accessToken, "Bearer "), secret)
 			if err != nil {
 				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("failed to parse jwt"))
 			}

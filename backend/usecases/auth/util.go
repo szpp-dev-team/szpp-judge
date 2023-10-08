@@ -7,27 +7,23 @@ import (
 	"connectrpc.com/connect"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	enttoken "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 )
-
-type Claims struct {
-	Username string `json:"username"`
-	jwt.RegisteredClaims
-}
 
 type Tokens struct {
 	AccessToken  string
 	RefreshToken string
 }
 
-func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, username string) (Tokens, error) {
-	accessToken, err := generateAccessToken(secret, username)
+func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, user *ent.User) (Tokens, error) {
+	accessToken, err := generateAccessToken(secret, user)
 	if err != nil {
 		return Tokens{}, connect.NewError(connect.CodeInternal, err)
 	}
-	refreshToken, err := generateRefreshToken(ctx, entClient, username)
+	refreshToken, err := generateRefreshToken(ctx, entClient, user)
 	if err != nil {
 		return Tokens{}, connect.NewError(connect.CodeInternal, err)
 	}
@@ -38,9 +34,10 @@ func GenerateTokens(ctx context.Context, entClient *ent.Client, secret []byte, u
 	}, nil
 }
 
-func generateAccessToken(secret []byte, username string) (string, error) {
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
-		Username: username,
+func generateAccessToken(secret []byte, user *ent.User) (string, error) {
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, interceptor.Claims{
+		Username: user.Username,
+		UserID:   user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(timejst.Now().Add(time.Hour)),
 		},
@@ -48,16 +45,16 @@ func generateAccessToken(secret []byte, username string) (string, error) {
 	return accessToken.SignedString(secret)
 }
 
-func generateRefreshToken(ctx context.Context, entClient *ent.Client, username string) (string, error) {
+func generateRefreshToken(ctx context.Context, entClient *ent.Client, user *ent.User) (string, error) {
 	uuidObj, _ := uuid.NewRandom()
 	token := uuidObj.String()
 	expiresAt := timejst.Now().Add(time.Hour * 24 * 30)
 
 	q := entClient.RefreshToken.Create().
 		SetToken(token).
-		SetUsername(username).
 		SetExpiresAt(expiresAt).
-		SetIsDead(false)
+		SetIsDead(false).
+		SetUser(user)
 
 	if _, err := q.Save(ctx); err != nil {
 		return "", connect.NewError(connect.CodeInternal, err)
