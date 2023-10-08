@@ -6,13 +6,15 @@ import { ContestSubmissionList } from "./ContestSubmissionList";
 
 export const ContestSubmissionListPage = () => {
   const { query } = useRouter();
-  const title = useContestPageTitle("me" in query ? "自分の提出" : "すべての提出");
+  const mode = "me" in query ? "me" : "all";
+  const heading = mode === "me" ? "自分の提出" : "すべての提出";
+  const title = useContestPageTitle(heading);
   return (
     <ContestLayout>
       <Head>
         <title>{title}</title>
       </Head>
-      <ContestSubmissionList />
+      <ContestSubmissionList mode={mode} heading={heading} />
     </ContestLayout>
   );
 };

@@ -8,11 +8,11 @@ import {
   GetSubmissionDetailRequest,
   ListSubmissionsRequest,
 } from "@/src/gen/proto/backend/v1/judge_service_pb";
+import { JudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { PlainMessage } from "@bufbuild/protobuf";
 import { useQuery } from "@tanstack/react-query";
-import { Duration } from "../util/time";
-import { JudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { useState } from "react";
+import { Duration } from "../util/time";
 
 export const useGetSubmissionDetail = (input?: PlainMessage<GetSubmissionDetailRequest>) => {
   const { data, error, isLoading } = useQuery(getSubmissionDetail.useQuery(input));
