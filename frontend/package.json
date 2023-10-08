@@ -46,7 +46,7 @@
     "react-icons": "^4.11.0",
     "react-timer-hook": "^3.0.7",
     "typescript": "5.1.6",
-    "zod": "3.21"
+    "zod": "3.22"
   },
   "devDependencies": {
     "@chakra-ui/storybook-addon": "^5.0.1",
