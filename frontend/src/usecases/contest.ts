@@ -12,8 +12,6 @@ import type {
   GetMySubmissionStatusesRequest,
   ListContestsRequest,
   ListContestTasksRequest,
-  RegisterMeRequest,
-  RegisterMeResponse,
 } from "@/src/gen/proto/backend/v1/contest_service_pb";
 import { PlainMessage } from "@bufbuild/protobuf";
 import { useMutation, useQuery } from "@tanstack/react-query";
