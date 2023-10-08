@@ -77,7 +77,8 @@ export const useGetContestTask = (input?: PlainMessage<GetContestTaskRequest>) =
     staleTime: 5 * Duration.MINUTE,
   });
   const task = data?.task;
-  return { task, error, isLoading };
+  const samples = data?.samples;
+  return { task, samples, error, isLoading };
 };
 
 export const useGetMySubmissionStatuses = (input?: PlainMessage<GetMySubmissionStatusesRequest>) => {
