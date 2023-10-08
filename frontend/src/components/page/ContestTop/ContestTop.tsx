@@ -1,10 +1,10 @@
-import { useAccessTokenClaimValue } from "@/src/globalStates/credential";
 import { useGetContest, useRegisterMe, useRouterContestSlug } from "@/src/usecases/contest";
 import { Box, Button, Card, CardBody, CardHeader, Heading, useToast } from "@chakra-ui/react";
 import { useTimer } from "react-timer-hook";
 
-const TimerComponent = (props: { expiryTimestamp: Date}) => {
-  const timer = useTimer({ expiryTimestamp: props.expiryTimestamp });
+const TimerComponent = (props: { expiryTimestamp: Date, timerHeader: string}) => {
+  const onExpire = () => window.location.reload();
+  const timer = useTimer({ expiryTimestamp: props.expiryTimestamp, onExpire });
   // leading zero を追加する処理
   let seq = [
     timer.days.toLocaleString(),
@@ -15,15 +15,14 @@ const TimerComponent = (props: { expiryTimestamp: Date}) => {
   for (let i = 0; i < 4; i++) {
     if (seq[i].length == 1) seq[i] = "0" + seq[i];
   }
-  return <p>
-    {seq[0] + ":" + seq[1] + ":" + seq[2] + ":" + seq[3]}
-  </p>
+  return <div>
+    {props.timerHeader + seq[0] + ":" + seq[1] + ":" + seq[2] + ":" + seq[3]}
+  </div>
 }
 
 export const ContestTop = () => {
   const slug = useRouterContestSlug();
   const { contest } = useGetContest({ slug });
-  const user = useAccessTokenClaimValue();
 
   // コンテスト開始まで or 終了までのタイマー
   let expiryTimestamp: Date;
@@ -33,11 +32,11 @@ export const ContestTop = () => {
   if (contest?.startAt != undefined && now < contest.startAt.toDate()) {
     expiryTimestamp = contest.startAt.toDate();
     isUpcomingOrRunning = true;
-    timerHeader = "開始まで :";
+    timerHeader = "開始まで ";
   } else if (contest?.endAt != undefined && now <= contest.endAt.toDate()) {
     expiryTimestamp = contest.endAt.toDate();
     isUpcomingOrRunning = true;
-    timerHeader = "終了まで :";
+    timerHeader = "終了まで ";
   } else {
     expiryTimestamp = now;
   }
@@ -65,8 +64,9 @@ export const ContestTop = () => {
                 <Button colorScheme="teal" onClick={handleClick} isLoading={isLoading} margin={4}>
                   参加登録
                 </Button>
-                <p>{timerHeader}</p>
-                <TimerComponent expiryTimestamp={expiryTimestamp}/>
+                <p>
+                  <TimerComponent expiryTimestamp={expiryTimestamp} timerHeader={timerHeader}/>
+                </p>
               </div>
             : <></>
           }
