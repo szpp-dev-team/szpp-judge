@@ -54,8 +54,8 @@ const dummySubmissionDetails: PlainMessage<SubmissionDetail>[] = [
 
 const dummySubmissionSummaries: PlainMessage<SubmissionSummary>[] = dummySubmissionDetails.map((submissions) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { testcaseResults, sourceCode, ...summary } = submissions; // 不要なプロパティを除く
-  return summary;
+  const { testcaseResults, sourceCode, status, ...summary } = submissions; // 不要なプロパティを除く
+  return { judgeStatus: status, ...summary }; // judgeStatus は SubmissionDetail.status と名前が違うだけで同じなので流用
 });
 
 const dummyJudgeProgress: Record<"wj" | "ac" | "wa" | "ce", PlainMessage<JudgeProgress>> = {
