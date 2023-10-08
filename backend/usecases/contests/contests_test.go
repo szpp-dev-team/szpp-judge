@@ -20,7 +20,7 @@ import (
 func Test_CreateContest(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient)
+	interactor := NewInteractor(entClient, nil)
 
 	tests := map[string]struct {
 		assert func(t *testing.T)
@@ -67,7 +67,7 @@ func Test_CreateContest(t *testing.T) {
 func Test_GetContest(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient)
+	interactor := NewInteractor(entClient, nil)
 
 	tests := map[string]struct {
 		assert func(t *testing.T, contest *backendv1.GetContestResponse)
@@ -105,7 +105,7 @@ func Test_GetContest(t *testing.T) {
 func Test_UpdateContest(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient)
+	interactor := NewInteractor(entClient, nil)
 
 	tests := map[string]struct {
 		modify func(t *testing.T, req *backendv1.UpdateContestRequest)
@@ -163,7 +163,7 @@ func Test_UpdateContest(t *testing.T) {
 func Test_SyncContestTasks(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient)
+	interactor := NewInteractor(entClient, nil)
 
 	contest := fixture.CreateContest(t, entClient,
 		"SZPP Programming Contest", "szpc001",

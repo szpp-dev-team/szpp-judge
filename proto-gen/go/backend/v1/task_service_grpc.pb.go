@@ -37,7 +37,6 @@ type TaskServiceClient interface {
 	// Task を更新する
 	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error)
 	// TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
-	// contestant によるリクエストの場合は sample のみ取得する。
 	GetTestcaseSets(ctx context.Context, in *GetTestcaseSetsRequest, opts ...grpc.CallOption) (*GetTestcaseSetsResponse, error)
 	// TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
 	SyncTestcaseSets(ctx context.Context, in *SyncTestcaseSetsRequest, opts ...grpc.CallOption) (*SyncTestcaseSetsResponse, error)
@@ -107,7 +106,6 @@ type TaskServiceServer interface {
 	// Task を更新する
 	UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error)
 	// TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
-	// contestant によるリクエストの場合は sample のみ取得する。
 	GetTestcaseSets(context.Context, *GetTestcaseSetsRequest) (*GetTestcaseSetsResponse, error)
 	// TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
 	SyncTestcaseSets(context.Context, *SyncTestcaseSetsRequest) (*SyncTestcaseSetsResponse, error)

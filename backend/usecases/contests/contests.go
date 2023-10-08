@@ -3,17 +3,21 @@ package contests
 import (
 	"context"
 	"errors"
-	"log"
 	"log/slog"
 
 	"connectrpc.com/connect"
 	"github.com/samber/lo"
+	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	ent_contesttask "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	ent_testcaseset "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
+	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
+	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slices"
@@ -21,13 +25,14 @@ import (
 )
 
 type Interactor struct {
-	entClient *ent.Client
-	logger    *slog.Logger
+	entClient     *ent.Client
+	logger        *slog.Logger
+	testcasesRepo testcases_repo.Repository
 }
 
-func NewInteractor(entClient *ent.Client) *Interactor {
+func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repository) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "contests"))
-	return &Interactor{entClient, logger}
+	return &Interactor{entClient, logger, testcasesRepo}
 }
 
 func (i *Interactor) CreateContest(ctx context.Context, req *backendv1.CreateContestRequest) (*backendv1.CreateContestResponse, error) {
@@ -129,6 +134,11 @@ func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListCo
 
 func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetContestTaskRequest) (*backendv1.GetContestTaskResponse, error) {
 	task, err := i.entClient.Task.Query().
+		WithTestcases(func(tq *ent.TestcaseQuery) {
+			tq.WithTestcaseSets(func(tsq *ent.TestcaseSetQuery) {
+				tsq.Where(ent_testcaseset.IsSample(true))
+			}).WithTask()
+		}).
 		Where(
 			ent_task.HasContestsWith(ent_contest.Slug(req.ContestSlug)),
 			ent_task.ID(int(req.TaskId)),
@@ -141,8 +151,22 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 		i.logger.Error("failed to get contest", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
+
+	testcases := make([]*testcases_repo.Testcase, 0, len(task.Edges.Testcases))
+	for _, tc := range task.Edges.Testcases {
+		testcase, err := i.testcasesRepo.DownloadTestcase(ctx, tc.Edges.Task.ID, tc.Name)
+		if err != nil {
+			i.logger.Error("failed to download testcase", slog.Any("error", err))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("failed to download testcase"))
+		}
+		testcases = append(testcases, testcase)
+	}
+
 	return &backendv1.GetContestTaskResponse{
 		Task: tasks.ToPbTask(task),
+		Samples: lo.Map(task.Edges.Testcases, func(tc *ent.Testcase, i int) *backendv1.Testcase {
+			return tasks.ToPbTestcase(tc, testcases[i].In, testcases[i].Out)
+		}),
 	}, nil
 }
 
@@ -198,7 +222,6 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 	slices.SortFunc(contestTasks, func(a, b *ent.ContestTask) int {
 		return a.Order - b.Order
 	})
-	log.Println("result", contestTasks, contestTaskIDs)
 	return &backendv1.SyncContestTasksResponse{
 		Tasks: lo.Map(contestTasks, func(ct *ent.ContestTask, _ int) *backendv1.Task {
 			return tasks.ToPbTask(ct.Edges.Task)
@@ -207,7 +230,44 @@ func (i *Interactor) SyncContestTasks(ctx context.Context, req *backendv1.SyncCo
 }
 
 func (i *Interactor) GetMySubmissionStatuses(ctx context.Context, req *backendv1.GetMySubmissionStatusesRequest) (*backendv1.GetMySubmissionStatusesResponse, error) {
-	panic("not implemented")
+	claims := interceptor.GetClaimsFromContext(ctx)
+
+	contest, err := i.entClient.Contest.Query().
+		WithSubmits(func(sq *ent.SubmitQuery) {
+			sq.WithTask().
+				Where(ent_submit.HasUserWith(ent_user.Username(claims.Username)))
+		}).
+		Where(ent_contest.Slug(req.ContestSlug)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
+		}
+		i.logger.Error("failed to get contest", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
+	}
+
+	submissionStatusByTaskID := make(map[int]*backendv1.SubmissionStatus)
+	for _, submit := range contest.Edges.Submits {
+		if _, ok := submissionStatusByTaskID[submit.Edges.Task.ID]; !ok {
+			submissionStatusByTaskID[submit.Edges.Task.ID] = &backendv1.SubmissionStatus{
+				TaskId: int32(submit.Edges.Task.ID),
+				Score:  lo.ToPtr(int32(submit.Score)),
+			}
+		}
+		if int32(submit.Score) > *submissionStatusByTaskID[submit.Edges.Task.ID].Score {
+			submissionStatusByTaskID[submit.Edges.Task.ID].Score = lo.ToPtr(int32(submit.Score))
+		}
+	}
+
+	submissionStatuses := make([]*backendv1.SubmissionStatus, 0, len(submissionStatusByTaskID))
+	for _, submissionStatus := range submissionStatusByTaskID {
+		submissionStatuses = append(submissionStatuses, submissionStatus)
+	}
+
+	return &backendv1.GetMySubmissionStatusesResponse{
+		SubmissionStatuses: submissionStatuses,
+	}, nil
 }
 
 func (i *Interactor) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRequest) (*backendv1.RegisterMeResponse, error) {

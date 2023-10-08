@@ -12,11 +12,11 @@ import (
 func Test_GetStandings(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient)
+	interactor := NewInteractor(entClient, nil)
 
 	ctx := context.Background()
 	resp, err := interactor.GetStandings(ctx, &backendv1.GetStandingsRequest{
-		ContestId: 1,
+		ContestSlug: "szpc002",
 	})
 	require.NoError(t, err)
 
