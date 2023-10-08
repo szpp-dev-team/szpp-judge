@@ -43,7 +43,8 @@ const now = new Date();
 const beforeNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() - dur));
 const afterNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() + dur));
 
-// StandingsRecord_TaskDetail.untilAc を作るため
+// StandingsRecord_TaskDetail.untilAc を作るため.
+// PlainMessage<PbDuration> だと JSON.stringify が bigint のシリアライズでエラるので PbDuration オブジェクトを渡す
 const duration = (/** ミリ秒 */ dur: number): PbDuration => new PbDuration({
   seconds: BigInt(Math.trunc(dur / Duration.SECOND)),
   nanos: 0,
@@ -173,6 +174,7 @@ const weightedPick = <T extends Record<string, number>>(table: T): keyof T => {
   return "";
 };
 
+// 順位のソート方法がバックエンドと異なるかもしれない. あくまでモック.
 const generateStandings = (participantsSize: number, taskSize: number) => {
   taskSize = Math.min(taskSize, contestTasks.length); // contestTasks.length 以上のタスクは作れない
 
