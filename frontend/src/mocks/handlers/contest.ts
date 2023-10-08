@@ -10,18 +10,19 @@ import { Duration } from "@/src/util/time";
 import { Duration as PbDuration, type PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { connectMock } from "../connectRpc";
-import { dummyTasks } from "./task";
+import { dummySampleCases } from "../fixtures/sampleCases";
+import { dummyTasks } from "../fixtures/tasks";
 
 const contestTasks: PlainMessage<ContestTask>[] = [
-  { ...dummyTasks[0], score: 100 },
-  { ...dummyTasks[1], score: 200 },
-  { ...dummyTasks[2], score: 314 },
-  { ...dummyTasks[3], score: 400 },
-  { ...dummyTasks[4], score: 450 },
-  { ...dummyTasks[5], score: 500 },
-  { ...dummyTasks[6], score: 600 },
-  { ...dummyTasks[7], score: 700 },
-  { ...dummyTasks[8], score: 1333 },
+  { ...dummyTasks[0]!, score: 100 },
+  { ...dummyTasks[1]!, score: 200 },
+  { ...dummyTasks[2]!, score: 314 },
+  { ...dummyTasks[3]!, score: 400 },
+  { ...dummyTasks[4]!, score: 450 },
+  { ...dummyTasks[5]!, score: 500 },
+  { ...dummyTasks[6]!, score: 600 },
+  { ...dummyTasks[7]!, score: 700 },
+  { ...dummyTasks[8]!, score: 1333 },
 ];
 
 const contestDescription = String.raw`
@@ -165,7 +166,7 @@ const weightedPick = <T extends Record<string, number>>(table: T): keyof T => {
   let cursor = 0;
 
   for (const k in sorted) {
-    cursor += sorted[k];
+    cursor += sorted[k]!;
     if (r <= cursor) {
       return k;
     }
@@ -186,7 +187,7 @@ const generateStandings = (participantsSize: number, taskSize: number) => {
 
     // 参加者ごとに提出を作る
     for (let j = 0; j < taskSize; j++) {
-      const t = contestTasks[j];
+      const t = contestTasks[j]!;
 
       if (t.difficulty > 4 && Math.random() < 0.05) { // true ならこのタスクは未提出
         taskDetailList.push({
@@ -331,9 +332,10 @@ export const contestHandlers: RequestHandler[] = [
         ctx.status(403),
       );
     }
+    const samples = [...dummySampleCases];
     return res(
       ctx.delay(500),
-      encodeResp({ task, samples: [] }), // FIXME: #109 を受けてとりあえずの対応なので後でちゃんとしたデータを入れる
+      encodeResp({ task, samples }),
     );
   }),
   connectMock(ContestService, "getMySubmissionStatuses", async (ctx, res, decodeReq, encodeResp) => {
@@ -363,10 +365,10 @@ export const contestHandlers: RequestHandler[] = [
       };
     });
     // 最初の4問は全パターン網羅
-    submissionStatuses[0].score = undefined;
-    submissionStatuses[1].score = 0;
-    submissionStatuses[2].score = 50;
-    submissionStatuses[3].score = contestTasks[3].score;
+    submissionStatuses[0]!.score = undefined;
+    submissionStatuses[1]!.score = 0;
+    submissionStatuses[2]!.score = 50;
+    submissionStatuses[3]!.score = contestTasks[3]!.score;
     return res(
       ctx.delay(500),
       encodeResp({ submissionStatuses }),

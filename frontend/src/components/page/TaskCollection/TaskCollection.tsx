@@ -1,7 +1,7 @@
 import { JudgeStatusBadge } from "@/src/components/model/judge/JudgeStatusBadge";
 // import { DifficultyBadge } from "@/src/components/model/task/DifficultyBadge";
 // import { Difficulty } from "@/src/model/task";
-import { useListContestTasks, useRouterContestSlug } from "@/src/usecases/contest";
+import { useIsContestStarted, useListContestTasks, useRouterContestSlug } from "@/src/usecases/contest";
 import { QuestionIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -23,7 +23,8 @@ import { Link } from "../../ui/Link";
 
 export const TaskCollection = () => {
   const contestSlug = useRouterContestSlug();
-  const { tasks } = useListContestTasks({ contestSlug });
+  const isContestStarted = useIsContestStarted({ contestSlug, now: new Date() });
+  const { tasks } = useListContestTasks({ contestSlug }, { isContestStarted });
 
   return (
     <Box px={16} h="100%">
