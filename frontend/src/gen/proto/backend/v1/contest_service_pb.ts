@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { Clarification, Clarification_Answer, Contest, ContestTask, MutationContest, StandingsRecord, SubmissionStatus } from "./contest_resources_pb";
-import { Task } from "./task_resources_pb";
+import { Task, Testcase } from "./task_resources_pb";
 
 /**
  * @generated from message backend.v1.CreateContestRequest
@@ -432,6 +432,11 @@ export class GetContestTaskResponse extends Message<GetContestTaskResponse> {
    */
   task?: Task;
 
+  /**
+   * @generated from field: repeated backend.v1.Testcase samples = 2;
+   */
+  samples: Testcase[] = [];
+
   constructor(data?: PartialMessage<GetContestTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -441,6 +446,7 @@ export class GetContestTaskResponse extends Message<GetContestTaskResponse> {
   static readonly typeName = "backend.v1.GetContestTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
+    { no: 2, name: "samples", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetContestTaskResponse {

@@ -43,11 +43,13 @@ type UserEdges struct {
 	Submits []*Submit `json:"submits,omitempty"`
 	// Contests holds the value of the contests edge.
 	Contests []*Contest `json:"contests,omitempty"`
+	// RefreshTokens holds the value of the refresh_tokens edge.
+	RefreshTokens []*RefreshToken `json:"refresh_tokens,omitempty"`
 	// ContestUser holds the value of the contest_user edge.
 	ContestUser []*ContestUser `json:"contest_user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // TasksOrErr returns the Tasks value or an error if the edge
@@ -77,10 +79,19 @@ func (e UserEdges) ContestsOrErr() ([]*Contest, error) {
 	return nil, &NotLoadedError{edge: "contests"}
 }
 
+// RefreshTokensOrErr returns the RefreshTokens value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) RefreshTokensOrErr() ([]*RefreshToken, error) {
+	if e.loadedTypes[3] {
+		return e.RefreshTokens, nil
+	}
+	return nil, &NotLoadedError{edge: "refresh_tokens"}
+}
+
 // ContestUserOrErr returns the ContestUser value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) ContestUserOrErr() ([]*ContestUser, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.ContestUser, nil
 	}
 	return nil, &NotLoadedError{edge: "contest_user"}
@@ -182,6 +193,11 @@ func (u *User) QuerySubmits() *SubmitQuery {
 // QueryContests queries the "contests" edge of the User entity.
 func (u *User) QueryContests() *ContestQuery {
 	return NewUserClient(u.config).QueryContests(u)
+}
+
+// QueryRefreshTokens queries the "refresh_tokens" edge of the User entity.
+func (u *User) QueryRefreshTokens() *RefreshTokenQuery {
+	return NewUserClient(u.config).QueryRefreshTokens(u)
 }
 
 // QueryContestUser queries the "contest_user" edge of the User entity.

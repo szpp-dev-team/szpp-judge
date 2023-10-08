@@ -549,7 +549,8 @@ type GetContestTaskResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Task *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	Task    *Task       `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	Samples []*Testcase `protobuf:"bytes,2,rep,name=samples,proto3" json:"samples,omitempty"`
 }
 
 func (x *GetContestTaskResponse) Reset() {
@@ -587,6 +588,13 @@ func (*GetContestTaskResponse) Descriptor() ([]byte, []int) {
 func (x *GetContestTaskResponse) GetTask() *Task {
 	if x != nil {
 		return x.Task
+	}
+	return nil
+}
+
+func (x *GetContestTaskResponse) GetSamples() []*Testcase {
+	if x != nil {
+		return x.Samples
 	}
 	return nil
 }
@@ -1672,11 +1680,14 @@ var file_backend_v1_contest_service_proto_rawDesc = []byte{
 	0x74, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x5f, 0x73, 0x6c, 0x75,
 	0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74,
 	0x53, 0x6c, 0x75, 0x67, 0x12, 0x17, 0x0a, 0x07, 0x74, 0x61, 0x73, 0x6b, 0x5f, 0x69, 0x64, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x74, 0x61, 0x73, 0x6b, 0x49, 0x64, 0x22, 0x3e, 0x0a,
+	0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x74, 0x61, 0x73, 0x6b, 0x49, 0x64, 0x22, 0x6e, 0x0a,
 	0x16, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x52,
 	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x04, 0x74, 0x61, 0x73, 0x6b, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e,
-	0x76, 0x31, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x04, 0x74, 0x61, 0x73, 0x6b, 0x22, 0xaa, 0x01,
+	0x76, 0x31, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x04, 0x74, 0x61, 0x73, 0x6b, 0x12, 0x2e, 0x0a,
+	0x07, 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14,
+	0x2e, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x54, 0x65, 0x73, 0x74,
+	0x63, 0x61, 0x73, 0x65, 0x52, 0x07, 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x22, 0xaa, 0x01,
 	0x0a, 0x17, 0x53, 0x79, 0x6e, 0x63, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x73, 0x74, 0x54, 0x61, 0x73,
 	0x6b, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x6f, 0x6e,
 	0x74, 0x65, 0x73, 0x74, 0x5f, 0x73, 0x6c, 0x75, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
@@ -1933,10 +1944,11 @@ var file_backend_v1_contest_service_proto_goTypes = []interface{}{
 	(*Contest)(nil),                         // 34: backend.v1.Contest
 	(*ContestTask)(nil),                     // 35: backend.v1.ContestTask
 	(*Task)(nil),                            // 36: backend.v1.Task
-	(*SubmissionStatus)(nil),                // 37: backend.v1.SubmissionStatus
-	(*StandingsRecord)(nil),                 // 38: backend.v1.StandingsRecord
-	(*Clarification)(nil),                   // 39: backend.v1.Clarification
-	(*Clarification_Answer)(nil),            // 40: backend.v1.Clarification.Answer
+	(*Testcase)(nil),                        // 37: backend.v1.Testcase
+	(*SubmissionStatus)(nil),                // 38: backend.v1.SubmissionStatus
+	(*StandingsRecord)(nil),                 // 39: backend.v1.StandingsRecord
+	(*Clarification)(nil),                   // 40: backend.v1.Clarification
+	(*Clarification_Answer)(nil),            // 41: backend.v1.Clarification.Answer
 }
 var file_backend_v1_contest_service_proto_depIdxs = []int32{
 	33, // 0: backend.v1.CreateContestRequest.contest:type_name -> backend.v1.MutationContest
@@ -1947,51 +1959,52 @@ var file_backend_v1_contest_service_proto_depIdxs = []int32{
 	34, // 5: backend.v1.ListContestsResponse.contests:type_name -> backend.v1.Contest
 	35, // 6: backend.v1.ListContestTasksResponse.tasks:type_name -> backend.v1.ContestTask
 	36, // 7: backend.v1.GetContestTaskResponse.task:type_name -> backend.v1.Task
-	32, // 8: backend.v1.SyncContestTasksRequest.tasks:type_name -> backend.v1.SyncContestTasksRequest.Task
-	36, // 9: backend.v1.SyncContestTasksResponse.tasks:type_name -> backend.v1.Task
-	37, // 10: backend.v1.GetMySubmissionStatusesResponse.submission_statuses:type_name -> backend.v1.SubmissionStatus
-	38, // 11: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsRecord
-	39, // 12: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
-	39, // 13: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
-	40, // 14: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	40, // 15: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
-	0,  // 16: backend.v1.ContestService.CreateContest:input_type -> backend.v1.CreateContestRequest
-	2,  // 17: backend.v1.ContestService.GetContest:input_type -> backend.v1.GetContestRequest
-	4,  // 18: backend.v1.ContestService.UpdateContest:input_type -> backend.v1.UpdateContestRequest
-	6,  // 19: backend.v1.ContestService.ListContests:input_type -> backend.v1.ListContestsRequest
-	8,  // 20: backend.v1.ContestService.ListContestTasks:input_type -> backend.v1.ListContestTasksRequest
-	10, // 21: backend.v1.ContestService.GetContestTask:input_type -> backend.v1.GetContestTaskRequest
-	12, // 22: backend.v1.ContestService.SyncContestTasks:input_type -> backend.v1.SyncContestTasksRequest
-	14, // 23: backend.v1.ContestService.GetMySubmissionStatuses:input_type -> backend.v1.GetMySubmissionStatusesRequest
-	16, // 24: backend.v1.ContestService.GetStandings:input_type -> backend.v1.GetStandingsRequest
-	18, // 25: backend.v1.ContestService.RegisterMe:input_type -> backend.v1.RegisterMeRequest
-	20, // 26: backend.v1.ContestService.CreateClarification:input_type -> backend.v1.CreateClarificationRequest
-	22, // 27: backend.v1.ContestService.ListClarifications:input_type -> backend.v1.ListClarificationsRequest
-	24, // 28: backend.v1.ContestService.DeleteClarification:input_type -> backend.v1.DeleteClarificationRequest
-	26, // 29: backend.v1.ContestService.CreateAnswer:input_type -> backend.v1.CreateAnswerRequest
-	28, // 30: backend.v1.ContestService.UpdateAnswer:input_type -> backend.v1.UpdateAnswerRequest
-	30, // 31: backend.v1.ContestService.DeleteAnswer:input_type -> backend.v1.DeleteAnswerRequest
-	1,  // 32: backend.v1.ContestService.CreateContest:output_type -> backend.v1.CreateContestResponse
-	3,  // 33: backend.v1.ContestService.GetContest:output_type -> backend.v1.GetContestResponse
-	5,  // 34: backend.v1.ContestService.UpdateContest:output_type -> backend.v1.UpdateContestResponse
-	7,  // 35: backend.v1.ContestService.ListContests:output_type -> backend.v1.ListContestsResponse
-	9,  // 36: backend.v1.ContestService.ListContestTasks:output_type -> backend.v1.ListContestTasksResponse
-	11, // 37: backend.v1.ContestService.GetContestTask:output_type -> backend.v1.GetContestTaskResponse
-	13, // 38: backend.v1.ContestService.SyncContestTasks:output_type -> backend.v1.SyncContestTasksResponse
-	15, // 39: backend.v1.ContestService.GetMySubmissionStatuses:output_type -> backend.v1.GetMySubmissionStatusesResponse
-	17, // 40: backend.v1.ContestService.GetStandings:output_type -> backend.v1.GetStandingsResponse
-	19, // 41: backend.v1.ContestService.RegisterMe:output_type -> backend.v1.RegisterMeResponse
-	21, // 42: backend.v1.ContestService.CreateClarification:output_type -> backend.v1.CreateClarificationResponse
-	23, // 43: backend.v1.ContestService.ListClarifications:output_type -> backend.v1.ListClarificationsResponse
-	25, // 44: backend.v1.ContestService.DeleteClarification:output_type -> backend.v1.DeleteClarificationResponse
-	27, // 45: backend.v1.ContestService.CreateAnswer:output_type -> backend.v1.CreateAnswerResponse
-	29, // 46: backend.v1.ContestService.UpdateAnswer:output_type -> backend.v1.UpdateAnswerResponse
-	31, // 47: backend.v1.ContestService.DeleteAnswer:output_type -> backend.v1.DeleteAnswerResponse
-	32, // [32:48] is the sub-list for method output_type
-	16, // [16:32] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	37, // 8: backend.v1.GetContestTaskResponse.samples:type_name -> backend.v1.Testcase
+	32, // 9: backend.v1.SyncContestTasksRequest.tasks:type_name -> backend.v1.SyncContestTasksRequest.Task
+	36, // 10: backend.v1.SyncContestTasksResponse.tasks:type_name -> backend.v1.Task
+	38, // 11: backend.v1.GetMySubmissionStatusesResponse.submission_statuses:type_name -> backend.v1.SubmissionStatus
+	39, // 12: backend.v1.GetStandingsResponse.standings_list:type_name -> backend.v1.StandingsRecord
+	40, // 13: backend.v1.CreateClarificationResponse.clarification:type_name -> backend.v1.Clarification
+	40, // 14: backend.v1.ListClarificationsResponse.clarifications:type_name -> backend.v1.Clarification
+	41, // 15: backend.v1.CreateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	41, // 16: backend.v1.UpdateAnswerResponse.answer:type_name -> backend.v1.Clarification.Answer
+	0,  // 17: backend.v1.ContestService.CreateContest:input_type -> backend.v1.CreateContestRequest
+	2,  // 18: backend.v1.ContestService.GetContest:input_type -> backend.v1.GetContestRequest
+	4,  // 19: backend.v1.ContestService.UpdateContest:input_type -> backend.v1.UpdateContestRequest
+	6,  // 20: backend.v1.ContestService.ListContests:input_type -> backend.v1.ListContestsRequest
+	8,  // 21: backend.v1.ContestService.ListContestTasks:input_type -> backend.v1.ListContestTasksRequest
+	10, // 22: backend.v1.ContestService.GetContestTask:input_type -> backend.v1.GetContestTaskRequest
+	12, // 23: backend.v1.ContestService.SyncContestTasks:input_type -> backend.v1.SyncContestTasksRequest
+	14, // 24: backend.v1.ContestService.GetMySubmissionStatuses:input_type -> backend.v1.GetMySubmissionStatusesRequest
+	16, // 25: backend.v1.ContestService.GetStandings:input_type -> backend.v1.GetStandingsRequest
+	18, // 26: backend.v1.ContestService.RegisterMe:input_type -> backend.v1.RegisterMeRequest
+	20, // 27: backend.v1.ContestService.CreateClarification:input_type -> backend.v1.CreateClarificationRequest
+	22, // 28: backend.v1.ContestService.ListClarifications:input_type -> backend.v1.ListClarificationsRequest
+	24, // 29: backend.v1.ContestService.DeleteClarification:input_type -> backend.v1.DeleteClarificationRequest
+	26, // 30: backend.v1.ContestService.CreateAnswer:input_type -> backend.v1.CreateAnswerRequest
+	28, // 31: backend.v1.ContestService.UpdateAnswer:input_type -> backend.v1.UpdateAnswerRequest
+	30, // 32: backend.v1.ContestService.DeleteAnswer:input_type -> backend.v1.DeleteAnswerRequest
+	1,  // 33: backend.v1.ContestService.CreateContest:output_type -> backend.v1.CreateContestResponse
+	3,  // 34: backend.v1.ContestService.GetContest:output_type -> backend.v1.GetContestResponse
+	5,  // 35: backend.v1.ContestService.UpdateContest:output_type -> backend.v1.UpdateContestResponse
+	7,  // 36: backend.v1.ContestService.ListContests:output_type -> backend.v1.ListContestsResponse
+	9,  // 37: backend.v1.ContestService.ListContestTasks:output_type -> backend.v1.ListContestTasksResponse
+	11, // 38: backend.v1.ContestService.GetContestTask:output_type -> backend.v1.GetContestTaskResponse
+	13, // 39: backend.v1.ContestService.SyncContestTasks:output_type -> backend.v1.SyncContestTasksResponse
+	15, // 40: backend.v1.ContestService.GetMySubmissionStatuses:output_type -> backend.v1.GetMySubmissionStatusesResponse
+	17, // 41: backend.v1.ContestService.GetStandings:output_type -> backend.v1.GetStandingsResponse
+	19, // 42: backend.v1.ContestService.RegisterMe:output_type -> backend.v1.RegisterMeResponse
+	21, // 43: backend.v1.ContestService.CreateClarification:output_type -> backend.v1.CreateClarificationResponse
+	23, // 44: backend.v1.ContestService.ListClarifications:output_type -> backend.v1.ListClarificationsResponse
+	25, // 45: backend.v1.ContestService.DeleteClarification:output_type -> backend.v1.DeleteClarificationResponse
+	27, // 46: backend.v1.ContestService.CreateAnswer:output_type -> backend.v1.CreateAnswerResponse
+	29, // 47: backend.v1.ContestService.UpdateAnswer:output_type -> backend.v1.UpdateAnswerResponse
+	31, // 48: backend.v1.ContestService.DeleteAnswer:output_type -> backend.v1.DeleteAnswerResponse
+	33, // [33:49] is the sub-list for method output_type
+	17, // [17:33] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_backend_v1_contest_service_proto_init() }

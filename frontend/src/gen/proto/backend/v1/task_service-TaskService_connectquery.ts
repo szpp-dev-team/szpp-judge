@@ -50,7 +50,6 @@ export const TaskService = {
     },
     /**
      * TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
-     * contestant によるリクエストの場合は sample のみ取得する。
      *
      * @generated from rpc backend.v1.TaskService.GetTestcaseSets
      */
@@ -103,7 +102,6 @@ export const updateTask = createQueryService({
 
 /**
  * TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
- * contestant によるリクエストの場合は sample のみ取得する。
  *
  * @generated from rpc backend.v1.TaskService.GetTestcaseSets
  */

@@ -14,6 +14,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
@@ -127,6 +128,21 @@ func (uu *UserUpdate) AddContests(c ...*Contest) *UserUpdate {
 	return uu.AddContestIDs(ids...)
 }
 
+// AddRefreshTokenIDs adds the "refresh_tokens" edge to the RefreshToken entity by IDs.
+func (uu *UserUpdate) AddRefreshTokenIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddRefreshTokenIDs(ids...)
+	return uu
+}
+
+// AddRefreshTokens adds the "refresh_tokens" edges to the RefreshToken entity.
+func (uu *UserUpdate) AddRefreshTokens(r ...*RefreshToken) *UserUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uu.AddRefreshTokenIDs(ids...)
+}
+
 // AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by IDs.
 func (uu *UserUpdate) AddContestUserIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddContestUserIDs(ids...)
@@ -208,6 +224,27 @@ func (uu *UserUpdate) RemoveContests(c ...*Contest) *UserUpdate {
 		ids[i] = c[i].ID
 	}
 	return uu.RemoveContestIDs(ids...)
+}
+
+// ClearRefreshTokens clears all "refresh_tokens" edges to the RefreshToken entity.
+func (uu *UserUpdate) ClearRefreshTokens() *UserUpdate {
+	uu.mutation.ClearRefreshTokens()
+	return uu
+}
+
+// RemoveRefreshTokenIDs removes the "refresh_tokens" edge to RefreshToken entities by IDs.
+func (uu *UserUpdate) RemoveRefreshTokenIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveRefreshTokenIDs(ids...)
+	return uu
+}
+
+// RemoveRefreshTokens removes "refresh_tokens" edges to RefreshToken entities.
+func (uu *UserUpdate) RemoveRefreshTokens(r ...*RefreshToken) *UserUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uu.RemoveRefreshTokenIDs(ids...)
 }
 
 // ClearContestUser clears all "contest_user" edges to the ContestUser entity.
@@ -423,6 +460,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.RefreshTokensCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RefreshTokensTable,
+			Columns: []string{user.RefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(refreshtoken.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedRefreshTokensIDs(); len(nodes) > 0 && !uu.mutation.RefreshTokensCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RefreshTokensTable,
+			Columns: []string{user.RefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(refreshtoken.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RefreshTokensIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RefreshTokensTable,
+			Columns: []string{user.RefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(refreshtoken.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if uu.mutation.ContestUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -583,6 +665,21 @@ func (uuo *UserUpdateOne) AddContests(c ...*Contest) *UserUpdateOne {
 	return uuo.AddContestIDs(ids...)
 }
 
+// AddRefreshTokenIDs adds the "refresh_tokens" edge to the RefreshToken entity by IDs.
+func (uuo *UserUpdateOne) AddRefreshTokenIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddRefreshTokenIDs(ids...)
+	return uuo
+}
+
+// AddRefreshTokens adds the "refresh_tokens" edges to the RefreshToken entity.
+func (uuo *UserUpdateOne) AddRefreshTokens(r ...*RefreshToken) *UserUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uuo.AddRefreshTokenIDs(ids...)
+}
+
 // AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by IDs.
 func (uuo *UserUpdateOne) AddContestUserIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddContestUserIDs(ids...)
@@ -664,6 +761,27 @@ func (uuo *UserUpdateOne) RemoveContests(c ...*Contest) *UserUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return uuo.RemoveContestIDs(ids...)
+}
+
+// ClearRefreshTokens clears all "refresh_tokens" edges to the RefreshToken entity.
+func (uuo *UserUpdateOne) ClearRefreshTokens() *UserUpdateOne {
+	uuo.mutation.ClearRefreshTokens()
+	return uuo
+}
+
+// RemoveRefreshTokenIDs removes the "refresh_tokens" edge to RefreshToken entities by IDs.
+func (uuo *UserUpdateOne) RemoveRefreshTokenIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveRefreshTokenIDs(ids...)
+	return uuo
+}
+
+// RemoveRefreshTokens removes "refresh_tokens" edges to RefreshToken entities.
+func (uuo *UserUpdateOne) RemoveRefreshTokens(r ...*RefreshToken) *UserUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uuo.RemoveRefreshTokenIDs(ids...)
 }
 
 // ClearContestUser clears all "contest_user" edges to the ContestUser entity.
@@ -902,6 +1020,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.RefreshTokensCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RefreshTokensTable,
+			Columns: []string{user.RefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(refreshtoken.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedRefreshTokensIDs(); len(nodes) > 0 && !uuo.mutation.RefreshTokensCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RefreshTokensTable,
+			Columns: []string{user.RefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(refreshtoken.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RefreshTokensIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RefreshTokensTable,
+			Columns: []string{user.RefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(refreshtoken.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
