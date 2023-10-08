@@ -89,12 +89,8 @@ const TaskScore = ({ score, penaltyCount, untilAc, href }: TaskScoreProps) => {
 
 export const Standings = () => {
   const contestSlug = useRouterContestSlug();
-  let contestId = 1; // TODO: contestSlug から standings を取れるようにする
-  try {
-    contestId = Number.parseInt(contestSlug.slice(-1), 10); // "sbc005" -> Number(5)
-  } catch { /* empty */ }
 
-  const { standingsList, error, isLoading } = useStandings({ contestId });
+  const { standingsList, error, isLoading } = useStandings({ contestSlug });
   const tasks = standingsList?.length ? standingsList[0].taskDetailList : [];
 
   const { contest, error: cError, isLoading: cIsLoading } = useGetContest({ slug: contestSlug });

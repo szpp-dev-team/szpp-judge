@@ -7,7 +7,7 @@ import {
 } from "@/src/gen/proto/backend/v1/contest_resources_pb";
 import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
 import { Duration } from "@/src/util/time";
-import { type PlainMessage, Timestamp } from "@bufbuild/protobuf";
+import { type PlainMessage, Duration as PbDuration, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { connectMock } from "../connectRpc";
 import { dummyTasks } from "./task";
@@ -44,7 +44,7 @@ const beforeNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() - d
 const afterNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() + dur));
 
 // StandingsRecord_TaskDetail.untilAc を作るため
-const duration = (/** ミリ秒 */ dur: number): PlainMessage<import("@bufbuild/protobuf").Duration> => ({
+const duration = (/** ミリ秒 */ dur: number): PbDuration => new PbDuration({
   seconds: BigInt(Math.trunc(dur / Duration.SECOND)),
   nanos: 0,
 });
@@ -265,11 +265,11 @@ const generateStandings = (participantsSize: number, taskSize: number) => {
 };
 
 const standingsMap: Map<string, PlainMessage<StandingsRecord>[]> = new Map([
-  ["1", generateStandings(0, 9)], // 開始2日前ver
-  ["2", generateStandings(0, 9)], // 開始5秒前ver
-  ["3", generateStandings(5, 9)], // 開催中ver
-  ["4", generateStandings(20, 9)], // 終了5秒前ver
-  ["5", generateStandings(50, 9)], // 終了後ver
+  ["sbc001", generateStandings(0, 9)], // 開始2日前ver
+  ["sbc002", generateStandings(0, 9)], // 開始5秒前ver
+  ["sbc003", generateStandings(5, 9)], // 開催中ver
+  ["sbc004", generateStandings(20, 9)], // 終了5秒前ver
+  ["sbc005", generateStandings(50, 9)], // 終了後ver
 ]);
 
 export const contestHandlers: RequestHandler[] = [
@@ -371,9 +371,10 @@ export const contestHandlers: RequestHandler[] = [
       encodeResp({ submissionStatuses }),
     );
   }),
-  grpcMock(ContestService, "getStandings", async (ctx, res, decodeReq, encodeResp) => {
-    const { contestId } = await decodeReq(); // TODO: proto 更新して contest_slug にしたい
-    const standingsList = standingsMap.get(String(contestId));
+  connectMock(ContestService, "getStandings", async (ctx, res, decodeReq, encodeResp) => {
+    const { contestSlug } = await decodeReq();
+    const standingsList = standingsMap.get(contestSlug);
+    debugger
 
     if (!standingsList) {
       return res(ctx.status(404));
