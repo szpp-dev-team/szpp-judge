@@ -14,6 +14,7 @@ import {
   ListItem,
   Text,
 } from "@chakra-ui/react";
+import Image from "next/image";
 import { Link } from "../../ui/Link";
 
 const ContestBanner = () => {
@@ -74,8 +75,7 @@ export const Top = () => {
     >
       <GridItem area="hero" bg="#212121">
         <HStack gap={16} h="100%" justifyContent="center">
-          {/** output: "export" にしていると next/image による image optimization が使えない */}
-          <img src="/szpp-judge-logo.png" alt="logo image" width={293} height={293} />
+          <Image src="/szpp-judge-logo.png" alt="logo image" width={293} height={293} />
           <Text fontSize="lg" lineHeight={7} color="white" whiteSpace="pre-wrap">
             {`SZPP Judge は静岡大学プログラミングサークル SZPP (すずっぷ) が運営する、
 競技プログラミング用オンラインジャッジサイトです。
