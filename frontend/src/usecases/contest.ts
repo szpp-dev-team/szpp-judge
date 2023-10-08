@@ -2,6 +2,7 @@ import {
   getContest,
   getContestTask,
   getMySubmissionStatuses,
+  getStandings,
   listContests,
   listContestTasks,
   registerMe,
@@ -10,6 +11,7 @@ import type {
   GetContestRequest,
   GetContestTaskRequest,
   GetMySubmissionStatusesRequest,
+  GetStandingsRequest,
   ListContestsRequest,
   ListContestTasksRequest,
 } from "@/src/gen/proto/backend/v1/contest_service_pb";
@@ -89,6 +91,12 @@ export const useGetMySubmissionStatuses = (input?: PlainMessage<GetMySubmissionS
   });
   const submissionStatuses = data?.submissionStatuses;
   return { submissionStatuses, error, isLoading };
+};
+
+export const useStandings = (input?: PlainMessage<GetStandingsRequest>) => {
+  const { data, error, isLoading } = useQuery(getStandings.useQuery(input));
+  const standingsList = data?.standingsList;
+  return { standingsList, error, isLoading };
 };
 
 export const useRegisterMe = () => {
