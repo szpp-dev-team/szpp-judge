@@ -1,4 +1,48 @@
-import { Card, CardBody, CardHeader, Grid, GridItem, Heading, HStack, Text } from "@chakra-ui/react";
+import { useListContests } from "@/src/usecases/contest";
+import {
+  Box,
+  Card,
+  CardBody,
+  CardHeader,
+  Grid,
+  GridItem,
+  Heading,
+  HStack,
+  List,
+  ListItem,
+  Text,
+} from "@chakra-ui/react";
+import { Link } from "../../ui/Link";
+
+const ContestBanner = () => {
+  const { contests, isLoading, error } = useListContests();
+
+  if (isLoading) {
+    return <>読み込み中</>;
+  }
+
+  if (error) {
+    if (error.code === 5) {
+      return <>コンテスト情報はありません</>;
+    }
+    return <>コンテスト情報の取得に失敗しました</>;
+  }
+
+  return (
+    <>
+      <List>
+        {contests!.map((c, i) => (
+          <ListItem key={i}>
+            <Link href={`/contests/${c.slug}`}>{c.name}</Link>
+          </ListItem>
+        ))}
+      </List>
+      <Box pt={16}>
+        <Link fontWeight="bold" href="/contests">コンテスト一覧</Link>
+      </Box>
+    </>
+  );
+};
 
 export const Top = () => {
   return (
@@ -31,7 +75,7 @@ export const Top = () => {
             <Heading size="md">最新のコンテスト</Heading>
           </CardHeader>
           <CardBody>
-            contest
+            <ContestBanner />
           </CardBody>
         </Card>
       </GridItem>
