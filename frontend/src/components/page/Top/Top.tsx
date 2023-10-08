@@ -49,7 +49,7 @@ const ContestBanner = () => {
         </Box>
       </ListItem>
     );
-  });
+  }).slice(0, 3);
 
   return (
     <>
