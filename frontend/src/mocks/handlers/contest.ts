@@ -166,7 +166,7 @@ const weightedPick = <T extends Record<string, number>>(table: T): keyof T => {
   let cursor = 0;
 
   for (const k in sorted) {
-    cursor += sorted[k];
+    cursor += sorted[k]!;
     if (r <= cursor) {
       return k;
     }
@@ -187,7 +187,7 @@ const generateStandings = (participantsSize: number, taskSize: number) => {
 
     // 参加者ごとに提出を作る
     for (let j = 0; j < taskSize; j++) {
-      const t = contestTasks[j];
+      const t = contestTasks[j]!;
 
       if (t.difficulty > 4 && Math.random() < 0.05) { // true ならこのタスクは未提出
         taskDetailList.push({
