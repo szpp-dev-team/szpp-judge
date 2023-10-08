@@ -3,6 +3,23 @@ import { useGetContest, useRegisterMe, useRouterContestSlug } from "@/src/usecas
 import { Box, Button, Card, CardBody, CardHeader, Heading, useToast } from "@chakra-ui/react";
 import { useTimer } from "react-timer-hook";
 
+const TimerComponent = (props: { expiryTimestamp: Date}) => {
+  const timer = useTimer({ expiryTimestamp: props.expiryTimestamp });
+  // leading zero を追加する処理
+  let seq = [
+    timer.days.toLocaleString(),
+    timer.hours.toLocaleString(),
+    timer.minutes.toLocaleString(),
+    timer.seconds.toLocaleString(),
+  ];
+  for (let i = 0; i < 4; i++) {
+    if (seq[i].length == 1) seq[i] = "0" + seq[i];
+  }
+  return <p>
+    {seq[0] + ":" + seq[1] + ":" + seq[2] + ":" + seq[3]}
+  </p>
+}
+
 export const ContestTop = () => {
   const slug = useRouterContestSlug();
   const { contest } = useGetContest({ slug });
@@ -16,27 +33,13 @@ export const ContestTop = () => {
   if (contest?.startAt != undefined && now < contest.startAt.toDate()) {
     expiryTimestamp = contest.startAt.toDate();
     isUpcomingOrRunning = true;
-    timerHeader = "開始まで ";
+    timerHeader = "開始まで :";
   } else if (contest?.endAt != undefined && now <= contest.endAt.toDate()) {
     expiryTimestamp = contest.endAt.toDate();
     isUpcomingOrRunning = true;
-    timerHeader = "終了まで ";
+    timerHeader = "終了まで :";
   } else {
     expiryTimestamp = now;
-  }
-  // expiryTimestamp = now;
-  // expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + 10);
-  const timer = useTimer({ expiryTimestamp });
-
-  // leading zero を追加する処理
-  let seq = [
-    timer.days.toLocaleString(),
-    timer.hours.toLocaleString(),
-    timer.minutes.toLocaleString(),
-    timer.seconds.toLocaleString(),
-  ];
-  for (let i = 0; i < 4; i++) {
-    if (seq[i].length == 1) seq[i] = "0" + seq[i];
   }
 
   const { isLoading, mutate } = useRegisterMe();
@@ -57,12 +60,13 @@ export const ContestTop = () => {
         <CardHeader textAlign="center">
           <Heading as="h1" mb={4}>{contest?.name}</Heading>
           <p>開催期間: {contest?.startAt?.toDate().toLocaleString()} - {contest?.endAt?.toDate().toLocaleString()}</p>
-          {isUpcomingOrRunning && user != null
+          {contest && isUpcomingOrRunning
             ? <div>
                 <Button colorScheme="teal" onClick={handleClick} isLoading={isLoading} margin={4}>
                   参加登録
                 </Button>
-                <p>{timerHeader + seq[0] + ":" + seq[1] + ":" + seq[2] + ":" + seq[3]}</p>
+                <p>{timerHeader}</p>
+                <TimerComponent expiryTimestamp={expiryTimestamp}/>
               </div>
             : <></>
           }
