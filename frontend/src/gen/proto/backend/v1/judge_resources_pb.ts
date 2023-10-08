@@ -71,11 +71,11 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
   /**
    * judge
    *
-   * ジャッジ中はnull
+   * ジャッジ中は judge.v1.JudgeStatus.WJ
    *
-   * @generated from field: optional judge.v1.JudgeStatus status = 10;
+   * @generated from field: judge.v1.JudgeStatus status = 10;
    */
-  status?: JudgeStatus;
+  status = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
 
   /**
    * ジャッジ中はnull
@@ -132,7 +132,7 @@ export class SubmissionDetail extends Message<SubmissionDetail> {
     { no: 7, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 8, name: "lang_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 9, name: "source_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 10, name: "status", kind: "enum", T: proto3.getEnumType(JudgeStatus), opt: true },
+    { no: 10, name: "status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
     { no: 11, name: "exec_time_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 12, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 13, name: "testcase_results", kind: "message", T: TestcaseResult, repeated: true },
@@ -215,11 +215,11 @@ export class SubmissionSummary extends Message<SubmissionSummary> {
   /**
    * judge
    *
-   * ジャッジ中はnull
+   * ジャッジ中は judge.v1.JudgeStatus.WJ
    *
-   * @generated from field: optional judge.v1.JudgeStatus judge_status = 9;
+   * @generated from field: judge.v1.JudgeStatus judge_status = 9;
    */
-  judgeStatus?: JudgeStatus;
+  judgeStatus = JudgeStatus.JUDGE_STATUS_UNSPECIFIED;
 
   /**
    * ジャッジ中はnull
@@ -258,7 +258,7 @@ export class SubmissionSummary extends Message<SubmissionSummary> {
     { no: 6, name: "task_title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 8, name: "lang_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 9, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus), opt: true },
+    { no: 9, name: "judge_status", kind: "enum", T: proto3.getEnumType(JudgeStatus) },
     { no: 10, name: "exec_time_ms", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 11, name: "exec_memory_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 12, name: "submitted_at", kind: "message", T: Timestamp },
