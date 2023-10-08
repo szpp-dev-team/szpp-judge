@@ -1,3 +1,3 @@
-import { ContestTopPage } from "@/src/components/page/ContestTop/ContstTop.page";
+import { ContestTopPage } from "@/src/components/page/ContestTop/ContestTop.page";
 
 export default ContestTopPage;

@@ -215,4 +215,11 @@ export const contestHandlers: RequestHandler[] = [
       encodeResp({ submissionStatuses }),
     );
   }),
+
+  connectMock(ContestService, "registerMe", async (ctx, res) => {
+    return res(
+      ctx.delay(500),
+      ctx.status(200),
+    );
+  }),
 ];
