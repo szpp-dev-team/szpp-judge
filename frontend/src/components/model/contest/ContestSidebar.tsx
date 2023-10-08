@@ -6,7 +6,7 @@ import type { BoxProps, LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React, { type ReactNode, useCallback, useMemo, useState } from "react";
 import type { IconType } from "react-icons";
-import { IoBarChart, IoChatboxEllipses, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
+import { IoBarChart, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
 import { SIDEBAR_TOGGLE_KNOB_H, SIDEBAR_TOGGLE_KNOB_TOP, SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
 import { ScoreStatusIcon } from "../task/ScoreStatusIcon";
 
@@ -156,7 +156,7 @@ const SidebarMainPane = ({
         <SidebarLinkItem text="コンテストトップ" icon={IoHome} href={`${contestRootPath}`} />
         {contestStarted && (
           <>
-            <SidebarLinkItem text="質問" icon={IoChatboxEllipses} href={`${contestRootPath}/clarifications`} />
+            {/* <SidebarLinkItem text="質問" icon={IoChatboxEllipses} href={`${contestRootPath}/clarifications`} /> */}
             <SidebarLinkItem text="問題" icon={IoList} href={`${contestRootPath}/tasks`} />
             <Box
               as="li"
