@@ -13,7 +13,7 @@ const TimerComponent = (props: { expiryTimestamp: Date; timerHeader: string }) =
     timer.seconds.toLocaleString(),
   ];
   for (let i = 0; i < 4; i++) {
-    if (seq[i].length == 1) seq[i] = "0" + seq[i];
+    if (seq[i]!.length == 1) seq[i] = "0" + seq[i];
   }
   return (
     <span>
