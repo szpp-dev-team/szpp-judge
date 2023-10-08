@@ -55,7 +55,7 @@ export const GlobalHeader = ({
           {contestSlug ? <NavItemLink href={`/contests/${contestSlug}`}>{contestTitle}</NavItemLink> : (
             <>
               <NavItemLink href="/contests">コンテスト</NavItemLink>
-              <NavItemLink href="/tasks">問題</NavItemLink>
+              {/* <NavItemLink href="/tasks">問題</NavItemLink> */}
             </>
           )}
         </Flex>
