@@ -144,7 +144,7 @@ func (i *Interactor) GetSubmissionDetail(ctx context.Context, req *backendv1.Get
 			})
 		}
 		submissionDetail.Score = int32(submit.Score)
-		submissionDetail.Status = judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status])
+		submissionDetail.Status = lo.ToPtr(judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status]))
 		submissionDetail.ExecTimeMs = lo.ToPtr(uint32(submit.ExecTime))
 		submissionDetail.ExecMemoryKib = lo.ToPtr(uint32(submit.ExecMemory))
 		submissionDetail.TestcaseResults = testcaseResults
@@ -211,7 +211,10 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 }
 
 func toPbSubmissionSummary(submit *ent.Submit) *backendv1.SubmissionSummary {
-	judgeStatus := judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status])
+	var judgeStatus *judgev1.JudgeStatus
+	if submit.Status != nil {
+		judgeStatus = lo.ToPtr(judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status]))
+	}
 	var contestID *int32
 	if submit.Edges.Contest != nil {
 		contestID = lo.ToPtr(int32(submit.Edges.Contest.ID))
