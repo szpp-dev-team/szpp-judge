@@ -7,7 +7,7 @@ import {
 } from "@/src/gen/proto/backend/v1/contest_resources_pb";
 import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
 import { Duration } from "@/src/util/time";
-import { type PlainMessage, Duration as PbDuration, Timestamp } from "@bufbuild/protobuf";
+import { Duration as PbDuration, type PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
 import { connectMock } from "../connectRpc";
 import { dummyTasks } from "./task";
@@ -45,10 +45,11 @@ const afterNow = (dur: number) => Timestamp.fromDate(new Date(now.getTime() + du
 
 // StandingsRecord_TaskDetail.untilAc を作るため.
 // PlainMessage<PbDuration> だと JSON.stringify が bigint のシリアライズでエラるので PbDuration オブジェクトを渡す
-const duration = (/** ミリ秒 */ dur: number): PbDuration => new PbDuration({
-  seconds: BigInt(Math.trunc(dur / Duration.SECOND)),
-  nanos: 0,
-});
+const duration = (/** ミリ秒 */ dur: number): PbDuration =>
+  new PbDuration({
+    seconds: BigInt(Math.trunc(dur / Duration.SECOND)),
+    nanos: 0,
+  });
 
 const groupBy = <K extends PropertyKey, T>(
   objectArray: readonly T[],
@@ -376,7 +377,6 @@ export const contestHandlers: RequestHandler[] = [
   connectMock(ContestService, "getStandings", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug } = await decodeReq();
     const standingsList = standingsMap.get(contestSlug);
-    debugger
 
     if (!standingsList) {
       return res(ctx.status(404));
