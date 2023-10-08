@@ -176,7 +176,7 @@ export const contestHandlers: RequestHandler[] = [
     }
     return res(
       ctx.delay(500),
-      encodeResp({ task }),
+      encodeResp({ task, samples: [] }), // FIXME: #109 を受けてとりあえずの対応なので後でちゃんとしたデータを入れる
     );
   }),
   connectMock(ContestService, "getMySubmissionStatuses", async (ctx, res, decodeReq, encodeResp) => {
