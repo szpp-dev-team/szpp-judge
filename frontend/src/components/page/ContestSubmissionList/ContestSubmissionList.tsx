@@ -85,7 +85,7 @@ const SubmissionTable = ({ contestSlug, contestId, username, ...props }: Submiss
 
   return (
     <TableContainer>
-      <Table {...props} variant="bordered">
+      <Table {...props} variant="bordered-narrow">
         <Thead>
           <Tr>
             <Th textAlign="center">提出日時</Th>
@@ -162,8 +162,8 @@ export const ContestSubmissionList = ({ mode, heading }: ContestSubmissionListPr
   };
 
   return (
-    <Container maxW="container.lg">
-      <Card px={3} py={4} h="100%" borderRadius={0}>
+    <Container h="100%" maxW="container.lg">
+      <Card px={3} py={4} h="inherit" borderRadius={0}>
         <CardHeader>
           <Heading as="h1">{heading}</Heading>
         </CardHeader>
