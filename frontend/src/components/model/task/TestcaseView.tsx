@@ -25,7 +25,7 @@ export const TestcaseView = ({ title, titleAs, content, ...props }: TestcaseView
         setCopyActionState("copied");
         copyActionTimeoutId.current = window.setTimeout(() => setCopyActionState("idle"), 1000);
       }).catch((e) => {
-        console.error("Failed to copy to clipboard:", e)
+        console.error("Failed to copy to clipboard:", e);
       });
   }, [content]);
 
