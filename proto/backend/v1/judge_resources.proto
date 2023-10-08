@@ -21,7 +21,7 @@ message SubmissionDetail {
   string lang_id = 8;
   string source_code = 9;
   // judge
-  optional judge.v1.JudgeStatus status = 10; // ジャッジ中はnull
+  judge.v1.JudgeStatus status = 10; // ジャッジ中は judge.v1.JudgeStatus.WJ
   optional uint32 exec_time_ms = 11; // ジャッジ中はnull
   optional uint32 exec_memory_kib = 12; // ジャッジ中はnull
   repeated TestcaseResult testcase_results = 13; // ジャッジ完了したテストケースの実行情報
