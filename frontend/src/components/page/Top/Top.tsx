@@ -1,5 +1,7 @@
 import { useListContests } from "@/src/usecases/contest";
+import { fmtDatetime } from "@/src/util/time";
 import {
+  Badge,
   Box,
   Card,
   CardBody,
@@ -28,15 +30,30 @@ const ContestBanner = () => {
     return <>コンテスト情報の取得に失敗しました</>;
   }
 
+  const now = new Date();
+  const element = contests!.map((c, i) => {
+    const startAt = c.startAt!.toDate();
+    const upComing = startAt > now;
+    const over = c.endAt!.toDate() < now;
+
+    const [color, label] = upComing ? ["gray", "予定"] : over ? ["blackAlpha", "終了"] : ["teal", "開催中"];
+
+    return (
+      <ListItem pt={i !== 0 ? 2 : 0} pb={1} borderBottomWidth={1} borderBottomColor="gray.200" key={i}>
+        <HStack>
+          <Badge variant="solid" colorScheme={color}>{label}</Badge>
+          <Box color="gray.500">{fmtDatetime(startAt)}</Box>
+        </HStack>
+        <Box>
+          <Link href={`/contests/${c.slug}`}>{c.name}</Link>
+        </Box>
+      </ListItem>
+    );
+  });
+
   return (
     <>
-      <List>
-        {contests!.map((c, i) => (
-          <ListItem key={i}>
-            <Link href={`/contests/${c.slug}`}>{c.name}</Link>
-          </ListItem>
-        ))}
-      </List>
+      <List>{element}</List>
       <Box pt={16}>
         <Link fontWeight="bold" href="/contests">コンテスト一覧</Link>
       </Box>
