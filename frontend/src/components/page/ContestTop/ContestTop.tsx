@@ -15,9 +15,9 @@ const TimerComponent = (props: { expiryTimestamp: Date, timerHeader: string}) =>
   for (let i = 0; i < 4; i++) {
     if (seq[i].length == 1) seq[i] = "0" + seq[i];
   }
-  return <div>
+  return <span>
     {props.timerHeader + seq[0] + ":" + seq[1] + ":" + seq[2] + ":" + seq[3]}
-  </div>
+  </span>
 }
 
 export const ContestTop = () => {
