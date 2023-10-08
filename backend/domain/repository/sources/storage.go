@@ -27,5 +27,5 @@ func (i *gcsImpl) DownloadSource(ctx context.Context, submitID int) ([]byte, err
 }
 
 func BuildSourceCodePath(submitID int) string {
-	return fmt.Sprintf("/submits/%d", submitID)
+	return fmt.Sprintf("submits/%d", submitID)
 }

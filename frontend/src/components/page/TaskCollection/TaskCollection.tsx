@@ -4,6 +4,7 @@ import { ScoreStatus } from "@/src/model/task";
 import {
   useGetContest,
   useGetMySubmissionStatuses,
+  useIsContestStarted,
   useListContestTasks,
   useRouterContestSlug,
 } from "@/src/usecases/contest";
@@ -33,8 +34,11 @@ const getBgColorFromScoreStatus = (s: ScoreStatus): string =>
 export const TaskCollection = () => {
   const contestSlug = useRouterContestSlug();
   const { contest, error: errorC } = useGetContest({ slug: contestSlug });
-  const { tasks, error: errorT } = useListContestTasks({ contestSlug });
-  const { submissionStatuses, error: errorS } = useGetMySubmissionStatuses({ contestSlug });
+
+  const isContestStarted = useIsContestStarted({ contestSlug, now: new Date() });
+  const { tasks, error: errorT } = useListContestTasks({ contestSlug }, { isContestStarted });
+
+  const { submissionStatuses, error: errorS } = useGetMySubmissionStatuses({ contestSlug }, { isContestStarted });
 
   const tasksWithScore = useMemo(() => {
     if (tasks == null || submissionStatuses == null) return [];

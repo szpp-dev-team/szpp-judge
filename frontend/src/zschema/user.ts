@@ -18,15 +18,15 @@ const username = z.string()
 // が対応する最大文字数が72文字なので、ソルトの追加も考慮して最大文字数は60文字とする
 const loginPassword = z.string()
   .min(1)
-  .max(60);
+  .max(60)
+  .regex(/^[^ ]*$/, "半角スペースが含まれています")
+  .regex(/^[!-~]*$/, "全角文字が含まれています"); // パスワードを表示するボタンを押すと全角文字が入力できてしまうのでチェック
 
 const registrationPassword = loginPassword
-  .describe("半角英大文字・英小文字・数字・記号全て必須、8文字以上60文字以内")
+  .describe("半角英字・数字ともに必須、8文字以上60文字以内")
   .min(8)
-  .regex(/[A-Z]/, "半角英大文字を含めてください")
-  .regex(/[a-z]/, "半角英小文字を含めてください")
-  .regex(/[0-9]/, "半角数字を含めてください")
-  .regex(/[\x20-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/, "半角記号を含めてください");
+  .regex(/[A-Za-z]/, "半角英字を含めてください")
+  .regex(/[0-9]/, "半角数字を含めてください");
 
 const email = z.string()
   .min(1)

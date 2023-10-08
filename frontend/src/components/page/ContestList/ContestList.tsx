@@ -50,7 +50,7 @@ const ContestListWithFilter = (header: string, f: (c: Contest) => boolean) => {
                     <Link href={`/contests/${c.slug}`}>{c.name}</Link>
                   </Td>
                   <Td textAlign="center">{ContestTypeToString(c.contestType)}</Td>
-                  <Td textAlign="center">{c.taskIds.length}</Td>
+                  <Td textAlign="center">{c.numTasks}</Td>
                 </Tr>
               ))}
             </Tbody>

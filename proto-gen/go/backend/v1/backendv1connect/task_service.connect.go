@@ -56,7 +56,6 @@ type TaskServiceClient interface {
 	// Task を更新する
 	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
 	// TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
-	// contestant によるリクエストの場合は sample のみ取得する。
 	GetTestcaseSets(context.Context, *connect.Request[v1.GetTestcaseSetsRequest]) (*connect.Response[v1.GetTestcaseSetsResponse], error)
 	// TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
 	SyncTestcaseSets(context.Context, *connect.Request[v1.SyncTestcaseSetsRequest]) (*connect.Response[v1.SyncTestcaseSetsResponse], error)
@@ -143,7 +142,6 @@ type TaskServiceHandler interface {
 	// Task を更新する
 	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
 	// TestcaseSet の一覧を取得する。また、Testcase の一覧も取得する。
-	// contestant によるリクエストの場合は sample のみ取得する。
 	GetTestcaseSets(context.Context, *connect.Request[v1.GetTestcaseSetsRequest]) (*connect.Response[v1.GetTestcaseSetsResponse], error)
 	// TestcaseSet を同期する。全てのリソースは上書きされ、このリクエストに含まれないリソースは削除される。
 	SyncTestcaseSets(context.Context, *connect.Request[v1.SyncTestcaseSetsRequest]) (*connect.Response[v1.SyncTestcaseSetsResponse], error)

@@ -15,14 +15,15 @@ type JudgeQueue interface {
 }
 
 type cloudtasksImpl struct {
-	client     *cloudtasks.Client
-	projectID  string
-	locationID string
-	queueID    string
+	client             *cloudtasks.Client
+	handleJudgeTaskURL string
+	projectID          string
+	locationID         string
+	queueID            string
 }
 
-func New(client *cloudtasks.Client, projectID, locationID, queueID string) JudgeQueue {
-	return &cloudtasksImpl{client, projectID, locationID, queueID}
+func New(client *cloudtasks.Client, handleJudgeTaskURL, projectID, locationID, queueID string) JudgeQueue {
+	return &cloudtasksImpl{client, handleJudgeTaskURL, projectID, locationID, queueID}
 }
 
 func (i *cloudtasksImpl) Push(ctx context.Context, submitID int, req *judgev1.JudgeRequest) error {
@@ -33,11 +34,11 @@ func (i *cloudtasksImpl) Push(ctx context.Context, submitID int, req *judgev1.Ju
 	if _, err := i.client.CreateTask(ctx, &cloudtaskspb.CreateTaskRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/%s/queues/%s", i.projectID, i.locationID, i.queueID),
 		Task: &cloudtaskspb.Task{
-			MessageType: &cloudtaskspb.Task_AppEngineHttpRequest{
-				AppEngineHttpRequest: &cloudtaskspb.AppEngineHttpRequest{
-					HttpMethod:  cloudtaskspb.HttpMethod_POST,
-					RelativeUri: "/post-judge-request",
-					Body:        reqBytes,
+			MessageType: &cloudtaskspb.Task_HttpRequest{
+				HttpRequest: &cloudtaskspb.HttpRequest{
+					Url:        i.handleJudgeTaskURL,
+					HttpMethod: cloudtaskspb.HttpMethod_POST,
+					Body:       reqBytes,
 					Headers: map[string]string{
 						"SubmitID": fmt.Sprintf("%d", submitID),
 					},

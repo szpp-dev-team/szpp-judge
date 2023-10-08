@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { Clarification, Clarification_Answer, Contest, ContestTask, MutationContest, StandingsRecord, SubmissionStatus } from "./contest_resources_pb";
-import { Task } from "./task_resources_pb";
+import { Task, Testcase } from "./task_resources_pb";
 
 /**
  * @generated from message backend.v1.CreateContestRequest
@@ -432,6 +432,11 @@ export class GetContestTaskResponse extends Message<GetContestTaskResponse> {
    */
   task?: Task;
 
+  /**
+   * @generated from field: repeated backend.v1.Testcase samples = 2;
+   */
+  samples: Testcase[] = [];
+
   constructor(data?: PartialMessage<GetContestTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -441,6 +446,7 @@ export class GetContestTaskResponse extends Message<GetContestTaskResponse> {
   static readonly typeName = "backend.v1.GetContestTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task", kind: "message", T: Task },
+    { no: 2, name: "samples", kind: "message", T: Testcase, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetContestTaskResponse {
@@ -666,9 +672,9 @@ export class GetMySubmissionStatusesResponse extends Message<GetMySubmissionStat
  */
 export class GetStandingsRequest extends Message<GetStandingsRequest> {
   /**
-   * @generated from field: int32 contest_id = 1;
+   * @generated from field: string contest_slug = 1;
    */
-  contestId = 0;
+  contestSlug = "";
 
   constructor(data?: PartialMessage<GetStandingsRequest>) {
     super();
@@ -678,7 +684,7 @@ export class GetStandingsRequest extends Message<GetStandingsRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "backend.v1.GetStandingsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "contest_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetStandingsRequest {
