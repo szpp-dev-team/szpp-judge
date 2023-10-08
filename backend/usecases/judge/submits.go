@@ -25,6 +25,8 @@ import (
 )
 
 func (i *Interactor) PostSubmit(ctx context.Context, req *backendv1.SubmitRequest) (*backendv1.SubmitResponse, error) {
+	claims := interceptor.GetClaimsFromContext(ctx)
+
 	task, err := i.entClient.Task.Query().WithTestcases().Where(ent_task.ID(int(req.TaskId))).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -45,12 +47,17 @@ func (i *Interactor) PostSubmit(ctx context.Context, req *backendv1.SubmitReques
 	var submit *ent.Submit
 	if err := entutil.WithTx(ctx, i.entClient, func(tx *ent.Tx) error {
 		now := timejst.Now()
-		submit, err = tx.Submit.Create().
+		q := tx.Submit.Create().
 			SetSubmittedAt(now).
 			SetCreatedAt(now).
 			SetTask(task).
 			SetLanguageID(langID).
-			Save(ctx)
+			SetUserID(claims.UserID)
+		if req.ContestId != nil {
+			q.SetContestID(int(*req.ContestId))
+		}
+
+		submit, err = q.Save(ctx)
 		if err != nil {
 			i.logger.Error("failed to get create a submit", slog.Any("error", err))
 			return connect.NewError(connect.CodeInternal, err)
@@ -178,7 +185,7 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 	if isAdmin || now.After(contest.EndAt) {
 		return &backendv1.ListSubmissionsResponse{
 			Submissions: lo.Map(contest.Edges.Submits, func(s *ent.Submit, _ int) *backendv1.SubmissionSummary {
-				return toPbSubmissionSummary(s, s.Edges.User)
+				return toPbSubmissionSummary(s)
 			}),
 		}, nil
 	}
@@ -198,12 +205,12 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 			if s.Edges.User.Username != claims.Username {
 				return nil, false
 			}
-			return toPbSubmissionSummary(s, s.Edges.User), true
+			return toPbSubmissionSummary(s), true
 		}),
 	}, nil
 }
 
-func toPbSubmissionSummary(submit *ent.Submit, user *ent.User) *backendv1.SubmissionSummary {
+func toPbSubmissionSummary(submit *ent.Submit) *backendv1.SubmissionSummary {
 	var judgeStatus *judgev1.JudgeStatus
 	if submit.Status != nil {
 		judgeStatus = lo.ToPtr(judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status]))
@@ -214,8 +221,8 @@ func toPbSubmissionSummary(submit *ent.Submit, user *ent.User) *backendv1.Submis
 	}
 	return &backendv1.SubmissionSummary{
 		Id:            int32(submit.ID),
-		UserId:        int32(user.ID),
-		Username:      user.Username,
+		UserId:        int32(submit.Edges.User.ID),
+		Username:      submit.Edges.User.Username,
 		ContestId:     contestID,
 		TaskId:        int32(submit.Edges.Task.ID),
 		TaskTitle:     submit.Edges.Task.Title,

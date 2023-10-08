@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/refreshtoken"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
@@ -119,6 +120,21 @@ func (uc *UserCreate) AddContests(c ...*Contest) *UserCreate {
 		ids[i] = c[i].ID
 	}
 	return uc.AddContestIDs(ids...)
+}
+
+// AddRefreshTokenIDs adds the "refresh_tokens" edge to the RefreshToken entity by IDs.
+func (uc *UserCreate) AddRefreshTokenIDs(ids ...int) *UserCreate {
+	uc.mutation.AddRefreshTokenIDs(ids...)
+	return uc
+}
+
+// AddRefreshTokens adds the "refresh_tokens" edges to the RefreshToken entity.
+func (uc *UserCreate) AddRefreshTokens(r ...*RefreshToken) *UserCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uc.AddRefreshTokenIDs(ids...)
 }
 
 // AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by IDs.
@@ -283,6 +299,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.RefreshTokensIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RefreshTokensTable,
+			Columns: []string{user.RefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(refreshtoken.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

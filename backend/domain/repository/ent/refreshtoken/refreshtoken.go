@@ -4,6 +4,7 @@ package refreshtoken
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -13,29 +14,46 @@ const (
 	FieldID = "id"
 	// FieldToken holds the string denoting the token field in the database.
 	FieldToken = "token"
-	// FieldUsername holds the string denoting the username field in the database.
-	FieldUsername = "username"
 	// FieldExpiresAt holds the string denoting the expires_at field in the database.
 	FieldExpiresAt = "expires_at"
 	// FieldIsDead holds the string denoting the is_dead field in the database.
 	FieldIsDead = "is_dead"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the refreshtoken in the database.
 	Table = "refresh_tokens"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "refresh_tokens"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_refresh_tokens"
 )
 
 // Columns holds all SQL columns for refreshtoken fields.
 var Columns = []string{
 	FieldID,
 	FieldToken,
-	FieldUsername,
 	FieldExpiresAt,
 	FieldIsDead,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "refresh_tokens"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"user_refresh_tokens",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -55,11 +73,6 @@ func ByToken(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldToken, opts...).ToFunc()
 }
 
-// ByUsername orders the results by the username field.
-func ByUsername(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUsername, opts...).ToFunc()
-}
-
 // ByExpiresAt orders the results by the expires_at field.
 func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExpiresAt, opts...).ToFunc()
@@ -68,4 +81,18 @@ func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 // ByIsDead orders the results by the is_dead field.
 func ByIsDead(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsDead, opts...).ToFunc()
+}
+
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+	)
 }

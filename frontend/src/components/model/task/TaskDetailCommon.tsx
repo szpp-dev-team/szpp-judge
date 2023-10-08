@@ -147,6 +147,6 @@ export const TaskDetailCommon = ({
           </Button>
         </Flex>
       </form>
-    </Card >
+    </Card>
   );
 };

@@ -44,6 +44,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.4",
     "react-icons": "^4.11.0",
+    "react-timer-hook": "^3.0.7",
     "typescript": "5.1.6",
     "zod": "3.21"
   },

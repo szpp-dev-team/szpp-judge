@@ -30,6 +30,8 @@ const (
 	EdgeSubmits = "submits"
 	// EdgeContests holds the string denoting the contests edge name in mutations.
 	EdgeContests = "contests"
+	// EdgeRefreshTokens holds the string denoting the refresh_tokens edge name in mutations.
+	EdgeRefreshTokens = "refresh_tokens"
 	// EdgeContestUser holds the string denoting the contest_user edge name in mutations.
 	EdgeContestUser = "contest_user"
 	// Table holds the table name of the user in the database.
@@ -53,6 +55,13 @@ const (
 	// ContestsInverseTable is the table name for the Contest entity.
 	// It exists in this package in order to avoid circular dependency with the "contest" package.
 	ContestsInverseTable = "contests"
+	// RefreshTokensTable is the table that holds the refresh_tokens relation/edge.
+	RefreshTokensTable = "refresh_tokens"
+	// RefreshTokensInverseTable is the table name for the RefreshToken entity.
+	// It exists in this package in order to avoid circular dependency with the "refreshtoken" package.
+	RefreshTokensInverseTable = "refresh_tokens"
+	// RefreshTokensColumn is the table column denoting the refresh_tokens relation/edge.
+	RefreshTokensColumn = "user_refresh_tokens"
 	// ContestUserTable is the table that holds the contest_user relation/edge.
 	ContestUserTable = "contest_users"
 	// ContestUserInverseTable is the table name for the ContestUser entity.
@@ -164,6 +173,20 @@ func ByContests(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByRefreshTokensCount orders the results by refresh_tokens count.
+func ByRefreshTokensCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRefreshTokensStep(), opts...)
+	}
+}
+
+// ByRefreshTokens orders the results by refresh_tokens terms.
+func ByRefreshTokens(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRefreshTokensStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByContestUserCount orders the results by contest_user count.
 func ByContestUserCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -196,6 +219,13 @@ func newContestsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ContestsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ContestsTable, ContestsPrimaryKey...),
+	)
+}
+func newRefreshTokensStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RefreshTokensInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RefreshTokensTable, RefreshTokensColumn),
 	)
 }
 func newContestUserStep() *sqlgraph.Step {
