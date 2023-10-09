@@ -10,6 +10,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
+	checker_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/checkers"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
@@ -17,19 +18,19 @@ import (
 	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Interactor struct {
 	entClient     *ent.Client
 	testcasesRepo testcases_repo.Repository
+	checkerRepo   checker_repo.Repository
 	logger        *slog.Logger
 }
 
-func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repository) *Interactor {
+func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repository, checkerRepo checker_repo.Repository) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "tasks"))
-	return &Interactor{entClient, testcasesRepo, logger}
+	return &Interactor{entClient, testcasesRepo, checkerRepo, logger}
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
@@ -43,6 +44,11 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 			return connect.NewError(connect.CodeInternal, err)
 		}
 
+		if err := i.checkerRepo.UploadChecker(ctx, task.ID, []byte(req.Task.Checker)); err != nil {
+			i.logger.Error("failed to upload checker code to the storage", slog.Any("error", err))
+			return connect.NewError(connect.CodeInternal, err)
+		}
+
 		q := tx.Task.Create().
 			SetTitle(req.Task.Title).
 			SetStatement(req.Task.Statement).
@@ -51,22 +57,7 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 			SetExecMemoryLimit(uint(req.Task.ExecMemoryLimit)).
 			SetCreatedAt(timejst.Now()).
 			SetUserID(userID)
-		switch ty := req.Task.JudgeType.JudgeType.(type) {
-		case *judgev1.JudgeType_Normal:
-			q.SetJudgeType(ent_task.JudgeTypeNormal)
-			q.SetCaseInsensitive(*ty.Normal.CaseInsensitive)
-		case *judgev1.JudgeType_Eps:
-			q.SetJudgeType(ent_task.JudgeTypeEps)
-			q.SetNdigits(uint(ty.Eps.Ndigits))
-		case *judgev1.JudgeType_Interactive:
-			q.SetJudgeType(ent_task.JudgeTypeInteractive)
-			q.SetJudgeCodePath(ty.Interactive.JudgeCodePath)
-		case *judgev1.JudgeType_Custom:
-			q.SetJudgeType(ent_task.JudgeTypeCustom)
-			q.SetJudgeCodePath(ty.Custom.JudgeCodePath)
-		default:
-			return fmt.Errorf("unrecognized JudgeType: %T", ty)
-		}
+
 		task, err = q.Save(ctx)
 		if err != nil {
 			return err
@@ -115,6 +106,11 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 			return connect.NewError(connect.CodePermissionDenied, fmt.Errorf("the task(id: %d) is not yours", req.TaskId))
 		}
 
+		if err := i.checkerRepo.UploadChecker(ctx, task.ID, []byte(req.Task.Checker)); err != nil {
+			i.logger.Error("failed to upload checker code to the storage", slog.Any("error", err))
+			return connect.NewError(connect.CodeInternal, err)
+		}
+
 		q := tx.Task.UpdateOneID(int(req.TaskId)).
 			SetTitle(req.Task.Title).
 			SetStatement(req.Task.Statement).
@@ -122,22 +118,7 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 			SetExecTimeLimit(uint(req.Task.ExecTimeLimit)).
 			SetExecMemoryLimit(uint(req.Task.ExecMemoryLimit)).
 			SetUpdatedAt(timejst.Now())
-		switch ty := req.Task.JudgeType.JudgeType.(type) {
-		case *judgev1.JudgeType_Normal:
-			q.SetJudgeType(ent_task.JudgeTypeNormal)
-			q.SetCaseInsensitive(*ty.Normal.CaseInsensitive)
-		case *judgev1.JudgeType_Eps:
-			q.SetJudgeType(ent_task.JudgeTypeEps)
-			q.SetNdigits(uint(ty.Eps.Ndigits))
-		case *judgev1.JudgeType_Interactive:
-			q.SetJudgeType(ent_task.JudgeTypeInteractive)
-			q.SetJudgeCodePath(ty.Interactive.JudgeCodePath)
-		case *judgev1.JudgeType_Custom:
-			q.SetJudgeType(ent_task.JudgeTypeCustom)
-			q.SetJudgeCodePath(ty.Custom.JudgeCodePath)
-		default:
-			return fmt.Errorf("unrecognized JudgeType: %T", ty)
-		}
+
 		task, err = q.Save(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
@@ -378,49 +359,10 @@ func ToPbTask(t *ent.Task) *backendv1.Task {
 		Statement:       t.Statement,
 		ExecTimeLimit:   int32(t.ExecTimeLimit),
 		ExecMemoryLimit: int32(t.ExecMemoryLimit),
-		JudgeType:       toPbJudgeType(t),
+		JudgeType:       nil,
 		Difficulty:      backendv1.Difficulty(backendv1.Difficulty_value[t.Difficulty]),
 		CreatedAt:       timestamppb.New(t.CreatedAt),
 		UpdatedAt:       updatedAt,
-	}
-}
-
-func toPbJudgeType(t *ent.Task) *judgev1.JudgeType {
-	switch t.JudgeType {
-	case ent_task.JudgeTypeNormal:
-		return &judgev1.JudgeType{
-			JudgeType: &judgev1.JudgeType_Normal{
-				Normal: &judgev1.JudgeTypeNormal{
-					CaseInsensitive: t.CaseInsensitive,
-				},
-			},
-		}
-	case ent_task.JudgeTypeEps:
-		return &judgev1.JudgeType{
-			JudgeType: &judgev1.JudgeType_Eps{
-				Eps: &judgev1.JudgeTypeEPS{
-					Ndigits: uint32(*t.Ndigits),
-				},
-			},
-		}
-	case ent_task.JudgeTypeInteractive:
-		return &judgev1.JudgeType{
-			JudgeType: &judgev1.JudgeType_Interactive{
-				Interactive: &judgev1.JudgeTypeInteractive{
-					JudgeCodePath: *t.JudgeCodePath,
-				},
-			},
-		}
-	case ent_task.JudgeTypeCustom:
-		return &judgev1.JudgeType{
-			JudgeType: &judgev1.JudgeType_Custom{
-				Custom: &judgev1.JudgeTypeCustom{
-					JudgeCodePath: *t.JudgeCodePath,
-				},
-			},
-		}
-	default:
-		return nil
 	}
 }
 

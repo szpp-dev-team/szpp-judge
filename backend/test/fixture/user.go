@@ -7,9 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
-	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
-	judgev1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/judge/v1"
 )
 
 func CreateUser(t *testing.T, client *ent.Client, username, role string) *ent.User {
@@ -34,24 +32,8 @@ func CreateTask(t *testing.T, client *ent.Client, title string, jt any, userID i
 		SetDifficulty(backendv1.Difficulty_BEGINNER.String()).
 		SetExecTimeLimit(2000).
 		SetExecMemoryLimit(1024).
-		SetJudgeType(ent_task.JudgeTypeNormal).
 		SetUserID(userID).
 		SetCreatedAt(timejst.Now())
-
-	switch jt := jt.(type) {
-	case *judgev1.JudgeType_Normal:
-		q = q.SetJudgeType(ent_task.JudgeTypeNormal).
-			SetCaseInsensitive(jt.Normal.GetCaseInsensitive())
-	case *judgev1.JudgeType_Interactive:
-		q = q.SetJudgeType(ent_task.JudgeTypeInteractive).
-			SetJudgeCodePath(jt.Interactive.GetJudgeCodePath())
-	case *judgev1.JudgeType_Eps:
-		q = q.SetJudgeType(ent_task.JudgeTypeEps).
-			SetNdigits(uint(jt.Eps.GetNdigits()))
-	case *judgev1.JudgeType_Custom:
-		q = q.SetJudgeType(ent_task.JudgeTypeCustom).
-			SetJudgeCodePath(jt.Custom.GetJudgeCodePath())
-	}
 
 	task, err := q.Save(context.Background())
 	require.NoError(t, err)

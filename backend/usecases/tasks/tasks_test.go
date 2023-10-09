@@ -10,7 +10,6 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
-	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases/mock"
@@ -23,7 +22,7 @@ import (
 func Test_CreateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient, nil)
+	interactor := NewInteractor(entClient, nil, nil)
 
 	tests := map[string]struct {
 		modify  func(ctx context.Context, req *backendv1.CreateTaskRequest) context.Context
@@ -72,7 +71,7 @@ func Test_CreateTask(t *testing.T) {
 func Test_UpdateTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient, nil)
+	interactor := NewInteractor(entClient, nil, nil)
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, user *ent.User, req *backendv1.UpdateTaskRequest)
@@ -131,7 +130,7 @@ func Test_UpdateTask(t *testing.T) {
 func Test_GetTask(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
-	interactor := NewInteractor(entClient, nil)
+	interactor := NewInteractor(entClient, nil, nil)
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.GetTaskRequest)
@@ -177,7 +176,7 @@ func Test_GetTestcaseSets(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
 	testcasesRepo := mock.NewMock()
-	interactor := NewInteractor(entClient, testcasesRepo)
+	interactor := NewInteractor(entClient, testcasesRepo, nil)
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.GetTestcaseSetsRequest)
@@ -239,7 +238,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 	entClient := utils.NewTestClient(t)
 	defer entClient.Close()
 	testcasesRepo := mock.NewMock()
-	interactor := NewInteractor(entClient, testcasesRepo)
+	interactor := NewInteractor(entClient, testcasesRepo, nil)
 
 	tests := map[string]struct {
 		prepare func(t *testing.T, req *backendv1.SyncTestcaseSetsRequest)
@@ -394,7 +393,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 			user := fixture.CreateUser(t, entClient, name, "ADMIN")
 			ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: user.Username})
 
-			task := fixture.CreateTask(t, entClient, "a", ent_task.JudgeTypeNormal, int(user.ID), nil)
+			task := fixture.CreateTask(t, entClient, "a", nil, int(user.ID), nil)
 
 			testcaseSets, testcases := seedMutationTestcasePairs()
 			req := &backendv1.SyncTestcaseSetsRequest{

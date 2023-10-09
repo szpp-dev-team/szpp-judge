@@ -34,7 +34,7 @@ func New(addr string, opts ...optionFunc) *http.Server {
 	mux.Handle(backendv1connect.NewHealthcheckServiceHandler(healthcheckSrv))
 	userSrv := connect_interfaces.NewUserServiceServer(user.NewInteractor(opt.EntClient))
 	mux.Handle(backendv1connect.NewUserServiceHandler(userSrv, interceptors))
-	taskInteractor := tasks.NewInteractor(opt.EntClient, opt.TestcasesRepository)
+	taskInteractor := tasks.NewInteractor(opt.EntClient, opt.TestcasesRepository, opt.CheckersRepository)
 	taskSrv := connect_interfaces.NewTaskServiceServer(taskInteractor)
 	mux.Handle(backendv1connect.NewTaskServiceHandler(taskSrv, interceptors))
 	judgeInteractor := judge.NewInteractor(opt.JudgeClient, opt.EntClient, opt.SourcesRepository, opt.judgeQueue)

@@ -3,8 +3,6 @@
 package task
 
 import (
-	"fmt"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -24,14 +22,6 @@ const (
 	FieldExecTimeLimit = "exec_time_limit"
 	// FieldExecMemoryLimit holds the string denoting the exec_memory_limit field in the database.
 	FieldExecMemoryLimit = "exec_memory_limit"
-	// FieldJudgeType holds the string denoting the judge_type field in the database.
-	FieldJudgeType = "judge_type"
-	// FieldCaseInsensitive holds the string denoting the case_insensitive field in the database.
-	FieldCaseInsensitive = "case_insensitive"
-	// FieldNdigits holds the string denoting the ndigits field in the database.
-	FieldNdigits = "ndigits"
-	// FieldJudgeCodePath holds the string denoting the judge_code_path field in the database.
-	FieldJudgeCodePath = "judge_code_path"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -100,10 +90,6 @@ var Columns = []string{
 	FieldDifficulty,
 	FieldExecTimeLimit,
 	FieldExecMemoryLimit,
-	FieldJudgeType,
-	FieldCaseInsensitive,
-	FieldNdigits,
-	FieldJudgeCodePath,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -133,31 +119,6 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
-}
-
-// JudgeType defines the type for the "judge_type" enum field.
-type JudgeType string
-
-// JudgeType values.
-const (
-	JudgeTypeNormal      JudgeType = "normal"
-	JudgeTypeEps         JudgeType = "eps"
-	JudgeTypeInteractive JudgeType = "interactive"
-	JudgeTypeCustom      JudgeType = "custom"
-)
-
-func (jt JudgeType) String() string {
-	return string(jt)
-}
-
-// JudgeTypeValidator is a validator for the "judge_type" field enum values. It is called by the builders before save.
-func JudgeTypeValidator(jt JudgeType) error {
-	switch jt {
-	case JudgeTypeNormal, JudgeTypeEps, JudgeTypeInteractive, JudgeTypeCustom:
-		return nil
-	default:
-		return fmt.Errorf("task: invalid enum value for judge_type field: %q", jt)
-	}
 }
 
 // OrderOption defines the ordering options for the Task queries.
@@ -191,26 +152,6 @@ func ByExecTimeLimit(opts ...sql.OrderTermOption) OrderOption {
 // ByExecMemoryLimit orders the results by the exec_memory_limit field.
 func ByExecMemoryLimit(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExecMemoryLimit, opts...).ToFunc()
-}
-
-// ByJudgeType orders the results by the judge_type field.
-func ByJudgeType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldJudgeType, opts...).ToFunc()
-}
-
-// ByCaseInsensitive orders the results by the case_insensitive field.
-func ByCaseInsensitive(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCaseInsensitive, opts...).ToFunc()
-}
-
-// ByNdigits orders the results by the ndigits field.
-func ByNdigits(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldNdigits, opts...).ToFunc()
-}
-
-// ByJudgeCodePath orders the results by the judge_code_path field.
-func ByJudgeCodePath(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldJudgeCodePath, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

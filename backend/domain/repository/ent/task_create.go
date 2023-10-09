@@ -58,54 +58,6 @@ func (tc *TaskCreate) SetExecMemoryLimit(u uint) *TaskCreate {
 	return tc
 }
 
-// SetJudgeType sets the "judge_type" field.
-func (tc *TaskCreate) SetJudgeType(tt task.JudgeType) *TaskCreate {
-	tc.mutation.SetJudgeType(tt)
-	return tc
-}
-
-// SetCaseInsensitive sets the "case_insensitive" field.
-func (tc *TaskCreate) SetCaseInsensitive(b bool) *TaskCreate {
-	tc.mutation.SetCaseInsensitive(b)
-	return tc
-}
-
-// SetNillableCaseInsensitive sets the "case_insensitive" field if the given value is not nil.
-func (tc *TaskCreate) SetNillableCaseInsensitive(b *bool) *TaskCreate {
-	if b != nil {
-		tc.SetCaseInsensitive(*b)
-	}
-	return tc
-}
-
-// SetNdigits sets the "ndigits" field.
-func (tc *TaskCreate) SetNdigits(u uint) *TaskCreate {
-	tc.mutation.SetNdigits(u)
-	return tc
-}
-
-// SetNillableNdigits sets the "ndigits" field if the given value is not nil.
-func (tc *TaskCreate) SetNillableNdigits(u *uint) *TaskCreate {
-	if u != nil {
-		tc.SetNdigits(*u)
-	}
-	return tc
-}
-
-// SetJudgeCodePath sets the "judge_code_path" field.
-func (tc *TaskCreate) SetJudgeCodePath(s string) *TaskCreate {
-	tc.mutation.SetJudgeCodePath(s)
-	return tc
-}
-
-// SetNillableJudgeCodePath sets the "judge_code_path" field if the given value is not nil.
-func (tc *TaskCreate) SetNillableJudgeCodePath(s *string) *TaskCreate {
-	if s != nil {
-		tc.SetJudgeCodePath(*s)
-	}
-	return tc
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (tc *TaskCreate) SetCreatedAt(t time.Time) *TaskCreate {
 	tc.mutation.SetCreatedAt(t)
@@ -267,14 +219,6 @@ func (tc *TaskCreate) check() error {
 	if _, ok := tc.mutation.ExecMemoryLimit(); !ok {
 		return &ValidationError{Name: "exec_memory_limit", err: errors.New(`ent: missing required field "Task.exec_memory_limit"`)}
 	}
-	if _, ok := tc.mutation.JudgeType(); !ok {
-		return &ValidationError{Name: "judge_type", err: errors.New(`ent: missing required field "Task.judge_type"`)}
-	}
-	if v, ok := tc.mutation.JudgeType(); ok {
-		if err := task.JudgeTypeValidator(v); err != nil {
-			return &ValidationError{Name: "judge_type", err: fmt.Errorf(`ent: validator failed for field "Task.judge_type": %w`, err)}
-		}
-	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Task.created_at"`)}
 	}
@@ -333,22 +277,6 @@ func (tc *TaskCreate) createSpec() (*Task, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.ExecMemoryLimit(); ok {
 		_spec.SetField(task.FieldExecMemoryLimit, field.TypeUint, value)
 		_node.ExecMemoryLimit = value
-	}
-	if value, ok := tc.mutation.JudgeType(); ok {
-		_spec.SetField(task.FieldJudgeType, field.TypeEnum, value)
-		_node.JudgeType = value
-	}
-	if value, ok := tc.mutation.CaseInsensitive(); ok {
-		_spec.SetField(task.FieldCaseInsensitive, field.TypeBool, value)
-		_node.CaseInsensitive = &value
-	}
-	if value, ok := tc.mutation.Ndigits(); ok {
-		_spec.SetField(task.FieldNdigits, field.TypeUint, value)
-		_node.Ndigits = &value
-	}
-	if value, ok := tc.mutation.JudgeCodePath(); ok {
-		_spec.SetField(task.FieldJudgeCodePath, field.TypeString, value)
-		_node.JudgeCodePath = &value
 	}
 	if value, ok := tc.mutation.CreatedAt(); ok {
 		_spec.SetField(task.FieldCreatedAt, field.TypeTime, value)
@@ -579,78 +507,6 @@ func (u *TaskUpsert) AddExecMemoryLimit(v uint) *TaskUpsert {
 	return u
 }
 
-// SetJudgeType sets the "judge_type" field.
-func (u *TaskUpsert) SetJudgeType(v task.JudgeType) *TaskUpsert {
-	u.Set(task.FieldJudgeType, v)
-	return u
-}
-
-// UpdateJudgeType sets the "judge_type" field to the value that was provided on create.
-func (u *TaskUpsert) UpdateJudgeType() *TaskUpsert {
-	u.SetExcluded(task.FieldJudgeType)
-	return u
-}
-
-// SetCaseInsensitive sets the "case_insensitive" field.
-func (u *TaskUpsert) SetCaseInsensitive(v bool) *TaskUpsert {
-	u.Set(task.FieldCaseInsensitive, v)
-	return u
-}
-
-// UpdateCaseInsensitive sets the "case_insensitive" field to the value that was provided on create.
-func (u *TaskUpsert) UpdateCaseInsensitive() *TaskUpsert {
-	u.SetExcluded(task.FieldCaseInsensitive)
-	return u
-}
-
-// ClearCaseInsensitive clears the value of the "case_insensitive" field.
-func (u *TaskUpsert) ClearCaseInsensitive() *TaskUpsert {
-	u.SetNull(task.FieldCaseInsensitive)
-	return u
-}
-
-// SetNdigits sets the "ndigits" field.
-func (u *TaskUpsert) SetNdigits(v uint) *TaskUpsert {
-	u.Set(task.FieldNdigits, v)
-	return u
-}
-
-// UpdateNdigits sets the "ndigits" field to the value that was provided on create.
-func (u *TaskUpsert) UpdateNdigits() *TaskUpsert {
-	u.SetExcluded(task.FieldNdigits)
-	return u
-}
-
-// AddNdigits adds v to the "ndigits" field.
-func (u *TaskUpsert) AddNdigits(v uint) *TaskUpsert {
-	u.Add(task.FieldNdigits, v)
-	return u
-}
-
-// ClearNdigits clears the value of the "ndigits" field.
-func (u *TaskUpsert) ClearNdigits() *TaskUpsert {
-	u.SetNull(task.FieldNdigits)
-	return u
-}
-
-// SetJudgeCodePath sets the "judge_code_path" field.
-func (u *TaskUpsert) SetJudgeCodePath(v string) *TaskUpsert {
-	u.Set(task.FieldJudgeCodePath, v)
-	return u
-}
-
-// UpdateJudgeCodePath sets the "judge_code_path" field to the value that was provided on create.
-func (u *TaskUpsert) UpdateJudgeCodePath() *TaskUpsert {
-	u.SetExcluded(task.FieldJudgeCodePath)
-	return u
-}
-
-// ClearJudgeCodePath clears the value of the "judge_code_path" field.
-func (u *TaskUpsert) ClearJudgeCodePath() *TaskUpsert {
-	u.SetNull(task.FieldJudgeCodePath)
-	return u
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (u *TaskUpsert) SetCreatedAt(v time.Time) *TaskUpsert {
 	u.Set(task.FieldCreatedAt, v)
@@ -810,90 +666,6 @@ func (u *TaskUpsertOne) AddExecMemoryLimit(v uint) *TaskUpsertOne {
 func (u *TaskUpsertOne) UpdateExecMemoryLimit() *TaskUpsertOne {
 	return u.Update(func(s *TaskUpsert) {
 		s.UpdateExecMemoryLimit()
-	})
-}
-
-// SetJudgeType sets the "judge_type" field.
-func (u *TaskUpsertOne) SetJudgeType(v task.JudgeType) *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.SetJudgeType(v)
-	})
-}
-
-// UpdateJudgeType sets the "judge_type" field to the value that was provided on create.
-func (u *TaskUpsertOne) UpdateJudgeType() *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.UpdateJudgeType()
-	})
-}
-
-// SetCaseInsensitive sets the "case_insensitive" field.
-func (u *TaskUpsertOne) SetCaseInsensitive(v bool) *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.SetCaseInsensitive(v)
-	})
-}
-
-// UpdateCaseInsensitive sets the "case_insensitive" field to the value that was provided on create.
-func (u *TaskUpsertOne) UpdateCaseInsensitive() *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.UpdateCaseInsensitive()
-	})
-}
-
-// ClearCaseInsensitive clears the value of the "case_insensitive" field.
-func (u *TaskUpsertOne) ClearCaseInsensitive() *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.ClearCaseInsensitive()
-	})
-}
-
-// SetNdigits sets the "ndigits" field.
-func (u *TaskUpsertOne) SetNdigits(v uint) *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.SetNdigits(v)
-	})
-}
-
-// AddNdigits adds v to the "ndigits" field.
-func (u *TaskUpsertOne) AddNdigits(v uint) *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.AddNdigits(v)
-	})
-}
-
-// UpdateNdigits sets the "ndigits" field to the value that was provided on create.
-func (u *TaskUpsertOne) UpdateNdigits() *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.UpdateNdigits()
-	})
-}
-
-// ClearNdigits clears the value of the "ndigits" field.
-func (u *TaskUpsertOne) ClearNdigits() *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.ClearNdigits()
-	})
-}
-
-// SetJudgeCodePath sets the "judge_code_path" field.
-func (u *TaskUpsertOne) SetJudgeCodePath(v string) *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.SetJudgeCodePath(v)
-	})
-}
-
-// UpdateJudgeCodePath sets the "judge_code_path" field to the value that was provided on create.
-func (u *TaskUpsertOne) UpdateJudgeCodePath() *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.UpdateJudgeCodePath()
-	})
-}
-
-// ClearJudgeCodePath clears the value of the "judge_code_path" field.
-func (u *TaskUpsertOne) ClearJudgeCodePath() *TaskUpsertOne {
-	return u.Update(func(s *TaskUpsert) {
-		s.ClearJudgeCodePath()
 	})
 }
 
@@ -1222,90 +994,6 @@ func (u *TaskUpsertBulk) AddExecMemoryLimit(v uint) *TaskUpsertBulk {
 func (u *TaskUpsertBulk) UpdateExecMemoryLimit() *TaskUpsertBulk {
 	return u.Update(func(s *TaskUpsert) {
 		s.UpdateExecMemoryLimit()
-	})
-}
-
-// SetJudgeType sets the "judge_type" field.
-func (u *TaskUpsertBulk) SetJudgeType(v task.JudgeType) *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.SetJudgeType(v)
-	})
-}
-
-// UpdateJudgeType sets the "judge_type" field to the value that was provided on create.
-func (u *TaskUpsertBulk) UpdateJudgeType() *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.UpdateJudgeType()
-	})
-}
-
-// SetCaseInsensitive sets the "case_insensitive" field.
-func (u *TaskUpsertBulk) SetCaseInsensitive(v bool) *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.SetCaseInsensitive(v)
-	})
-}
-
-// UpdateCaseInsensitive sets the "case_insensitive" field to the value that was provided on create.
-func (u *TaskUpsertBulk) UpdateCaseInsensitive() *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.UpdateCaseInsensitive()
-	})
-}
-
-// ClearCaseInsensitive clears the value of the "case_insensitive" field.
-func (u *TaskUpsertBulk) ClearCaseInsensitive() *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.ClearCaseInsensitive()
-	})
-}
-
-// SetNdigits sets the "ndigits" field.
-func (u *TaskUpsertBulk) SetNdigits(v uint) *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.SetNdigits(v)
-	})
-}
-
-// AddNdigits adds v to the "ndigits" field.
-func (u *TaskUpsertBulk) AddNdigits(v uint) *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.AddNdigits(v)
-	})
-}
-
-// UpdateNdigits sets the "ndigits" field to the value that was provided on create.
-func (u *TaskUpsertBulk) UpdateNdigits() *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.UpdateNdigits()
-	})
-}
-
-// ClearNdigits clears the value of the "ndigits" field.
-func (u *TaskUpsertBulk) ClearNdigits() *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.ClearNdigits()
-	})
-}
-
-// SetJudgeCodePath sets the "judge_code_path" field.
-func (u *TaskUpsertBulk) SetJudgeCodePath(v string) *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.SetJudgeCodePath(v)
-	})
-}
-
-// UpdateJudgeCodePath sets the "judge_code_path" field to the value that was provided on create.
-func (u *TaskUpsertBulk) UpdateJudgeCodePath() *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.UpdateJudgeCodePath()
-	})
-}
-
-// ClearJudgeCodePath clears the value of the "judge_code_path" field.
-func (u *TaskUpsertBulk) ClearJudgeCodePath() *TaskUpsertBulk {
-	return u.Update(func(s *TaskUpsert) {
-		s.ClearJudgeCodePath()
 	})
 }
 
