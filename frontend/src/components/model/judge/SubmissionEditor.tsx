@@ -15,13 +15,13 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Textarea,
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
 import path from "path";
 import { ChangeEventHandler, useRef, useState } from "react";
 import { IoPushSharp } from "react-icons/io5";
+import { Editor } from "../../ui/Editor";
 
 const activeLangIds = langIDs.filter((id) => langMetasBrief[id].active);
 
@@ -139,10 +139,10 @@ export const SubmissionEditor = ({
           accept={acceptedFileExtsCommnaJoined}
           onChange={handleFileAttach}
         />
-        <Textarea
-          rows={15}
-          value={sourceCode}
-          onChange={(e) => onSourceCodeChange(e.target.value)}
+        <Editor
+          doc={sourceCode}
+          onDocChange={onSourceCodeChange}
+          height="20rem"
         />
       </Box>
       {warnings.length > 0 && (

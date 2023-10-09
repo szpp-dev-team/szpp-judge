@@ -1,3 +1,4 @@
+import { indentWithTab } from "@codemirror/commands";
 import { cpp } from "@codemirror/lang-cpp";
 import { defaultHighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorState, EditorStateConfig } from "@codemirror/state";
@@ -8,6 +9,7 @@ import {
   highlightActiveLine,
   highlightActiveLineGutter,
   highlightSpecialChars,
+  keymap,
   lineNumbers,
 } from "@codemirror/view";
 import { useEffect, useRef } from "react";
@@ -15,9 +17,18 @@ import { useEffect, useRef } from "react";
 interface EditorProps extends Omit<EditorStateConfig, "extensions"> {
   /** 編集できなくなる */
   readonly?: boolean;
+
+  onDocChange?: (s: string) => unknown;
+
+  height?: string;
 }
 
-export const Editor = ({ doc, readonly = false }: EditorProps) => {
+export const Editor = ({
+  doc,
+  height,
+  onDocChange = () => {},
+  readonly = false,
+}: EditorProps) => {
   const editor = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,8 +44,14 @@ export const Editor = ({ doc, readonly = false }: EditorProps) => {
         dropCursor(),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         highlightActiveLine(),
+        keymap.of([indentWithTab]),
         cpp(),
         EditorState.readOnly.of(readonly),
+        EditorView.updateListener.of(upd => {
+          if (upd.docChanged) {
+            onDocChange(upd.state.doc.toString());
+          }
+        }),
       ],
     });
 
@@ -48,5 +65,5 @@ export const Editor = ({ doc, readonly = false }: EditorProps) => {
     };
   }, [doc, readonly]);
 
-  return <div ref={editor} />;
+  return <div style={{ height, overflow: "auto", overscrollBehavior: "none" }} ref={editor} />;
 };
