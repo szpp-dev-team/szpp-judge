@@ -21,6 +21,22 @@ export type TaskDetailCommonProps = {
   score?: number;
 };
 
+const MarkdownView = dynamic(
+  () => import("@/src/components/ui/MarkdownView").then(mod => mod.MarkdownView),
+  {
+    loading: () => <p>読み込み中です</p>,
+    ssr: false
+  },
+);
+
+const SubmissionEditor = dynamic(
+  () => import("@/src/components/model/judge/SubmissionEditor").then(mod => mod.SubmissionEditor),
+  {
+    loading: () => <p>読み込み中です</p>,
+    ssr: false,
+  },
+);
+
 // コンテスト問題ページ、スタンドアロン問題ページ共通の問題表示ビュー。
 // 問題タイトルや時間制限、問題文、サンプルケース、提出フォームなどを表示する
 export const TaskDetailCommon = ({
@@ -79,19 +95,6 @@ export const TaskDetailCommon = ({
       },
     });
   };
-
-  const MarkdownView = dynamic(
-    () => import("@/src/components/ui/MarkdownView").then(mod => mod.MarkdownView),
-    { ssr: false },
-  );
-
-  const SubmissionEditor = dynamic(
-    () => import("@/src/components/model/judge/SubmissionEditor").then(mod => mod.SubmissionEditor),
-    {
-      loading: () => <p>読み込み中です</p>,
-      ssr: false,
-    },
-  );
 
   return (
     <Card px={6} py={4} minH="100%" maxW="860px" w="100%" rounded={"none"} color="cyan.900">
