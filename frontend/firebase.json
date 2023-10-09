@@ -17,6 +17,10 @@
         "destination": "/contests/[contest_slug]/standings.html"
       },
       {
+        "regex": "^/contests/([^/]+?)/submissions(?:/)?$",
+        "destination": "/contests/[contest_slug]/submissions.html"
+      },
+      {
         "regex": "^/contests/([^/]+?)/submissions/([^/]+?)(?:/)?$",
         "destination": "/contests/[contest_slug]/submissions/[submission_id].html"
       },
