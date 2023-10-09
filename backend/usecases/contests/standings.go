@@ -95,7 +95,7 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 	sort.SliceStable(result, func(i, j int) bool {
 		if result[i].totalScore > result[j].totalScore {
 			return true
-		} else if *result[i].latestUntilAc < *result[j].latestUntilAc {
+		} else if result[i].latestUntilAc != nil && result[j].latestUntilAc != nil && *result[i].latestUntilAc < *result[j].latestUntilAc {
 			return true
 		}
 		return false
@@ -118,7 +118,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 	for _, submission := range submissions {
 
 		// exception handling
-		if submission.SubmittedAt.Before(contest.StartAt) || contest.EndAt.After(submission.SubmittedAt) {
+		if submission.SubmittedAt.Before(contest.StartAt) || submission.SubmittedAt.After(contest.EndAt) {
 			continue
 		}
 
@@ -152,7 +152,6 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 		} else {
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
 		}
-
 		userInfo[submission.Edges.User.ID] = updateUserInfo
 	}
 
@@ -229,12 +228,19 @@ func toStandingsRecord(standings StandingsRecord) *backendv1.StandingsRecord {
 		taskDetailList = append(taskDetailList, toStandingsRecordTaskDetail(row))
 	}
 
+	var latestAcAt *timestamppb.Timestamp
+	latestAcAt = nil
+
+	if standings.latestUntilAc != nil {
+		latestAcAt = toTimestamp(standings.latestUntilAc)
+	}
+
 	return &backendv1.StandingsRecord{
 		Rank:              int32(standings.rank),
 		Username:          standings.userName,
 		TotalScore:        int32(standings.totalScore),
 		TotalPenaltyCount: int32(standings.totalPenaltyCount),
-		LatestAcAt:        toTimestamp(standings.latestUntilAc),
+		LatestAcAt:        latestAcAt,
 		TaskDetailList:    taskDetailList,
 	}
 }
