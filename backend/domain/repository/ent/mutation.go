@@ -2906,10 +2906,11 @@ type RefreshTokenMutation struct {
 	typ           string
 	id            *int
 	token         *string
-	username      *string
 	expires_at    *time.Time
 	is_dead       *bool
 	clearedFields map[string]struct{}
+	user          *int
+	cleareduser   bool
 	done          bool
 	oldValue      func(context.Context) (*RefreshToken, error)
 	predicates    []predicate.RefreshToken
@@ -3049,42 +3050,6 @@ func (m *RefreshTokenMutation) ResetToken() {
 	m.token = nil
 }
 
-// SetUsername sets the "username" field.
-func (m *RefreshTokenMutation) SetUsername(s string) {
-	m.username = &s
-}
-
-// Username returns the value of the "username" field in the mutation.
-func (m *RefreshTokenMutation) Username() (r string, exists bool) {
-	v := m.username
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUsername returns the old "username" field's value of the RefreshToken entity.
-// If the RefreshToken object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RefreshTokenMutation) OldUsername(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUsername is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUsername requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUsername: %w", err)
-	}
-	return oldValue.Username, nil
-}
-
-// ResetUsername resets all changes to the "username" field.
-func (m *RefreshTokenMutation) ResetUsername() {
-	m.username = nil
-}
-
 // SetExpiresAt sets the "expires_at" field.
 func (m *RefreshTokenMutation) SetExpiresAt(t time.Time) {
 	m.expires_at = &t
@@ -3157,6 +3122,45 @@ func (m *RefreshTokenMutation) ResetIsDead() {
 	m.is_dead = nil
 }
 
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *RefreshTokenMutation) SetUserID(id int) {
+	m.user = &id
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *RefreshTokenMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *RefreshTokenMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserID returns the "user" edge ID in the mutation.
+func (m *RefreshTokenMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *RefreshTokenMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *RefreshTokenMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
 // Where appends a list predicates to the RefreshTokenMutation builder.
 func (m *RefreshTokenMutation) Where(ps ...predicate.RefreshToken) {
 	m.predicates = append(m.predicates, ps...)
@@ -3191,12 +3195,9 @@ func (m *RefreshTokenMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RefreshTokenMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 3)
 	if m.token != nil {
 		fields = append(fields, refreshtoken.FieldToken)
-	}
-	if m.username != nil {
-		fields = append(fields, refreshtoken.FieldUsername)
 	}
 	if m.expires_at != nil {
 		fields = append(fields, refreshtoken.FieldExpiresAt)
@@ -3214,8 +3215,6 @@ func (m *RefreshTokenMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case refreshtoken.FieldToken:
 		return m.Token()
-	case refreshtoken.FieldUsername:
-		return m.Username()
 	case refreshtoken.FieldExpiresAt:
 		return m.ExpiresAt()
 	case refreshtoken.FieldIsDead:
@@ -3231,8 +3230,6 @@ func (m *RefreshTokenMutation) OldField(ctx context.Context, name string) (ent.V
 	switch name {
 	case refreshtoken.FieldToken:
 		return m.OldToken(ctx)
-	case refreshtoken.FieldUsername:
-		return m.OldUsername(ctx)
 	case refreshtoken.FieldExpiresAt:
 		return m.OldExpiresAt(ctx)
 	case refreshtoken.FieldIsDead:
@@ -3252,13 +3249,6 @@ func (m *RefreshTokenMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetToken(v)
-		return nil
-	case refreshtoken.FieldUsername:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUsername(v)
 		return nil
 	case refreshtoken.FieldExpiresAt:
 		v, ok := value.(time.Time)
@@ -3326,9 +3316,6 @@ func (m *RefreshTokenMutation) ResetField(name string) error {
 	case refreshtoken.FieldToken:
 		m.ResetToken()
 		return nil
-	case refreshtoken.FieldUsername:
-		m.ResetUsername()
-		return nil
 	case refreshtoken.FieldExpiresAt:
 		m.ResetExpiresAt()
 		return nil
@@ -3341,19 +3328,28 @@ func (m *RefreshTokenMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RefreshTokenMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.user != nil {
+		edges = append(edges, refreshtoken.EdgeUser)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *RefreshTokenMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case refreshtoken.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RefreshTokenMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -3365,25 +3361,42 @@ func (m *RefreshTokenMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RefreshTokenMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.cleareduser {
+		edges = append(edges, refreshtoken.EdgeUser)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *RefreshTokenMutation) EdgeCleared(name string) bool {
+	switch name {
+	case refreshtoken.EdgeUser:
+		return m.cleareduser
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *RefreshTokenMutation) ClearEdge(name string) error {
+	switch name {
+	case refreshtoken.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
 	return fmt.Errorf("unknown RefreshToken unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *RefreshTokenMutation) ResetEdge(name string) error {
+	switch name {
+	case refreshtoken.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
 	return fmt.Errorf("unknown RefreshToken edge %s", name)
 }
 
@@ -8196,31 +8209,34 @@ func (m *TestcaseSetMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	username            *string
-	email               *string
-	role                *string
-	hashed_password     *[]byte
-	created_at          *time.Time
-	updated_at          *time.Time
-	clearedFields       map[string]struct{}
-	tasks               map[int]struct{}
-	removedtasks        map[int]struct{}
-	clearedtasks        bool
-	submits             map[int]struct{}
-	removedsubmits      map[int]struct{}
-	clearedsubmits      bool
-	contests            map[int]struct{}
-	removedcontests     map[int]struct{}
-	clearedcontests     bool
-	contest_user        map[int]struct{}
-	removedcontest_user map[int]struct{}
-	clearedcontest_user bool
-	done                bool
-	oldValue            func(context.Context) (*User, error)
-	predicates          []predicate.User
+	op                    Op
+	typ                   string
+	id                    *int
+	username              *string
+	email                 *string
+	role                  *string
+	hashed_password       *[]byte
+	created_at            *time.Time
+	updated_at            *time.Time
+	clearedFields         map[string]struct{}
+	tasks                 map[int]struct{}
+	removedtasks          map[int]struct{}
+	clearedtasks          bool
+	submits               map[int]struct{}
+	removedsubmits        map[int]struct{}
+	clearedsubmits        bool
+	contests              map[int]struct{}
+	removedcontests       map[int]struct{}
+	clearedcontests       bool
+	refresh_tokens        map[int]struct{}
+	removedrefresh_tokens map[int]struct{}
+	clearedrefresh_tokens bool
+	contest_user          map[int]struct{}
+	removedcontest_user   map[int]struct{}
+	clearedcontest_user   bool
+	done                  bool
+	oldValue              func(context.Context) (*User, error)
+	predicates            []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -8718,6 +8734,60 @@ func (m *UserMutation) ResetContests() {
 	m.removedcontests = nil
 }
 
+// AddRefreshTokenIDs adds the "refresh_tokens" edge to the RefreshToken entity by ids.
+func (m *UserMutation) AddRefreshTokenIDs(ids ...int) {
+	if m.refresh_tokens == nil {
+		m.refresh_tokens = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.refresh_tokens[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRefreshTokens clears the "refresh_tokens" edge to the RefreshToken entity.
+func (m *UserMutation) ClearRefreshTokens() {
+	m.clearedrefresh_tokens = true
+}
+
+// RefreshTokensCleared reports if the "refresh_tokens" edge to the RefreshToken entity was cleared.
+func (m *UserMutation) RefreshTokensCleared() bool {
+	return m.clearedrefresh_tokens
+}
+
+// RemoveRefreshTokenIDs removes the "refresh_tokens" edge to the RefreshToken entity by IDs.
+func (m *UserMutation) RemoveRefreshTokenIDs(ids ...int) {
+	if m.removedrefresh_tokens == nil {
+		m.removedrefresh_tokens = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.refresh_tokens, ids[i])
+		m.removedrefresh_tokens[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRefreshTokens returns the removed IDs of the "refresh_tokens" edge to the RefreshToken entity.
+func (m *UserMutation) RemovedRefreshTokensIDs() (ids []int) {
+	for id := range m.removedrefresh_tokens {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RefreshTokensIDs returns the "refresh_tokens" edge IDs in the mutation.
+func (m *UserMutation) RefreshTokensIDs() (ids []int) {
+	for id := range m.refresh_tokens {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRefreshTokens resets all changes to the "refresh_tokens" edge.
+func (m *UserMutation) ResetRefreshTokens() {
+	m.refresh_tokens = nil
+	m.clearedrefresh_tokens = false
+	m.removedrefresh_tokens = nil
+}
+
 // AddContestUserIDs adds the "contest_user" edge to the ContestUser entity by ids.
 func (m *UserMutation) AddContestUserIDs(ids ...int) {
 	if m.contest_user == nil {
@@ -8999,7 +9069,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.tasks != nil {
 		edges = append(edges, user.EdgeTasks)
 	}
@@ -9008,6 +9078,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.contests != nil {
 		edges = append(edges, user.EdgeContests)
+	}
+	if m.refresh_tokens != nil {
+		edges = append(edges, user.EdgeRefreshTokens)
 	}
 	if m.contest_user != nil {
 		edges = append(edges, user.EdgeContestUser)
@@ -9037,6 +9110,12 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeRefreshTokens:
+		ids := make([]ent.Value, 0, len(m.refresh_tokens))
+		for id := range m.refresh_tokens {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeContestUser:
 		ids := make([]ent.Value, 0, len(m.contest_user))
 		for id := range m.contest_user {
@@ -9049,7 +9128,7 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedtasks != nil {
 		edges = append(edges, user.EdgeTasks)
 	}
@@ -9058,6 +9137,9 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedcontests != nil {
 		edges = append(edges, user.EdgeContests)
+	}
+	if m.removedrefresh_tokens != nil {
+		edges = append(edges, user.EdgeRefreshTokens)
 	}
 	if m.removedcontest_user != nil {
 		edges = append(edges, user.EdgeContestUser)
@@ -9087,6 +9169,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeRefreshTokens:
+		ids := make([]ent.Value, 0, len(m.removedrefresh_tokens))
+		for id := range m.removedrefresh_tokens {
+			ids = append(ids, id)
+		}
+		return ids
 	case user.EdgeContestUser:
 		ids := make([]ent.Value, 0, len(m.removedcontest_user))
 		for id := range m.removedcontest_user {
@@ -9099,7 +9187,7 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedtasks {
 		edges = append(edges, user.EdgeTasks)
 	}
@@ -9108,6 +9196,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	}
 	if m.clearedcontests {
 		edges = append(edges, user.EdgeContests)
+	}
+	if m.clearedrefresh_tokens {
+		edges = append(edges, user.EdgeRefreshTokens)
 	}
 	if m.clearedcontest_user {
 		edges = append(edges, user.EdgeContestUser)
@@ -9125,6 +9216,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedsubmits
 	case user.EdgeContests:
 		return m.clearedcontests
+	case user.EdgeRefreshTokens:
+		return m.clearedrefresh_tokens
 	case user.EdgeContestUser:
 		return m.clearedcontest_user
 	}
@@ -9151,6 +9244,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeContests:
 		m.ResetContests()
+		return nil
+	case user.EdgeRefreshTokens:
+		m.ResetRefreshTokens()
 		return nil
 	case user.EdgeContestUser:
 		m.ResetContestUser()

@@ -43,7 +43,7 @@ func (i *Interactor) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 	}
 
 	secret := i.Secret
-	tokens, err := GenerateTokens(ctx, i.entClient, []byte(secret), username)
+	tokens, err := GenerateTokens(ctx, i.entClient, []byte(secret), user)
 	if err != nil {
 		return nil, err
 	}
@@ -72,12 +72,11 @@ func (i *Interactor) RefreshAccessToken(ctx context.Context, req *pb.RefreshAcce
 	} else {
 		secret := i.Secret
 		q := i.entClient.RefreshToken.Query()
-		refreshToken, err := q.Where(entrefreshtoken.Token(req.RefreshToken)).Only(ctx)
+		refreshToken, err := q.WithUser().Where(entrefreshtoken.Token(req.RefreshToken)).Only(ctx)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
-		username := refreshToken.Username
-		accessToken, err := generateAccessToken([]byte(secret), username)
+		accessToken, err := generateAccessToken([]byte(secret), refreshToken.Edges.User)
 		if err != nil {
 			return nil, err
 		}

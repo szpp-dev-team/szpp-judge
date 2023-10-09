@@ -50,6 +50,7 @@ jobs:
         run: pnpm build
         env:
           NEXT_PUBLIC_BACKEND_BASE_URL: ${{ secrets.NEXT_PUBLIC_BACKEND_BASE_URL }}
+          NEXT_PUBLIC_MOCK_ENABLED: '1'
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:

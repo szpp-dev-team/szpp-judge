@@ -13,12 +13,20 @@
         "destination": "/contests/[contest_slug].html"
       },
       {
+        "regex": "^/contests/([^/]+?)/standings(?:/)?$",
+        "destination": "/contests/[contest_slug]/standings.html"
+      },
+      {
         "regex": "^/contests/([^/]+?)/submissions/([^/]+?)(?:/)?$",
         "destination": "/contests/[contest_slug]/submissions/[submission_id].html"
       },
       {
         "regex": "^/contests/([^/]+?)/tasks(?:/)?$",
         "destination": "/contests/[contest_slug]/tasks.html"
+      },
+      {
+        "regex": "^/contests/([^/]+?)/tasks/([^/]+?)(?:/)?$",
+        "destination": "/contests/[contest_slug]/tasks/[contest_task_seq].html"
       }
     ]
   }

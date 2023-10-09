@@ -8,5 +8,6 @@
   "rules": {
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "error"
-  }
+  },
+  "ignorePatterns": ["src/util/scratch/cpp_converter.js"]
 }

@@ -1,12 +1,12 @@
 import { ScoreStatus } from "@/src/model/task";
-import { calcNthTaskSeq } from "@/src/usecases/contest";
+import { useTaskSeqCodes } from "@/src/usecases/contest";
 import { Duration, fmtDatetime } from "@/src/util/time";
 import { Box, FormControl, FormLabel, Icon, Link, Switch, Text } from "@chakra-ui/react";
 import type { BoxProps, LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React, { type ReactNode, useCallback, useMemo, useState } from "react";
 import type { IconType } from "react-icons";
-import { IoBarChart, IoChatboxEllipses, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
+import { IoBarChart, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
 import { SIDEBAR_TOGGLE_KNOB_H, SIDEBAR_TOGGLE_KNOB_TOP, SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
 import { ScoreStatusIcon } from "../task/ScoreStatusIcon";
 
@@ -119,6 +119,7 @@ const SidebarMainPane = ({
   const contestRootPath = `/contests/${slug}`;
   const contestStarted = startAt ? now >= startAt : false;
   const contestFinished = endAt ? now >= endAt : false;
+  const seqCodes = useTaskSeqCodes(tasks.length);
 
   return (
     <Box
@@ -155,7 +156,7 @@ const SidebarMainPane = ({
         <SidebarLinkItem text="コンテストトップ" icon={IoHome} href={`${contestRootPath}`} />
         {contestStarted && (
           <>
-            <SidebarLinkItem text="質問" icon={IoChatboxEllipses} href={`${contestRootPath}/clarifications`} />
+            {/* <SidebarLinkItem text="質問" icon={IoChatboxEllipses} href={`${contestRootPath}/clarifications`} /> */}
             <SidebarLinkItem text="問題" icon={IoList} href={`${contestRootPath}/tasks`} />
             <Box
               as="li"
@@ -172,7 +173,7 @@ const SidebarMainPane = ({
                     leftElem={
                       <>
                         <ScoreStatusIcon status={t.scoreStatus} mr={1} />
-                        <TaskSeqBadge seq={calcNthTaskSeq(i, tasks.length)} />
+                        <TaskSeqBadge seq={seqCodes[i]!} />
                       </>
                     }
                     key={t.id}

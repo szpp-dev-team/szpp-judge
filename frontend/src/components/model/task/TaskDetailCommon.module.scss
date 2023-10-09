@@ -1,0 +1,120 @@
+@mixin header-common {
+  margin-top: 1.75rem;
+}
+
+@mixin h2 {
+  @include header-common();
+  font-size: 1.75rem;
+  font-weight: bold;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+@mixin h3 {
+  @include header-common();
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+@mixin h4 {
+  @include header-common();
+  font-size: 1.5rem;
+}
+
+// TypeScript 側から CSS Module として読み込めるようにここでも定義
+.h2 { @include h2(); }
+.h3 { @include h3(); }
+.h4 { @include h4(); }
+
+.markdownWrapper {
+  & > *:first-child {
+    margin-top: 0 !important;
+  }
+  & > *:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  h1 {
+    font-size: 3rem;
+    color: red;
+    &::after {
+      content: "問題文ではh1タグを使わないでください";
+      color: red;
+    }
+  }
+
+  h2 { @include h2(); }
+  h3 { @include h3(); }
+  h4 { @include h4(); }
+
+  p {
+    margin-top: 1em;
+  }
+
+  a {
+    color: #2b6cb0;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  ul, ol {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-left: 2em;
+  }
+
+  li > :is(ul, ol) {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  em {
+    font-style: italic;
+  }
+  strong {
+    font-style: bold;
+  }
+  del {
+    text-decoration: line-through;
+  }
+
+  code {
+    color: #e052a8;
+  }
+
+  pre > code {
+    display: block;
+    padding: 0.5em;
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    color: #000;
+    background: #f4f4f8;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    overflow: auto;
+  }
+
+  summary {
+    margin-top: 1em;
+    cursor: pointer;
+  }
+
+  $table-border-color: #ddd;
+  $table-border-style: 1px solid $table-border-color;
+
+  table {
+    margin: 1.5rem auto;
+    border-top: $table-border-style;
+    border-left: $table-border-style;
+  }
+
+  td, th {
+    padding: .25em .75em;
+    border-bottom: $table-border-style;
+    border-right: $table-border-style;
+  }
+  th {
+    background: #f9f9f9;
+    border-bottom: 2px solid $table-border-color;
+  }
+}
