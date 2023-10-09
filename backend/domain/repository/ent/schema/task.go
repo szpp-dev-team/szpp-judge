@@ -19,11 +19,6 @@ func (Task) Fields() []ent.Field {
 		field.Uint("exec_time_limit"),   // ms
 		field.Uint("exec_memory_limit"), // MiB
 
-		field.Enum("judge_type").Values("normal", "eps", "interactive", "custom"),
-		field.Bool("case_insensitive").Optional().Nillable(),  // normal
-		field.Uint("ndigits").Optional().Nillable(),           // eps
-		field.String("judge_code_path").Optional().Nillable(), // interactive, custom
-
 		field.Time("created_at"),
 		field.Time("updated_at").Optional().Nillable(),
 	}
