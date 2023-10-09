@@ -1,4 +1,5 @@
 import taskDetailStyle from "@/src/components/model/task/TaskDetailCommon.module.scss";
+import { MAX_SOURCE_CODE_SIZE } from "@/src/config/submission";
 import { LangID } from "@/src/gen/langs";
 import { SubmitRequest } from "@/src/gen/proto/backend/v1/judge_service_pb";
 import { Task, Testcase } from "@/src/gen/proto/backend/v1/task_resources_pb";
@@ -10,7 +11,6 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { DifficultyBadge } from "../../model/task/DifficultyBadge";
 import { TestcaseView } from "./TestcaseView";
-import { MAX_SOURCE_CODE_SIZE } from "@/src/config/submission";
 
 export type TaskDetailCommonProps = {
   task: Task;
@@ -126,15 +126,15 @@ export const TaskDetailCommon = ({
       ))}
 
       <h2 className={taskDetailStyle.h2}>解答プログラム</h2>
-      <Text mt={2}>ソースコード長の上限は {MAX_SOURCE_CODE_SIZE >> 10} KiB です。</Text>
       <form>
         <SubmissionEditor
           sourceCode={sourceCode}
           langId={langId}
           onLangIdChange={setLangId}
           onSourceCodeChange={setSourceCode}
-          mt={2}
+          mt={6}
         />
+        <Text mt={2}>ソースコード長の上限は {MAX_SOURCE_CODE_SIZE >> 10} KiB です。</Text>
         <Flex justifyContent="center" my={12}>
           <Button
             fontSize="2xl"
