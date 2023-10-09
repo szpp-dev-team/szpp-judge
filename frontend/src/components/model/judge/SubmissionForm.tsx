@@ -10,7 +10,6 @@ import {
   ButtonProps,
   Flex,
   Heading,
-  Icon,
   ListItem,
   Menu,
   MenuButton,
@@ -22,7 +21,6 @@ import {
 } from "@chakra-ui/react";
 import path from "path";
 import { ChangeEventHandler, useCallback, useRef, useState } from "react";
-import { IoPushSharp } from "react-icons/io5";
 import { Editor } from "../../ui/Editor";
 
 const activeLangIds = langIDs.filter((id) => langMetasBrief[id].active);
@@ -95,7 +93,7 @@ export const SubmissionForm = ({
   return (
     <Box as="form">
       <Text my={2} fontSize="sm">ソースコード長の上限は {MAX_SOURCE_CODE_SIZE >> 10} KiB です。</Text>
-      <Box rounded="md" border="1px" color="teal.900" borderColor="gray.300">
+      <Box rounded="md" border="1px" color="teal.900" borderColor="gray.300" overflow="hidden">
         <Flex
           justifyContent="space-between"
           roundedTop="inherit"
@@ -108,14 +106,31 @@ export const SubmissionForm = ({
         >
           <Menu autoSelect={false}>
             <MenuButton
-              as={Button}
+              type="button"
+              fontSize="14px"
+              px={3}
+              py={2}
+              rounded="md"
               textAlign="left"
+              border="1px"
+              borderColor="gray.300"
               bg="white"
               _hover={{ bg: "white" }}
               _expanded={{ bg: "white" }}
-              rightIcon={<ChevronDownIcon />}
             >
-              {langMetasBrief[langId].name}
+              <Flex alignItems="center">
+                <Text
+                  as="span"
+                  display="inline-block"
+                  w="20ch"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                >
+                  {langMetasBrief[langId].name}
+                </Text>
+                <ChevronDownIcon ml={1} />
+              </Flex>
             </MenuButton>
             <MenuList>
               {activeLangIds.map((id) => (
@@ -124,7 +139,7 @@ export const SubmissionForm = ({
             </MenuList>
           </Menu>
           <Button
-            leftIcon={<Icon as={IoPushSharp} />}
+            fontSize="12px"
             colorScheme="orange"
             onClick={() => fileInputRef.current?.click()}
           >
@@ -155,8 +170,8 @@ export const SubmissionForm = ({
       )}
       <Flex justifyContent="center" my={12}>
         <Button
-          fontSize="2xl"
-          px={16}
+          fontSize="xl"
+          px={14}
           py={8}
           colorScheme="teal"
           onClick={onSubmit ? () => onSubmit(langId, sourceCode) : undefined}
