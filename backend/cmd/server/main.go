@@ -15,6 +15,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/config"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/checkers"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
@@ -69,6 +70,7 @@ func main() {
 	defer storageClient.Close()
 	testcasesRepository := testcases.NewRepository(storageClient, config.GcsBucketName)
 	sourcesRepository := sources.NewRepository(storageClient, config.GcsBucketName)
+	checkerRepository := checkers.NewRepository(storageClient, config.GcsBucketName)
 	judgeQueue := judge_queue.New(cloudtasksClient, config.HandleJudgeTaskURL, config.CloudTasksProjectID, config.CloudTasksLocationID, config.CloudTasksQueueID)
 	conn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -88,6 +90,7 @@ func main() {
 		connect_server.WithTestcasesRepository(testcasesRepository),
 		connect_server.WithJudgeQueue(judgeQueue),
 		connect_server.WithJudgeClient(judgeClient),
+		connect_server.WithCheckerRepository(checkerRepository),
 		connect_server.WithSecret(config.JWTSecret),
 		connect_server.WithFrontendURL(config.FrontendURL),
 	)
