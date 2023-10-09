@@ -67,8 +67,8 @@ func main() {
 		log.Fatal(err)
 	}
 	defer storageClient.Close()
-	testcasesRepository := testcases.NewRepository(storageClient)
-	sourcesRepository := sources.NewRepository(storageClient)
+	testcasesRepository := testcases.NewRepository(storageClient, config.GcsBucketName)
+	sourcesRepository := sources.NewRepository(storageClient, config.GcsBucketName)
 	judgeQueue := judge_queue.New(cloudtasksClient, config.HandleJudgeTaskURL, config.CloudTasksProjectID, config.CloudTasksLocationID, config.CloudTasksQueueID)
 	conn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

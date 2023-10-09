@@ -9,15 +9,16 @@ import (
 )
 
 type gcsImpl struct {
-	client *storage.Client
+	client     *storage.Client
+	bucketName string
 }
 
-func NewRepository(client *storage.Client) Repository {
-	return &gcsImpl{client}
+func NewRepository(client *storage.Client, bucketName string) Repository {
+	return &gcsImpl{client, bucketName}
 }
 
 func (i *gcsImpl) DownloadTestcase(ctx context.Context, taskID int, name string) (*Testcase, error) {
-	bucket := i.client.Bucket("szpp-judge")
+	bucket := i.client.Bucket(i.bucketName)
 	inBytes, err := gcs.DownloadFile(ctx, bucket, BuildTestcaseInPath(taskID, name))
 	if err != nil {
 		return nil, err
@@ -34,7 +35,7 @@ func (i *gcsImpl) DownloadTestcase(ctx context.Context, taskID int, name string)
 }
 
 func (i *gcsImpl) UpsertTestcase(ctx context.Context, taskID int, testcase *Testcase) error {
-	bucket := i.client.Bucket("szpp-judge")
+	bucket := i.client.Bucket(i.bucketName)
 	if err := gcs.UploadFile(ctx, bucket, BuildTestcaseInPath(taskID, testcase.Name), testcase.In); err != nil {
 		return err
 	}
