@@ -26,6 +26,7 @@ message MutationTask {
   judge.v1.JudgeType judge_type = 6; // Judge の type(完全一致、誤差など)
   Difficulty difficulty = 7;
   bool is_public = 8;
+  string checker = 9;
 }
 
 enum Difficulty {

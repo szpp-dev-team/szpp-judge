@@ -24,6 +24,7 @@ message JudgeRequest {
   optional uint32 stdout_limit_kib = 9;
   optional uint32 stderr_limit_kib = 10;
   int32 submission_id = 11;
+  string checker_code_path = 12; // GCS 上の checker のパス
 }
 
 message JudgeResponse {

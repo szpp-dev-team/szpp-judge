@@ -202,6 +202,11 @@ export class MutationTask extends Message<MutationTask> {
    */
   isPublic = false;
 
+  /**
+   * @generated from field: string checker = 9;
+   */
+  checker = "";
+
   constructor(data?: PartialMessage<MutationTask>) {
     super();
     proto3.util.initPartial(data, this);
@@ -218,6 +223,7 @@ export class MutationTask extends Message<MutationTask> {
     { no: 6, name: "judge_type", kind: "message", T: JudgeType },
     { no: 7, name: "difficulty", kind: "enum", T: proto3.getEnumType(Difficulty) },
     { no: 8, name: "is_public", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "checker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MutationTask {

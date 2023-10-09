@@ -142,6 +142,13 @@ export class JudgeRequest extends Message<JudgeRequest> {
    */
   submissionId = 0;
 
+  /**
+   * GCS 上の checker のパス
+   *
+   * @generated from field: string checker_code_path = 12;
+   */
+  checkerCodePath = "";
+
   constructor(data?: PartialMessage<JudgeRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -160,6 +167,7 @@ export class JudgeRequest extends Message<JudgeRequest> {
     { no: 9, name: "stdout_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 10, name: "stderr_limit_kib", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 11, name: "submission_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 12, name: "checker_code_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): JudgeRequest {
