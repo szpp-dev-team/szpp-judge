@@ -3,7 +3,6 @@ package judge
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"connectrpc.com/connect"
@@ -236,53 +235,6 @@ func toPbSubmissionSummary(submit *ent.Submit) *backendv1.SubmissionSummary {
 }
 
 func buildJudgeRequest(submitID int, langID string, task *ent.Task) (*judgev1.JudgeRequest, error) {
-	var judgeType *judgev1.JudgeType
-	switch task.JudgeType {
-	case ent_task.JudgeTypeNormal:
-		judgeType = &judgev1.JudgeType{
-			JudgeType: &judgev1.JudgeType_Normal{
-				Normal: &judgev1.JudgeTypeNormal{
-					CaseInsensitive: task.CaseInsensitive,
-				},
-			},
-		}
-	case ent_task.JudgeTypeEps:
-		if task.Ndigits == nil {
-			return nil, fmt.Errorf("the type of task is JudgeTypeEps, but the field ndigits is not set")
-		}
-		judgeType = &judgev1.JudgeType{
-			JudgeType: &judgev1.JudgeType_Eps{
-				Eps: &judgev1.JudgeTypeEPS{
-					Ndigits: uint32(*task.Ndigits),
-				},
-			},
-		}
-	case ent_task.JudgeTypeCustom:
-		if task.JudgeCodePath == nil {
-			return nil, fmt.Errorf("the type of task is JudgeTypeCustom, but the field judge_code_path is not set")
-		}
-		judgeType = &judgev1.JudgeType{
-			JudgeType: &judgev1.JudgeType_Custom{
-				Custom: &judgev1.JudgeTypeCustom{
-					JudgeCodePath: *task.JudgeCodePath,
-				},
-			},
-		}
-	case ent_task.JudgeTypeInteractive:
-		if task.JudgeCodePath == nil {
-			return nil, fmt.Errorf("the type of task is JudgeTypeInteractive, but the field judge_code_path is not set")
-		}
-		judgeType = &judgev1.JudgeType{
-			JudgeType: &judgev1.JudgeType_Interactive{
-				Interactive: &judgev1.JudgeTypeInteractive{
-					JudgeCodePath: *task.JudgeCodePath,
-				},
-			},
-		}
-	default:
-		return nil, fmt.Errorf("unknown judge type: %s", task.JudgeType)
-	}
-
 	testcaseList := make([]*judgev1.Testcase, 0, len(task.Edges.Testcases))
 	for _, tc := range task.Edges.Testcases {
 		testcaseList = append(testcaseList, &judgev1.Testcase{
@@ -294,7 +246,7 @@ func buildJudgeRequest(submitID int, langID string, task *ent.Task) (*judgev1.Ju
 	return &judgev1.JudgeRequest{
 		SourceCodePath:     sources.BuildSourceCodePath(submitID),
 		LangId:             langID,
-		JudgeType:          judgeType,
+		JudgeType:          nil,
 		ExecTimeLimitMs:    uint32(task.ExecMemoryLimit),
 		ExecMemoryLimitMib: uint32(task.ExecMemoryLimit),
 		Testcases:          testcaseList,

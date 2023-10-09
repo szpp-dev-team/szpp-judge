@@ -10,7 +10,6 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
-	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases/mock"
@@ -394,7 +393,7 @@ func Test_SyncTestcaseSets(t *testing.T) {
 			user := fixture.CreateUser(t, entClient, name, "ADMIN")
 			ctx = interceptor.SetClaimsToContext(ctx, &interceptor.Claims{Username: user.Username})
 
-			task := fixture.CreateTask(t, entClient, "a", ent_task.JudgeTypeNormal, int(user.ID), nil)
+			task := fixture.CreateTask(t, entClient, "a", nil, int(user.ID), nil)
 
 			testcaseSets, testcases := seedMutationTestcasePairs()
 			req := &backendv1.SyncTestcaseSetsRequest{
