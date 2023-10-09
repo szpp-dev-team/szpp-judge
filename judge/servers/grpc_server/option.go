@@ -12,6 +12,7 @@ type option struct {
 	dockerClient  *docker.Client
 	gcsClient     *storage.Client
 	workdirRoot   string
+	gcsBucketName string
 	useReflection bool
 }
 
@@ -51,5 +52,11 @@ func WithGcsClient(c *storage.Client) optionFunc {
 func WithWorkdirRoot(s string) optionFunc {
 	return func(o *option) {
 		o.workdirRoot = s
+	}
+}
+
+func WithGcsBucketName(s string) optionFunc {
+	return func(o *option) {
+		o.gcsBucketName = s
 	}
 }

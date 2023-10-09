@@ -31,7 +31,7 @@ func New(opts ...optionFunc) *grpc.Server {
 	}
 	healthcheckSrv := grpc_interfaces.NewHealthcheckServiceServer()
 	pb.RegisterHealthcheckServiceServer(srv, healthcheckSrv)
-	judgeInteractor := judge.NewInteractor(opt.dockerClient, opt.gcsClient, opt.workdirRoot)
+	judgeInteractor := judge.NewInteractor(opt.dockerClient, opt.gcsClient, opt.workdirRoot, opt.gcsBucketName)
 	judgeSrv := grpc_interfaces.NewJudgeServiceServer(judgeInteractor)
 	pb.RegisterJudgeServiceServer(srv, judgeSrv)
 
