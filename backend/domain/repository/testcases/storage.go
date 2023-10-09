@@ -46,11 +46,11 @@ func (i *gcsImpl) UpsertTestcase(ctx context.Context, taskID int, testcase *Test
 }
 
 func BuildTestcaseInPath(taskID int, name string) string {
-	return fmt.Sprintf("testcases/%d/in/%s", taskID, name)
+	return fmt.Sprintf("tasks/%d/testcases/in/%s", taskID, name)
 }
 
 func BuildTestcaseOutPath(taskID int, name string) string {
-	return fmt.Sprintf("testcases/%d/out/%s", taskID, name)
+	return fmt.Sprintf("tasks/%d/testcases/out/%s", taskID, name)
 }
 
 var _ Repository = (*gcsImpl)(nil)
