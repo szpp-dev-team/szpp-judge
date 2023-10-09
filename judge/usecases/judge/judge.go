@@ -25,15 +25,16 @@ type Interactor struct {
 	dockerClient *docker.Client
 	gcsClient    *storage.Client
 	workdirRoot  string
+	bucketName   string
 	logger       *slog.Logger
 }
 
-func NewInteractor(dockerClient *docker.Client, gcsClient *storage.Client, workdirRoot string) *Interactor {
+func NewInteractor(dockerClient *docker.Client, gcsClient *storage.Client, workdirRoot, bucketName string) *Interactor {
 	if !filepath.IsAbs(workdirRoot) {
 		panic("workdir must be absolute path")
 	}
 	logger := slog.Default()
-	return &Interactor{dockerClient, gcsClient, workdirRoot, logger}
+	return &Interactor{dockerClient, gcsClient, workdirRoot, bucketName, logger}
 }
 
 func (i *Interactor) Judge(req *judgev1.JudgeRequest, stream judgev1.JudgeService_JudgeServer) error {

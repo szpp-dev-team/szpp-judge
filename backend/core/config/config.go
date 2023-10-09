@@ -20,6 +20,7 @@ type Config struct {
 	CloudTasksQueueID    string `envconfig:"CLOUD_TASKS_QUEUE_ID" required:"true"`
 	FrontendURL          string `envconfig:"FRONTEND_URL" required:"false"`
 	HandleJudgeTaskURL   string `envconfig:"HANDLE_JUDGE_TASK_URL" required:"false"`
+	GcsBucketName        string `envconfig:"GCS_BUCKET_NAME" required:"true"`
 }
 
 func New() (*Config, error) {

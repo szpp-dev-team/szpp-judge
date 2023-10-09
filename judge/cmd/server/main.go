@@ -47,6 +47,7 @@ func main() {
 		grpc_server.WithReflection(cfg.ModeDev),
 		grpc_server.WithGcsClient(gcsClient),
 		grpc_server.WithWorkdirRoot(cfg.WorkdirRoot),
+		grpc_server.WithGcsBucketName(cfg.GcsBucketName),
 	)
 
 	lsnr, err := net.Listen("tcp", ":"+cfg.GrpcPort)
