@@ -3,6 +3,7 @@ package connect_server
 import (
 	"log/slog"
 
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/checkers"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
@@ -16,6 +17,7 @@ type option struct {
 	UseReflection       bool
 	TestcasesRepository testcases.Repository
 	SourcesRepository   sources.Repository
+	CheckersRepository  checkers.Repository
 	judgeQueue          judge_queue.JudgeQueue
 	JudgeClient         judgev1.JudgeServiceClient
 	Secret              string
@@ -51,6 +53,12 @@ func WithSourcesRepository(r sources.Repository) optionFunc {
 func WithTestcasesRepository(r testcases.Repository) optionFunc {
 	return func(o *option) {
 		o.TestcasesRepository = r
+	}
+}
+
+func WithCheckerRepository(r checkers.Repository) optionFunc {
+	return func(o *option) {
+		o.CheckersRepository = r
 	}
 }
 
