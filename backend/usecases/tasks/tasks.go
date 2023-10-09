@@ -44,11 +44,6 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 			return connect.NewError(connect.CodeInternal, err)
 		}
 
-		if err := i.checkerRepo.UploadChecker(ctx, task.ID, []byte(req.Task.Checker)); err != nil {
-			i.logger.Error("failed to upload checker code to the storage", slog.Any("error", err))
-			return connect.NewError(connect.CodeInternal, err)
-		}
-
 		q := tx.Task.Create().
 			SetTitle(req.Task.Title).
 			SetStatement(req.Task.Statement).
@@ -62,6 +57,12 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 		if err != nil {
 			return err
 		}
+
+		if err := i.checkerRepo.UploadChecker(ctx, task.ID, []byte(req.Task.Checker)); err != nil {
+			i.logger.Error("failed to upload checker code to the storage", slog.Any("error", err))
+			return connect.NewError(connect.CodeInternal, err)
+		}
+
 		return nil
 	}); err != nil {
 		i.logger.Error("failed to register task information", slog.Any("error", err))
@@ -106,11 +107,6 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 			return connect.NewError(connect.CodePermissionDenied, fmt.Errorf("the task(id: %d) is not yours", req.TaskId))
 		}
 
-		if err := i.checkerRepo.UploadChecker(ctx, task.ID, []byte(req.Task.Checker)); err != nil {
-			i.logger.Error("failed to upload checker code to the storage", slog.Any("error", err))
-			return connect.NewError(connect.CodeInternal, err)
-		}
-
 		q := tx.Task.UpdateOneID(int(req.TaskId)).
 			SetTitle(req.Task.Title).
 			SetStatement(req.Task.Statement).
@@ -124,6 +120,11 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 			if ent.IsNotFound(err) {
 				return connect.NewError(connect.CodeNotFound, fmt.Errorf("the task(id: %d) is not found", req.TaskId))
 			}
+			return connect.NewError(connect.CodeInternal, err)
+		}
+
+		if err := i.checkerRepo.UploadChecker(ctx, task.ID, []byte(req.Task.Checker)); err != nil {
+			i.logger.Error("failed to upload checker code to the storage", slog.Any("error", err))
 			return connect.NewError(connect.CodeInternal, err)
 		}
 
