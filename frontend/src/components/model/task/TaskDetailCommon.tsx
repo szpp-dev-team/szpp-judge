@@ -1,4 +1,5 @@
 import taskDetailStyle from "@/src/components/model/task/TaskDetailCommon.module.scss";
+import { MAX_SOURCE_CODE_SIZE } from "@/src/config/submission";
 import { LangID } from "@/src/gen/langs";
 import { SubmitRequest } from "@/src/gen/proto/backend/v1/judge_service_pb";
 import { Task, Testcase } from "@/src/gen/proto/backend/v1/task_resources_pb";
@@ -47,9 +48,9 @@ export const TaskDetailCommon = ({
       return;
     }
 
-    if (sourceCode.length > 512 * 1024) {
+    if (sourceCode.length > MAX_SOURCE_CODE_SIZE) {
       toast({
-        title: "ソースコード長の上限は512KiBです。",
+        title: `ソースコード長の上限は ${MAX_SOURCE_CODE_SIZE} KiBです。`,
         description: `あなたのソースコードの長さ: ${sourceCode.length} Byte (${sourceCode.length >> 10} KiB)`,
         status: "error",
         duration: 5000,
@@ -124,16 +125,16 @@ export const TaskDetailCommon = ({
         </Box>
       ))}
 
-      <h2 className={taskDetailStyle.h2}>提出</h2>
-      <Text mt={2}>ソースコード長の上限は 512 KiB です。</Text>
+      <h2 className={taskDetailStyle.h2}>解答プログラム</h2>
       <form>
         <SubmissionEditor
           sourceCode={sourceCode}
           langId={langId}
           onLangIdChange={setLangId}
           onSourceCodeChange={setSourceCode}
-          mt={2}
+          mt={6}
         />
+        <Text mt={2}>ソースコード長の上限は {MAX_SOURCE_CODE_SIZE >> 10} KiB です。</Text>
         <Flex justifyContent="center" my={12}>
           <Button
             fontSize="2xl"
