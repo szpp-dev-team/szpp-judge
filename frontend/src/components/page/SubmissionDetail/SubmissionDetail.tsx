@@ -1,3 +1,4 @@
+import { LangID } from "@/src/gen/langs";
 import { JudgeStatus as PbJudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { JudgeStatus } from "@/src/model/judge";
 import { useRouterSubmissionId } from "@/src/usecases/contest";
@@ -88,7 +89,7 @@ export const SubmissionDetail = () => {
             </TableContainer>
 
             <Heading as="h2" size={["md", null, "lg"]}>ソースコード</Heading>
-            <Editor doc={submissionDetail?.sourceCode} readonly={true} />
+            <Editor value={submissionDetail?.sourceCode} lang={submissionDetail?.langId as LangID} readOnly />
           </CardBody>
         </Card>
       </Container>

@@ -6,9 +6,8 @@ import { Task, Testcase } from "@/src/gen/proto/backend/v1/task_resources_pb";
 import { Difficulty } from "@/src/model/task";
 import { useSubmit } from "@/src/usecases/judge";
 import { PlainMessage } from "@bufbuild/protobuf";
-import { Box, Button, Card, Flex, Heading, Text, useToast } from "@chakra-ui/react";
+import { Box, Card, Heading, Text, useToast } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
-import { useState } from "react";
 import { DifficultyBadge } from "../../model/task/DifficultyBadge";
 import { TestcaseView } from "./TestcaseView";
 
@@ -21,6 +20,22 @@ export type TaskDetailCommonProps = {
   score?: number;
 };
 
+const MarkdownView = dynamic(
+  () => import("@/src/components/ui/MarkdownView").then(mod => mod.MarkdownView),
+  {
+    loading: () => <p>読み込み中です</p>,
+    ssr: false,
+  },
+);
+
+const SubmissionEditor = dynamic(
+  () => import("@/src/components/model/judge/SubmissionForm").then(mod => mod.SubmissionForm),
+  {
+    loading: () => <p>読み込み中です</p>,
+    ssr: false,
+  },
+);
+
 // コンテスト問題ページ、スタンドアロン問題ページ共通の問題表示ビュー。
 // 問題タイトルや時間制限、問題文、サンプルケース、提出フォームなどを表示する
 export const TaskDetailCommon = ({
@@ -31,14 +46,11 @@ export const TaskDetailCommon = ({
   taskSeqCode,
   score,
 }: TaskDetailCommonProps) => {
-  const [sourceCode, setSourceCode] = useState("");
-  const [langId, setLangId] = useState<LangID>("cpp/20/gcc");
-
   const toast = useToast();
 
   const { mutate, isLoading: isSubmissionLoading } = useSubmit();
 
-  const handleSubmit = () => {
+  const handleSubmit = (langId: LangID, sourceCode: string) => {
     if (sourceCode.length === 0) {
       toast({
         title: "ソースコードが空です。",
@@ -80,19 +92,6 @@ export const TaskDetailCommon = ({
     });
   };
 
-  const MarkdownView = dynamic(
-    () => import("@/src/components/ui/MarkdownView").then(mod => mod.MarkdownView),
-    { ssr: false },
-  );
-
-  const SubmissionEditor = dynamic(
-    () => import("@/src/components/model/judge/SubmissionEditor").then(mod => mod.SubmissionEditor),
-    {
-      loading: () => <p>読み込み中です</p>,
-      ssr: false,
-    },
-  );
-
   return (
     <Card px={6} py={4} minH="100%" maxW="860px" w="100%" rounded={"none"} color="cyan.900">
       <Heading as="h1" fontSize="3xl">
@@ -124,30 +123,11 @@ export const TaskDetailCommon = ({
           <MarkdownView markdown={c.description} className={taskDetailStyle.markdownWrapper} />
         </Box>
       ))}
-
       <h2 className={taskDetailStyle.h2}>解答プログラム</h2>
-      <form>
-        <SubmissionEditor
-          sourceCode={sourceCode}
-          langId={langId}
-          onLangIdChange={setLangId}
-          onSourceCodeChange={setSourceCode}
-          mt={6}
-        />
-        <Text mt={2}>ソースコード長の上限は {MAX_SOURCE_CODE_SIZE >> 10} KiB です。</Text>
-        <Flex justifyContent="center" my={12}>
-          <Button
-            fontSize="2xl"
-            px={16}
-            py={8}
-            colorScheme="teal"
-            isLoading={isSubmissionLoading}
-            onClick={handleSubmit}
-          >
-            提出
-          </Button>
-        </Flex>
-      </form>
+      <SubmissionEditor
+        onSubmit={handleSubmit}
+        submitButtonProps={{ isLoading: isSubmissionLoading }}
+      />
     </Card>
   );
 };
