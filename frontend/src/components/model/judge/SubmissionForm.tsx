@@ -29,15 +29,15 @@ const activeLangIds = langIDs.filter((id) => langMetasBrief[id].active);
 
 const acceptedFileExtsCommnaJoined = acceptedFileExts.join(",");
 
-export type SubmissionEditorProps = {
+export type SubmissionFormProps = {
   onSubmit?: (langId: LangID, sourceCode: string) => unknown;
   submitButtonProps?: ButtonProps;
 } & Omit<BoxProps, "children" | "onSubmit">;
 
-export const SubmissionEditor = ({
+export const SubmissionForm = ({
   onSubmit,
   submitButtonProps,
-}: SubmissionEditorProps) => {
+}: SubmissionFormProps) => {
   const [sourceCode, setSourceCode] = useState("");
   const [langId, setLangId] = useState<LangID>("cpp/20/gcc");
 

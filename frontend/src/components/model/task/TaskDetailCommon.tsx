@@ -29,7 +29,7 @@ const MarkdownView = dynamic(
 );
 
 const SubmissionEditor = dynamic(
-  () => import("@/src/components/model/judge/SubmissionEditor").then(mod => mod.SubmissionEditor),
+  () => import("@/src/components/model/judge/SubmissionForm").then(mod => mod.SubmissionForm),
   {
     loading: () => <p>読み込み中です</p>,
     ssr: false,
