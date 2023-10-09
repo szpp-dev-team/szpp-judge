@@ -1,5 +1,5 @@
 import { LangID } from "@/src/gen/langs";
-import type { JudgeProgress, SubmissionDetail } from "@/src/gen/proto/backend/v1/judge_resources_pb";
+import type { JudgeProgress, SubmissionDetail, SubmissionSummary } from "@/src/gen/proto/backend/v1/judge_resources_pb";
 import { JudgeService } from "@/src/gen/proto/backend/v1/judge_service-JudgeService_connectquery";
 import { JudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { PlainMessage, Timestamp } from "@bufbuild/protobuf";
@@ -52,12 +52,23 @@ const dummySubmissionDetails: PlainMessage<SubmissionDetail>[] = [
   },
 ];
 
-const dummyJudgeProgress: Record<"inProgress" | "ac" | "wa" | "ce", PlainMessage<JudgeProgress>> = {
-  inProgress: { status: JudgeStatus.JUDGE_STATUS_UNSPECIFIED, totalTestcases: 20, completedTestcases: 8 },
+const dummySubmissionSummaries: PlainMessage<SubmissionSummary>[] = dummySubmissionDetails.map((submissions) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { testcaseResults, sourceCode, status, ...summary } = submissions; // 不要なプロパティを除く
+  return { judgeStatus: status, ...summary }; // judgeStatus は SubmissionDetail.status と名前が違うだけで同じなので流用
+});
+
+const dummyJudgeProgress: Record<"wj" | "ac" | "wa" | "ce", PlainMessage<JudgeProgress>> = {
+  wj: { status: JudgeStatus.WJ, totalTestcases: 20, completedTestcases: 0 },
   ac: { status: JudgeStatus.AC, totalTestcases: 20, completedTestcases: 20 },
   wa: { status: JudgeStatus.WA, totalTestcases: 20, completedTestcases: 12 },
   ce: { status: JudgeStatus.CE, totalTestcases: 20, completedTestcases: 0 },
 };
+
+/** 4回目の getJudgeProgress で AC や WA を返すためにリクエスト回数を記録しておく辞書 */
+const reqCountMap = new Map<number, number>();
+/** 同じsubmissionId のリクエストに対して確定したジャッジ結果を返すために記録しておく辞書 */
+const fixedResultMap = new Map<number, PlainMessage<JudgeProgress>>();
 
 export const judgeHandlers: RequestHandler[] = [
   connectMock(JudgeService, "submit", async (ctx, res, _, encodeResp) => {
@@ -73,6 +84,19 @@ export const judgeHandlers: RequestHandler[] = [
       return res(ctx.status(404));
     }
   }),
+  connectMock(JudgeService, "listSubmissions", async (ctx, res, decodeReq, encodeResp) => {
+    const { username } = await decodeReq(); // デバッグの都合で contestId を無視
+
+    const submissionSummaries = dummySubmissionSummaries.filter(s => {
+      if (username && s.username !== username) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    return res(ctx.delay(500), encodeResp({ submissions: submissionSummaries }));
+  }),
   connectMock(JudgeService, "getJudgeProgress", async (ctx, res, decodeReq, encodeResp) => {
     const { submissionId } = await decodeReq();
 
@@ -81,15 +105,18 @@ export const judgeHandlers: RequestHandler[] = [
       return res(ctx.status(404));
     }
 
-    const r = Math.random();
-    const judgeProgress = r < 0.25
-      ? dummyJudgeProgress.inProgress
-      : r < 0.5
-      ? dummyJudgeProgress.ac
-      : r < 0.75
-      ? dummyJudgeProgress.wa
-      : dummyJudgeProgress.ce;
-
-    return res(encodeResp({ judgeProgress }));
+    reqCountMap.set(submissionId, (reqCountMap.get(submissionId) ?? 0) + 1);
+    const c = reqCountMap.get(submissionId)!;
+    if (c < 4) {
+      return res(encodeResp({ judgeProgress: dummyJudgeProgress.wj }));
+    } else if (c === 4) {
+      const r = Math.random();
+      const judgeProgress = r < 0.33 ? dummyJudgeProgress.ac : r < 0.66 ? dummyJudgeProgress.ce : dummyJudgeProgress.wa;
+      fixedResultMap.set(submissionId, judgeProgress);
+      return res(encodeResp({ judgeProgress }));
+    } else {
+      const r = fixedResultMap.get(submissionId);
+      return res(encodeResp({ judgeProgress: r ?? dummyJudgeProgress.wj })); // WJ になるはずはない
+    }
   }),
 ];
