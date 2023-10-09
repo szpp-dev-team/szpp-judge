@@ -8,6 +8,7 @@ import { useSubmit } from "@/src/usecases/judge";
 import { PlainMessage } from "@bufbuild/protobuf";
 import { Box, Card, Heading, Text, useToast } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
+import { useCallback } from "react";
 import { DifficultyBadge } from "../../model/task/DifficultyBadge";
 import { TestcaseView } from "./TestcaseView";
 
@@ -50,7 +51,7 @@ export const TaskDetailCommon = ({
 
   const { mutate, isLoading: isSubmissionLoading } = useSubmit();
 
-  const handleSubmit = (langId: LangID, sourceCode: string) => {
+  const handleSubmit = useCallback((langId: LangID, sourceCode: string) => {
     if (sourceCode.length === 0) {
       toast({
         title: "ソースコードが空です。",
@@ -90,7 +91,7 @@ export const TaskDetailCommon = ({
         });
       },
     });
-  };
+  }, [contestId, task.id, mutate, onSubmitSuccess, toast]);
 
   return (
     <Card px={6} py={4} minH="100%" maxW="860px" w="100%" rounded={"none"} color="cyan.900">
