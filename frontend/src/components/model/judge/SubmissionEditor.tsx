@@ -7,6 +7,7 @@ import {
   Box,
   BoxProps,
   Button,
+  ButtonProps,
   Flex,
   Heading,
   Icon,
@@ -15,11 +16,12 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Text,
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
 import path from "path";
-import { ChangeEventHandler, useRef, useState } from "react";
+import { ChangeEventHandler, useCallback, useRef, useState } from "react";
 import { IoPushSharp } from "react-icons/io5";
 import { Editor } from "../../ui/Editor";
 
@@ -28,29 +30,25 @@ const activeLangIds = langIDs.filter((id) => langMetasBrief[id].active);
 const acceptedFileExtsCommnaJoined = acceptedFileExts.join(",");
 
 export type SubmissionEditorProps = {
-  sourceCode: string;
-  langId: LangID;
-  onLangIdChange: (id: LangID) => unknown;
-  onSourceCodeChange: (code: string) => unknown;
-} & Omit<BoxProps, "children">;
+  onSubmit?: (langId: LangID, sourceCode: string) => unknown;
+  submitButtonProps?: ButtonProps;
+} & Omit<BoxProps, "children" | "onSubmit">;
 
 export const SubmissionEditor = ({
-  sourceCode,
-  langId,
-  onLangIdChange,
-  onSourceCodeChange,
-  ...props
+  onSubmit,
+  submitButtonProps,
 }: SubmissionEditorProps) => {
+  const [sourceCode, setSourceCode] = useState("");
+  const [langId, setLangId] = useState<LangID>("cpp/20/gcc");
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
 
   const toast = useToast();
 
-  const handleFileAttach: ChangeEventHandler<HTMLInputElement> = (e) => {
+  const handleFileAttach = useCallback<ChangeEventHandler<HTMLInputElement>>((e) => {
     const files = e.target.files;
     if (files == null || files.length <= 0) return;
-
-    console.log("file attached:", files);
 
     const file = files[0]!;
     if (file.size > MAX_SOURCE_CODE_SIZE) {
@@ -66,8 +64,8 @@ export const SubmissionEditor = ({
     if (file.name.endsWith(".sb3")) {
       convertSb3ToCpp(file)
         .then(({ cppSource, warnings }) => {
-          onLangIdChange("scratch/3/gcc");
-          onSourceCodeChange(cppSource);
+          setLangId("scratch/3/gcc");
+          setSourceCode(cppSource);
           setWarnings(warnings);
         })
         .catch((e) => {
@@ -86,17 +84,18 @@ export const SubmissionEditor = ({
     }
 
     file.text().then((s) => {
-      onSourceCodeChange(s);
+      setSourceCode(s);
       const lang = fileExt2langId[path.extname(file.name) as AcceptedFileExt];
       if (lang) {
-        onLangIdChange(lang);
+        setLangId(lang);
       }
     }).catch((e) => console.error(e));
-  };
+  }, [toast]);
 
   return (
-    <Box>
-      <Box rounded="md" border="1px" color="teal.900" borderColor="gray.300" {...props}>
+    <Box as="form">
+      <Text my={2} fontSize="sm">ソースコード長の上限は {MAX_SOURCE_CODE_SIZE >> 10} KiB です。</Text>
+      <Box rounded="md" border="1px" color="teal.900" borderColor="gray.300">
         <Flex
           justifyContent="space-between"
           roundedTop="inherit"
@@ -120,7 +119,7 @@ export const SubmissionEditor = ({
             </MenuButton>
             <MenuList>
               {activeLangIds.map((id) => (
-                <MenuItem key={id} onClick={() => onLangIdChange(id)}>{langMetasBrief[id].name}</MenuItem>
+                <MenuItem key={id} onClick={() => setLangId(id)}>{langMetasBrief[id].name}</MenuItem>
               ))}
             </MenuList>
           </Menu>
@@ -140,8 +139,9 @@ export const SubmissionEditor = ({
           onChange={handleFileAttach}
         />
         <Editor
-          doc={sourceCode}
-          onDocChange={onSourceCodeChange}
+          lang={langId}
+          value={sourceCode}
+          onChange={setSourceCode}
           height="20rem"
         />
       </Box>
@@ -153,6 +153,18 @@ export const SubmissionEditor = ({
           </UnorderedList>
         </Box>
       )}
+      <Flex justifyContent="center" my={12}>
+        <Button
+          fontSize="2xl"
+          px={16}
+          py={8}
+          colorScheme="teal"
+          onClick={onSubmit ? () => onSubmit(langId, sourceCode) : undefined}
+          {...submitButtonProps}
+        >
+          提出
+        </Button>
+      </Flex>
     </Box>
   );
 };
