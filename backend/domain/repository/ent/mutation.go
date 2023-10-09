@@ -4601,11 +4601,6 @@ type TaskMutation struct {
 	addexec_time_limit   *int
 	exec_memory_limit    *uint
 	addexec_memory_limit *int
-	judge_type           *task.JudgeType
-	case_insensitive     *bool
-	ndigits              *uint
-	addndigits           *int
-	judge_code_path      *string
 	created_at           *time.Time
 	updated_at           *time.Time
 	clearedFields        map[string]struct{}
@@ -4953,210 +4948,6 @@ func (m *TaskMutation) AddedExecMemoryLimit() (r int, exists bool) {
 func (m *TaskMutation) ResetExecMemoryLimit() {
 	m.exec_memory_limit = nil
 	m.addexec_memory_limit = nil
-}
-
-// SetJudgeType sets the "judge_type" field.
-func (m *TaskMutation) SetJudgeType(tt task.JudgeType) {
-	m.judge_type = &tt
-}
-
-// JudgeType returns the value of the "judge_type" field in the mutation.
-func (m *TaskMutation) JudgeType() (r task.JudgeType, exists bool) {
-	v := m.judge_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldJudgeType returns the old "judge_type" field's value of the Task entity.
-// If the Task object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TaskMutation) OldJudgeType(ctx context.Context) (v task.JudgeType, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldJudgeType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldJudgeType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldJudgeType: %w", err)
-	}
-	return oldValue.JudgeType, nil
-}
-
-// ResetJudgeType resets all changes to the "judge_type" field.
-func (m *TaskMutation) ResetJudgeType() {
-	m.judge_type = nil
-}
-
-// SetCaseInsensitive sets the "case_insensitive" field.
-func (m *TaskMutation) SetCaseInsensitive(b bool) {
-	m.case_insensitive = &b
-}
-
-// CaseInsensitive returns the value of the "case_insensitive" field in the mutation.
-func (m *TaskMutation) CaseInsensitive() (r bool, exists bool) {
-	v := m.case_insensitive
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCaseInsensitive returns the old "case_insensitive" field's value of the Task entity.
-// If the Task object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TaskMutation) OldCaseInsensitive(ctx context.Context) (v *bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCaseInsensitive is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCaseInsensitive requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCaseInsensitive: %w", err)
-	}
-	return oldValue.CaseInsensitive, nil
-}
-
-// ClearCaseInsensitive clears the value of the "case_insensitive" field.
-func (m *TaskMutation) ClearCaseInsensitive() {
-	m.case_insensitive = nil
-	m.clearedFields[task.FieldCaseInsensitive] = struct{}{}
-}
-
-// CaseInsensitiveCleared returns if the "case_insensitive" field was cleared in this mutation.
-func (m *TaskMutation) CaseInsensitiveCleared() bool {
-	_, ok := m.clearedFields[task.FieldCaseInsensitive]
-	return ok
-}
-
-// ResetCaseInsensitive resets all changes to the "case_insensitive" field.
-func (m *TaskMutation) ResetCaseInsensitive() {
-	m.case_insensitive = nil
-	delete(m.clearedFields, task.FieldCaseInsensitive)
-}
-
-// SetNdigits sets the "ndigits" field.
-func (m *TaskMutation) SetNdigits(u uint) {
-	m.ndigits = &u
-	m.addndigits = nil
-}
-
-// Ndigits returns the value of the "ndigits" field in the mutation.
-func (m *TaskMutation) Ndigits() (r uint, exists bool) {
-	v := m.ndigits
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldNdigits returns the old "ndigits" field's value of the Task entity.
-// If the Task object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TaskMutation) OldNdigits(ctx context.Context) (v *uint, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNdigits is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNdigits requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNdigits: %w", err)
-	}
-	return oldValue.Ndigits, nil
-}
-
-// AddNdigits adds u to the "ndigits" field.
-func (m *TaskMutation) AddNdigits(u int) {
-	if m.addndigits != nil {
-		*m.addndigits += u
-	} else {
-		m.addndigits = &u
-	}
-}
-
-// AddedNdigits returns the value that was added to the "ndigits" field in this mutation.
-func (m *TaskMutation) AddedNdigits() (r int, exists bool) {
-	v := m.addndigits
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearNdigits clears the value of the "ndigits" field.
-func (m *TaskMutation) ClearNdigits() {
-	m.ndigits = nil
-	m.addndigits = nil
-	m.clearedFields[task.FieldNdigits] = struct{}{}
-}
-
-// NdigitsCleared returns if the "ndigits" field was cleared in this mutation.
-func (m *TaskMutation) NdigitsCleared() bool {
-	_, ok := m.clearedFields[task.FieldNdigits]
-	return ok
-}
-
-// ResetNdigits resets all changes to the "ndigits" field.
-func (m *TaskMutation) ResetNdigits() {
-	m.ndigits = nil
-	m.addndigits = nil
-	delete(m.clearedFields, task.FieldNdigits)
-}
-
-// SetJudgeCodePath sets the "judge_code_path" field.
-func (m *TaskMutation) SetJudgeCodePath(s string) {
-	m.judge_code_path = &s
-}
-
-// JudgeCodePath returns the value of the "judge_code_path" field in the mutation.
-func (m *TaskMutation) JudgeCodePath() (r string, exists bool) {
-	v := m.judge_code_path
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldJudgeCodePath returns the old "judge_code_path" field's value of the Task entity.
-// If the Task object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TaskMutation) OldJudgeCodePath(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldJudgeCodePath is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldJudgeCodePath requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldJudgeCodePath: %w", err)
-	}
-	return oldValue.JudgeCodePath, nil
-}
-
-// ClearJudgeCodePath clears the value of the "judge_code_path" field.
-func (m *TaskMutation) ClearJudgeCodePath() {
-	m.judge_code_path = nil
-	m.clearedFields[task.FieldJudgeCodePath] = struct{}{}
-}
-
-// JudgeCodePathCleared returns if the "judge_code_path" field was cleared in this mutation.
-func (m *TaskMutation) JudgeCodePathCleared() bool {
-	_, ok := m.clearedFields[task.FieldJudgeCodePath]
-	return ok
-}
-
-// ResetJudgeCodePath resets all changes to the "judge_code_path" field.
-func (m *TaskMutation) ResetJudgeCodePath() {
-	m.judge_code_path = nil
-	delete(m.clearedFields, task.FieldJudgeCodePath)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -5587,7 +5378,7 @@ func (m *TaskMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TaskMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 7)
 	if m.title != nil {
 		fields = append(fields, task.FieldTitle)
 	}
@@ -5602,18 +5393,6 @@ func (m *TaskMutation) Fields() []string {
 	}
 	if m.exec_memory_limit != nil {
 		fields = append(fields, task.FieldExecMemoryLimit)
-	}
-	if m.judge_type != nil {
-		fields = append(fields, task.FieldJudgeType)
-	}
-	if m.case_insensitive != nil {
-		fields = append(fields, task.FieldCaseInsensitive)
-	}
-	if m.ndigits != nil {
-		fields = append(fields, task.FieldNdigits)
-	}
-	if m.judge_code_path != nil {
-		fields = append(fields, task.FieldJudgeCodePath)
 	}
 	if m.created_at != nil {
 		fields = append(fields, task.FieldCreatedAt)
@@ -5639,14 +5418,6 @@ func (m *TaskMutation) Field(name string) (ent.Value, bool) {
 		return m.ExecTimeLimit()
 	case task.FieldExecMemoryLimit:
 		return m.ExecMemoryLimit()
-	case task.FieldJudgeType:
-		return m.JudgeType()
-	case task.FieldCaseInsensitive:
-		return m.CaseInsensitive()
-	case task.FieldNdigits:
-		return m.Ndigits()
-	case task.FieldJudgeCodePath:
-		return m.JudgeCodePath()
 	case task.FieldCreatedAt:
 		return m.CreatedAt()
 	case task.FieldUpdatedAt:
@@ -5670,14 +5441,6 @@ func (m *TaskMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldExecTimeLimit(ctx)
 	case task.FieldExecMemoryLimit:
 		return m.OldExecMemoryLimit(ctx)
-	case task.FieldJudgeType:
-		return m.OldJudgeType(ctx)
-	case task.FieldCaseInsensitive:
-		return m.OldCaseInsensitive(ctx)
-	case task.FieldNdigits:
-		return m.OldNdigits(ctx)
-	case task.FieldJudgeCodePath:
-		return m.OldJudgeCodePath(ctx)
 	case task.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case task.FieldUpdatedAt:
@@ -5726,34 +5489,6 @@ func (m *TaskMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetExecMemoryLimit(v)
 		return nil
-	case task.FieldJudgeType:
-		v, ok := value.(task.JudgeType)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetJudgeType(v)
-		return nil
-	case task.FieldCaseInsensitive:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCaseInsensitive(v)
-		return nil
-	case task.FieldNdigits:
-		v, ok := value.(uint)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetNdigits(v)
-		return nil
-	case task.FieldJudgeCodePath:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetJudgeCodePath(v)
-		return nil
 	case task.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -5782,9 +5517,6 @@ func (m *TaskMutation) AddedFields() []string {
 	if m.addexec_memory_limit != nil {
 		fields = append(fields, task.FieldExecMemoryLimit)
 	}
-	if m.addndigits != nil {
-		fields = append(fields, task.FieldNdigits)
-	}
 	return fields
 }
 
@@ -5797,8 +5529,6 @@ func (m *TaskMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedExecTimeLimit()
 	case task.FieldExecMemoryLimit:
 		return m.AddedExecMemoryLimit()
-	case task.FieldNdigits:
-		return m.AddedNdigits()
 	}
 	return nil, false
 }
@@ -5822,13 +5552,6 @@ func (m *TaskMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddExecMemoryLimit(v)
 		return nil
-	case task.FieldNdigits:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddNdigits(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Task numeric field %s", name)
 }
@@ -5837,15 +5560,6 @@ func (m *TaskMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *TaskMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(task.FieldCaseInsensitive) {
-		fields = append(fields, task.FieldCaseInsensitive)
-	}
-	if m.FieldCleared(task.FieldNdigits) {
-		fields = append(fields, task.FieldNdigits)
-	}
-	if m.FieldCleared(task.FieldJudgeCodePath) {
-		fields = append(fields, task.FieldJudgeCodePath)
-	}
 	if m.FieldCleared(task.FieldUpdatedAt) {
 		fields = append(fields, task.FieldUpdatedAt)
 	}
@@ -5863,15 +5577,6 @@ func (m *TaskMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *TaskMutation) ClearField(name string) error {
 	switch name {
-	case task.FieldCaseInsensitive:
-		m.ClearCaseInsensitive()
-		return nil
-	case task.FieldNdigits:
-		m.ClearNdigits()
-		return nil
-	case task.FieldJudgeCodePath:
-		m.ClearJudgeCodePath()
-		return nil
 	case task.FieldUpdatedAt:
 		m.ClearUpdatedAt()
 		return nil
@@ -5897,18 +5602,6 @@ func (m *TaskMutation) ResetField(name string) error {
 		return nil
 	case task.FieldExecMemoryLimit:
 		m.ResetExecMemoryLimit()
-		return nil
-	case task.FieldJudgeType:
-		m.ResetJudgeType()
-		return nil
-	case task.FieldCaseInsensitive:
-		m.ResetCaseInsensitive()
-		return nil
-	case task.FieldNdigits:
-		m.ResetNdigits()
-		return nil
-	case task.FieldJudgeCodePath:
-		m.ResetJudgeCodePath()
 		return nil
 	case task.FieldCreatedAt:
 		m.ResetCreatedAt()

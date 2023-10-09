@@ -184,10 +184,6 @@ var (
 		{Name: "difficulty", Type: field.TypeString},
 		{Name: "exec_time_limit", Type: field.TypeUint},
 		{Name: "exec_memory_limit", Type: field.TypeUint},
-		{Name: "judge_type", Type: field.TypeEnum, Enums: []string{"normal", "eps", "interactive", "custom"}},
-		{Name: "case_insensitive", Type: field.TypeBool, Nullable: true},
-		{Name: "ndigits", Type: field.TypeUint, Nullable: true},
-		{Name: "judge_code_path", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "user_tasks", Type: field.TypeInt},
@@ -200,7 +196,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "tasks_users_tasks",
-				Columns:    []*schema.Column{TasksColumns[12]},
+				Columns:    []*schema.Column{TasksColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

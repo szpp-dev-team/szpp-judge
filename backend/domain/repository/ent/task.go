@@ -28,14 +28,6 @@ type Task struct {
 	ExecTimeLimit uint `json:"exec_time_limit,omitempty"`
 	// ExecMemoryLimit holds the value of the "exec_memory_limit" field.
 	ExecMemoryLimit uint `json:"exec_memory_limit,omitempty"`
-	// JudgeType holds the value of the "judge_type" field.
-	JudgeType task.JudgeType `json:"judge_type,omitempty"`
-	// CaseInsensitive holds the value of the "case_insensitive" field.
-	CaseInsensitive *bool `json:"case_insensitive,omitempty"`
-	// Ndigits holds the value of the "ndigits" field.
-	Ndigits *uint `json:"ndigits,omitempty"`
-	// JudgeCodePath holds the value of the "judge_code_path" field.
-	JudgeCodePath *string `json:"judge_code_path,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -129,11 +121,9 @@ func (*Task) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case task.FieldCaseInsensitive:
-			values[i] = new(sql.NullBool)
-		case task.FieldID, task.FieldExecTimeLimit, task.FieldExecMemoryLimit, task.FieldNdigits:
+		case task.FieldID, task.FieldExecTimeLimit, task.FieldExecMemoryLimit:
 			values[i] = new(sql.NullInt64)
-		case task.FieldTitle, task.FieldStatement, task.FieldDifficulty, task.FieldJudgeType, task.FieldJudgeCodePath:
+		case task.FieldTitle, task.FieldStatement, task.FieldDifficulty:
 			values[i] = new(sql.NullString)
 		case task.FieldCreatedAt, task.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -189,33 +179,6 @@ func (t *Task) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field exec_memory_limit", values[i])
 			} else if value.Valid {
 				t.ExecMemoryLimit = uint(value.Int64)
-			}
-		case task.FieldJudgeType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field judge_type", values[i])
-			} else if value.Valid {
-				t.JudgeType = task.JudgeType(value.String)
-			}
-		case task.FieldCaseInsensitive:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field case_insensitive", values[i])
-			} else if value.Valid {
-				t.CaseInsensitive = new(bool)
-				*t.CaseInsensitive = value.Bool
-			}
-		case task.FieldNdigits:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ndigits", values[i])
-			} else if value.Valid {
-				t.Ndigits = new(uint)
-				*t.Ndigits = uint(value.Int64)
-			}
-		case task.FieldJudgeCodePath:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field judge_code_path", values[i])
-			} else if value.Valid {
-				t.JudgeCodePath = new(string)
-				*t.JudgeCodePath = value.String
 			}
 		case task.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -317,24 +280,6 @@ func (t *Task) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("exec_memory_limit=")
 	builder.WriteString(fmt.Sprintf("%v", t.ExecMemoryLimit))
-	builder.WriteString(", ")
-	builder.WriteString("judge_type=")
-	builder.WriteString(fmt.Sprintf("%v", t.JudgeType))
-	builder.WriteString(", ")
-	if v := t.CaseInsensitive; v != nil {
-		builder.WriteString("case_insensitive=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	if v := t.Ndigits; v != nil {
-		builder.WriteString("ndigits=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	if v := t.JudgeCodePath; v != nil {
-		builder.WriteString("judge_code_path=")
-		builder.WriteString(*v)
-	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(t.CreatedAt.Format(time.ANSIC))

@@ -78,79 +78,6 @@ func (tu *TaskUpdate) AddExecMemoryLimit(u int) *TaskUpdate {
 	return tu
 }
 
-// SetJudgeType sets the "judge_type" field.
-func (tu *TaskUpdate) SetJudgeType(tt task.JudgeType) *TaskUpdate {
-	tu.mutation.SetJudgeType(tt)
-	return tu
-}
-
-// SetCaseInsensitive sets the "case_insensitive" field.
-func (tu *TaskUpdate) SetCaseInsensitive(b bool) *TaskUpdate {
-	tu.mutation.SetCaseInsensitive(b)
-	return tu
-}
-
-// SetNillableCaseInsensitive sets the "case_insensitive" field if the given value is not nil.
-func (tu *TaskUpdate) SetNillableCaseInsensitive(b *bool) *TaskUpdate {
-	if b != nil {
-		tu.SetCaseInsensitive(*b)
-	}
-	return tu
-}
-
-// ClearCaseInsensitive clears the value of the "case_insensitive" field.
-func (tu *TaskUpdate) ClearCaseInsensitive() *TaskUpdate {
-	tu.mutation.ClearCaseInsensitive()
-	return tu
-}
-
-// SetNdigits sets the "ndigits" field.
-func (tu *TaskUpdate) SetNdigits(u uint) *TaskUpdate {
-	tu.mutation.ResetNdigits()
-	tu.mutation.SetNdigits(u)
-	return tu
-}
-
-// SetNillableNdigits sets the "ndigits" field if the given value is not nil.
-func (tu *TaskUpdate) SetNillableNdigits(u *uint) *TaskUpdate {
-	if u != nil {
-		tu.SetNdigits(*u)
-	}
-	return tu
-}
-
-// AddNdigits adds u to the "ndigits" field.
-func (tu *TaskUpdate) AddNdigits(u int) *TaskUpdate {
-	tu.mutation.AddNdigits(u)
-	return tu
-}
-
-// ClearNdigits clears the value of the "ndigits" field.
-func (tu *TaskUpdate) ClearNdigits() *TaskUpdate {
-	tu.mutation.ClearNdigits()
-	return tu
-}
-
-// SetJudgeCodePath sets the "judge_code_path" field.
-func (tu *TaskUpdate) SetJudgeCodePath(s string) *TaskUpdate {
-	tu.mutation.SetJudgeCodePath(s)
-	return tu
-}
-
-// SetNillableJudgeCodePath sets the "judge_code_path" field if the given value is not nil.
-func (tu *TaskUpdate) SetNillableJudgeCodePath(s *string) *TaskUpdate {
-	if s != nil {
-		tu.SetJudgeCodePath(*s)
-	}
-	return tu
-}
-
-// ClearJudgeCodePath clears the value of the "judge_code_path" field.
-func (tu *TaskUpdate) ClearJudgeCodePath() *TaskUpdate {
-	tu.mutation.ClearJudgeCodePath()
-	return tu
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (tu *TaskUpdate) SetCreatedAt(t time.Time) *TaskUpdate {
 	tu.mutation.SetCreatedAt(t)
@@ -408,11 +335,6 @@ func (tu *TaskUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tu *TaskUpdate) check() error {
-	if v, ok := tu.mutation.JudgeType(); ok {
-		if err := task.JudgeTypeValidator(v); err != nil {
-			return &ValidationError{Name: "judge_type", err: fmt.Errorf(`ent: validator failed for field "Task.judge_type": %w`, err)}
-		}
-	}
 	if _, ok := tu.mutation.UserID(); tu.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Task.user"`)
 	}
@@ -451,30 +373,6 @@ func (tu *TaskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.AddedExecMemoryLimit(); ok {
 		_spec.AddField(task.FieldExecMemoryLimit, field.TypeUint, value)
-	}
-	if value, ok := tu.mutation.JudgeType(); ok {
-		_spec.SetField(task.FieldJudgeType, field.TypeEnum, value)
-	}
-	if value, ok := tu.mutation.CaseInsensitive(); ok {
-		_spec.SetField(task.FieldCaseInsensitive, field.TypeBool, value)
-	}
-	if tu.mutation.CaseInsensitiveCleared() {
-		_spec.ClearField(task.FieldCaseInsensitive, field.TypeBool)
-	}
-	if value, ok := tu.mutation.Ndigits(); ok {
-		_spec.SetField(task.FieldNdigits, field.TypeUint, value)
-	}
-	if value, ok := tu.mutation.AddedNdigits(); ok {
-		_spec.AddField(task.FieldNdigits, field.TypeUint, value)
-	}
-	if tu.mutation.NdigitsCleared() {
-		_spec.ClearField(task.FieldNdigits, field.TypeUint)
-	}
-	if value, ok := tu.mutation.JudgeCodePath(); ok {
-		_spec.SetField(task.FieldJudgeCodePath, field.TypeString, value)
-	}
-	if tu.mutation.JudgeCodePathCleared() {
-		_spec.ClearField(task.FieldJudgeCodePath, field.TypeString)
 	}
 	if value, ok := tu.mutation.CreatedAt(); ok {
 		_spec.SetField(task.FieldCreatedAt, field.TypeTime, value)
@@ -803,79 +701,6 @@ func (tuo *TaskUpdateOne) AddExecMemoryLimit(u int) *TaskUpdateOne {
 	return tuo
 }
 
-// SetJudgeType sets the "judge_type" field.
-func (tuo *TaskUpdateOne) SetJudgeType(tt task.JudgeType) *TaskUpdateOne {
-	tuo.mutation.SetJudgeType(tt)
-	return tuo
-}
-
-// SetCaseInsensitive sets the "case_insensitive" field.
-func (tuo *TaskUpdateOne) SetCaseInsensitive(b bool) *TaskUpdateOne {
-	tuo.mutation.SetCaseInsensitive(b)
-	return tuo
-}
-
-// SetNillableCaseInsensitive sets the "case_insensitive" field if the given value is not nil.
-func (tuo *TaskUpdateOne) SetNillableCaseInsensitive(b *bool) *TaskUpdateOne {
-	if b != nil {
-		tuo.SetCaseInsensitive(*b)
-	}
-	return tuo
-}
-
-// ClearCaseInsensitive clears the value of the "case_insensitive" field.
-func (tuo *TaskUpdateOne) ClearCaseInsensitive() *TaskUpdateOne {
-	tuo.mutation.ClearCaseInsensitive()
-	return tuo
-}
-
-// SetNdigits sets the "ndigits" field.
-func (tuo *TaskUpdateOne) SetNdigits(u uint) *TaskUpdateOne {
-	tuo.mutation.ResetNdigits()
-	tuo.mutation.SetNdigits(u)
-	return tuo
-}
-
-// SetNillableNdigits sets the "ndigits" field if the given value is not nil.
-func (tuo *TaskUpdateOne) SetNillableNdigits(u *uint) *TaskUpdateOne {
-	if u != nil {
-		tuo.SetNdigits(*u)
-	}
-	return tuo
-}
-
-// AddNdigits adds u to the "ndigits" field.
-func (tuo *TaskUpdateOne) AddNdigits(u int) *TaskUpdateOne {
-	tuo.mutation.AddNdigits(u)
-	return tuo
-}
-
-// ClearNdigits clears the value of the "ndigits" field.
-func (tuo *TaskUpdateOne) ClearNdigits() *TaskUpdateOne {
-	tuo.mutation.ClearNdigits()
-	return tuo
-}
-
-// SetJudgeCodePath sets the "judge_code_path" field.
-func (tuo *TaskUpdateOne) SetJudgeCodePath(s string) *TaskUpdateOne {
-	tuo.mutation.SetJudgeCodePath(s)
-	return tuo
-}
-
-// SetNillableJudgeCodePath sets the "judge_code_path" field if the given value is not nil.
-func (tuo *TaskUpdateOne) SetNillableJudgeCodePath(s *string) *TaskUpdateOne {
-	if s != nil {
-		tuo.SetJudgeCodePath(*s)
-	}
-	return tuo
-}
-
-// ClearJudgeCodePath clears the value of the "judge_code_path" field.
-func (tuo *TaskUpdateOne) ClearJudgeCodePath() *TaskUpdateOne {
-	tuo.mutation.ClearJudgeCodePath()
-	return tuo
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (tuo *TaskUpdateOne) SetCreatedAt(t time.Time) *TaskUpdateOne {
 	tuo.mutation.SetCreatedAt(t)
@@ -1146,11 +971,6 @@ func (tuo *TaskUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tuo *TaskUpdateOne) check() error {
-	if v, ok := tuo.mutation.JudgeType(); ok {
-		if err := task.JudgeTypeValidator(v); err != nil {
-			return &ValidationError{Name: "judge_type", err: fmt.Errorf(`ent: validator failed for field "Task.judge_type": %w`, err)}
-		}
-	}
 	if _, ok := tuo.mutation.UserID(); tuo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Task.user"`)
 	}
@@ -1206,30 +1026,6 @@ func (tuo *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) 
 	}
 	if value, ok := tuo.mutation.AddedExecMemoryLimit(); ok {
 		_spec.AddField(task.FieldExecMemoryLimit, field.TypeUint, value)
-	}
-	if value, ok := tuo.mutation.JudgeType(); ok {
-		_spec.SetField(task.FieldJudgeType, field.TypeEnum, value)
-	}
-	if value, ok := tuo.mutation.CaseInsensitive(); ok {
-		_spec.SetField(task.FieldCaseInsensitive, field.TypeBool, value)
-	}
-	if tuo.mutation.CaseInsensitiveCleared() {
-		_spec.ClearField(task.FieldCaseInsensitive, field.TypeBool)
-	}
-	if value, ok := tuo.mutation.Ndigits(); ok {
-		_spec.SetField(task.FieldNdigits, field.TypeUint, value)
-	}
-	if value, ok := tuo.mutation.AddedNdigits(); ok {
-		_spec.AddField(task.FieldNdigits, field.TypeUint, value)
-	}
-	if tuo.mutation.NdigitsCleared() {
-		_spec.ClearField(task.FieldNdigits, field.TypeUint)
-	}
-	if value, ok := tuo.mutation.JudgeCodePath(); ok {
-		_spec.SetField(task.FieldJudgeCodePath, field.TypeString, value)
-	}
-	if tuo.mutation.JudgeCodePathCleared() {
-		_spec.ClearField(task.FieldJudgeCodePath, field.TypeString)
 	}
 	if value, ok := tuo.mutation.CreatedAt(); ok {
 		_spec.SetField(task.FieldCreatedAt, field.TypeTime, value)
