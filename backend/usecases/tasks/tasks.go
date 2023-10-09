@@ -10,6 +10,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/api/connect_server/interceptor"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/entutil"
 	"github.com/szpp-dev-team/szpp-judge/backend/core/timejst"
+	checker_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/checkers"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
@@ -24,12 +25,13 @@ import (
 type Interactor struct {
 	entClient     *ent.Client
 	testcasesRepo testcases_repo.Repository
+	checkerRepo   checker_repo.Repository
 	logger        *slog.Logger
 }
 
-func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repository) *Interactor {
+func NewInteractor(entClient *ent.Client, testcasesRepo testcases_repo.Repository, checkerRepo checker_repo.Repository) *Interactor {
 	logger := slog.Default().With(slog.String("usecase", "tasks"))
-	return &Interactor{entClient, testcasesRepo, logger}
+	return &Interactor{entClient, testcasesRepo, checkerRepo, logger}
 }
 
 func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRequest) (*backendv1.CreateTaskResponse, error) {
@@ -40,6 +42,11 @@ func (i *Interactor) CreateTask(ctx context.Context, req *backendv1.CreateTaskRe
 		userID, err := tx.User.Query().Where(ent_user.Username(claims.Username)).OnlyID(ctx)
 		if err != nil {
 			i.logger.Error("[!!!inconsistency!!!] failed to get user", slog.Any("error", err), slog.String("username", claims.Username))
+			return connect.NewError(connect.CodeInternal, err)
+		}
+
+		if err := i.checkerRepo.UploadChecker(ctx, task.ID, []byte(req.Task.Checker)); err != nil {
+			i.logger.Error("failed to upload checker code to the storage", slog.Any("error", err))
 			return connect.NewError(connect.CodeInternal, err)
 		}
 
@@ -113,6 +120,11 @@ func (i *Interactor) UpdateTask(ctx context.Context, req *backendv1.UpdateTaskRe
 		}
 		if claims.Username != task.Edges.User.Username {
 			return connect.NewError(connect.CodePermissionDenied, fmt.Errorf("the task(id: %d) is not yours", req.TaskId))
+		}
+
+		if err := i.checkerRepo.UploadChecker(ctx, task.ID, []byte(req.Task.Checker)); err != nil {
+			i.logger.Error("failed to upload checker code to the storage", slog.Any("error", err))
+			return connect.NewError(connect.CodeInternal, err)
 		}
 
 		q := tx.Task.UpdateOneID(int(req.TaskId)).
