@@ -2,9 +2,7 @@ package contests
 
 import (
 	"context"
-	"log"
 	"sort"
-	"strconv"
 	"time"
 
 	"connectrpc.com/connect"
@@ -74,11 +72,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	log.Println("separateSubmit DONE!")
-
 	standings_list := GetStandingsRecordSlice(userInfo)
-
-	log.Println("GetStandingsRecordSlice DONE!")
 
 	var standings_record []*backendv1.StandingsRecord
 	for _, row := range standings_list {
@@ -97,8 +91,6 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 		result = append(result, value)
 	}
 
-	log.Println("append DONE!")
-
 	// sort by totalScore and latestUntilAc
 	sort.SliceStable(result, func(i, j int) bool {
 		if result[i].totalScore > result[j].totalScore {
@@ -108,8 +100,6 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 		}
 		return false
 	})
-
-	log.Println("sort DONE!")
 
 	// allocate rank
 	for index := range result {
@@ -145,7 +135,6 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 		index := getTaskDetailIndex(userInfo, submission.Edges.User.ID, submission.Edges.Task.ID)
 		updateUserInfo := userInfo[submission.Edges.User.ID]
 		if *submission.Status == STATUS_AC {
-			log.Println("State AC")
 			untilAc := time.Until(contest.StartAt) * -1
 			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
 			updateUserInfo.taskDetailList[index].untilAc = &untilAc
@@ -161,11 +150,8 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			updateUserInfo.latestUntilAc = &untilAc
 			*updateUserInfo.latestUntilAc += time.Duration(updateUserInfo.totalPenaltyCount * contest.PenaltySeconds)
 		} else {
-			log.Println("State WA")
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
 		}
-
-		log.Println("Update:" + strconv.Itoa(submission.Edges.User.ID))
 		userInfo[submission.Edges.User.ID] = updateUserInfo
 	}
 
