@@ -17,9 +17,18 @@ import { useEffect, useRef } from "react";
 interface EditorProps extends Omit<EditorStateConfig, "extensions"> {
   /** 編集できなくなる */
   readonly?: boolean;
+
+  onDocChange?: (s: string) => unknown;
+
+  height?: string;
 }
 
-export const Editor = ({ doc, readonly = false }: EditorProps) => {
+export const Editor = ({
+  doc,
+  height,
+  onDocChange = () => {},
+  readonly = false,
+}: EditorProps) => {
   const editor = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,6 +47,11 @@ export const Editor = ({ doc, readonly = false }: EditorProps) => {
         keymap.of([indentWithTab]),
         cpp(),
         EditorState.readOnly.of(readonly),
+        EditorView.updateListener.of(upd => {
+          if (upd.docChanged) {
+            onDocChange(upd.state.doc.toString());
+          }
+        }),
       ],
     });
 
@@ -51,5 +65,5 @@ export const Editor = ({ doc, readonly = false }: EditorProps) => {
     };
   }, [doc, readonly]);
 
-  return <div ref={editor} />;
+  return <div style={{ height, overflow: "auto", overscrollBehavior: "none" }} ref={editor} />;
 };
