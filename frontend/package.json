@@ -22,6 +22,7 @@
     "@chakra-ui/next-js": "2.1.5",
     "@chakra-ui/react": "2.8.0",
     "@chakra-ui/styled-system": "^2.9.1",
+    "@codemirror/commands": "^6.3.0",
     "@codemirror/lang-cpp": "^6.0.2",
     "@codemirror/language": "^6.9.1",
     "@codemirror/state": "^6.2.1",

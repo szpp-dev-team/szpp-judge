@@ -1,3 +1,4 @@
+import { indentWithTab } from "@codemirror/commands";
 import { cpp } from "@codemirror/lang-cpp";
 import { defaultHighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorState, EditorStateConfig } from "@codemirror/state";
@@ -8,6 +9,7 @@ import {
   highlightActiveLine,
   highlightActiveLineGutter,
   highlightSpecialChars,
+  keymap,
   lineNumbers,
 } from "@codemirror/view";
 import { useEffect, useRef } from "react";
@@ -33,6 +35,7 @@ export const Editor = ({ doc, readonly = false }: EditorProps) => {
         dropCursor(),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         highlightActiveLine(),
+        keymap.of([indentWithTab]),
         cpp(),
         EditorState.readOnly.of(readonly),
       ],

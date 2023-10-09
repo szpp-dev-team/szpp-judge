@@ -29,6 +29,9 @@ dependencies:
   '@chakra-ui/styled-system':
     specifier: ^2.9.1
     version: 2.9.1
+  '@codemirror/commands':
+    specifier: ^6.3.0
+    version: 6.3.0
   '@codemirror/lang-cpp':
     specifier: ^6.0.2
     version: 6.0.2
@@ -2663,6 +2666,15 @@ packages:
     dependencies:
       '@chakra-ui/system': 2.6.0(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(react@18.2.0)
       react: 18.2.0
+
+  /@codemirror/commands@6.3.0:
+    resolution: {integrity: sha512-tFfcxRIlOWiQDFhjBSWJ10MxcvbCIsRr6V64SgrcaY0MwNk32cUOcCuNlWo8VjV4qRQCgNgUAnIeo0svkk4R5Q==}
+    dependencies:
+      '@codemirror/language': 6.9.1
+      '@codemirror/state': 6.2.1
+      '@codemirror/view': 6.20.2
+      '@lezer/common': 1.1.0
+    dev: false
 
   /@codemirror/lang-cpp@6.0.2:
     resolution: {integrity: sha512-6oYEYUKHvrnacXxWxYa6t4puTlbN3dgV662BDfSH8+MfjQjVmP697/KYTDOqpxgerkvoNm7q5wlFMBeX8ZMocg==}
