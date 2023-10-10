@@ -1,4 +1,4 @@
-import { Code, ConnectError, createPromiseClient } from "@bufbuild/connect";
+import { Code, ConnectError, createPromiseClient } from "@connectrpc/connect";
 import { useMutation } from "@tanstack/react-query";
 import { backendTransportWithOnlyBaseUrl } from "../config/connectRpc";
 import { AuthService, login, logout } from "../gen/proto/backend/v1/auth_service-AuthService_connectquery";
