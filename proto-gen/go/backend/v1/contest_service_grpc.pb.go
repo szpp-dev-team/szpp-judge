@@ -29,6 +29,7 @@ const (
 	ContestService_GetMySubmissionStatuses_FullMethodName = "/backend.v1.ContestService/GetMySubmissionStatuses"
 	ContestService_GetStandings_FullMethodName            = "/backend.v1.ContestService/GetStandings"
 	ContestService_RegisterMe_FullMethodName              = "/backend.v1.ContestService/RegisterMe"
+	ContestService_GetMyRegistrationStatus_FullMethodName = "/backend.v1.ContestService/GetMyRegistrationStatus"
 	ContestService_CreateClarification_FullMethodName     = "/backend.v1.ContestService/CreateClarification"
 	ContestService_ListClarifications_FullMethodName      = "/backend.v1.ContestService/ListClarifications"
 	ContestService_DeleteClarification_FullMethodName     = "/backend.v1.ContestService/DeleteClarification"
@@ -61,6 +62,8 @@ type ContestServiceClient interface {
 	GetStandings(ctx context.Context, in *GetStandingsRequest, opts ...grpc.CallOption) (*GetStandingsResponse, error)
 	// 参加登録をする
 	RegisterMe(ctx context.Context, in *RegisterMeRequest, opts ...grpc.CallOption) (*RegisterMeResponse, error)
+	// 自分の参加登録状況を取得する
+	GetMyRegistrationStatus(ctx context.Context, in *GetMyRegistrationStatusRequest, opts ...grpc.CallOption) (*GetMyRegistrationStatusResponse, error)
 	// Clarification を作成する
 	CreateClarification(ctx context.Context, in *CreateClarificationRequest, opts ...grpc.CallOption) (*CreateClarificationResponse, error)
 	// ClarificationListを取得する
@@ -173,6 +176,15 @@ func (c *contestServiceClient) RegisterMe(ctx context.Context, in *RegisterMeReq
 	return out, nil
 }
 
+func (c *contestServiceClient) GetMyRegistrationStatus(ctx context.Context, in *GetMyRegistrationStatusRequest, opts ...grpc.CallOption) (*GetMyRegistrationStatusResponse, error) {
+	out := new(GetMyRegistrationStatusResponse)
+	err := c.cc.Invoke(ctx, ContestService_GetMyRegistrationStatus_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contestServiceClient) CreateClarification(ctx context.Context, in *CreateClarificationRequest, opts ...grpc.CallOption) (*CreateClarificationResponse, error) {
 	out := new(CreateClarificationResponse)
 	err := c.cc.Invoke(ctx, ContestService_CreateClarification_FullMethodName, in, out, opts...)
@@ -251,6 +263,8 @@ type ContestServiceServer interface {
 	GetStandings(context.Context, *GetStandingsRequest) (*GetStandingsResponse, error)
 	// 参加登録をする
 	RegisterMe(context.Context, *RegisterMeRequest) (*RegisterMeResponse, error)
+	// 自分の参加登録状況を取得する
+	GetMyRegistrationStatus(context.Context, *GetMyRegistrationStatusRequest) (*GetMyRegistrationStatusResponse, error)
 	// Clarification を作成する
 	CreateClarification(context.Context, *CreateClarificationRequest) (*CreateClarificationResponse, error)
 	// ClarificationListを取得する
@@ -298,6 +312,9 @@ func (UnimplementedContestServiceServer) GetStandings(context.Context, *GetStand
 }
 func (UnimplementedContestServiceServer) RegisterMe(context.Context, *RegisterMeRequest) (*RegisterMeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterMe not implemented")
+}
+func (UnimplementedContestServiceServer) GetMyRegistrationStatus(context.Context, *GetMyRegistrationStatusRequest) (*GetMyRegistrationStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMyRegistrationStatus not implemented")
 }
 func (UnimplementedContestServiceServer) CreateClarification(context.Context, *CreateClarificationRequest) (*CreateClarificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateClarification not implemented")
@@ -509,6 +526,24 @@ func _ContestService_RegisterMe_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContestService_GetMyRegistrationStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMyRegistrationStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContestServiceServer).GetMyRegistrationStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContestService_GetMyRegistrationStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContestServiceServer).GetMyRegistrationStatus(ctx, req.(*GetMyRegistrationStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContestService_CreateClarification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateClarificationRequest)
 	if err := dec(in); err != nil {
@@ -663,6 +698,10 @@ var ContestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterMe",
 			Handler:    _ContestService_RegisterMe_Handler,
+		},
+		{
+			MethodName: "GetMyRegistrationStatus",
+			Handler:    _ContestService_GetMyRegistrationStatus_Handler,
 		},
 		{
 			MethodName: "CreateClarification",
