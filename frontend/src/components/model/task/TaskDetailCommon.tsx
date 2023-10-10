@@ -6,8 +6,9 @@ import { Task, Testcase } from "@/src/gen/proto/backend/v1/task_resources_pb";
 import { Difficulty } from "@/src/model/task";
 import { useSubmit } from "@/src/usecases/judge";
 import { PlainMessage } from "@bufbuild/protobuf";
-import { Box, Card, Heading, Text, useToast } from "@chakra-ui/react";
+import { Box, BoxProps, Card, Heading, Text, useToast } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
+import { ReactNode, useCallback } from "react";
 import { DifficultyBadge } from "../../model/task/DifficultyBadge";
 import { TestcaseView } from "./TestcaseView";
 
@@ -50,7 +51,7 @@ export const TaskDetailCommon = ({
 
   const { mutate, isLoading: isSubmissionLoading } = useSubmit();
 
-  const handleSubmit = (langId: LangID, sourceCode: string) => {
+  const handleSubmit = useCallback((langId: LangID, sourceCode: string) => {
     if (sourceCode.length === 0) {
       toast({
         title: "ソースコードが空です。",
@@ -90,7 +91,7 @@ export const TaskDetailCommon = ({
         });
       },
     });
-  };
+  }, [contestId, task.id, mutate, onSubmitSuccess, toast]);
 
   return (
     <Card px={6} py={4} minH="100%" maxW="860px" w="100%" rounded={"none"} color="cyan.900">
@@ -98,22 +99,21 @@ export const TaskDetailCommon = ({
         {taskSeqCode && taskSeqCode + " - "}
         {task.title}
       </Heading>
-      <Box pb={8}>
-        {/* TODO: 良いカンジに表示する */}
-        <Text>実行時間制限:</Text>
-        <Text>{task.execTimeLimit / 1000} ms</Text>
-        <Text>メモリ制限:</Text>
-        <Text>{task.execMemoryLimit} MiB</Text>
-        <Text>難易度:</Text>
-        <DifficultyBadge dif={Difficulty.fromPb(task.difficulty)} />
-        {score != null && (
-          <>
-            <Text>配点:</Text>
-            <Text>{score} 点</Text>
-          </>
-        )}
+      <Box mt={4} as="dl">
+        <TaskMetaRecord name="実行時間制限">{task.execTimeLimit / 1000} sec</TaskMetaRecord>
+        <TaskMetaRecord name="メモリ制限">{task.execMemoryLimit} MiB</TaskMetaRecord>
+        <TaskMetaRecord name="難易度">
+          <DifficultyBadge dif={Difficulty.fromPb(task.difficulty)} />
+        </TaskMetaRecord>
       </Box>
-      <MarkdownView markdown={task.statement} className={taskDetailStyle.markdownWrapper} />
+      {score != null && (
+        <Box mt={1} as="dl">
+          <TaskMetaRecord name="配点" fontSize="lg">
+            <Text as="strong">{score}</Text> 点
+          </TaskMetaRecord>
+        </Box>
+      )}
+      <MarkdownView markdown={task.statement} className={taskDetailStyle.markdownWrapper} mt={10} />
       <h2 className={taskDetailStyle.h2}>入出力例</h2>
       {sampleCases.map((c, i) => (
         <Box key={c.id} as="section" mb={8}>
@@ -129,5 +129,33 @@ export const TaskDetailCommon = ({
         submitButtonProps={{ isLoading: isSubmissionLoading }}
       />
     </Card>
+  );
+};
+
+const TaskMetaRecord = ({ name, children, ...props }: {
+  name: string;
+  children: ReactNode;
+} & Omit<BoxProps, "name" | "children">) => {
+  return (
+    <Box
+      display="inline-flex"
+      alignItems="center"
+      sx={{
+        "&:not(:last-child)::after": {
+          content: `'/'`,
+          mx: 3,
+        },
+      }}
+      {...props}
+    >
+      <Text
+        as="dt"
+        display="inline"
+        _after={{ content: `':'`, mr: 1 }}
+      >
+        {name}
+      </Text>
+      <Box as="dd" display="inline">{children}</Box>
+    </Box>
   );
 };
