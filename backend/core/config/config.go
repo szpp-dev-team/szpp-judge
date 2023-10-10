@@ -21,6 +21,7 @@ type Config struct {
 	FrontendURL          string `envconfig:"FRONTEND_URL" required:"false"`
 	HandleJudgeTaskURL   string `envconfig:"HANDLE_JUDGE_TASK_URL" required:"false"`
 	GcsBucketName        string `envconfig:"GCS_BUCKET_NAME" required:"true"`
+	ServiceAccountEmail  string `envconfig:"SERVICE_ACCOUNT_EMAIL"`
 }
 
 func New() (*Config, error) {

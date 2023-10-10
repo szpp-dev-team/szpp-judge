@@ -15,15 +15,16 @@ type JudgeQueue interface {
 }
 
 type cloudtasksImpl struct {
-	client             *cloudtasks.Client
-	handleJudgeTaskURL string
-	projectID          string
-	locationID         string
-	queueID            string
+	client              *cloudtasks.Client
+	handleJudgeTaskURL  string
+	projectID           string
+	locationID          string
+	queueID             string
+	serviceAccountEmail string
 }
 
-func New(client *cloudtasks.Client, handleJudgeTaskURL, projectID, locationID, queueID string) JudgeQueue {
-	return &cloudtasksImpl{client, handleJudgeTaskURL, projectID, locationID, queueID}
+func New(client *cloudtasks.Client, handleJudgeTaskURL, projectID, locationID, queueID, serviceAccountEmail string) JudgeQueue {
+	return &cloudtasksImpl{client, handleJudgeTaskURL, projectID, locationID, queueID, serviceAccountEmail}
 }
 
 func (i *cloudtasksImpl) Push(ctx context.Context, submitID int, req *judgev1.JudgeRequest) error {
@@ -41,6 +42,11 @@ func (i *cloudtasksImpl) Push(ctx context.Context, submitID int, req *judgev1.Ju
 					Body:       reqBytes,
 					Headers: map[string]string{
 						"SubmitID": fmt.Sprintf("%d", submitID),
+					},
+					AuthorizationHeader: &cloudtaskspb.HttpRequest_OidcToken{
+						OidcToken: &cloudtaskspb.OidcToken{
+							ServiceAccountEmail: i.serviceAccountEmail,
+						},
 					},
 				},
 			},

@@ -71,7 +71,14 @@ func main() {
 	testcasesRepository := testcases.NewRepository(storageClient, config.GcsBucketName)
 	sourcesRepository := sources.NewRepository(storageClient, config.GcsBucketName)
 	checkerRepository := checkers.NewRepository(storageClient, config.GcsBucketName)
-	judgeQueue := judge_queue.New(cloudtasksClient, config.HandleJudgeTaskURL, config.CloudTasksProjectID, config.CloudTasksLocationID, config.CloudTasksQueueID)
+	judgeQueue := judge_queue.New(
+		cloudtasksClient,
+		config.HandleJudgeTaskURL,
+		config.CloudTasksProjectID,
+		config.CloudTasksLocationID,
+		config.CloudTasksQueueID,
+		config.ServiceAccountEmail,
+	)
 	conn, err := grpc.Dial(config.JudgeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
