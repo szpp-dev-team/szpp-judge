@@ -91,18 +91,12 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 
 	// download and compile checker
 	checkerLm := newCheckerLangMeta()
-	if _, _, err := i.downloadAndCompileCode(ctx, filepath.Join(workdir, "checker.cpp"), req.CheckerCodePath, checkerLm, sb); err != nil {
+	ok, _, err = i.downloadAndCompileCode(ctx, filepath.Join(workdir, "checker.cpp"), req.CheckerCodePath, checkerLm, sb)
+	if err != nil {
 		return err
 	}
 	if !ok {
-		if err := stream.Send(&judgev1.JudgeResponse{
-			SubmissionId:    req.SubmissionId,
-			Status:          judgev1.JudgeStatus_CE,
-			CompilerMessage: compileMessage,
-		}); err != nil {
-			return status.Error(codes.Internal, err.Error())
-		}
-		return nil
+		return status.Error(codes.Internal, "failed to compile checker")
 	}
 
 	for _, tc := range req.Testcases {
@@ -111,21 +105,9 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 			return err
 		}
 
-		res, err := sb.Exec(ctx, sandbox.ExecOption{
-			AsRootUser:      false,
-			Stdin:           bytes.NewBuffer(testcase.Input),
-			Cmd:             lm.ExecCmd,
-			StdoutReadLimit: 256 * unit.KiB,
-			StderrReadLimit: 64 * unit.KiB,
-		}, sandbox.SzpprunOption{
-			TimeLimit:        time.Duration(req.ExecTimeLimitMs+200) * time.Millisecond,
-			MemoryLimit:      unit.Byte(req.ExecMemoryLimitMib) * unit.MiB,
-			FileWriteLimit:   unit.MiB * 8,
-			NumOpenFileLimit: 128,
-		})
+		res, err := i.run(ctx, workdir, req, testcase, lm, sb)
 		if err != nil {
-			i.logger.Error("error occurred while exec", slog.Any("error", err))
-			return status.Error(codes.Internal, err.Error())
+			return err
 		}
 
 		judgeResp := &judgev1.JudgeResponse{
@@ -135,7 +117,6 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 			ExecTimeMs:    uint32(res.ExecTime.Milliseconds()),
 			ExecMemoryKib: uint32(res.ExecMemory / unit.KiB),
 		}
-
 		switch {
 		case res.ExitCode != 0:
 			i.logger.Warn("RE occurred", slog.Any("exitCode", res.ExitCode), slog.Any("stderr", res.Stderr))
@@ -165,6 +146,54 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 	return nil
 }
 
+func (i *Interactor) run(
+	ctx context.Context,
+	workdir string,
+	req *judgev1.JudgeRequest,
+	testcase *Testcase,
+	lm *langs.Meta,
+	sb *sandbox.Sandbox,
+) (*sandbox.ExecResult, error) {
+	res, err := sb.Exec(ctx, sandbox.ExecOption{
+		AsRootUser:      false,
+		Stdin:           bytes.NewBuffer(testcase.Input),
+		Cmd:             lm.ExecCmd,
+		StdoutReadLimit: 256 * unit.KiB,
+		StderrReadLimit: 64 * unit.KiB,
+	}, sandbox.SzpprunOption{
+		TimeLimit:        time.Duration(req.ExecTimeLimitMs+200) * time.Millisecond,
+		MemoryLimit:      unit.Byte(req.ExecMemoryLimitMib) * unit.MiB,
+		FileWriteLimit:   unit.MiB * 8,
+		NumOpenFileLimit: 128,
+	})
+	if err != nil {
+		i.logger.Error("error occurred while exec", slog.Any("error", err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if err := saveAsFile(filepath.Join(workdir, "testcase_input.txt"), testcase.Input); err != nil {
+		return nil, err
+	}
+	if err := saveAsFile(filepath.Join(workdir, "testcase_output.txt"), testcase.Output); err != nil {
+		return nil, err
+	}
+	if err := saveAsFile(filepath.Join(workdir, "user_output.txt"), []byte(res.Stdout)); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func saveAsFile(name string, b []byte) error {
+	f, err := os.Create(name)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = io.Copy(f, bytes.NewReader(b))
+	return err
+}
+
 func sendIE(stream judgev1.JudgeService_JudgeServer, submissionID int32) error {
 	if err := stream.Send(&judgev1.JudgeResponse{
 		SubmissionId: submissionID,
@@ -185,13 +214,14 @@ func (i *Interactor) compile(ctx context.Context, langMeta *langs.Meta, sb *sand
 	}, sandbox.SzpprunOption{
 		TimeLimit:        time.Minute,
 		MemoryLimit:      512 * unit.MiB,
-		FileWriteLimit:   unit.MiB,
+		FileWriteLimit:   1024 * unit.MiB,
 		NumOpenFileLimit: 1024,
 	})
 	if err != nil {
 		i.logger.Error("error occurred while compile", slog.Any("error", err))
 		return false, "", status.Error(codes.Internal, err.Error())
 	}
+	i.logger.Info("compile finished", slog.Any("result", res))
 	return res.ExitCode == 0, res.Stderr, nil
 }
 
@@ -282,6 +312,7 @@ func (i *Interactor) check(ctx context.Context, lm *langs.Meta, sb *sandbox.Sand
 		i.logger.Error("error occurred while compile", slog.Any("error", err))
 		return false, status.Error(codes.Internal, err.Error())
 	}
+	slog.Info("check was finished", slog.Any("result", res))
 	return res.ExitCode == 0, nil
 }
 
