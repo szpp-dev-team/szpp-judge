@@ -5,10 +5,12 @@ WORKDIR /work
 RUN apt-get update \
   && apt-get install -y git
 RUN git clone --depth=1 https://github.com/atcoder/ac-library/ -b v1.4
+RUN git clone --depth=1 https://github.com/MikeMirzayanov/testlib.git
 
 FROM gcc:13.2.0
 WORKDIR /work
 COPY --from=builder /work/ac-library/atcoder /opt/include/atcoder
+COPY --from=builder /work/testlib/testlib.h /opt/include/testlib.h
 COPY --from=szpprun /usr/local/bin/szpprun /usr/local/bin/
 
 LABEL szpp-judge-image=true
