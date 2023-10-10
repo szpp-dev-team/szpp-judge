@@ -1,7 +1,7 @@
 import { backendTransportWithOnlyBaseUrl } from "@/src/config/connectRpc";
 import { HealthcheckService } from "@/src/gen/proto/backend/v1/healthcheck_service-HealthcheckService_connectquery";
-import { createPromiseClient } from "@bufbuild/connect";
 import { Button, Container } from "@chakra-ui/react";
+import { createPromiseClient } from "@connectrpc/connect";
 import type { NextPage } from "next";
 import { useState } from "react";
 

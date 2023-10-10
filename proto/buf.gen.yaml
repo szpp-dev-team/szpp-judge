@@ -19,11 +19,6 @@ plugins:
     opt:
       - paths=source_relative
       - require_unimplemented_servers=false
-  - plugin: buf.build/bufbuild/connect-es:v0.13.0
-    out: ../frontend/src/gen/proto
-    opt:
-      - target=ts
-      - import_extension=none
   - plugin: buf.build/connectrpc/query-es:v0.4.4
     out: ../frontend/src/gen/proto
     opt:

@@ -1,7 +1,7 @@
 import { AuthService } from "@/src/gen/proto/backend/v1/auth_service-AuthService_connectquery";
 import type { Credential } from "@/src/model/auth";
-import { Code, ConnectError, Interceptor } from "@bufbuild/connect";
-import { createConnectTransport } from "@bufbuild/connect-web";
+import { Code, ConnectError, Interceptor } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
 
 if (!process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
   console.error("NEXT_PUBLIC_BACKEND_BASE_URL is empty");
