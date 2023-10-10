@@ -12,6 +12,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	ent_contesttask "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
+	ent_contestuser "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contestuser"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
@@ -21,6 +22,8 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/usecases/tasks"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
 	"golang.org/x/exp/slices"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -267,6 +270,27 @@ func (i *Interactor) GetMySubmissionStatuses(ctx context.Context, req *backendv1
 
 	return &backendv1.GetMySubmissionStatusesResponse{
 		SubmissionStatuses: submissionStatuses,
+	}, nil
+}
+
+func (i *Interactor) GetMyRegistrationStatus(ctx context.Context, req *backendv1.GetMyRegistrationStatusRequest) (*backendv1.GetMyRegistrationStatusResponse, error) {
+	claims := interceptor.GetClaimsFromContext(ctx)
+
+	contest, err := i.entClient.Contest.Query().
+		WithContestUser(func(cuq *ent.ContestUserQuery) {
+			cuq.Where(ent_contestuser.UserID(claims.UserID))
+		}).
+		Where(ent_contest.Slug(req.ContestSlug)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Error(codes.NotFound, "contest not found")
+		}
+		i.logger.Error("failed to get contest", slog.Any("error", err))
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &backendv1.GetMyRegistrationStatusResponse{
+		Registered: contest.Edges.ContestUser != nil,
 	}, nil
 }
 

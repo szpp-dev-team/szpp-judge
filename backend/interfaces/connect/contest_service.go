@@ -81,6 +81,14 @@ func (s *contestServiceServer) GetMySubmissionStatuses(ctx context.Context, req 
 	return connect.NewResponse(resp), nil
 }
 
+func (s *contestServiceServer) GetMyRegistrationStatus(ctx context.Context, req *connect.Request[backendv1.GetMyRegistrationStatusRequest]) (*connect.Response[backendv1.GetMyRegistrationStatusResponse], error) {
+	resp, err := s.interactor.GetMyRegistrationStatus(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
+}
+
 func (s *contestServiceServer) GetStandings(ctx context.Context, req *connect.Request[backendv1.GetStandingsRequest]) (*connect.Response[backendv1.GetStandingsResponse], error) {
 	resp, err := s.interactor.GetStandings(ctx, req.Msg)
 	if err != nil {
