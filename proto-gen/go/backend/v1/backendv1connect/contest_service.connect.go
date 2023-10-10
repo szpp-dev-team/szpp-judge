@@ -63,6 +63,9 @@ const (
 	// ContestServiceRegisterMeProcedure is the fully-qualified name of the ContestService's RegisterMe
 	// RPC.
 	ContestServiceRegisterMeProcedure = "/backend.v1.ContestService/RegisterMe"
+	// ContestServiceGetMyRegistrationStatusProcedure is the fully-qualified name of the
+	// ContestService's GetMyRegistrationStatus RPC.
+	ContestServiceGetMyRegistrationStatusProcedure = "/backend.v1.ContestService/GetMyRegistrationStatus"
 	// ContestServiceCreateClarificationProcedure is the fully-qualified name of the ContestService's
 	// CreateClarification RPC.
 	ContestServiceCreateClarificationProcedure = "/backend.v1.ContestService/CreateClarification"
@@ -105,6 +108,8 @@ type ContestServiceClient interface {
 	GetStandings(context.Context, *connect.Request[v1.GetStandingsRequest]) (*connect.Response[v1.GetStandingsResponse], error)
 	// 参加登録をする
 	RegisterMe(context.Context, *connect.Request[v1.RegisterMeRequest]) (*connect.Response[v1.RegisterMeResponse], error)
+	// 自分の参加登録状況を取得する
+	GetMyRegistrationStatus(context.Context, *connect.Request[v1.GetMyRegistrationStatusRequest]) (*connect.Response[v1.GetMyRegistrationStatusResponse], error)
 	// Clarification を作成する
 	CreateClarification(context.Context, *connect.Request[v1.CreateClarificationRequest]) (*connect.Response[v1.CreateClarificationResponse], error)
 	// ClarificationListを取得する
@@ -179,6 +184,11 @@ func NewContestServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			baseURL+ContestServiceRegisterMeProcedure,
 			opts...,
 		),
+		getMyRegistrationStatus: connect.NewClient[v1.GetMyRegistrationStatusRequest, v1.GetMyRegistrationStatusResponse](
+			httpClient,
+			baseURL+ContestServiceGetMyRegistrationStatusProcedure,
+			opts...,
+		),
 		createClarification: connect.NewClient[v1.CreateClarificationRequest, v1.CreateClarificationResponse](
 			httpClient,
 			baseURL+ContestServiceCreateClarificationProcedure,
@@ -224,6 +234,7 @@ type contestServiceClient struct {
 	getMySubmissionStatuses *connect.Client[v1.GetMySubmissionStatusesRequest, v1.GetMySubmissionStatusesResponse]
 	getStandings            *connect.Client[v1.GetStandingsRequest, v1.GetStandingsResponse]
 	registerMe              *connect.Client[v1.RegisterMeRequest, v1.RegisterMeResponse]
+	getMyRegistrationStatus *connect.Client[v1.GetMyRegistrationStatusRequest, v1.GetMyRegistrationStatusResponse]
 	createClarification     *connect.Client[v1.CreateClarificationRequest, v1.CreateClarificationResponse]
 	listClarifications      *connect.Client[v1.ListClarificationsRequest, v1.ListClarificationsResponse]
 	deleteClarification     *connect.Client[v1.DeleteClarificationRequest, v1.DeleteClarificationResponse]
@@ -282,6 +293,11 @@ func (c *contestServiceClient) RegisterMe(ctx context.Context, req *connect.Requ
 	return c.registerMe.CallUnary(ctx, req)
 }
 
+// GetMyRegistrationStatus calls backend.v1.ContestService.GetMyRegistrationStatus.
+func (c *contestServiceClient) GetMyRegistrationStatus(ctx context.Context, req *connect.Request[v1.GetMyRegistrationStatusRequest]) (*connect.Response[v1.GetMyRegistrationStatusResponse], error) {
+	return c.getMyRegistrationStatus.CallUnary(ctx, req)
+}
+
 // CreateClarification calls backend.v1.ContestService.CreateClarification.
 func (c *contestServiceClient) CreateClarification(ctx context.Context, req *connect.Request[v1.CreateClarificationRequest]) (*connect.Response[v1.CreateClarificationResponse], error) {
 	return c.createClarification.CallUnary(ctx, req)
@@ -334,6 +350,8 @@ type ContestServiceHandler interface {
 	GetStandings(context.Context, *connect.Request[v1.GetStandingsRequest]) (*connect.Response[v1.GetStandingsResponse], error)
 	// 参加登録をする
 	RegisterMe(context.Context, *connect.Request[v1.RegisterMeRequest]) (*connect.Response[v1.RegisterMeResponse], error)
+	// 自分の参加登録状況を取得する
+	GetMyRegistrationStatus(context.Context, *connect.Request[v1.GetMyRegistrationStatusRequest]) (*connect.Response[v1.GetMyRegistrationStatusResponse], error)
 	// Clarification を作成する
 	CreateClarification(context.Context, *connect.Request[v1.CreateClarificationRequest]) (*connect.Response[v1.CreateClarificationResponse], error)
 	// ClarificationListを取得する
@@ -404,6 +422,11 @@ func NewContestServiceHandler(svc ContestServiceHandler, opts ...connect.Handler
 		svc.RegisterMe,
 		opts...,
 	)
+	contestServiceGetMyRegistrationStatusHandler := connect.NewUnaryHandler(
+		ContestServiceGetMyRegistrationStatusProcedure,
+		svc.GetMyRegistrationStatus,
+		opts...,
+	)
 	contestServiceCreateClarificationHandler := connect.NewUnaryHandler(
 		ContestServiceCreateClarificationProcedure,
 		svc.CreateClarification,
@@ -456,6 +479,8 @@ func NewContestServiceHandler(svc ContestServiceHandler, opts ...connect.Handler
 			contestServiceGetStandingsHandler.ServeHTTP(w, r)
 		case ContestServiceRegisterMeProcedure:
 			contestServiceRegisterMeHandler.ServeHTTP(w, r)
+		case ContestServiceGetMyRegistrationStatusProcedure:
+			contestServiceGetMyRegistrationStatusHandler.ServeHTTP(w, r)
 		case ContestServiceCreateClarificationProcedure:
 			contestServiceCreateClarificationHandler.ServeHTTP(w, r)
 		case ContestServiceListClarificationsProcedure:
@@ -515,6 +540,10 @@ func (UnimplementedContestServiceHandler) GetStandings(context.Context, *connect
 
 func (UnimplementedContestServiceHandler) RegisterMe(context.Context, *connect.Request[v1.RegisterMeRequest]) (*connect.Response[v1.RegisterMeResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("backend.v1.ContestService.RegisterMe is not implemented"))
+}
+
+func (UnimplementedContestServiceHandler) GetMyRegistrationStatus(context.Context, *connect.Request[v1.GetMyRegistrationStatusRequest]) (*connect.Response[v1.GetMyRegistrationStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("backend.v1.ContestService.GetMyRegistrationStatus is not implemented"))
 }
 
 func (UnimplementedContestServiceHandler) CreateClarification(context.Context, *connect.Request[v1.CreateClarificationRequest]) (*connect.Response[v1.CreateClarificationResponse], error) {

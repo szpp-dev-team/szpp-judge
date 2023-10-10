@@ -812,6 +812,80 @@ export class RegisterMeResponse extends Message<RegisterMeResponse> {
 }
 
 /**
+ * @generated from message backend.v1.GetMyRegistrationStatusRequest
+ */
+export class GetMyRegistrationStatusRequest extends Message<GetMyRegistrationStatusRequest> {
+  /**
+   * @generated from field: string contest_slug = 1;
+   */
+  contestSlug = "";
+
+  constructor(data?: PartialMessage<GetMyRegistrationStatusRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetMyRegistrationStatusRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "contest_slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetMyRegistrationStatusRequest {
+    return new GetMyRegistrationStatusRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetMyRegistrationStatusRequest {
+    return new GetMyRegistrationStatusRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetMyRegistrationStatusRequest {
+    return new GetMyRegistrationStatusRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetMyRegistrationStatusRequest | PlainMessage<GetMyRegistrationStatusRequest> | undefined, b: GetMyRegistrationStatusRequest | PlainMessage<GetMyRegistrationStatusRequest> | undefined): boolean {
+    return proto3.util.equals(GetMyRegistrationStatusRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message backend.v1.GetMyRegistrationStatusResponse
+ */
+export class GetMyRegistrationStatusResponse extends Message<GetMyRegistrationStatusResponse> {
+  /**
+   * @generated from field: bool registered = 1;
+   */
+  registered = false;
+
+  constructor(data?: PartialMessage<GetMyRegistrationStatusResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "backend.v1.GetMyRegistrationStatusResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "registered", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetMyRegistrationStatusResponse {
+    return new GetMyRegistrationStatusResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetMyRegistrationStatusResponse {
+    return new GetMyRegistrationStatusResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetMyRegistrationStatusResponse {
+    return new GetMyRegistrationStatusResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetMyRegistrationStatusResponse | PlainMessage<GetMyRegistrationStatusResponse> | undefined, b: GetMyRegistrationStatusResponse | PlainMessage<GetMyRegistrationStatusResponse> | undefined): boolean {
+    return proto3.util.equals(GetMyRegistrationStatusResponse, a, b);
+  }
+}
+
+/**
  * @generated from message backend.v1.CreateClarificationRequest
  */
 export class CreateClarificationRequest extends Message<CreateClarificationRequest> {

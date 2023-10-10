@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetContestRequest, GetContestResponse, GetContestTaskRequest, GetContestTaskResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, SyncContestTasksRequest, SyncContestTasksResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
+import { CreateAnswerRequest, CreateAnswerResponse, CreateClarificationRequest, CreateClarificationResponse, CreateContestRequest, CreateContestResponse, DeleteAnswerRequest, DeleteAnswerResponse, DeleteClarificationRequest, DeleteClarificationResponse, GetContestRequest, GetContestResponse, GetContestTaskRequest, GetContestTaskResponse, GetMyRegistrationStatusRequest, GetMyRegistrationStatusResponse, GetMySubmissionStatusesRequest, GetMySubmissionStatusesResponse, GetStandingsRequest, GetStandingsResponse, ListClarificationsRequest, ListClarificationsResponse, ListContestsRequest, ListContestsResponse, ListContestTasksRequest, ListContestTasksResponse, RegisterMeRequest, RegisterMeResponse, SyncContestTasksRequest, SyncContestTasksResponse, UpdateAnswerRequest, UpdateAnswerResponse, UpdateContestRequest, UpdateContestResponse } from "./contest_service_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 import { createQueryService } from "@connectrpc/connect-query";
 
@@ -123,6 +123,17 @@ export const ContestService = {
       name: "RegisterMe",
       I: RegisterMeRequest,
       O: RegisterMeResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * 自分の参加登録状況を取得する
+     *
+     * @generated from rpc backend.v1.ContestService.GetMyRegistrationStatus
+     */
+    getMyRegistrationStatus: {
+      name: "GetMyRegistrationStatus",
+      I: GetMyRegistrationStatusRequest,
+      O: GetMyRegistrationStatusResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -283,6 +294,15 @@ export const getStandings = createQueryService({
 export const registerMe = createQueryService({
   service: ContestService,
 }).registerMe;
+
+/**
+ * 自分の参加登録状況を取得する
+ *
+ * @generated from rpc backend.v1.ContestService.GetMyRegistrationStatus
+ */
+export const getMyRegistrationStatus = createQueryService({
+  service: ContestService,
+}).getMyRegistrationStatus;
 
 /**
  * Clarification を作成する

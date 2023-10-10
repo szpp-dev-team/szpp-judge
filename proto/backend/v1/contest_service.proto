@@ -26,6 +26,8 @@ service ContestService {
   rpc GetStandings(GetStandingsRequest) returns (GetStandingsResponse);
   // 参加登録をする
   rpc RegisterMe(RegisterMeRequest) returns (RegisterMeResponse);
+  // 自分の参加登録状況を取得する
+  rpc GetMyRegistrationStatus(GetMyRegistrationStatusRequest) returns (GetMyRegistrationStatusResponse);
   // Clarification を作成する
   rpc CreateClarification(CreateClarificationRequest) returns (CreateClarificationResponse);
   // ClarificationListを取得する
@@ -125,6 +127,14 @@ message RegisterMeRequest {
 }
 
 message RegisterMeResponse {}
+
+message GetMyRegistrationStatusRequest {
+  string contest_slug = 1;
+}
+
+message GetMyRegistrationStatusResponse {
+  bool registered = 1;
+}
 
 message CreateClarificationRequest {
   string content = 1;
