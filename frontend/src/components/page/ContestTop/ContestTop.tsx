@@ -1,6 +1,12 @@
 import { useGetContest, useRegisterMe, useRouterContestSlug } from "@/src/usecases/contest";
-import { Box, Button, Card, CardBody, CardHeader, Heading, useToast } from "@chakra-ui/react";
+import { Box, Button, Card, CardBody, CardHeader, Heading, Text, useToast } from "@chakra-ui/react";
+import dynamic from "next/dynamic";
 import { useTimer } from "react-timer-hook";
+import contestTopStyle from "./ContestTop.module.scss";
+
+const MarkdownView = dynamic(() => import("@/src/components/ui/MarkdownView").then(mod => mod.MarkdownView), {
+  ssr: false,
+});
 
 const TimerComponent = (props: { expiryTimestamp: Date; timerHeader: string }) => {
   const onExpire = () => window.location.reload();
@@ -59,24 +65,28 @@ export const ContestTop = () => {
 
   return (
     <Box px={16} h="100%">
-      <Card px={3} py={4} h="100%" borderRadius={0}>
+      <Card px={3} py={4} h="100%" borderRadius={0} color="cyan.900">
         <CardHeader textAlign="center">
           <Heading as="h1" mb={4}>{contest?.name}</Heading>
-          <p>開催期間: {contest?.startAt?.toDate().toLocaleString()} - {contest?.endAt?.toDate().toLocaleString()}</p>
+          <Text>
+            開催期間: {contest?.startAt?.toDate().toLocaleString()} - {contest?.endAt?.toDate().toLocaleString()}
+          </Text>
           {contest && isUpcomingOrRunning
             ? (
-              <div>
+              <Box>
                 <Button colorScheme="teal" onClick={handleClick} isLoading={isLoading} margin={4}>
                   参加登録
                 </Button>
-                <p>
+                <Text>
                   <TimerComponent expiryTimestamp={expiryTimestamp} timerHeader={timerHeader} />
-                </p>
-              </div>
+                </Text>
+              </Box>
             )
             : <></>}
         </CardHeader>
-        <CardBody>{contest?.description}</CardBody>
+        <CardBody>
+          <MarkdownView markdown={contest?.description} className={contestTopStyle.markdownWrapper} />
+        </CardBody>
       </Card>
     </Box>
   );
