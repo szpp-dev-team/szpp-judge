@@ -151,6 +151,9 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 		i.logger.Error("failed to update submit", slog.Any("error", err))
 		return err
 	}
+
+	i.logger.Info("submission updated", slog.Any("submission", submit))
+
 	return nil
 }
 
