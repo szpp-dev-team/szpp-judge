@@ -13,6 +13,7 @@ import (
 	ent_contesttask "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	ent_tr "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/judge_queue"
 	sources_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/sources"
 	backendv1 "github.com/szpp-dev-team/szpp-judge/proto-gen/go/backend/v1"
@@ -55,7 +56,7 @@ func (i *Interactor) PostJudgeRequest(ctx context.Context, req *judgev1.JudgeReq
 		return err
 	}
 
-	testcaseResults := make([]*ent.TestcaseResult, 0)
+	testcaseResultIDs := make([]int, 0, len(req.Testcases))
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
@@ -89,7 +90,16 @@ func (i *Interactor) PostJudgeRequest(ctx context.Context, req *judgev1.JudgeReq
 			i.logger.Error("failed to create testcase result", slog.Int("submissionID", int(req.SubmissionId)), slog.Any("error", err))
 			return err
 		}
-		testcaseResults = append(testcaseResults, res)
+		testcaseResultIDs = append(testcaseResultIDs, res.ID)
+	}
+
+	testcaseResults, err := i.entClient.TestcaseResult.Query().
+		WithTestcase().
+		Where(ent_tr.IDIn(testcaseResultIDs...)).
+		All(ctx)
+	if err != nil {
+		i.logger.Error("failed to list testcase_results", slog.Any("error", err))
+		return err
 	}
 
 	if err := i.updateSubmitResult(ctx, int(req.SubmissionId), testcaseResults); err != nil {
