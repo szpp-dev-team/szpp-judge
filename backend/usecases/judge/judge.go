@@ -147,10 +147,10 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 		if judgeStatusPriority < trStatusPriority {
 			submit.Status = &tr.Status
 		}
-		if tr.ExecMemory < submit.ExecMemory {
+		if submit.ExecMemory < tr.ExecMemory {
 			submit.ExecMemory = tr.ExecMemory
 		}
-		if tr.ExecTime < submit.ExecTime {
+		if submit.ExecTime < tr.ExecTime {
 			submit.ExecTime = tr.ExecTime
 		}
 	}
