@@ -50,7 +50,7 @@ func main() {
 		grpc_server.WithGcsBucketName(cfg.GcsBucketName),
 	)
 
-	lsnr, err := net.Listen("tcp", ":"+cfg.GrpcPort)
+	lsnr, err := net.Listen("tcp", "0.0.0.0:"+cfg.GrpcPort)
 	if err != nil {
 		gcsClient.Close()
 		dockerClient.Close()
