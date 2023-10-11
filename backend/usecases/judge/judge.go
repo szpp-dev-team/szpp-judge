@@ -90,6 +90,7 @@ func (i *Interactor) PostJudgeRequest(ctx context.Context, req *judgev1.JudgeReq
 			i.logger.Error("failed to create testcase result", slog.Int("submissionID", int(req.SubmissionId)), slog.Any("error", err))
 			return err
 		}
+		i.logger.Info("testcase result created", slog.Any("testcaseResult", res))
 		testcaseResultIDs = append(testcaseResultIDs, res.ID)
 	}
 
@@ -145,7 +146,11 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 		trStatusPriority := priorityByJudgeStatus[judgev1.JudgeStatus(judgev1.JudgeStatus_value[tr.Status])]
 		if judgeStatusPriority < trStatusPriority {
 			submit.Status = &tr.Status
+		}
+		if tr.ExecMemory < submit.ExecMemory {
 			submit.ExecMemory = tr.ExecMemory
+		}
+		if tr.ExecTime < submit.ExecTime {
 			submit.ExecTime = tr.ExecTime
 		}
 	}
