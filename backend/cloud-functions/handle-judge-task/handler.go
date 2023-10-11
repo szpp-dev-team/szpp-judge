@@ -65,6 +65,8 @@ func HandleJudgeTask(interactor *judge.Interactor) func(w http.ResponseWriter, r
 			return
 		}
 
+		slog.Info("request received", slog.Any("request", &req))
+
 		if err := interactor.PostJudgeRequest(r.Context(), &req); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
