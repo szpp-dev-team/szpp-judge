@@ -239,6 +239,7 @@ func buildJudgeRequest(submitID int, langID string, task *ent.Task) (*judgev1.Ju
 	testcaseList := make([]*judgev1.Testcase, 0, len(task.Edges.Testcases))
 	for _, tc := range task.Edges.Testcases {
 		testcaseList = append(testcaseList, &judgev1.Testcase{
+			Id:           uint32(tc.ID),
 			InputPath:    testcases.BuildTestcaseInPath(task.ID, tc.Name),
 			ExpectedPath: testcases.BuildTestcaseOutPath(task.ID, tc.Name),
 		})
