@@ -158,8 +158,13 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 	}
 	submit.Score = (contest.Edges.ContestTask[0].Score * ratioSum) / 100
 
-	submit.UpdatedAt = lo.ToPtr(timejst.Now())
-	newSubmit, err := i.entClient.Submit.UpdateOne(submit).Save(ctx)
+	newSubmit, err := i.entClient.Submit.UpdateOneID(submit.ID).
+		SetScore(submit.Score).
+		SetStatus(*submit.Status).
+		SetExecMemory(submit.ExecMemory).
+		SetExecTime(submit.ExecTime).
+		SetUpdatedAt(timejst.Now()).
+		Save(ctx)
 	if err != nil {
 		i.logger.Error("failed to update submit", slog.Any("error", err))
 		return err
