@@ -128,10 +128,11 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 	}
 
 	// Status, ExecMemory, ExecTime を更新
+	submit.Status = lo.ToPtr(judgev1.JudgeStatus_AC.String())
 	for _, tr := range testcaseResults {
 		judgeStatusPriority := priorityByJudgeStatus[judgev1.JudgeStatus(judgev1.JudgeStatus_value[*submit.Status])]
 		trStatusPriority := priorityByJudgeStatus[judgev1.JudgeStatus(judgev1.JudgeStatus_value[tr.Status])]
-		if submit.Status == nil || judgeStatusPriority < trStatusPriority {
+		if judgeStatusPriority < trStatusPriority {
 			submit.Status = &tr.Status
 			submit.ExecMemory = tr.ExecMemory
 			submit.ExecTime = tr.ExecTime
