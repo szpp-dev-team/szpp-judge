@@ -69,6 +69,10 @@ func (i *Interactor) PostJudgeRequest(ctx context.Context, req *judgev1.JudgeReq
 			}
 			break
 		}
+		if err != nil {
+			i.logger.Error("failed to receive response message from stream", slog.Any("error", err))
+			return err
+		}
 
 		res, err := i.entClient.TestcaseResult.Create().
 			SetStatus(resp.Status.String()).
