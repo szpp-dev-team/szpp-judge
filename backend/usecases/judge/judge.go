@@ -79,6 +79,7 @@ func (i *Interactor) PostJudgeRequest(ctx context.Context, req *judgev1.JudgeReq
 			SetExecTime(int(resp.ExecTimeMs)).
 			SetExecMemory(int(resp.ExecMemoryKib)).
 			SetSubmitID(int(req.SubmissionId)).
+			SetTestcaseID(int(resp.TestcaseId)).
 			Save(ctx)
 		if err != nil {
 			if err := i.updateSubmitStatusIE(ctx, int(req.SubmissionId)); err != nil {

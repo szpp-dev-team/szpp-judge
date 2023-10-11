@@ -53,14 +53,6 @@ func (trc *TestcaseResultCreate) SetSubmitID(id int) *TestcaseResultCreate {
 	return trc
 }
 
-// SetNillableSubmitID sets the "submit" edge to the Submit entity by ID if the given value is not nil.
-func (trc *TestcaseResultCreate) SetNillableSubmitID(id *int) *TestcaseResultCreate {
-	if id != nil {
-		trc = trc.SetSubmitID(*id)
-	}
-	return trc
-}
-
 // SetSubmit sets the "submit" edge to the Submit entity.
 func (trc *TestcaseResultCreate) SetSubmit(s *Submit) *TestcaseResultCreate {
 	return trc.SetSubmitID(s.ID)
@@ -69,14 +61,6 @@ func (trc *TestcaseResultCreate) SetSubmit(s *Submit) *TestcaseResultCreate {
 // SetTestcaseID sets the "testcase" edge to the Testcase entity by ID.
 func (trc *TestcaseResultCreate) SetTestcaseID(id int) *TestcaseResultCreate {
 	trc.mutation.SetTestcaseID(id)
-	return trc
-}
-
-// SetNillableTestcaseID sets the "testcase" edge to the Testcase entity by ID if the given value is not nil.
-func (trc *TestcaseResultCreate) SetNillableTestcaseID(id *int) *TestcaseResultCreate {
-	if id != nil {
-		trc = trc.SetTestcaseID(*id)
-	}
 	return trc
 }
 
@@ -127,6 +111,12 @@ func (trc *TestcaseResultCreate) check() error {
 	}
 	if _, ok := trc.mutation.ExecMemory(); !ok {
 		return &ValidationError{Name: "exec_memory", err: errors.New(`ent: missing required field "TestcaseResult.exec_memory"`)}
+	}
+	if _, ok := trc.mutation.SubmitID(); !ok {
+		return &ValidationError{Name: "submit", err: errors.New(`ent: missing required edge "TestcaseResult.submit"`)}
+	}
+	if _, ok := trc.mutation.TestcaseID(); !ok {
+		return &ValidationError{Name: "testcase", err: errors.New(`ent: missing required edge "TestcaseResult.testcase"`)}
 	}
 	return nil
 }

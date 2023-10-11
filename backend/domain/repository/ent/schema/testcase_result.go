@@ -21,7 +21,7 @@ func (TestcaseResult) Fields() []ent.Field {
 
 func (TestcaseResult) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("submit", Submit.Type).Ref("testcase_results").Unique(),
-		edge.To("testcase", Testcase.Type).Unique(),
+		edge.From("submit", Submit.Type).Ref("testcase_results").Unique().Required(),
+		edge.To("testcase", Testcase.Type).Unique().Required(),
 	}
 }

@@ -67,14 +67,6 @@ func (tru *TestcaseResultUpdate) SetSubmitID(id int) *TestcaseResultUpdate {
 	return tru
 }
 
-// SetNillableSubmitID sets the "submit" edge to the Submit entity by ID if the given value is not nil.
-func (tru *TestcaseResultUpdate) SetNillableSubmitID(id *int) *TestcaseResultUpdate {
-	if id != nil {
-		tru = tru.SetSubmitID(*id)
-	}
-	return tru
-}
-
 // SetSubmit sets the "submit" edge to the Submit entity.
 func (tru *TestcaseResultUpdate) SetSubmit(s *Submit) *TestcaseResultUpdate {
 	return tru.SetSubmitID(s.ID)
@@ -83,14 +75,6 @@ func (tru *TestcaseResultUpdate) SetSubmit(s *Submit) *TestcaseResultUpdate {
 // SetTestcaseID sets the "testcase" edge to the Testcase entity by ID.
 func (tru *TestcaseResultUpdate) SetTestcaseID(id int) *TestcaseResultUpdate {
 	tru.mutation.SetTestcaseID(id)
-	return tru
-}
-
-// SetNillableTestcaseID sets the "testcase" edge to the Testcase entity by ID if the given value is not nil.
-func (tru *TestcaseResultUpdate) SetNillableTestcaseID(id *int) *TestcaseResultUpdate {
-	if id != nil {
-		tru = tru.SetTestcaseID(*id)
-	}
 	return tru
 }
 
@@ -143,7 +127,21 @@ func (tru *TestcaseResultUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tru *TestcaseResultUpdate) check() error {
+	if _, ok := tru.mutation.SubmitID(); tru.mutation.SubmitCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "TestcaseResult.submit"`)
+	}
+	if _, ok := tru.mutation.TestcaseID(); tru.mutation.TestcaseCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "TestcaseResult.testcase"`)
+	}
+	return nil
+}
+
 func (tru *TestcaseResultUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := tru.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(testcaseresult.Table, testcaseresult.Columns, sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt))
 	if ps := tru.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -283,14 +281,6 @@ func (truo *TestcaseResultUpdateOne) SetSubmitID(id int) *TestcaseResultUpdateOn
 	return truo
 }
 
-// SetNillableSubmitID sets the "submit" edge to the Submit entity by ID if the given value is not nil.
-func (truo *TestcaseResultUpdateOne) SetNillableSubmitID(id *int) *TestcaseResultUpdateOne {
-	if id != nil {
-		truo = truo.SetSubmitID(*id)
-	}
-	return truo
-}
-
 // SetSubmit sets the "submit" edge to the Submit entity.
 func (truo *TestcaseResultUpdateOne) SetSubmit(s *Submit) *TestcaseResultUpdateOne {
 	return truo.SetSubmitID(s.ID)
@@ -299,14 +289,6 @@ func (truo *TestcaseResultUpdateOne) SetSubmit(s *Submit) *TestcaseResultUpdateO
 // SetTestcaseID sets the "testcase" edge to the Testcase entity by ID.
 func (truo *TestcaseResultUpdateOne) SetTestcaseID(id int) *TestcaseResultUpdateOne {
 	truo.mutation.SetTestcaseID(id)
-	return truo
-}
-
-// SetNillableTestcaseID sets the "testcase" edge to the Testcase entity by ID if the given value is not nil.
-func (truo *TestcaseResultUpdateOne) SetNillableTestcaseID(id *int) *TestcaseResultUpdateOne {
-	if id != nil {
-		truo = truo.SetTestcaseID(*id)
-	}
 	return truo
 }
 
@@ -372,7 +354,21 @@ func (truo *TestcaseResultUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (truo *TestcaseResultUpdateOne) check() error {
+	if _, ok := truo.mutation.SubmitID(); truo.mutation.SubmitCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "TestcaseResult.submit"`)
+	}
+	if _, ok := truo.mutation.TestcaseID(); truo.mutation.TestcaseCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "TestcaseResult.testcase"`)
+	}
+	return nil
+}
+
 func (truo *TestcaseResultUpdateOne) sqlSave(ctx context.Context) (_node *TestcaseResult, err error) {
+	if err := truo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(testcaseresult.Table, testcaseresult.Columns, sqlgraph.NewFieldSpec(testcaseresult.FieldID, field.TypeInt))
 	id, ok := truo.mutation.ID()
 	if !ok {

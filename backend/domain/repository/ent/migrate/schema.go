@@ -238,8 +238,8 @@ var (
 		{Name: "status", Type: field.TypeString},
 		{Name: "exec_time", Type: field.TypeInt},
 		{Name: "exec_memory", Type: field.TypeInt},
-		{Name: "submit_testcase_results", Type: field.TypeInt, Nullable: true},
-		{Name: "testcase_result_testcase", Type: field.TypeInt, Nullable: true},
+		{Name: "submit_testcase_results", Type: field.TypeInt},
+		{Name: "testcase_result_testcase", Type: field.TypeInt},
 	}
 	// TestcaseResultsTable holds the schema information for the "testcase_results" table.
 	TestcaseResultsTable = &schema.Table{
@@ -251,13 +251,13 @@ var (
 				Symbol:     "testcase_results_submits_testcase_results",
 				Columns:    []*schema.Column{TestcaseResultsColumns[4]},
 				RefColumns: []*schema.Column{SubmitsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "testcase_results_testcases_testcase",
 				Columns:    []*schema.Column{TestcaseResultsColumns[5]},
 				RefColumns: []*schema.Column{TestcasesColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
