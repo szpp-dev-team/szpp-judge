@@ -72,7 +72,7 @@ func (i *Interactor) PostSubmit(ctx context.Context, req *backendv1.SubmitReques
 			i.logger.Error("[CRETICAL ERROR] inconsistency was found through building JudgeRequest", slog.Any("error", err), slog.Int("taskID", task.ID))
 			return connect.NewError(connect.CodeInternal, err)
 		}
-		if err := i.judgeQueue.Push(ctx, submit.ID, req); err != nil {
+		if err := i.judgeQueue.Push(ctx, req); err != nil {
 			i.logger.Error("failed to push a judge task to the queue", slog.Any("error", err))
 			return connect.NewError(connect.CodeInternal, err)
 		}
@@ -251,5 +251,6 @@ func buildJudgeRequest(submitID int, langID string, task *ent.Task) (*judgev1.Ju
 		ExecMemoryLimitMib: uint32(task.ExecMemoryLimit),
 		Testcases:          testcaseList,
 		WantResultDetail:   lo.ToPtr(true), // TODO: これが何か確認する
+		SubmissionId:       int32(submitID),
 	}, nil
 }

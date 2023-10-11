@@ -11,7 +11,7 @@ import (
 )
 
 type JudgeQueue interface {
-	Push(ctx context.Context, submitID int, req *judgev1.JudgeRequest) error
+	Push(ctx context.Context, req *judgev1.JudgeRequest) error
 }
 
 type cloudtasksImpl struct {
@@ -27,7 +27,7 @@ func New(client *cloudtasks.Client, handleJudgeTaskURL, projectID, locationID, q
 	return &cloudtasksImpl{client, handleJudgeTaskURL, projectID, locationID, queueID, serviceAccountEmail}
 }
 
-func (i *cloudtasksImpl) Push(ctx context.Context, submitID int, req *judgev1.JudgeRequest) error {
+func (i *cloudtasksImpl) Push(ctx context.Context, req *judgev1.JudgeRequest) error {
 	reqBytes, err := proto.Marshal(req)
 	if err != nil {
 		return err
@@ -40,9 +40,6 @@ func (i *cloudtasksImpl) Push(ctx context.Context, submitID int, req *judgev1.Ju
 					Url:        i.handleJudgeTaskURL,
 					HttpMethod: cloudtaskspb.HttpMethod_POST,
 					Body:       reqBytes,
-					Headers: map[string]string{
-						"SubmitID": fmt.Sprintf("%d", submitID),
-					},
 					AuthorizationHeader: &cloudtaskspb.HttpRequest_OidcToken{
 						OidcToken: &cloudtaskspb.OidcToken{
 							ServiceAccountEmail: i.serviceAccountEmail,
