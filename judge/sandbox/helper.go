@@ -20,6 +20,7 @@ func parseSzpprunResultFile(dir string) (time.Duration, unit.Byte, int, error) {
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("failed to open %q: %w", fpath, err)
 	}
+	defer f.Close()
 
 	bs, err := io.ReadAll(f)
 	if err != nil {

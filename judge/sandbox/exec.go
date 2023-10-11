@@ -5,6 +5,8 @@ import (
 	"context"
 	"io"
 	"log/slog"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -166,6 +168,9 @@ func (sb *Sandbox) Exec(
 
 	t, mem, exitCode, err := parseSzpprunResultFile(sb.HostBindDir)
 	if err != nil {
+		return ExecResult{}, err
+	}
+	if err := os.Remove(filepath.Join(sb.HostBindDir, ".szpprun-result.txt")); err != nil {
 		return ExecResult{}, err
 	}
 
