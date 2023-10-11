@@ -29,7 +29,6 @@ func init() {
 		slog.Error("failed to dial with judge-server", slog.String("judgeAddr", config.JudgeAddr))
 		os.Exit(1)
 	}
-	defer judgeConn.Close()
 	judgeClient := judgev1.NewJudgeServiceClient(judgeConn)
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
