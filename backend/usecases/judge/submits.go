@@ -3,6 +3,7 @@ package judge
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 
 	"connectrpc.com/connect"
@@ -251,6 +252,9 @@ func buildJudgeRequest(submitID int, langID string, task *ent.Task) (*judgev1.Ju
 		ExecMemoryLimitMib: uint32(task.ExecMemoryLimit),
 		Testcases:          testcaseList,
 		WantResultDetail:   lo.ToPtr(true), // TODO: これが何か確認する
+		StdoutLimitKib:     lo.ToPtr(uint32(512)),
+		StderrLimitKib:     lo.ToPtr(uint32(512)),
 		SubmissionId:       int32(submitID),
+		CheckerCodePath:    fmt.Sprintf("tasks/%d/checker.cpp", task.ID),
 	}, nil
 }
