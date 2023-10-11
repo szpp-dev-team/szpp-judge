@@ -56,7 +56,7 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 	}
 
 	workdir := filepath.Join(i.workdirRoot, uuid.NewString())
-	if err := os.MkdirAll(workdir, 0755); err != nil {
+	if err := os.MkdirAll(workdir, 0666); err != nil {
 		i.logger.Error("failed to create workdir", slog.Any("error", err))
 		return status.Error(codes.Internal, err.Error())
 	}
