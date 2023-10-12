@@ -210,6 +210,7 @@ func (i *Interactor) compile(ctx context.Context, langMeta *langs.Meta, sb *sand
 		Stdin:               nil,
 		Cmd:                 langMeta.CompileCmd,
 		StdoutReadLimit:     16 * unit.KiB,
+		StderrReadLimit:     unit.KiB,
 		MergeStderrToStdout: true,
 	}, sandbox.SzpprunOption{
 		TimeLimit:        time.Minute,
