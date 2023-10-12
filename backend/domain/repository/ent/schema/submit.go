@@ -17,6 +17,7 @@ func (Submit) Fields() []ent.Field {
 		field.Int("exec_time").Optional(),   // ms
 		field.Int("exec_memory").Optional(), // kib
 		field.Int("score").Optional(),
+		field.String("compile_message").Optional(),
 		field.Time("submitted_at"),
 		field.Time("created_at"),
 		field.Time("updated_at").Optional().Nillable(),

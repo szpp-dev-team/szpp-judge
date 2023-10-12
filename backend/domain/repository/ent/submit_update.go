@@ -134,6 +134,26 @@ func (su *SubmitUpdate) ClearScore() *SubmitUpdate {
 	return su
 }
 
+// SetCompileMessage sets the "compile_message" field.
+func (su *SubmitUpdate) SetCompileMessage(s string) *SubmitUpdate {
+	su.mutation.SetCompileMessage(s)
+	return su
+}
+
+// SetNillableCompileMessage sets the "compile_message" field if the given value is not nil.
+func (su *SubmitUpdate) SetNillableCompileMessage(s *string) *SubmitUpdate {
+	if s != nil {
+		su.SetCompileMessage(*s)
+	}
+	return su
+}
+
+// ClearCompileMessage clears the value of the "compile_message" field.
+func (su *SubmitUpdate) ClearCompileMessage() *SubmitUpdate {
+	su.mutation.ClearCompileMessage()
+	return su
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (su *SubmitUpdate) SetSubmittedAt(t time.Time) *SubmitUpdate {
 	su.mutation.SetSubmittedAt(t)
@@ -368,6 +388,12 @@ func (su *SubmitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.ScoreCleared() {
 		_spec.ClearField(submit.FieldScore, field.TypeInt)
+	}
+	if value, ok := su.mutation.CompileMessage(); ok {
+		_spec.SetField(submit.FieldCompileMessage, field.TypeString, value)
+	}
+	if su.mutation.CompileMessageCleared() {
+		_spec.ClearField(submit.FieldCompileMessage, field.TypeString)
 	}
 	if value, ok := su.mutation.SubmittedAt(); ok {
 		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)
@@ -663,6 +689,26 @@ func (suo *SubmitUpdateOne) ClearScore() *SubmitUpdateOne {
 	return suo
 }
 
+// SetCompileMessage sets the "compile_message" field.
+func (suo *SubmitUpdateOne) SetCompileMessage(s string) *SubmitUpdateOne {
+	suo.mutation.SetCompileMessage(s)
+	return suo
+}
+
+// SetNillableCompileMessage sets the "compile_message" field if the given value is not nil.
+func (suo *SubmitUpdateOne) SetNillableCompileMessage(s *string) *SubmitUpdateOne {
+	if s != nil {
+		suo.SetCompileMessage(*s)
+	}
+	return suo
+}
+
+// ClearCompileMessage clears the value of the "compile_message" field.
+func (suo *SubmitUpdateOne) ClearCompileMessage() *SubmitUpdateOne {
+	suo.mutation.ClearCompileMessage()
+	return suo
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (suo *SubmitUpdateOne) SetSubmittedAt(t time.Time) *SubmitUpdateOne {
 	suo.mutation.SetSubmittedAt(t)
@@ -927,6 +973,12 @@ func (suo *SubmitUpdateOne) sqlSave(ctx context.Context) (_node *Submit, err err
 	}
 	if suo.mutation.ScoreCleared() {
 		_spec.ClearField(submit.FieldScore, field.TypeInt)
+	}
+	if value, ok := suo.mutation.CompileMessage(); ok {
+		_spec.SetField(submit.FieldCompileMessage, field.TypeString, value)
+	}
+	if suo.mutation.CompileMessageCleared() {
+		_spec.ClearField(submit.FieldCompileMessage, field.TypeString)
 	}
 	if value, ok := suo.mutation.SubmittedAt(); ok {
 		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)

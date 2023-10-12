@@ -29,6 +29,8 @@ type Submit struct {
 	ExecMemory int `json:"exec_memory,omitempty"`
 	// Score holds the value of the "score" field.
 	Score int `json:"score,omitempty"`
+	// CompileMessage holds the value of the "compile_message" field.
+	CompileMessage string `json:"compile_message,omitempty"`
 	// SubmittedAt holds the value of the "submitted_at" field.
 	SubmittedAt time.Time `json:"submitted_at,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -130,7 +132,7 @@ func (*Submit) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case submit.FieldID, submit.FieldExecTime, submit.FieldExecMemory, submit.FieldScore:
 			values[i] = new(sql.NullInt64)
-		case submit.FieldStatus:
+		case submit.FieldStatus, submit.FieldCompileMessage:
 			values[i] = new(sql.NullString)
 		case submit.FieldSubmittedAt, submit.FieldCreatedAt, submit.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -187,6 +189,12 @@ func (s *Submit) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field score", values[i])
 			} else if value.Valid {
 				s.Score = int(value.Int64)
+			}
+		case submit.FieldCompileMessage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field compile_message", values[i])
+			} else if value.Valid {
+				s.CompileMessage = value.String
 			}
 		case submit.FieldSubmittedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -309,6 +317,9 @@ func (s *Submit) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("score=")
 	builder.WriteString(fmt.Sprintf("%v", s.Score))
+	builder.WriteString(", ")
+	builder.WriteString("compile_message=")
+	builder.WriteString(s.CompileMessage)
 	builder.WriteString(", ")
 	builder.WriteString("submitted_at=")
 	builder.WriteString(s.SubmittedAt.Format(time.ANSIC))

@@ -3413,6 +3413,7 @@ type SubmitMutation struct {
 	addexec_memory          *int
 	score                   *int
 	addscore                *int
+	compile_message         *string
 	submitted_at            *time.Time
 	created_at              *time.Time
 	updated_at              *time.Time
@@ -3796,6 +3797,55 @@ func (m *SubmitMutation) ResetScore() {
 	delete(m.clearedFields, submit.FieldScore)
 }
 
+// SetCompileMessage sets the "compile_message" field.
+func (m *SubmitMutation) SetCompileMessage(s string) {
+	m.compile_message = &s
+}
+
+// CompileMessage returns the value of the "compile_message" field in the mutation.
+func (m *SubmitMutation) CompileMessage() (r string, exists bool) {
+	v := m.compile_message
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCompileMessage returns the old "compile_message" field's value of the Submit entity.
+// If the Submit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubmitMutation) OldCompileMessage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCompileMessage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCompileMessage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCompileMessage: %w", err)
+	}
+	return oldValue.CompileMessage, nil
+}
+
+// ClearCompileMessage clears the value of the "compile_message" field.
+func (m *SubmitMutation) ClearCompileMessage() {
+	m.compile_message = nil
+	m.clearedFields[submit.FieldCompileMessage] = struct{}{}
+}
+
+// CompileMessageCleared returns if the "compile_message" field was cleared in this mutation.
+func (m *SubmitMutation) CompileMessageCleared() bool {
+	_, ok := m.clearedFields[submit.FieldCompileMessage]
+	return ok
+}
+
+// ResetCompileMessage resets all changes to the "compile_message" field.
+func (m *SubmitMutation) ResetCompileMessage() {
+	m.compile_message = nil
+	delete(m.clearedFields, submit.FieldCompileMessage)
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (m *SubmitMutation) SetSubmittedAt(t time.Time) {
 	m.submitted_at = &t
@@ -4161,7 +4211,7 @@ func (m *SubmitMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubmitMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.status != nil {
 		fields = append(fields, submit.FieldStatus)
 	}
@@ -4173,6 +4223,9 @@ func (m *SubmitMutation) Fields() []string {
 	}
 	if m.score != nil {
 		fields = append(fields, submit.FieldScore)
+	}
+	if m.compile_message != nil {
+		fields = append(fields, submit.FieldCompileMessage)
 	}
 	if m.submitted_at != nil {
 		fields = append(fields, submit.FieldSubmittedAt)
@@ -4199,6 +4252,8 @@ func (m *SubmitMutation) Field(name string) (ent.Value, bool) {
 		return m.ExecMemory()
 	case submit.FieldScore:
 		return m.Score()
+	case submit.FieldCompileMessage:
+		return m.CompileMessage()
 	case submit.FieldSubmittedAt:
 		return m.SubmittedAt()
 	case submit.FieldCreatedAt:
@@ -4222,6 +4277,8 @@ func (m *SubmitMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldExecMemory(ctx)
 	case submit.FieldScore:
 		return m.OldScore(ctx)
+	case submit.FieldCompileMessage:
+		return m.OldCompileMessage(ctx)
 	case submit.FieldSubmittedAt:
 		return m.OldSubmittedAt(ctx)
 	case submit.FieldCreatedAt:
@@ -4264,6 +4321,13 @@ func (m *SubmitMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetScore(v)
+		return nil
+	case submit.FieldCompileMessage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCompileMessage(v)
 		return nil
 	case submit.FieldSubmittedAt:
 		v, ok := value.(time.Time)
@@ -4367,6 +4431,9 @@ func (m *SubmitMutation) ClearedFields() []string {
 	if m.FieldCleared(submit.FieldScore) {
 		fields = append(fields, submit.FieldScore)
 	}
+	if m.FieldCleared(submit.FieldCompileMessage) {
+		fields = append(fields, submit.FieldCompileMessage)
+	}
 	if m.FieldCleared(submit.FieldUpdatedAt) {
 		fields = append(fields, submit.FieldUpdatedAt)
 	}
@@ -4396,6 +4463,9 @@ func (m *SubmitMutation) ClearField(name string) error {
 	case submit.FieldScore:
 		m.ClearScore()
 		return nil
+	case submit.FieldCompileMessage:
+		m.ClearCompileMessage()
+		return nil
 	case submit.FieldUpdatedAt:
 		m.ClearUpdatedAt()
 		return nil
@@ -4418,6 +4488,9 @@ func (m *SubmitMutation) ResetField(name string) error {
 		return nil
 	case submit.FieldScore:
 		m.ResetScore()
+		return nil
+	case submit.FieldCompileMessage:
+		m.ResetCompileMessage()
 		return nil
 	case submit.FieldSubmittedAt:
 		m.ResetSubmittedAt()

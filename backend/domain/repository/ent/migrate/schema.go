@@ -136,6 +136,7 @@ var (
 		{Name: "exec_time", Type: field.TypeInt, Nullable: true},
 		{Name: "exec_memory", Type: field.TypeInt, Nullable: true},
 		{Name: "score", Type: field.TypeInt, Nullable: true},
+		{Name: "compile_message", Type: field.TypeString, Nullable: true},
 		{Name: "submitted_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
@@ -152,25 +153,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "submits_contests_submits",
-				Columns:    []*schema.Column{SubmitsColumns[8]},
+				Columns:    []*schema.Column{SubmitsColumns[9]},
 				RefColumns: []*schema.Column{ContestsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "submits_languages_submits",
-				Columns:    []*schema.Column{SubmitsColumns[9]},
+				Columns:    []*schema.Column{SubmitsColumns[10]},
 				RefColumns: []*schema.Column{LanguagesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "submits_tasks_submits",
-				Columns:    []*schema.Column{SubmitsColumns[10]},
+				Columns:    []*schema.Column{SubmitsColumns[11]},
 				RefColumns: []*schema.Column{TasksColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "submits_users_submits",
-				Columns:    []*schema.Column{SubmitsColumns[11]},
+				Columns:    []*schema.Column{SubmitsColumns[12]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
