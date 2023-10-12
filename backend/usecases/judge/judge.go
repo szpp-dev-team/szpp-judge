@@ -75,6 +75,21 @@ func (i *Interactor) PostJudgeRequest(ctx context.Context, req *judgev1.JudgeReq
 			return err
 		}
 
+		if resp.Status == judgev1.JudgeStatus_CE {
+			if _, err := i.entClient.Submit.UpdateOneID(int(req.SubmissionId)).
+				SetStatus(judgev1.JudgeStatus_CE.String()).
+				SetUpdatedAt(timejst.Now()).
+				Save(ctx); err != nil {
+				if err := i.updateSubmitStatusIE(ctx, int(req.SubmissionId)); err != nil {
+					i.logger.Error("failed to update submit status", slog.Int("submissionID", int(req.SubmissionId)), slog.Any("error", err))
+					return err
+				}
+				i.logger.Error("failed to update submit", slog.Any("error", err))
+				return err
+			}
+			return nil
+		}
+
 		res, err := i.entClient.TestcaseResult.Create().
 			SetStatus(resp.Status.String()).
 			SetExecTime(int(resp.ExecTimeMs)).
