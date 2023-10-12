@@ -11,7 +11,6 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent"
 	ent_contest "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contest"
 	ent_contesttask "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/contesttask"
-	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
 	ent_tr "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseresult"
@@ -129,22 +128,6 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 		i.logger.Error("failed to get submit", slog.Any("error", err))
 		return err
 	}
-	contestQuery := i.entClient.Contest.Query().
-		WithContestTask(func(ctq *ent.ContestTaskQuery) {
-			predicates := []predicate.ContestTask{
-				ent_contesttask.HasTaskWith(ent_task.ID(submit.Edges.Task.ID)),
-			}
-			if submit.Edges.Contest != nil {
-				predicates = append(predicates, ent_contesttask.HasContestWith(ent_contest.ID(submit.Edges.Contest.ID)))
-			}
-			ctq.Where(predicates...)
-		}).
-		Where(ent_contest.ID(submit.Edges.Contest.ID))
-	contest, err := contestQuery.First(ctx)
-	if err != nil {
-		i.logger.Error("failed to get contest", slog.Any("error", err))
-		return err
-	}
 
 	// Status, ExecMemory, ExecTime を更新
 	submit.Status = lo.ToPtr(judgev1.JudgeStatus_AC.String())
@@ -171,6 +154,19 @@ func (i *Interactor) updateSubmitResult(ctx context.Context, submitID int, testc
 	if submit.Edges.Contest == nil {
 		submit.Score = ratioSum
 	} else {
+		contest, err := i.entClient.Contest.Query().
+			WithContestTask(func(ctq *ent.ContestTaskQuery) {
+				ctq.Where(
+					ent_contesttask.HasTaskWith(ent_task.ID(submit.Edges.Task.ID)),
+					ent_contesttask.HasContestWith(ent_contest.ID(submit.Edges.Contest.ID)),
+				)
+			}).
+			Where(ent_contest.ID(submit.Edges.Contest.ID)).
+			First(ctx)
+		if err != nil {
+			i.logger.Error("failed to get contest", slog.Any("error", err))
+			return err
+		}
 		submit.Score = (contest.Edges.ContestTask[0].Score * ratioSum) / 100
 	}
 
