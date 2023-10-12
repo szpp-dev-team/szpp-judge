@@ -78,6 +78,7 @@ func (i *Interactor) PostJudgeRequest(ctx context.Context, req *judgev1.JudgeReq
 		if resp.Status == judgev1.JudgeStatus_CE {
 			if _, err := i.entClient.Submit.UpdateOneID(int(req.SubmissionId)).
 				SetStatus(judgev1.JudgeStatus_CE.String()).
+				SetCompileMessage(resp.CompilerMessage).
 				SetUpdatedAt(timejst.Now()).
 				Save(ctx); err != nil {
 				if err := i.updateSubmitStatusIE(ctx, int(req.SubmissionId)); err != nil {

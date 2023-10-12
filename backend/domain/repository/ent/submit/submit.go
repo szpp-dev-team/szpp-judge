@@ -20,6 +20,8 @@ const (
 	FieldExecMemory = "exec_memory"
 	// FieldScore holds the string denoting the score field in the database.
 	FieldScore = "score"
+	// FieldCompileMessage holds the string denoting the compile_message field in the database.
+	FieldCompileMessage = "compile_message"
 	// FieldSubmittedAt holds the string denoting the submitted_at field in the database.
 	FieldSubmittedAt = "submitted_at"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -82,6 +84,7 @@ var Columns = []string{
 	FieldExecTime,
 	FieldExecMemory,
 	FieldScore,
+	FieldCompileMessage,
 	FieldSubmittedAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -137,6 +140,11 @@ func ByExecMemory(opts ...sql.OrderTermOption) OrderOption {
 // ByScore orders the results by the score field.
 func ByScore(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScore, opts...).ToFunc()
+}
+
+// ByCompileMessage orders the results by the compile_message field.
+func ByCompileMessage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCompileMessage, opts...).ToFunc()
 }
 
 // BySubmittedAt orders the results by the submitted_at field.

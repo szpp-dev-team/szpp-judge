@@ -83,6 +83,20 @@ func (sc *SubmitCreate) SetNillableScore(i *int) *SubmitCreate {
 	return sc
 }
 
+// SetCompileMessage sets the "compile_message" field.
+func (sc *SubmitCreate) SetCompileMessage(s string) *SubmitCreate {
+	sc.mutation.SetCompileMessage(s)
+	return sc
+}
+
+// SetNillableCompileMessage sets the "compile_message" field if the given value is not nil.
+func (sc *SubmitCreate) SetNillableCompileMessage(s *string) *SubmitCreate {
+	if s != nil {
+		sc.SetCompileMessage(*s)
+	}
+	return sc
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (sc *SubmitCreate) SetSubmittedAt(t time.Time) *SubmitCreate {
 	sc.mutation.SetSubmittedAt(t)
@@ -279,6 +293,10 @@ func (sc *SubmitCreate) createSpec() (*Submit, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Score(); ok {
 		_spec.SetField(submit.FieldScore, field.TypeInt, value)
 		_node.Score = value
+	}
+	if value, ok := sc.mutation.CompileMessage(); ok {
+		_spec.SetField(submit.FieldCompileMessage, field.TypeString, value)
+		_node.CompileMessage = value
 	}
 	if value, ok := sc.mutation.SubmittedAt(); ok {
 		_spec.SetField(submit.FieldSubmittedAt, field.TypeTime, value)
@@ -518,6 +536,24 @@ func (u *SubmitUpsert) ClearScore() *SubmitUpsert {
 	return u
 }
 
+// SetCompileMessage sets the "compile_message" field.
+func (u *SubmitUpsert) SetCompileMessage(v string) *SubmitUpsert {
+	u.Set(submit.FieldCompileMessage, v)
+	return u
+}
+
+// UpdateCompileMessage sets the "compile_message" field to the value that was provided on create.
+func (u *SubmitUpsert) UpdateCompileMessage() *SubmitUpsert {
+	u.SetExcluded(submit.FieldCompileMessage)
+	return u
+}
+
+// ClearCompileMessage clears the value of the "compile_message" field.
+func (u *SubmitUpsert) ClearCompileMessage() *SubmitUpsert {
+	u.SetNull(submit.FieldCompileMessage)
+	return u
+}
+
 // SetSubmittedAt sets the "submitted_at" field.
 func (u *SubmitUpsert) SetSubmittedAt(v time.Time) *SubmitUpsert {
 	u.Set(submit.FieldSubmittedAt, v)
@@ -710,6 +746,27 @@ func (u *SubmitUpsertOne) UpdateScore() *SubmitUpsertOne {
 func (u *SubmitUpsertOne) ClearScore() *SubmitUpsertOne {
 	return u.Update(func(s *SubmitUpsert) {
 		s.ClearScore()
+	})
+}
+
+// SetCompileMessage sets the "compile_message" field.
+func (u *SubmitUpsertOne) SetCompileMessage(v string) *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetCompileMessage(v)
+	})
+}
+
+// UpdateCompileMessage sets the "compile_message" field to the value that was provided on create.
+func (u *SubmitUpsertOne) UpdateCompileMessage() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateCompileMessage()
+	})
+}
+
+// ClearCompileMessage clears the value of the "compile_message" field.
+func (u *SubmitUpsertOne) ClearCompileMessage() *SubmitUpsertOne {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearCompileMessage()
 	})
 }
 
@@ -1073,6 +1130,27 @@ func (u *SubmitUpsertBulk) UpdateScore() *SubmitUpsertBulk {
 func (u *SubmitUpsertBulk) ClearScore() *SubmitUpsertBulk {
 	return u.Update(func(s *SubmitUpsert) {
 		s.ClearScore()
+	})
+}
+
+// SetCompileMessage sets the "compile_message" field.
+func (u *SubmitUpsertBulk) SetCompileMessage(v string) *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.SetCompileMessage(v)
+	})
+}
+
+// UpdateCompileMessage sets the "compile_message" field to the value that was provided on create.
+func (u *SubmitUpsertBulk) UpdateCompileMessage() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.UpdateCompileMessage()
+	})
+}
+
+// ClearCompileMessage clears the value of the "compile_message" field.
+func (u *SubmitUpsertBulk) ClearCompileMessage() *SubmitUpsertBulk {
+	return u.Update(func(s *SubmitUpsert) {
+		s.ClearCompileMessage()
 	})
 }
 

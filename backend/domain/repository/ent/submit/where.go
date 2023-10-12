@@ -75,6 +75,11 @@ func Score(v int) predicate.Submit {
 	return predicate.Submit(sql.FieldEQ(FieldScore, v))
 }
 
+// CompileMessage applies equality check predicate on the "compile_message" field. It's identical to CompileMessageEQ.
+func CompileMessage(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldEQ(FieldCompileMessage, v))
+}
+
 // SubmittedAt applies equality check predicate on the "submitted_at" field. It's identical to SubmittedAtEQ.
 func SubmittedAt(v time.Time) predicate.Submit {
 	return predicate.Submit(sql.FieldEQ(FieldSubmittedAt, v))
@@ -313,6 +318,81 @@ func ScoreIsNil() predicate.Submit {
 // ScoreNotNil applies the NotNil predicate on the "score" field.
 func ScoreNotNil() predicate.Submit {
 	return predicate.Submit(sql.FieldNotNull(FieldScore))
+}
+
+// CompileMessageEQ applies the EQ predicate on the "compile_message" field.
+func CompileMessageEQ(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldEQ(FieldCompileMessage, v))
+}
+
+// CompileMessageNEQ applies the NEQ predicate on the "compile_message" field.
+func CompileMessageNEQ(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldNEQ(FieldCompileMessage, v))
+}
+
+// CompileMessageIn applies the In predicate on the "compile_message" field.
+func CompileMessageIn(vs ...string) predicate.Submit {
+	return predicate.Submit(sql.FieldIn(FieldCompileMessage, vs...))
+}
+
+// CompileMessageNotIn applies the NotIn predicate on the "compile_message" field.
+func CompileMessageNotIn(vs ...string) predicate.Submit {
+	return predicate.Submit(sql.FieldNotIn(FieldCompileMessage, vs...))
+}
+
+// CompileMessageGT applies the GT predicate on the "compile_message" field.
+func CompileMessageGT(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldGT(FieldCompileMessage, v))
+}
+
+// CompileMessageGTE applies the GTE predicate on the "compile_message" field.
+func CompileMessageGTE(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldGTE(FieldCompileMessage, v))
+}
+
+// CompileMessageLT applies the LT predicate on the "compile_message" field.
+func CompileMessageLT(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldLT(FieldCompileMessage, v))
+}
+
+// CompileMessageLTE applies the LTE predicate on the "compile_message" field.
+func CompileMessageLTE(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldLTE(FieldCompileMessage, v))
+}
+
+// CompileMessageContains applies the Contains predicate on the "compile_message" field.
+func CompileMessageContains(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldContains(FieldCompileMessage, v))
+}
+
+// CompileMessageHasPrefix applies the HasPrefix predicate on the "compile_message" field.
+func CompileMessageHasPrefix(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldHasPrefix(FieldCompileMessage, v))
+}
+
+// CompileMessageHasSuffix applies the HasSuffix predicate on the "compile_message" field.
+func CompileMessageHasSuffix(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldHasSuffix(FieldCompileMessage, v))
+}
+
+// CompileMessageIsNil applies the IsNil predicate on the "compile_message" field.
+func CompileMessageIsNil() predicate.Submit {
+	return predicate.Submit(sql.FieldIsNull(FieldCompileMessage))
+}
+
+// CompileMessageNotNil applies the NotNil predicate on the "compile_message" field.
+func CompileMessageNotNil() predicate.Submit {
+	return predicate.Submit(sql.FieldNotNull(FieldCompileMessage))
+}
+
+// CompileMessageEqualFold applies the EqualFold predicate on the "compile_message" field.
+func CompileMessageEqualFold(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldEqualFold(FieldCompileMessage, v))
+}
+
+// CompileMessageContainsFold applies the ContainsFold predicate on the "compile_message" field.
+func CompileMessageContainsFold(v string) predicate.Submit {
+	return predicate.Submit(sql.FieldContainsFold(FieldCompileMessage, v))
 }
 
 // SubmittedAtEQ applies the EQ predicate on the "submitted_at" field.
