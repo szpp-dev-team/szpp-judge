@@ -2,6 +2,7 @@ package contests
 
 import (
 	"context"
+	"log"
 	"sort"
 	"time"
 
@@ -72,7 +73,15 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	log.Println("=============== check user Info ===============")
+	log.Println(userInfo)
+	log.Println("===============================================")
+
 	standings_list := GetStandingsRecordSlice(userInfo)
+
+	log.Println("=============== check standings_list ===============")
+	log.Println(standings_list)
+	log.Println("====================================================")
 
 	var standings_record []*backendv1.StandingsRecord
 	for _, row := range standings_list {
