@@ -156,8 +156,10 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
 
-	i.logger.Info("testcases", slog.Any("testcases", task.Edges.Testcases))
 	i.logger.Info("testcase sets", slog.Any("testcase sets", task.Edges.TestcaseSets))
+	for _, tcs := range task.Edges.TestcaseSets {
+		i.logger.Info("testcases", slog.Any("testcases", tcs.Edges.Testcases))
+	}
 
 	testcases := make([]*testcases_repo.Testcase, 0, len(task.Edges.Testcases))
 	for _, tcs := range task.Edges.TestcaseSets {
