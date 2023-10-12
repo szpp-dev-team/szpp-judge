@@ -13,6 +13,8 @@ type FormFields = z.infer<typeof userLoginSchema>;
 
 export const Login = () => {
   const router = useRouter();
+  // router.query.redirecturi を配列にしてはいけない. 例えば redirecturi[]=/hogehoge はだめ
+  const redirecturi = (router.query.redirecturi ?? "/") as string;
   const toast = useToast({
     position: "bottom",
   });
@@ -53,7 +55,7 @@ export const Login = () => {
           title: `${data.user!.username} にログインしました`,
           status: "success",
         });
-        router.push("/");
+        router.push(redirecturi);
       },
     });
   });
@@ -66,7 +68,8 @@ export const Login = () => {
         <CardHeader textAlign="center">
           <Heading as="h1" size="lg" mb={4}>ログイン</Heading>
           <p>
-            ユーザ登録をしていない方はまず <Link href="/register">こちら</Link> で登録してください
+            ユーザ登録をしていない方はまず{" "}
+            <Link href={"/register?redirecturi=" + encodeURIComponent(redirecturi)}>こちら</Link> で登録してください
           </p>
         </CardHeader>
         <CardBody>

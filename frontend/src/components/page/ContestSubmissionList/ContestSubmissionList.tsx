@@ -21,6 +21,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { JudgeStatusBadge } from "../../model/judge/JudgeStatusBadge";
 import { Link } from "../../ui/Link";
@@ -137,6 +138,7 @@ type ContestSubmissionListProps = {
 };
 
 export const ContestSubmissionList = ({ mode, heading }: ContestSubmissionListProps) => {
+  const router = useRouter();
   const contestSlug = useRouterContestSlug();
   const { contest } = useGetContest({ slug: contestSlug });
   const contestId = useMemo(() => contest?.id ?? 1, [contest]);
@@ -149,7 +151,9 @@ export const ContestSubmissionList = ({ mode, heading }: ContestSubmissionListPr
         if (!user) {
           return (
             <Text>
-              自分の提出を見るには<Link href="/login">ログイン</Link>してください
+              自分の提出を見るには<Link href={"/login?redirecturi=" + encodeURIComponent(router.asPath)}>
+                ログイン
+              </Link>してください
             </Text>
           );
         }
