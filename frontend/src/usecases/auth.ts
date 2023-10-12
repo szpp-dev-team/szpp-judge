@@ -14,18 +14,17 @@ import { Duration } from "../util/time";
  * ログイン用カスタムフック
  * - フックを呼び出す側は mutate を呼び出す
  * - mutate が成功したらこのフックによって状態( jotai )が更新されるのでフックを呼び出した側は何もすべきでない
- * @example
- * ```ts
- * const { mutate } = useLogin(() => { toast({ title: "失敗" }}) });
- * const onSubmit = handleSubmit((values) => mutate(values));
- * ```
- * @param onUnauthenticatedError パスワード間違いをコンポーネントに通知するためのコールバック
- * @returns
  */
-export const useLogin = (onUnauthenticatedError?: () => void) => {
+export const useLogin = (opt?: {
+  onUserNotFound?: () => void;
+  onPasswordIncorrect?: () => void;
+}) => {
   const onConnectError = (e: ConnectError) => {
-    if (e.code === Code.Unauthenticated && onUnauthenticatedError) {
-      onUnauthenticatedError();
+    // NOTE: mock で 404 を返した場合は e.code が Code.Unimplemented になってしまうので、モック使用中はここの分岐をテストできない
+    if (e.code === Code.NotFound && opt?.onUserNotFound) {
+      opt.onUserNotFound();
+    } else if (e.code === Code.Unauthenticated && opt?.onPasswordIncorrect) {
+      opt.onPasswordIncorrect();
     } else {
       throw e; // mutate を使う限り React Query がエラーをキャッチして(握りつぶして)くれる
     }

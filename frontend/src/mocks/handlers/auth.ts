@@ -38,12 +38,14 @@ const generateMockCredential = (username: string): Credential => {
 export const authHandlers: RequestHandler[] = [
   connectMock(AuthService, "login", async (ctx, res, decodeReq, encodeResp) => {
     const { username, password } = await decodeReq();
-    const ok = (username === "user" || username === "admin") && password === "pass";
-    if (!ok) {
-      return res(
-        ctx.delay(500),
-        ctx.status(401), // 401 Unauthorized
-      );
+
+    const userFound = username === "user" || username === "admin";
+    if (!userFound) {
+      return res(ctx.delay(500), ctx.status(404));
+    }
+
+    if (password !== "pass") {
+      return res(ctx.delay(500), ctx.status(401));
     }
 
     return res(
