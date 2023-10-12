@@ -302,9 +302,9 @@ func (i *Interactor) RegisterMe(ctx context.Context, req *backendv1.RegisterMeRe
 	}
 
 	if _, err := i.entClient.ContestUser.Create().
-		// SetRole().
+		SetRole(backendv1.ContestRole_CONTEST_ROLE_CONTESTANT.String()).
 		SetContest(contest).
-		// SetUserID().
+		SetUserID(interceptor.GetClaimsFromContext(ctx).UserID).
 		Save(ctx); err != nil {
 		if ent.IsConstraintError(err) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, errors.New("the user has already registered"))
