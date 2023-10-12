@@ -6,6 +6,8 @@ import {
   StandingsRecord_TaskDetail,
 } from "@/src/gen/proto/backend/v1/contest_resources_pb";
 import { ContestService } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
+import { AccessTokenClaim } from "@/src/model/auth";
+import { decodeJwtPayload } from "@/src/util/jwt";
 import { Duration } from "@/src/util/time";
 import { Duration as PbDuration, type PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import type { RequestHandler } from "msw";
@@ -274,6 +276,8 @@ const standingsMap: Map<string, PlainMessage<StandingsRecord>[]> = new Map([
   ["sbc005", generateStandings(50, 9)], // 終了後ver
 ]);
 
+const registrationStatusDatabase: Set<string> = new Set();
+
 export const contestHandlers: RequestHandler[] = [
   connectMock(ContestService, "listContests", async (ctx, res, _, encodeResp) => {
     return res(
@@ -387,10 +391,41 @@ export const contestHandlers: RequestHandler[] = [
       );
     }
   }),
-  connectMock(ContestService, "registerMe", async (ctx, res) => {
-    return res(
-      ctx.delay(500),
-      ctx.json({}),
-    );
+  connectMock(ContestService, "registerMe", async (ctx, res, decodeReq, _encodeResp, req) => {
+    const { contestSlug } = await decodeReq();
+    const authorizationValue = req.headers.get("authorization");
+    if (!authorizationValue) {
+      return res(ctx.status(401), ctx.json({}));
+    }
+    try {
+      const claim = decodeJwtPayload(authorizationValue) as AccessTokenClaim;
+      registrationStatusDatabase.add(contestSlug + "/" + claim.username);
+
+      return res(
+        ctx.delay(500),
+        ctx.json({}),
+      );
+    } catch (e) {
+      console.error(e);
+      return res(ctx.status(500));
+    }
+  }),
+  connectMock(ContestService, "getMyRegistrationStatus", async (ctx, res, decodeReq, encodeResp, req) => {
+    const { contestSlug } = await decodeReq();
+    const authorizationValue = req.headers.get("authorization");
+    if (!authorizationValue) {
+      return res(ctx.status(401), ctx.json({}));
+    }
+    try {
+      const claim = decodeJwtPayload(authorizationValue) as AccessTokenClaim;
+      const registered = registrationStatusDatabase.has(contestSlug + "/" + claim.username);
+
+      return res(encodeResp({
+        registered,
+      }));
+    } catch (e) {
+      console.error(e);
+      return res(ctx.status(500));
+    }
   }),
 ];
