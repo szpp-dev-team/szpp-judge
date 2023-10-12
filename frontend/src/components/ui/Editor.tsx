@@ -16,7 +16,6 @@ const langExtension = {
   "scratch/3/gcc": cpp,
   "java/21/openjdk": java,
   "python/3.11/cpython": python,
-  "cpp(testlib)/20/gcc": cpp,
 } as const satisfies Record<LangID, () => LanguageSupport>;
 
 export const Editor = ({ lang, extensions = [], ...props }: EditorProps) => {
