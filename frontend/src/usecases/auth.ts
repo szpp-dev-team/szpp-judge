@@ -20,6 +20,7 @@ export const useLogin = (opt?: {
   onPasswordIncorrect?: () => void;
 }) => {
   const onConnectError = (e: ConnectError) => {
+    // NOTE: mock で 404 を返した場合は e.code が Code.Unimplemented になってしまうので、モック使用中はここの分岐をテストできない
     if (e.code === Code.NotFound && opt?.onUserNotFound) {
       opt.onUserNotFound();
     } else if (e.code === Code.Unauthenticated && opt?.onPasswordIncorrect) {
