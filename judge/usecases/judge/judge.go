@@ -90,7 +90,7 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 	}
 
 	// download and compile checker
-	checkerLm := newCheckerLangMeta()
+	checkerLm, _ := langs.Get(langs.CPP_20_GCC_TESTLIB)
 	ok, _, err = i.downloadAndCompileCode(ctx, filepath.Join(workdir, "checker.cpp"), req.CheckerCodePath, checkerLm, sb)
 	if err != nil {
 		return err
@@ -314,30 +314,4 @@ func (i *Interactor) check(ctx context.Context, lm *langs.Meta, sb *sandbox.Sand
 	}
 	slog.Info("check was finished", slog.Any("result", res))
 	return res.ExitCode == 0, nil
-}
-
-func newCheckerLangMeta() *langs.Meta {
-	lm, _ := langs.Get(langs.CPP_20_GCC)
-	lm.CompileCmd = []string{
-		"g++",
-		"-std=c++20",
-		"-I/opt/include",
-		"-lm",
-		"-Wall",
-		"-Wextra",
-		"-DSZPP_JUDGE",
-		"-O2",
-		"-march=native",
-		"-mtune=native",
-		"-o",
-		"checker",
-		"checker.cpp",
-	}
-	lm.ExecCmd = []string{
-		"./checker",
-		"testcase_input.txt",
-		"testcase_output.txt",
-		"user_output.txt",
-	}
-	return lm
 }
