@@ -334,7 +334,7 @@ func toPbContest(contest *ent.Contest) *backendv1.Contest {
 
 func toPbContestTask(ct *ent.ContestTask) *backendv1.ContestTask {
 	return &backendv1.ContestTask{
-		Id:              int32(ct.ID),
+		Id:              int32(ct.Edges.Task.ID),
 		Title:           ct.Edges.Task.Title,
 		ExecTimeLimit:   int32(ct.Edges.Task.ExecTimeLimit),
 		ExecMemoryLimit: int32(ct.Edges.Task.ExecMemoryLimit),
