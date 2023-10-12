@@ -218,7 +218,7 @@ func (i *Interactor) calculateRatioSum(ctx context.Context, testcaseSets []*ent.
 			if !ok {
 				return 0, fmt.Errorf("testcase \"%s\" is not found in the testcaseSet \"%s\"", testcase.Name, testcaseSet.Name)
 			}
-			if isAC {
+			if !isAC {
 				isAllAC = false
 				break
 			}
