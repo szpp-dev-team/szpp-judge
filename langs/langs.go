@@ -19,6 +19,7 @@ const (
 	SCRATCH_3_GCC      = LangID("scratch/3/gcc")
 	JAVA_21_OPENJDK    = LangID("java/21/openjdk")
 	PYTHON_311_CPYTHON = LangID("python/3.11/cpython")
+	CPP_20_GCC_TESTLIB = LangID("cpp(testlib)/20/gcc")
 )
 
 type Meta struct {
@@ -111,6 +112,32 @@ var LangMetas = []Meta{
 		SourceFile:  "main.py",
 		CompileCmd:  []string{"python3", "-m", "compileall", "-q", "main.py"},
 		ExecCmd:     []string{"python3", "main.py"},
+	},
+	{
+		ID:          CPP_20_GCC_TESTLIB,
+		Name:        name("C++(testlib)", "20", "GCC", gccVer),
+		Active:      true,
+		DockerImage: gccDockerImage,
+		SourceFile:  "checker.cpp",
+		CompileCmd: []string{
+			"g++",
+			"-std=c++20",
+			"-I/opt/include",
+			"-lm",
+			"-DSZPP_JUDGE",
+			"-O2",
+			"-march=native",
+			"-mtune=native",
+			"-o",
+			"checker",
+			"checker.cpp",
+		},
+		ExecCmd: []string{
+			"./checker",
+			"testcase_input.txt",
+			"testcase_output.txt",
+			"user_output.txt",
+		},
 	},
 }
 
