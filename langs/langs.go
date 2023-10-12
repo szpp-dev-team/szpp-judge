@@ -23,9 +23,18 @@ const (
 )
 
 type Meta struct {
-	ID          LangID
-	Name        string
-	Active      bool
+	ID   LangID
+	Name string
+
+	// 提出可能な言語はこれでフィルタリングする。
+	// 提出言語リストから削除したい場合はこのフィールドを false にする
+	// (この langs.go から削除することはしないように！！)。
+	Active bool
+
+	// cpplib など。true にするとフロントエンド側に露出させない
+	// (フロントエンドのコード生成の段階で除外する)。
+	Internal bool
+
 	DockerImage string
 	SourceFile  string
 	CompileCmd  []string
@@ -117,6 +126,7 @@ var LangMetas = []Meta{
 		ID:          CPP_20_GCC_TESTLIB,
 		Name:        name("C++(testlib)", "20", "GCC", gccVer),
 		Active:      true,
+		Internal:    true,
 		DockerImage: gccDockerImage,
 		SourceFile:  "checker.cpp",
 		CompileCmd: []string{
