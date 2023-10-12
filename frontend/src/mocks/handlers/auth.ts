@@ -14,8 +14,8 @@ const generateMockAccessToken = (username: string, now: Date): string => {
   const payloadObj: AccessTokenClaim = {
     username,
     isAdmin: username.startsWith("admin"),
-    iat: now.getTime(),
-    exp: now.getTime() + Duration.SECOND * 10,
+    iat: Math.trunc(now.getTime() / 1000),
+    exp: Math.trunc((now.getTime() + Duration.SECOND * 10) / 1000), // JWT の claim の時間は秒単位
   };
   const header = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"; // { alg: "HS256", typ: "JWT" } のエンコード文字列
   const payload = Buffer.from(JSON.stringify(payloadObj)).toString("base64");
