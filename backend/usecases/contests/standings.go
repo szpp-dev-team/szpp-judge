@@ -161,7 +161,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 		updateUserInfo := userInfo[submission.Edges.User.ID]
 		if *submission.Status == STATUS_AC {
 			log.Println("------------------ Status AC ------------------")
-			untilAc := time.Until(contest.StartAt) * -1
+			untilAc := submission.SubmittedAt.Sub(contest.StartAt)
 			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
 			updateUserInfo.taskDetailList[index].untilAc = &untilAc
 			updateUserInfo.taskDetailList[index].score = submission.Score
@@ -262,6 +262,9 @@ func toStandingsRecord(standings StandingsRecord) *backendv1.StandingsRecord {
 		latestAcAt = toTimestamp(standings.latestUntilAc)
 	}
 
+	log.Println("check: standings.latestUntilAC" + standings.latestUntilAc.String())
+	log.Println("check: latestACat converted   " + latestAcAt.String())
+
 	return &backendv1.StandingsRecord{
 		Rank:              int32(standings.rank),
 		Username:          standings.userName,
@@ -282,6 +285,8 @@ func toStandingsRecordTaskDetail(td TaskDetail) *backendv1.StandingsRecord_TaskD
 	var acSubmitID int32
 	if td.acSubmitId != nil {
 		acSubmitID = int32(*td.acSubmitId)
+	} else {
+		log.Println("check: ac submit id is null.")
 	}
 
 	var untilAc *durationpb.Duration
