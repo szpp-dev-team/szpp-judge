@@ -33,7 +33,7 @@ export const ContestTaskDetail = () => {
     return <Text>コンテスト開始前なので問題を表示できません</Text>;
   }
 
-  if (tasks == null || task == null || sampleCases == null) {
+  if (contest == null || tasks == null || task == null || sampleCases == null) {
     return <Text>読み込み中...</Text>;
   }
 
@@ -42,6 +42,7 @@ export const ContestTaskDetail = () => {
   return (
     <Container px={12} maxW="900px" h="100%" centerContent>
       <TaskDetailCommon
+        contestId={contest.id}
         task={task}
         score={contestTask!.score}
         sampleCases={sampleCases}
