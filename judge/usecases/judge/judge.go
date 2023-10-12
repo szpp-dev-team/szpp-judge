@@ -223,7 +223,7 @@ func (i *Interactor) compile(ctx context.Context, langMeta *langs.Meta, sb *sand
 		return false, "", status.Error(codes.Internal, err.Error())
 	}
 	i.logger.Info("compile finished", slog.Any("result", res))
-	return res.ExitCode == 0, res.Stderr, nil
+	return res.ExitCode == 0, res.Stdout, nil
 }
 
 func (i *Interactor) downloadAndCompileCode(ctx context.Context, dst, gcsPath string, lm *langs.Meta, sb *sandbox.Sandbox) (bool, string, error) {
