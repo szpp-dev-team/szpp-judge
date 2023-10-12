@@ -78,6 +78,9 @@ func writeLangIDArray(w io.WriteSeeker, e *json.Encoder) error {
 
 	langIDs := make([]langs.LangID, 0, len(langs.LangMetas))
 	for i := range langs.LangMetas {
+		if langs.LangMetas[i].Internal {
+			continue
+		}
 		langIDs = append(langIDs, langs.LangMetas[i].ID)
 	}
 
@@ -105,6 +108,9 @@ func writeLangMetasBrief(w io.WriteSeeker, e *json.Encoder) error {
 	v := map[langs.LangID]LangMetaBrief{}
 	for i := range langs.LangMetas {
 		m := &langs.LangMetas[i]
+		if m.Internal {
+			continue
+		}
 		v[m.ID] = LangMetaBrief{
 			Name:   m.Name,
 			Active: m.Active,
@@ -132,6 +138,9 @@ func writeLangMetasFull(w io.WriteSeeker, e *json.Encoder) error {
 	v := map[langs.LangID]LangMetaFull{}
 	for i := range langs.LangMetas {
 		m := &langs.LangMetas[i]
+		if m.Internal {
+			continue
+		}
 		v[m.ID] = LangMetaFull{
 			Name:       m.Name,
 			Active:     m.Active,
