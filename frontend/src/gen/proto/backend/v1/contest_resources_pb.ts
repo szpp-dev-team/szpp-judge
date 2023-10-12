@@ -8,6 +8,50 @@ import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Difficulty } from "./task_resources_pb";
 
 /**
+ * @generated from enum backend.v1.ContestRole
+ */
+export enum ContestRole {
+  /**
+   * @generated from enum value: CONTEST_ROLE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: CONTEST_ROLE_ADMIN = 1;
+   */
+  ADMIN = 1,
+
+  /**
+   * @generated from enum value: CONTEST_ROLE_WRITER = 2;
+   */
+  WRITER = 2,
+
+  /**
+   * @generated from enum value: CONTEST_ROLE_TESTER = 3;
+   */
+  TESTER = 3,
+
+  /**
+   * @generated from enum value: CONTEST_ROLE_CONTESTANT = 4;
+   */
+  CONTESTANT = 4,
+
+  /**
+   * @generated from enum value: CONTEST_ROLE_GUEST = 5;
+   */
+  GUEST = 5,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ContestRole)
+proto3.util.setEnumType(ContestRole, "backend.v1.ContestRole", [
+  { no: 0, name: "CONTEST_ROLE_UNSPECIFIED" },
+  { no: 1, name: "CONTEST_ROLE_ADMIN" },
+  { no: 2, name: "CONTEST_ROLE_WRITER" },
+  { no: 3, name: "CONTEST_ROLE_TESTER" },
+  { no: 4, name: "CONTEST_ROLE_CONTESTANT" },
+  { no: 5, name: "CONTEST_ROLE_GUEST" },
+]);
+
+/**
  * @generated from enum backend.v1.ContestType
  */
 export enum ContestType {
