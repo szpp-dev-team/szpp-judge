@@ -54,7 +54,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	log.Println("check: contest is " + contest.Name)
+	log.Println("standings.go " + contest.Name)
 	log.Println("check: contest id: " + strconv.Itoa(contest.ID))
 
 	// get contest submits
@@ -66,8 +66,6 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		All(ctx)
 
 	if err != nil {
-		log.Println("=============== get submits ERROR!!!!!!!!!!!!")
-		log.Println("=============== contest ID:" + strconv.Itoa(contest.ID))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -76,25 +74,13 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	// sort submissions by submit_at (asc)
 	sort.SliceStable(submits, func(i, j int) bool { return submits[i].SubmittedAt.Before(submits[j].SubmittedAt) })
 
-	log.Println("=============== check submits ===============")
-	log.Println(submits)
-	log.Println("=============================================")
-
 	// get user info
 	userInfo, err := separateSubmit(i, ctx, submits, contest)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	log.Println("=============== check user Info ===============")
-	log.Println(userInfo)
-	log.Println("===============================================")
-
 	standings_list := GetStandingsRecordSlice(userInfo)
-
-	log.Println("=============== check standings_list ===============")
-	log.Println(standings_list)
-	log.Println("====================================================")
 
 	var standings_record []*backendv1.StandingsRecord
 	for _, row := range standings_list {
@@ -159,7 +145,6 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 		index := getTaskDetailIndex(userInfo, submission.Edges.User.ID, submission.Edges.Task.ID)
 		updateUserInfo := userInfo[submission.Edges.User.ID]
 		if *submission.Status == STATUS_AC {
-			log.Println("------------------ Status AC ------------------")
 			untilAc := submission.SubmittedAt.Sub(contest.StartAt)
 			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
 			updateUserInfo.taskDetailList[index].untilAc = &untilAc
@@ -175,7 +160,6 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			updateUserInfo.latestUntilAc = &untilAc
 			*updateUserInfo.latestUntilAc += time.Duration(updateUserInfo.totalPenaltyCount * contest.PenaltySeconds)
 		} else {
-			log.Println("------------------ Status WA ------------------")
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
 		}
 		userInfo[submission.Edges.User.ID] = updateUserInfo
@@ -274,8 +258,6 @@ func toStandingsRecordTaskDetail(td TaskDetail) *backendv1.StandingsRecord_TaskD
 	var acSubmitID int32
 	if td.acSubmitId != nil {
 		acSubmitID = int32(*td.acSubmitId)
-	} else {
-		log.Println("check: ac submit id is null.")
 	}
 
 	var untilAc *durationpb.Duration
