@@ -176,9 +176,9 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("the contest was not found"))
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("contest not found"))
 		}
-		i.logger.Error("failed to get the contest", slog.Any("error", err))
+		i.logger.Error("failed to get contest", slog.Int("contestID", int(*req.ContestId)))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	// admin もしくはコンテスト終了後は全ての提出の閲覧が可能
@@ -189,25 +189,26 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 			}),
 		}, nil
 	}
-	// コンテスト開始前は permissionDenied として扱う
-	if now.Before(contest.StartAt) {
-		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("contest is not held"))
+
+	var userID int
+	if claims != nil {
+		userID = claims.UserID
 	}
 
-	// 未ログインの場合は空を返す
-	if claims == nil {
-		return &backendv1.ListSubmissionsResponse{}, nil
+	// コンテスト中は自分の提出のみ閲覧可
+	if now.After(contest.StartAt) && now.Before(contest.EndAt) {
+		return &backendv1.ListSubmissionsResponse{
+			Submissions: lo.FilterMap(contest.Edges.Submits, func(s *ent.Submit, _ int) (*backendv1.SubmissionSummary, bool) {
+				if s.Edges.User.ID != userID {
+					return nil, false
+				}
+				return toPbSubmissionSummary(s), true
+			}),
+		}, nil
 	}
 
-	// コンテスト開催中は自分の提出のみ返す
-	return &backendv1.ListSubmissionsResponse{
-		Submissions: lo.FilterMap(contest.Edges.Submits, func(s *ent.Submit, _ int) (*backendv1.SubmissionSummary, bool) {
-			if s.Edges.User.Username != claims.Username {
-				return nil, false
-			}
-			return toPbSubmissionSummary(s), true
-		}),
-	}, nil
+	// コンテスト開始前は閲覧不可
+	return nil, connect.NewError(connect.CodePermissionDenied, errors.New("contest is not started"))
 }
 
 func toPbSubmissionSummary(submit *ent.Submit) *backendv1.SubmissionSummary {
