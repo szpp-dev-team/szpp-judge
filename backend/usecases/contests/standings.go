@@ -17,7 +17,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type TaskDetail struct {
@@ -255,15 +254,11 @@ func toStandingsRecord(standings StandingsRecord) *backendv1.StandingsRecord {
 		taskDetailList = append(taskDetailList, toStandingsRecordTaskDetail(row))
 	}
 
-	var latestAcAt *timestamppb.Timestamp
+	var latestAcAt *durationpb.Duration
 	latestAcAt = nil
-
 	if standings.latestUntilAc != nil {
-		latestAcAt = toTimestamp(standings.latestUntilAc)
+		latestAcAt = durationpb.New(*standings.latestUntilAc)
 	}
-
-	log.Println("check: standings.latestUntilAC" + standings.latestUntilAc.String())
-	log.Println("check: latestACat converted   " + latestAcAt.String())
 
 	return &backendv1.StandingsRecord{
 		Rank:              int32(standings.rank),
@@ -273,12 +268,6 @@ func toStandingsRecord(standings StandingsRecord) *backendv1.StandingsRecord {
 		LatestAcAt:        latestAcAt,
 		TaskDetailList:    taskDetailList,
 	}
-}
-
-func toTimestamp(d *time.Duration) *timestamppb.Timestamp {
-	seconds := int64(d.Seconds())
-	nanos := int64(d.Nanoseconds() % 1e9)
-	return timestamppb.New(time.Unix(seconds, nanos))
 }
 
 func toStandingsRecordTaskDetail(td TaskDetail) *backendv1.StandingsRecord_TaskDetail {
