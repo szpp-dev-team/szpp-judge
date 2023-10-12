@@ -137,10 +137,10 @@ func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListCo
 
 func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetContestTaskRequest) (*backendv1.GetContestTaskResponse, error) {
 	task, err := i.entClient.Task.Query().
-		WithTestcaseSets(func(tsq *ent.TestcaseSetQuery) {
-			tsq.Where(ent_testcaseset.IsSample(true))
-			tsq.WithTestcases(func(tq *ent.TestcaseQuery) {
-				tq.WithTask()
+		WithTestcases(func(tq *ent.TestcaseQuery) {
+			tq.WithTestcaseSets(func(tsq *ent.TestcaseSetQuery) {
+				tsq.Where(ent_testcaseset.IsSample(true))
+				tsq.WithTask()
 			})
 		}).
 		Where(
@@ -156,23 +156,14 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get contest"))
 	}
 
-	i.logger.Info("testcase sets", slog.Any("testcase sets", task.Edges.TestcaseSets))
-	for _, tcs := range task.Edges.TestcaseSets {
-		i.logger.Info("testcases", slog.Any("testcases", tcs.Edges.Testcases))
-	}
-
 	testcases := make([]*testcases_repo.Testcase, 0, len(task.Edges.Testcases))
-	for _, tcs := range task.Edges.TestcaseSets {
-		for _, tc := range tcs.Edges.Testcases {
-			i.logger.Info("task id", slog.Any("task id", tc.Edges.Task.ID))
-			i.logger.Info("testcase name", slog.Any("testcase name", tc.Name))
-			testcase, err := i.testcasesRepo.DownloadTestcase(ctx, tc.Edges.Task.ID, tc.Name)
-			if err != nil {
-				i.logger.Error("failed to download testcase", slog.Any("error", err))
-				return nil, connect.NewError(connect.CodeInternal, errors.New("failed to download testcase"))
-			}
-			testcases = append(testcases, testcase)
+	for _, tc := range task.Edges.Testcases {
+		testcase, err := i.testcasesRepo.DownloadTestcase(ctx, tc.Edges.Task.ID, tc.Name)
+		if err != nil {
+			i.logger.Error("failed to download testcase", slog.Any("error", err))
+			return nil, connect.NewError(connect.CodeInternal, errors.New("failed to download testcase"))
 		}
+		testcases = append(testcases, testcase)
 	}
 
 	return &backendv1.GetContestTaskResponse{
