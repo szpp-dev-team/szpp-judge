@@ -26,7 +26,7 @@ type FormFields = z.infer<typeof userRegistrationSchema>;
 export const Register = () => {
   const router = useRouter();
   // router.query.redirecturi を配列にしてはいけない. 例えば redirecturi[]=/hogehoge はだめ
-  const redirecturi = (router.query.redirecturi ?? window.location.origin + "/") as string;
+  const redirecturi = (router.query.redirecturi ?? "/") as string;
   const toast = useToast({
     position: "bottom",
   });
