@@ -19,7 +19,7 @@ const (
 	SCRATCH_3_GCC      = LangID("scratch/3/gcc")
 	JAVA_21_OPENJDK    = LangID("java/21/openjdk")
 	PYTHON_311_CPYTHON = LangID("python/3.11/cpython")
-	CPP_20_GCC_TESTLIB = LangID("cpp/20/gcc/testlib")
+	CPP_20_GCC_TESTLIB = LangID("cpp(testlib)/20/gcc")
 )
 
 type Meta struct {
