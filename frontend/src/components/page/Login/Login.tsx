@@ -27,17 +27,22 @@ export const Login = () => {
     resolver: zodResolver(userLoginSchema),
   });
 
-  const onUnauthenticatedError = () => {
+  const onUserNotFound = () => {
     toast({
       title: "ログインに失敗しました",
       status: "error",
     });
-    const err = { type: "custom", message: "ユーザ名またはパスワードが間違っています" } as const;
-    setFormError("username", err);
-    setFormError("password", err);
+    setFormError("username", { type: "custom", message: "そのようなユーザ名は存在しません" });
+  };
+  const onPasswordIncorrect = () => {
+    toast({
+      title: "ログインに失敗しました",
+      status: "error",
+    });
+    setFormError("password", { type: "custom", message: "パスワードが間違っています" });
   };
 
-  const { isLoading, mutate } = useLogin(onUnauthenticatedError);
+  const { isLoading, mutate } = useLogin({ onUserNotFound, onPasswordIncorrect });
 
   const onSubmit = handleSubmit((values) => {
     console.log("onSubmit(): values=", values);
