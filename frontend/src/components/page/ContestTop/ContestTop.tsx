@@ -1,6 +1,7 @@
 import { useGetContest, useRegisterMe, useRouterContestSlug } from "@/src/usecases/contest";
 import { Box, Button, Card, CardBody, CardHeader, Heading, Text, useToast } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
+import { useCallback, useState } from "react";
 import { useTimer } from "react-timer-hook";
 import contestTopStyle from "./ContestTop.module.scss";
 
@@ -8,9 +9,8 @@ const MarkdownView = dynamic(() => import("@/src/components/ui/MarkdownView").th
   ssr: false,
 });
 
-const TimerComponent = (props: { expiryTimestamp: Date; timerHeader: string }) => {
-  const onExpire = () => window.location.reload();
-  const timer = useTimer({ expiryTimestamp: props.expiryTimestamp, onExpire });
+const TimerComponent = (props: { expiryTimestamp: Date; timerHeader: string; onExpire?: () => void }) => {
+  const timer = useTimer({ expiryTimestamp: props.expiryTimestamp, onExpire: props.onExpire });
   // leading zero を追加する処理
   const seq = [
     timer.days.toLocaleString(),
@@ -29,6 +29,7 @@ const TimerComponent = (props: { expiryTimestamp: Date; timerHeader: string }) =
 };
 
 export const ContestTop = () => {
+  const [key, setKey] = useState(1);
   const slug = useRouterContestSlug();
   const { contest } = useGetContest({ slug });
 
@@ -63,8 +64,16 @@ export const ContestTop = () => {
     );
   };
 
+  // HACK: タイマーの終了に合わせて isUpcomingOrRunning や timerHeader などを更新したい
+  // 無理やりページごと React に re-render させるために key を書き換えている
+  // もうちょいキレイなやり方はありそう…
+  // tanstack query のおかげで getContest でリクエストが何度も飛ぶことはない
+  const forceRerender = useCallback(() => {
+    setKey(prev => prev + 1);
+  }, []);
+
   return (
-    <Box px={16} h="100%">
+    <Box key={key} px={16} h="100%">
       <Card px={3} py={4} h="100%" borderRadius={0} color="cyan.900">
         <CardHeader textAlign="center">
           <Heading as="h1" mb={4}>{contest?.name}</Heading>
@@ -78,7 +87,11 @@ export const ContestTop = () => {
                   参加登録
                 </Button>
                 <Text>
-                  <TimerComponent expiryTimestamp={expiryTimestamp} timerHeader={timerHeader} />
+                  <TimerComponent
+                    expiryTimestamp={expiryTimestamp}
+                    timerHeader={timerHeader}
+                    onExpire={forceRerender}
+                  />
                 </Text>
               </Box>
             )
