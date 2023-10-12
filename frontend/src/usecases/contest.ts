@@ -1,6 +1,7 @@
 import {
   getContest,
   getContestTask,
+  getMyRegistrationStatus,
   getMySubmissionStatuses,
   getStandings,
   listContests,
@@ -9,6 +10,7 @@ import {
 } from "@/src/gen/proto/backend/v1/contest_service-ContestService_connectquery";
 import type {
   GetContestRequest,
+  GetMyRegistrationStatusRequest,
   GetMySubmissionStatusesRequest,
   GetStandingsRequest,
   ListContestsRequest,
@@ -166,4 +168,14 @@ export const useStandings = (input?: PlainMessage<GetStandingsRequest>) => {
 export const useRegisterMe = () => {
   const { error, isLoading, mutate } = useMutation(registerMe.useMutation());
   return { error, isLoading, mutate };
+};
+
+export const useGetMyRegistrationStatus = (
+  input: PlainMessage<GetMyRegistrationStatusRequest>,
+  opt?: { enabled: boolean },
+) => {
+  return useQuery({
+    ...getMyRegistrationStatus.useQuery(input),
+    enabled: opt ? opt.enabled : true,
+  });
 };

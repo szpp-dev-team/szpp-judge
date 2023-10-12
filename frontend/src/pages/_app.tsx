@@ -2,6 +2,7 @@ import customizedTheme from "@/src/config/theme";
 import { ChakraProvider } from "@chakra-ui/react";
 import { TransportProvider } from "@connectrpc/connect-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
 import { createBackendTransport } from "../config/connectRpc";
 import { useAccessTokenClaimValue, useCredentialValue } from "../globalStates/credential";
@@ -29,6 +30,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         <ChakraProvider toastOptions={{ defaultOptions: { isClosable: true } }} theme={customizedTheme}>
           <Component {...pageProps} />
         </ChakraProvider>
+        <ReactQueryDevtools />
       </QueryClientProvider>
     </TransportProvider>
   );

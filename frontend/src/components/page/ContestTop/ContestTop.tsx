@@ -1,6 +1,8 @@
-import { useGetContest, useRegisterMe, useRouterContestSlug } from "@/src/usecases/contest";
-import { Box, Button, Card, CardBody, CardHeader, Heading, Text, useToast } from "@chakra-ui/react";
+import { useAccessTokenClaimValue } from "@/src/globalStates/credential";
+import { useGetContest, useGetMyRegistrationStatus, useRegisterMe, useRouterContestSlug } from "@/src/usecases/contest";
+import { Alert, AlertIcon, Box, Button, Card, CardBody, CardHeader, Heading, Text, useToast } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
 import { useTimer } from "react-timer-hook";
 import contestTopStyle from "./ContestTop.module.scss";
@@ -29,9 +31,17 @@ const TimerComponent = (props: { expiryTimestamp: Date; timerHeader: string; onE
 };
 
 export const ContestTop = () => {
+  const router = useRouter();
   const [key, setKey] = useState(1);
   const slug = useRouterContestSlug();
   const { contest } = useGetContest({ slug });
+
+  const claim = useAccessTokenClaimValue();
+  const registrationStatus = useGetMyRegistrationStatus({ contestSlug: slug }, {
+    enabled: !!claim,
+  });
+  const registerMeMutation = useRegisterMe();
+  const toast = useToast({ position: "bottom" });
 
   // コンテスト開始まで or 終了までのタイマー
   let expiryTimestamp: Date;
@@ -50,18 +60,22 @@ export const ContestTop = () => {
     expiryTimestamp = now;
   }
 
-  const { isLoading, mutate } = useRegisterMe();
-  const toast = useToast({ position: "bottom" });
   const handleClick = () => {
     console.info("button clicked");
-    mutate(
-      { contestSlug: slug },
-      {
-        onSuccess: () => {
-          toast({ title: "参加登録しました", status: "success" });
+    if (claim) {
+      registerMeMutation.mutate(
+        { contestSlug: slug },
+        {
+          onSuccess: () => {
+            toast({ title: "参加登録しました", status: "success" });
+            registrationStatus.refetch(); // staletime などを無視して再更新
+          },
         },
-      },
-    );
+      );
+    } else {
+      toast({ title: "ログインしてから参加登録してください", status: "error" });
+      router.push("/login");
+    }
   };
 
   // HACK: タイマーの終了に合わせて isUpcomingOrRunning や timerHeader などを更新したい
@@ -71,6 +85,37 @@ export const ContestTop = () => {
   const forceRerender = useCallback(() => {
     setKey(prev => prev + 1);
   }, []);
+
+  const registrationStatusElement = (function calcElement() {
+    if (claim) {
+      // isLoading と error の if は data の型を絞り込むためだけのもの
+      if (registrationStatus.isLoading) {
+        return null;
+      } else if (registrationStatus.error) {
+        return null;
+      } else if (registrationStatus.data.registered) {
+        return (
+          <Alert status="success" my={4} justifyContent="center">
+            <AlertIcon />あなたはこのコンテストに参加しています
+          </Alert>
+        );
+      } else {
+        /* pass through */
+      }
+    }
+
+    // 未ログインまたはログイン中だが参加登録してない場合はここに来る
+    return (
+      <Button
+        colorScheme="teal"
+        onClick={handleClick}
+        isLoading={registerMeMutation.isLoading}
+        margin={4}
+      >
+        参加登録
+      </Button>
+    );
+  })();
 
   return (
     <Box key={key} px={16} h="100%">
@@ -83,9 +128,7 @@ export const ContestTop = () => {
           {contest && isUpcomingOrRunning
             ? (
               <Box>
-                <Button colorScheme="teal" onClick={handleClick} isLoading={isLoading} margin={4}>
-                  参加登録
-                </Button>
+                {registrationStatusElement}
                 <Text>
                   <TimerComponent
                     expiryTimestamp={expiryTimestamp}
