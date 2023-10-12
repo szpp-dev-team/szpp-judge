@@ -25,6 +25,8 @@ type FormFields = z.infer<typeof userRegistrationSchema>;
 
 export const Register = () => {
   const router = useRouter();
+  // router.query.redirecturi を配列にしてはいけない. 例えば redirecturi[]=/hogehoge はだめ
+  const redirecturi = (router.query.redirecturi ?? window.location.origin + "/") as string;
   const toast = useToast({
     position: "bottom",
   });
@@ -49,7 +51,7 @@ export const Register = () => {
           title: `${data.user!.username} で登録しました`,
           status: "success",
         });
-        router.push("/");
+        router.push(redirecturi);
       },
       onError: () => {
         toast({
@@ -70,7 +72,8 @@ export const Register = () => {
         <CardHeader textAlign="center">
           <Heading as="h1" size="lg" mb={4}>ユーザ新規登録</Heading>
           <p>
-            既に登録済みの方は <Link href="/login">ログインページ</Link> へ
+            既に登録済みの方は{" "}
+            <Link href={"/login?redirecturi=" + encodeURIComponent(redirecturi)}>ログインページ</Link> へ
           </p>
         </CardHeader>
         <CardBody textAlign="center">
