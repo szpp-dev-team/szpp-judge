@@ -163,10 +163,9 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 
 	testcases := make([]*testcases_repo.Testcase, 0, len(task.Edges.Testcases))
 	for _, tcs := range task.Edges.TestcaseSets {
-		if !tcs.IsSample {
-			continue
-		}
 		for _, tc := range tcs.Edges.Testcases {
+			i.logger.Info("task id", slog.Any("task id", tc.Edges.Task.ID))
+			i.logger.Info("testcase name", slog.Any("testcase name", tc.Name))
 			testcase, err := i.testcasesRepo.DownloadTestcase(ctx, tc.Edges.Task.ID, tc.Name)
 			if err != nil {
 				i.logger.Error("failed to download testcase", slog.Any("error", err))
