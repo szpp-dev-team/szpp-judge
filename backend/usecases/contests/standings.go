@@ -56,6 +56,7 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	}
 
 	log.Println("check: contest is " + contest.Name)
+	log.Println("check: contest id: " + strconv.Itoa(contest.ID))
 
 	// get contest submits
 	submits, err := i.entClient.Submit.Query().
