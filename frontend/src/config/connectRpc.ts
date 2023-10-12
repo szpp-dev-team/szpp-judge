@@ -37,7 +37,7 @@ async (req) => {
     return await next(req);
   }
 
-  if (accessTokenExpireAt && Date.now() > accessTokenExpireAt) {
+  if (accessTokenExpireAt && Date.now() > accessTokenExpireAt * 1000) {
     const newAccessToken = await refreshAccessToken();
     req.header.set("Authorization", `Bearer ${newAccessToken}`);
   } else {
