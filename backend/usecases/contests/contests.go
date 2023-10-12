@@ -140,7 +140,6 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 		WithTestcases(func(tq *ent.TestcaseQuery) {
 			tq.WithTestcaseSets(func(tsq *ent.TestcaseSetQuery) {
 				tsq.Where(ent_testcaseset.IsSample(true))
-				tsq.WithTask()
 			})
 		}).
 		Where(
@@ -158,7 +157,7 @@ func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetConte
 
 	testcases := make([]*testcases_repo.Testcase, 0, len(task.Edges.Testcases))
 	for _, tc := range task.Edges.Testcases {
-		testcase, err := i.testcasesRepo.DownloadTestcase(ctx, tc.Edges.Task.ID, tc.Name)
+		testcase, err := i.testcasesRepo.DownloadTestcase(ctx, task.ID, tc.Name)
 		if err != nil {
 			i.logger.Error("failed to download testcase", slog.Any("error", err))
 			return nil, connect.NewError(connect.CodeInternal, errors.New("failed to download testcase"))
