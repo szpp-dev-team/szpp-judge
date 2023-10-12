@@ -287,21 +287,18 @@ func (i *Interactor) GetMySubmissionStatuses(ctx context.Context, req *backendv1
 func (i *Interactor) GetMyRegistrationStatus(ctx context.Context, req *backendv1.GetMyRegistrationStatusRequest) (*backendv1.GetMyRegistrationStatusResponse, error) {
 	claims := interceptor.GetClaimsFromContext(ctx)
 
-	contest, err := i.entClient.Contest.Query().
-		WithContestUser(func(cuq *ent.ContestUserQuery) {
-			cuq.Where(ent_contestuser.UserID(claims.UserID))
-		}).
-		Where(ent_contest.Slug(req.ContestSlug)).
-		Only(ctx)
+	exists, err := i.entClient.Contest.Query().
+		Where(
+			ent_contest.Slug(req.ContestSlug),
+			ent_contest.HasContestUserWith(ent_contestuser.UserID(claims.UserID)),
+		).
+		Exist(ctx)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "contest not found")
-		}
 		i.logger.Error("failed to get contest", slog.Any("error", err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &backendv1.GetMyRegistrationStatusResponse{
-		Registered: contest.Edges.ContestUser != nil,
+		Registered: exists,
 	}, nil
 }
 
