@@ -333,9 +333,11 @@ export class StandingsRecord extends Message<StandingsRecord> {
   totalPenaltyCount = 0;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp latest_ac_at = 5;
+   * コンテスト開始からの経過時間（諸事情でよくない命名をしています）
+   *
+   * @generated from field: optional google.protobuf.Duration latest_ac_at = 5;
    */
-  latestAcAt?: Timestamp;
+  latestAcAt?: Duration;
 
   /**
    * @generated from field: repeated backend.v1.StandingsRecord.TaskDetail task_detail_list = 6;
@@ -354,7 +356,7 @@ export class StandingsRecord extends Message<StandingsRecord> {
     { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "total_score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "total_penalty_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "latest_ac_at", kind: "message", T: Timestamp, opt: true },
+    { no: 5, name: "latest_ac_at", kind: "message", T: Duration, opt: true },
     { no: 6, name: "task_detail_list", kind: "message", T: StandingsRecord_TaskDetail, repeated: true },
   ]);
 

@@ -66,7 +66,7 @@ message StandingsRecord {
   string username = 2;
   int32 total_score = 3;
   int32 total_penalty_count = 4;
-  optional google.protobuf.Timestamp latest_ac_at = 5;
+  optional google.protobuf.Duration latest_ac_at = 5; // コンテスト開始からの経過時間（諸事情でよくない命名をしています）
   repeated TaskDetail task_detail_list = 6;
 }
 
