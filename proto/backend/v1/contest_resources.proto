@@ -27,6 +27,15 @@ message Contest {
   int32 num_tasks = 9;
 }
 
+enum ContestRole {
+  CONTEST_ROLE_UNSPECIFIED = 0;
+  CONTEST_ROLE_ADMIN = 1;
+  CONTEST_ROLE_WRITER = 2;
+  CONTEST_ROLE_TESTER = 3;
+  CONTEST_ROLE_CONTESTANT = 4;
+  CONTEST_ROLE_GUEST = 5;
+}
+
 message MutationContest {
   string name = 1;
   string slug = 2;
