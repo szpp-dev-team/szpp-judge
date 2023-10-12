@@ -74,7 +74,7 @@ export const ContestTop = () => {
       );
     } else {
       toast({ title: "ログインしてから参加登録してください", status: "error" });
-      router.push("/login");
+      router.push("/login?redirecturi=" + encodeURIComponent(router.asPath));
     }
   };
 
