@@ -56,7 +56,7 @@ func (i *Interactor) judgeMain(req *judgev1.JudgeRequest, stream judgev1.JudgeSe
 	}
 
 	workdir := filepath.Join(i.workdirRoot, uuid.NewString())
-	if err := os.MkdirAll(workdir, 0666); err != nil {
+	if err := os.MkdirAll(workdir, 0777); err != nil {
 		i.logger.Error("failed to create workdir", slog.Any("error", err))
 		return status.Error(codes.Internal, err.Error())
 	}
@@ -155,7 +155,7 @@ func (i *Interactor) run(
 	sb *sandbox.Sandbox,
 ) (*sandbox.ExecResult, error) {
 	res, err := sb.Exec(ctx, sandbox.ExecOption{
-		AsRootUser:      false,
+		AsRootUser:      true, // TODO: should not run user code as root user
 		Stdin:           bytes.NewBuffer(testcase.Input),
 		Cmd:             lm.ExecCmd,
 		StdoutReadLimit: 256 * unit.KiB,
