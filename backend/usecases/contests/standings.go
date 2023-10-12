@@ -47,11 +47,15 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		Where(ent_contest.Slug(req.ContestSlug)).
 		Only(ctx)
 	if err != nil {
+		log.Println("=============== get contest ERROR!!!!!!!!!!!!")
+		log.Println("=============== ContestSlug:" + req.ContestSlug)
 		if ent.IsNotFound(err) {
 			return nil, status.Errorf(codes.NotFound, "the contest(slug: %s) is not found", req.ContestSlug)
 		}
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+
+	log.Println("check: contest is " + contest.Name)
 
 	// get contest submits
 	submits, err := i.entClient.Submit.Query().
@@ -62,8 +66,12 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		All(ctx)
 
 	if err != nil {
+		log.Println("=============== get submits ERROR!!!!!!!!!!!!")
+		log.Println("=============== contest ID:" + strconv.Itoa(contest.ID))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+
+	log.Println("check: get submits. submission length: " + strconv.Itoa(len(submits)))
 
 	// sort submissions by submit_at (asc)
 	sort.SliceStable(submits, func(i, j int) bool { return submits[i].SubmittedAt.Before(submits[j].SubmittedAt) })
