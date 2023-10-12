@@ -1,5 +1,6 @@
 import { AcceptedFileExt, acceptedFileExts, fileExt2langId, MAX_SOURCE_CODE_SIZE } from "@/src/config/submission";
 import { type LangID, langIDs, langMetasBrief } from "@/src/gen/langs";
+import { useSubmissionLangValue } from "@/src/globalStates/submission";
 import { convertSb3ToCpp } from "@/src/util/scratch/converter";
 import { Sb3ConvertError } from "@/src/util/scratch/errors";
 import { ChevronDownIcon } from "@chakra-ui/icons";
@@ -37,7 +38,7 @@ export const SubmissionForm = ({
   submitButtonProps,
 }: SubmissionFormProps) => {
   const [sourceCode, setSourceCode] = useState("");
-  const [langId, setLangId] = useState<LangID>("cpp/20/gcc");
+  const [langId, setLangId] = useState<LangID>(useSubmissionLangValue());
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);

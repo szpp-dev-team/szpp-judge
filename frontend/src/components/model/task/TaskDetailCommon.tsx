@@ -3,6 +3,7 @@ import { MAX_SOURCE_CODE_SIZE } from "@/src/config/submission";
 import { LangID } from "@/src/gen/langs";
 import { SubmitRequest } from "@/src/gen/proto/backend/v1/judge_service_pb";
 import { Task, Testcase } from "@/src/gen/proto/backend/v1/task_resources_pb";
+import { useSubmissionLangSetter } from "@/src/globalStates/submission";
 import { Difficulty } from "@/src/model/task";
 import { useSubmit } from "@/src/usecases/judge";
 import { PlainMessage } from "@bufbuild/protobuf";
@@ -50,6 +51,7 @@ export const TaskDetailCommon = ({
   const toast = useToast();
 
   const { mutate, isLoading: isSubmissionLoading } = useSubmit();
+  const saveSubmissionLang = useSubmissionLangSetter();
 
   const handleSubmit = useCallback((langId: LangID, sourceCode: string) => {
     if (sourceCode.length === 0) {
@@ -60,6 +62,8 @@ export const TaskDetailCommon = ({
       });
       return;
     }
+
+    saveSubmissionLang(langId);
 
     if (sourceCode.length > MAX_SOURCE_CODE_SIZE) {
       toast({
@@ -91,7 +95,7 @@ export const TaskDetailCommon = ({
         });
       },
     });
-  }, [contestId, task.id, mutate, onSubmitSuccess, toast]);
+  }, [contestId, task.id, mutate, onSubmitSuccess, toast, saveSubmissionLang]);
 
   return (
     <Card px={6} py={4} minH="100%" maxW="860px" w="100%" rounded={"none"} color="cyan.900">
