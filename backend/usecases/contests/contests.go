@@ -16,6 +16,7 @@ import (
 	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/predicate"
 	ent_submit "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/submit"
 	ent_task "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+	ent_testcase "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcase"
 	ent_testcaseset "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/testcaseset"
 	ent_user "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/user"
 	testcases_repo "github.com/szpp-dev-team/szpp-judge/backend/domain/repository/testcases"
@@ -138,9 +139,8 @@ func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListCo
 func (i *Interactor) GetContestTask(ctx context.Context, req *backendv1.GetContestTaskRequest) (*backendv1.GetContestTaskResponse, error) {
 	task, err := i.entClient.Task.Query().
 		WithTestcases(func(tq *ent.TestcaseQuery) {
-			tq.WithTestcaseSets(func(tsq *ent.TestcaseSetQuery) {
-				tsq.Where(ent_testcaseset.IsSample(true))
-			})
+			tq.WithTestcaseSets()
+			tq.Where(ent_testcase.HasTestcaseSetsWith(ent_testcaseset.IsSample(true)))
 		}).
 		Where(
 			ent_task.HasContestsWith(ent_contest.Slug(req.ContestSlug)),
