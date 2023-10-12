@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"sort"
+	"strconv"
 	"time"
 
 	"connectrpc.com/connect"
@@ -67,6 +68,10 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 	// sort submissions by submit_at (asc)
 	sort.SliceStable(submits, func(i, j int) bool { return submits[i].SubmittedAt.Before(submits[j].SubmittedAt) })
 
+	log.Println("=============== check submits ===============")
+	log.Println(submits)
+	log.Println("=============================================")
+
 	// get user info
 	userInfo, err := separateSubmit(i, ctx, submits, contest)
 	if err != nil {
@@ -124,6 +129,8 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submit, contest *ent.Contest) (map[int]StandingsRecord, error) {
 	userInfo := make(map[int]StandingsRecord)
 
+	log.Println("check: submissions length: " + strconv.Itoa(len(submissions)))
+
 	for _, submission := range submissions {
 
 		// exception handling
@@ -144,6 +151,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 		index := getTaskDetailIndex(userInfo, submission.Edges.User.ID, submission.Edges.Task.ID)
 		updateUserInfo := userInfo[submission.Edges.User.ID]
 		if *submission.Status == STATUS_AC {
+			log.Println("------------------ Status AC ------------------")
 			untilAc := time.Until(contest.StartAt) * -1
 			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
 			updateUserInfo.taskDetailList[index].untilAc = &untilAc
@@ -159,6 +167,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			updateUserInfo.latestUntilAc = &untilAc
 			*updateUserInfo.latestUntilAc += time.Duration(updateUserInfo.totalPenaltyCount * contest.PenaltySeconds)
 		} else {
+			log.Println("------------------ Status WA ------------------")
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
 		}
 		userInfo[submission.Edges.User.ID] = updateUserInfo
