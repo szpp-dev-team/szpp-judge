@@ -372,18 +372,20 @@ export const contestHandlers: RequestHandler[] = [
     // 25%: 0点
     // 25%: 50点
     // 25%: 満点
-    const submissionStatuses = contestTasks.map(t => {
+    let submissionStatuses = contestTasks.map(t => {
       const r = Math.random();
       return {
         taskId: t.id,
         score: r < 0.25 ? undefined : r < 0.5 ? 0 : r < 0.75 ? 50 : t.score,
       };
     });
+
     // 最初の4問は全パターン網羅
     submissionStatuses[0]!.score = undefined;
     submissionStatuses[1]!.score = 0;
     submissionStatuses[2]!.score = 50;
     submissionStatuses[3]!.score = contestTasks[3]!.score;
+    submissionStatuses = submissionStatuses.filter(t => t.score != null); // 未提出のレコードは含めない (Backend の実装がそうなっているため)
     return res(
       ctx.delay(500),
       encodeResp({ submissionStatuses }),
