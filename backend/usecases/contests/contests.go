@@ -118,7 +118,7 @@ func (i *Interactor) ListContests(ctx context.Context, req *backendv1.ListContes
 func (i *Interactor) ListContestTasks(ctx context.Context, req *backendv1.ListContestTasksRequest) (*backendv1.ListContestTasksResponse, error) {
 	contest, err := i.entClient.Contest.Query().
 		WithContestTask(func(ctq *ent.ContestTaskQuery) {
-			ctq.WithTask()
+			ctq.WithTask().Order(ent.Asc(ent_contesttask.FieldOrder))
 		}).
 		Where(ent_contest.Slug(req.ContestSlug)).
 		Only(ctx)
