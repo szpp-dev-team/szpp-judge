@@ -42,11 +42,9 @@ export const TaskCollection = () => {
 
   const tasksWithScore = useMemo(() => {
     if (tasks == null || submissionStatuses == null) return [];
-    return tasks.map((t, seq) => {
-      // 未提出のタスクがあってもそれは空として処理されるので
-      // 配列 tasks と submissionStatuses の長さは一致しているはず
-      // したがって submissionStatuses[tasks の添字] は truthy なはずだが念の為気をつけてアクセスする
-      const ss = submissionStatuses[seq]?.score ?? 0;
+    return tasks.map((t) => {
+      // submissionStatuses には提出したことのある問題の結果しか含まれない
+      const ss = submissionStatuses.find(s => s.taskId === t.id)?.score;
       return {
         ...t,
         submissionScore: ss,

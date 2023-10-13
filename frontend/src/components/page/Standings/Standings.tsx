@@ -18,6 +18,7 @@ import {
   Tr,
   VStack,
 } from "@chakra-ui/react";
+import { LoadingPane } from "../../ui/LoadingPane";
 
 type TaskScoreProps = {
   /** タスク(への提出)の得点 */
@@ -35,13 +36,14 @@ type TotalScoreProps = {
   /** コンテストの得点 */
   score?: number;
   penaltyCount?: number;
-  untilAc?: number | bigint;
+  /** ペナルティを加味した回答にかかった時間. protobuf 的には Duration だが諸事情によりタイムスタンプっぽい名前になっている */
+  latestAcAt?: number | bigint; // TODO: proto とともに名前を直す
 };
 
 /**
  * 順位表のテーブルのセルに入れるための得点コンポーネント(総得点)
  */
-const TotalScore = ({ score, penaltyCount, untilAc }: TotalScoreProps) => {
+const TotalScore = ({ score, penaltyCount, latestAcAt }: TotalScoreProps) => {
   /** 1つ以上の AC を提出しているかどうか(提出があっても AC でなければだめ) */
   const hasAc = typeof score === "number" && score > 0;
   if (!hasAc) {
@@ -56,7 +58,7 @@ const TotalScore = ({ score, penaltyCount, untilAc }: TotalScoreProps) => {
           ? <Text as="span" fontWeight="bold" color="pink.400">({penaltyCount})</Text>
           : null}
       </Box>
-      {untilAc ? <Text color="gray.400">{Duration.fromNumber(untilAc).fmtHMS()}</Text> : null}
+      {latestAcAt ? <Text color="gray.400">{Duration.fromNumber(latestAcAt).fmtHMS()}</Text> : null}
     </VStack>
   );
 };
@@ -106,7 +108,7 @@ export const Standings = () => {
 
   // HACK: 本来は useStandings だけ面倒見ればいいのに useGetContest の方もハンドリングするの微妙
   if (isLoading || cIsLoading) {
-    return <>読み込み中です...</>;
+    return <LoadingPane />;
   }
 
   if (error || cError) {
@@ -153,7 +155,9 @@ export const Standings = () => {
                           <TotalScore
                             score={record.totalScore}
                             penaltyCount={record.totalPenaltyCount}
-                            untilAc={1800000} // TODO: ペナルティを加味した untilAc 的な指標をバックエンドからもらう
+                            latestAcAt={record.latestAcAt
+                              ? record.latestAcAt.seconds * BigInt(Duration.SECOND)
+                              : undefined}
                           />
                         </Td>
                         {record.taskDetailList.map((task, j) => (

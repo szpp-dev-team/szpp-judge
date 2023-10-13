@@ -7,9 +7,10 @@ import {
   useRouterContestTaskSeq,
   useTaskSeqCode,
 } from "@/src/usecases/contest";
-import { Container, Text } from "@chakra-ui/react";
+import { Container } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { TaskDetailCommon } from "../../model/task/TaskDetailCommon";
+import { LoadingPane } from "../../ui/LoadingPane";
 
 export const ContestTaskDetail = () => {
   const contestSlug = useRouterContestSlug();
@@ -29,12 +30,8 @@ export const ContestTaskDetail = () => {
     router.push(`/contests/${contestSlug}/submissions?me`);
   };
 
-  if (contest != null && !isContestStarted) {
-    return <Text>コンテスト開始前なので問題を表示できません</Text>;
-  }
-
-  if (tasks == null || task == null || sampleCases == null) {
-    return <Text>読み込み中...</Text>;
+  if (contest == null || tasks == null || task == null || sampleCases == null) {
+    return <LoadingPane />;
   }
 
   // FIXME: contestTask の execTimeLimit, execMemLimit を使う
@@ -42,6 +39,7 @@ export const ContestTaskDetail = () => {
   return (
     <Container px={12} maxW="900px" h="100%" centerContent>
       <TaskDetailCommon
+        contestId={contest.id}
         task={task}
         score={contestTask!.score}
         sampleCases={sampleCases}

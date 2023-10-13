@@ -3,6 +3,7 @@ package interceptor
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"strings"
 
 	"connectrpc.com/connect"
@@ -41,17 +42,20 @@ var excludeMethodSet = map[string]struct{}{
 func Auth(secret []byte) connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			// skip authentication
-			if _, ok := excludeMethodSet[req.Spec().Procedure]; ok {
-				return next(ctx, req)
-			}
-
 			accessToken := req.Header().Get("Authorization")
+
+			// check if can skip authentication
+			_, skippable := excludeMethodSet[req.Spec().Procedure]
+
 			claims, err := GetClaimsFromToken(strings.TrimPrefix(accessToken, "Bearer "), secret)
 			if err != nil {
-				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("failed to parse jwt"))
+				if !skippable {
+					return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("failed to parse jwt"))
+				}
+			} else {
+				slog.Info("authentication succeeded", slog.Int("userID", claims.UserID))
+				ctx = context.WithValue(ctx, claimsKey, claims)
 			}
-			ctx = context.WithValue(ctx, claimsKey, claims)
 			return next(ctx, req)
 		}
 	}

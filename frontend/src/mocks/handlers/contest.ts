@@ -232,11 +232,16 @@ const generateStandings = (participantsSize: number, taskSize: number) => {
       });
     }
 
+    // Protobuf Duration に seconds: bigint があるせいで Math.max が使えないので自力で最大を探す
+    const maxUntilAc = taskDetailList.map(t => t.untilAc)
+      .filter((u): u is PlainMessage<PbDuration> => u !== undefined) // 型付け目的の filter
+      .sort((a, b) => b.seconds > a.seconds ? 1 : b.seconds < a.seconds ? -1 : 0)[0];
+
     standingsNoRank.push({
       username: `user${user}`,
       totalScore: taskDetailList.reduce((accum, item) => accum + item.score, 0),
       totalPenaltyCount: taskDetailList.reduce((accum, item) => accum + item.penaltyCount, 0),
-      latestAcAt: undefined, // TODO: 削除?
+      latestAcAt: maxUntilAc, // TODO: proto とともに名前を直す 7084bd5
       taskDetailList,
     });
   }
@@ -254,7 +259,13 @@ const generateStandings = (participantsSize: number, taskSize: number) => {
 
   const [rowsGroupedByScore, groupKeys] = groupBy(standingsNoRank, s => s.totalScore); // 得点でグループ化
   const standings = Array.from(groupKeys.values()).sort((a, b) => b - a) // 得点の降順に処理する
-    .flatMap(key => rowsGroupedByScore[key]!.sort((a, b) => a.totalPenaltyCount - b.totalPenaltyCount)) // 同点はペナ少がランク高
+    .flatMap(key =>
+      rowsGroupedByScore[key]!.sort((a, b) =>
+        // @ts-expect-error undefined の可能性がある要素について比較演算子を使おうとして怒られる.
+        // Array.prototype.sort は undefined な要素を配列の末尾に並べるのでこれでも動作する.
+        a.latestAcAt.seconds > b.latestAcAt.seconds ? 1 : a.latestAcAt.seconds < b.latestAcAt.seconds ? -1 : 0
+      )
+    ) // 同点は提出が早い順
     .map<PlainMessage<StandingsRecord>>((record, i) => ({
       rank: i + 1,
       ...record,
@@ -361,18 +372,20 @@ export const contestHandlers: RequestHandler[] = [
     // 25%: 0点
     // 25%: 50点
     // 25%: 満点
-    const submissionStatuses = contestTasks.map(t => {
+    let submissionStatuses = contestTasks.map(t => {
       const r = Math.random();
       return {
         taskId: t.id,
         score: r < 0.25 ? undefined : r < 0.5 ? 0 : r < 0.75 ? 50 : t.score,
       };
     });
+
     // 最初の4問は全パターン網羅
     submissionStatuses[0]!.score = undefined;
     submissionStatuses[1]!.score = 0;
     submissionStatuses[2]!.score = 50;
     submissionStatuses[3]!.score = contestTasks[3]!.score;
+    submissionStatuses = submissionStatuses.filter(t => t.score != null); // 未提出のレコードは含めない (Backend の実装がそうなっているため)
     return res(
       ctx.delay(500),
       encodeResp({ submissionStatuses }),
@@ -380,14 +393,14 @@ export const contestHandlers: RequestHandler[] = [
   }),
   connectMock(ContestService, "getStandings", async (ctx, res, decodeReq, encodeResp) => {
     const { contestSlug } = await decodeReq();
-    const standingsList = standingsMap.get(contestSlug);
+    const standings = standingsMap.get(contestSlug);
 
-    if (!standingsList) {
+    if (!standings) {
       return res(ctx.status(404));
     } else {
       return res(
         ctx.delay(500),
-        encodeResp({ standingsList }),
+        encodeResp({ standingsList: standings }),
       );
     }
   }),
