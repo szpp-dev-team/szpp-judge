@@ -25,10 +25,10 @@ export const ContestLayout = ({ children }: ContestLayoutProps) => {
 
   const unifiedTasks = useMemo((): ContestSidebarProps["tasks"] => {
     if (tasks == null || submissionStatuses == null) return [];
-    return submissionStatuses.map((s, i) => ({
-      id: s.taskId,
-      title: tasks[i]!.title,
-      scoreStatus: ScoreStatus.fromScore(tasks[i]!.score, s.score),
+    return tasks.map((task) => ({
+      id: task.id,
+      title: task.title,
+      scoreStatus: ScoreStatus.fromScore(task.score, submissionStatuses.find((s) => s.taskId === task.id)?.score),
     }));
   }, [tasks, submissionStatuses]);
 
