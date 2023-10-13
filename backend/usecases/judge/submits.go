@@ -181,6 +181,8 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 		i.logger.Error("failed to get contest", slog.Int("contestID", int(*req.ContestId)))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	i.logger.Info("listed submits", slog.Int("contestID", int(*req.ContestId)), slog.Int("rows", len(contest.Edges.Submits)))
+
 	// admin もしくはコンテスト終了後は全ての提出の閲覧が可能
 	if isAdmin || now.After(contest.EndAt) {
 		return &backendv1.ListSubmissionsResponse{
