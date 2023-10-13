@@ -3,6 +3,7 @@ package interceptor
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"strings"
 
 	"connectrpc.com/connect"
@@ -51,6 +52,7 @@ func Auth(secret []byte) connect.UnaryInterceptorFunc {
 			if err != nil {
 				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("failed to parse jwt"))
 			}
+			slog.Info("authentication succeeded", slog.Int("userID", claims.UserID))
 			ctx = context.WithValue(ctx, claimsKey, claims)
 			return next(ctx, req)
 		}
