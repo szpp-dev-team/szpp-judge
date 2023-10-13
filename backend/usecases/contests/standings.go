@@ -110,7 +110,7 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 	log.Println(result)
 
 	// sort by totalScore and latestUntilAc
-	sort.SliceStable(result, func(i, j int) bool {
+	sort.Slice(result, func(i, j int) bool {
 		if result[i].totalScore > result[j].totalScore {
 			log.Println("==================sort By Score============================")
 			log.Println("i:" + strconv.Itoa(i) + " " + strconv.Itoa(result[i].totalScore) + " j:" + strconv.Itoa(j) + " " + strconv.Itoa(result[j].totalScore))
