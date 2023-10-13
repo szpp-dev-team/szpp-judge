@@ -2,6 +2,7 @@ package contests
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sort"
 	"strconv"
@@ -101,6 +102,9 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 	for _, value := range userInfo {
 		result = append(result, value)
 	}
+
+	log.Println("==================Check Type of result============================")
+	fmt.Printf("%T\n", result)
 
 	log.Println("==================Before result============================")
 	log.Println(result)
