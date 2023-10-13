@@ -201,6 +201,7 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 	if now.After(contest.StartAt) && now.Before(contest.EndAt) {
 		return &backendv1.ListSubmissionsResponse{
 			Submissions: lo.FilterMap(contest.Edges.Submits, func(s *ent.Submit, _ int) (*backendv1.SubmissionSummary, bool) {
+				i.logger.Info("submission", slog.Int("userID", s.Edges.User.ID), slog.Int("submissionID", s.ID))
 				if s.Edges.User.ID != userID {
 					return nil, false
 				}
