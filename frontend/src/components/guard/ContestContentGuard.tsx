@@ -53,16 +53,17 @@ export const ContestContentGuard = ({ contentName, children }: ContestContentGua
     if (registrationStatus.isLoading) {
       return <LoadingPane />;
     }
-    if (!registrationStatus.data?.registered) {
-      return (
-        <CenteringFullSizeContainer>
-          <Text>
-            {message}
-            <br />参加登録は <Link href={`/contests/${slug}`}>コンテストトップページ</Link> でできます。
-          </Text>
-        </CenteringFullSizeContainer>
-      );
+    if (registrationStatus.data?.registered) {
+      return children;
     }
+    return (
+      <CenteringFullSizeContainer>
+        <Text>
+          {message}
+          <br />参加登録は <Link href={`/contests/${slug}`}>コンテストトップページ</Link> でできます。
+        </Text>
+      </CenteringFullSizeContainer>
+    );
   }
 
   return (
