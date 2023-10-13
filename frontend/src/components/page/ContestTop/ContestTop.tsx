@@ -1,5 +1,6 @@
 import { useAccessTokenClaimValue } from "@/src/globalStates/credential";
 import { useGetContest, useGetMyRegistrationStatus, useRegisterMe, useRouterContestSlug } from "@/src/usecases/contest";
+import { getLoginUriWithRedirect } from "@/src/usecases/url";
 import { Alert, AlertIcon, Box, Button, Card, CardBody, CardHeader, Heading, Text, useToast } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -74,7 +75,7 @@ export const ContestTop = () => {
       );
     } else {
       toast({ title: "ログインしてから参加登録してください", status: "error" });
-      router.push("/login?redirecturi=" + encodeURIComponent(router.asPath));
+      router.push(getLoginUriWithRedirect(router.asPath));
     }
   };
 
