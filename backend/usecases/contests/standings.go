@@ -87,6 +87,9 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		standings_record = append(standings_record, toStandingsRecord(row))
 	}
 
+	log.Println("==================StandingsRecored============================")
+	log.Println(standings_record)
+
 	return &backendv1.GetStandingsResponse{
 		StandingsList: standings_record,
 	}, nil
@@ -120,6 +123,9 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 	for index := range result {
 		result[index].rank = index + 1
 	}
+
+	log.Println("==================Allocated rank============================")
+	log.Println(result)
 
 	return result
 }
