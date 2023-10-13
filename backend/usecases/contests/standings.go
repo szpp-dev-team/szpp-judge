@@ -99,6 +99,9 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 		result = append(result, value)
 	}
 
+	log.Println("==================Before result============================")
+	log.Println(result)
+
 	// sort by totalScore and latestUntilAc
 	sort.SliceStable(result, func(i, j int) bool {
 		if result[i].totalScore > result[j].totalScore {
@@ -109,6 +112,9 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 
 		return result[i].userName < result[j].userName
 	})
+
+	log.Println("==================After result============================")
+	log.Println(result)
 
 	// allocate rank
 	for index := range result {
