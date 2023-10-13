@@ -18,6 +18,7 @@ import {
   Tr,
   VStack,
 } from "@chakra-ui/react";
+import { LoadingPane } from "../../ui/LoadingPane";
 
 type TaskScoreProps = {
   /** タスク(への提出)の得点 */
@@ -107,7 +108,7 @@ export const Standings = () => {
 
   // HACK: 本来は useStandings だけ面倒見ればいいのに useGetContest の方もハンドリングするの微妙
   if (isLoading || cIsLoading) {
-    return <>読み込み中です...</>;
+    return <LoadingPane />;
   }
 
   if (error || cError) {
