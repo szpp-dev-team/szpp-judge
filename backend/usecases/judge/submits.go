@@ -170,7 +170,7 @@ func (i *Interactor) ListSubmissions(ctx context.Context, req *backendv1.ListSub
 
 	contest, err := i.entClient.Contest.Query().
 		WithSubmits(func(sq *ent.SubmitQuery) {
-			sq.WithUser()
+			sq.WithUser().WithTask().WithLanguage()
 		}).
 		Where(ent_contest.ID(int(*req.ContestId))).
 		Only(ctx)
