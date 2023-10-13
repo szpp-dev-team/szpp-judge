@@ -38,7 +38,7 @@ func (i *Interactor) PostSubmit(ctx context.Context, req *backendv1.SubmitReques
 	langID, err := i.entClient.Language.Query().Where(ent_language.SlugEQ(req.LangId)).OnlyID(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, errors.New("the task was not found"))
+			return nil, connect.NewError(connect.CodeNotFound, errors.New("the language was not found"))
 		}
 		i.logger.Error("failed to get the language", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
