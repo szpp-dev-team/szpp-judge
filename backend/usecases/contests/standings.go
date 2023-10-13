@@ -106,7 +106,8 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 		} else if result[i].latestUntilAc != nil && result[j].latestUntilAc != nil && *result[i].latestUntilAc < *result[j].latestUntilAc {
 			return true
 		}
-		return false
+
+		return result[i].userName < result[j].userName
 	})
 
 	// allocate rank
