@@ -52,7 +52,8 @@ func (i *Interactor) PostSubmit(ctx context.Context, req *backendv1.SubmitReques
 			SetCreatedAt(now).
 			SetTask(task).
 			SetLanguageID(langID).
-			SetUserID(claims.UserID)
+			SetUserID(claims.UserID).
+			SetStatus(judgev1.JudgeStatus_WJ.String())
 		if req.ContestId != nil {
 			q.SetContestID(int(*req.ContestId))
 		}
