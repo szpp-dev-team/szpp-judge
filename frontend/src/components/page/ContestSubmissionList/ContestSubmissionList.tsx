@@ -41,15 +41,18 @@ const ReactiveStatusCell = ({ submissionId }: { submissionId: number }) => {
   }
 
   // HACK: UNSPECIFIED も WJ 扱いにする
-  const judgeStatus = data.judgeProgress?.status == null || data.judgeProgress.status === PbJudgeStatus.JUDGE_STATUS_UNSPECIFIED ? "WJ" : PbJudgeStatus[data.judgeProgress.status] as JudgeStatus;
+  const judgeStatus =
+    data.judgeProgress?.status == null || data.judgeProgress.status === PbJudgeStatus.JUDGE_STATUS_UNSPECIFIED
+      ? "WJ"
+      : PbJudgeStatus[data.judgeProgress.status] as JudgeStatus;
 
   let progress: JudgeTestcaseProgress | undefined = undefined;
 
-  if (data.judgeProgress?.completedTestcases !== undefined && data.judgeProgress?.totalTestcases !== undefined){
+  if (data.judgeProgress?.completedTestcases !== undefined && data.judgeProgress?.totalTestcases !== undefined) {
     progress = {
       done: data.judgeProgress.completedTestcases,
       total: data.judgeProgress.totalTestcases,
-    }
+    };
   }
 
   return <JudgeStatusBadge status={judgeStatus} progress={progress} />;
