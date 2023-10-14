@@ -2,7 +2,6 @@ package contests
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sort"
 	"strconv"
@@ -88,9 +87,6 @@ func (i *Interactor) GetStandings(ctx context.Context, req *backendv1.GetStandin
 		standings_record = append(standings_record, toStandingsRecord(row))
 	}
 
-	log.Println("==================StandingsRecored============================")
-	log.Println(standings_record)
-
 	return &backendv1.GetStandingsResponse{
 		StandingsList: standings_record,
 	}, nil
@@ -103,40 +99,21 @@ func GetStandingsRecordSlice(userInfo map[int]StandingsRecord) []StandingsRecord
 		result = append(result, value)
 	}
 
-	log.Println("==================Check Type of result============================")
-	fmt.Printf("%T\n", result)
-
-	log.Println("==================Before result============================")
-	log.Println(result)
-
 	// sort by totalScore and latestUntilAc
 	sort.Slice(result, func(i, j int) bool {
 		if result[i].totalScore != result[j].totalScore {
-			log.Println("==================sort By Score============================")
-			log.Println("i:" + strconv.Itoa(i) + " " + strconv.Itoa(result[i].totalScore) + " j:" + strconv.Itoa(j) + " " + strconv.Itoa(result[j].totalScore))
 			return result[i].totalScore > result[j].totalScore
 		} else if result[i].latestUntilAc != nil && result[j].latestUntilAc != nil && *result[i].latestUntilAc != *result[j].latestUntilAc {
-			log.Println("==================sort By UntilAc============================")
-			log.Println("i:" + strconv.Itoa(i) + " " + result[i].latestUntilAc.String() + " j:" + strconv.Itoa(j) + " " + result[j].latestUntilAc.String())
 			return *result[i].latestUntilAc < *result[j].latestUntilAc
 		}
 
-		log.Println("==================Name============================")
-		log.Println("i:" + strconv.Itoa(i) + " j:" + strconv.Itoa(j))
-
 		return result[i].userName < result[j].userName
 	})
-
-	log.Println("==================After result============================")
-	log.Println(result)
 
 	// allocate rank
 	for index := range result {
 		result[index].rank = index + 1
 	}
-
-	log.Println("==================Allocated rank============================")
-	log.Println(result)
 
 	return result
 }
