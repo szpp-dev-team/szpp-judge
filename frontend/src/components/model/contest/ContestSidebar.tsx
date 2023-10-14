@@ -54,7 +54,7 @@ export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) =
         left={0}
         h={`calc(100vh - ${top})`}
         maxH={`calc(100vh - ${top})`}
-        minW={fixedShow ? SIDEBAR_MAIN_PANE_WIDTH : 0}
+        w={fixedShow ? SIDEBAR_MAIN_PANE_WIDTH : 0}
       >
         <SidebarMainPane
           zIndex={47}
