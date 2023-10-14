@@ -37,44 +37,50 @@ func Test_GetStandings(t *testing.T) {
 	// 	ContestSlug: "test001",
 	// })
 
-	var emptyInt *int
-	var emptyTime *time.Duration
-	emptyInt = nil
-	emptyTime = nil
+	// var emptyInt *int
+	// var emptyTime *time.Duration
+	// emptyInt = nil
+	// emptyTime = nil
 
-	userInfo := make(map[int]StandingsRecord)
+	// userInfo := make(map[int]StandingsRecord)
 
-	navle_task1 := createTaskDetail(4, 0, 0, 0, emptyInt, emptyTime)
-	navle_task2 := createTaskDetail(5, 0, 0, 0, emptyInt, emptyTime)
-	var navle_list []TaskDetail = []TaskDetail{navle_task1, navle_task2}
-	userInfo[0] = createStandingsRecord("navle", 0, 0, emptyTime, navle_list)
+	// navle_task1 := createTaskDetail(4, 0, 0, 0, emptyInt, emptyTime)
+	// navle_task2 := createTaskDetail(5, 0, 0, 0, emptyInt, emptyTime)
+	// var navle_list []TaskDetail = []TaskDetail{navle_task1, navle_task2}
+	// userInfo[0] = createStandingsRecord("navle", 0, 0, emptyTime, navle_list)
 
-	admin_time, _ := time.ParseDuration("68593026s")
-	admin_task1 := createTaskDetail(4, 100, 0, 0, emptyInt, &admin_time)
-	admin_task2 := createTaskDetail(5, 200, 0, 0, emptyInt, &admin_time)
-	var admin_list []TaskDetail = []TaskDetail{admin_task1, admin_task2}
-	userInfo[1] = createStandingsRecord("admin", 300, 0, &admin_time, admin_list)
+	// admin_time, _ := time.ParseDuration("68593026s")
+	// admin_task1 := createTaskDetail(4, 100, 0, 0, emptyInt, &admin_time)
+	// admin_task2 := createTaskDetail(5, 200, 0, 0, emptyInt, &admin_time)
+	// var admin_list []TaskDetail = []TaskDetail{admin_task1, admin_task2}
+	// userInfo[1] = createStandingsRecord("admin", 300, 0, &admin_time, admin_list)
 
-	aya_time, _ := time.ParseDuration("68603810s")
-	aya_task1 := createTaskDetail(4, 100, 0, 0, emptyInt, &aya_time)
-	aya_task2 := createTaskDetail(5, 200, 0, 0, emptyInt, &aya_time)
-	var aya_list []TaskDetail = []TaskDetail{aya_task1, aya_task2}
-	userInfo[2] = createStandingsRecord("aya", 300, 0, &aya_time, aya_list)
+	// aya_time, _ := time.ParseDuration("68603810s")
+	// aya_task1 := createTaskDetail(4, 100, 0, 0, emptyInt, &aya_time)
+	// aya_task2 := createTaskDetail(5, 200, 0, 0, emptyInt, &aya_time)
+	// var aya_list []TaskDetail = []TaskDetail{aya_task1, aya_task2}
+	// userInfo[2] = createStandingsRecord("aya", 300, 0, &aya_time, aya_list)
 
-	piddy_time, _ := time.ParseDuration("68593103s")
-	piddy_task1 := createTaskDetail(4, 100, 0, 0, emptyInt, &piddy_time)
-	piddy_task2 := createTaskDetail(5, 200, 0, 0, emptyInt, &piddy_time)
-	var piddy_list []TaskDetail = []TaskDetail{piddy_task1, piddy_task2}
-	userInfo[3] = createStandingsRecord("piddy", 300, 0, &piddy_time, piddy_list)
+	// piddy_time, _ := time.ParseDuration("68593103s")
+	// piddy_task1 := createTaskDetail(4, 100, 0, 0, emptyInt, &piddy_time)
+	// piddy_task2 := createTaskDetail(5, 200, 0, 0, emptyInt, &piddy_time)
+	// var piddy_list []TaskDetail = []TaskDetail{piddy_task1, piddy_task2}
+	// userInfo[3] = createStandingsRecord("piddy", 300, 0, &piddy_time, piddy_list)
 
-	test_time, _ := time.ParseDuration("68594201s")
-	test_task1 := createTaskDetail(4, 100, 0, 0, emptyInt, &test_time)
-	test_task2 := createTaskDetail(5, 200, 0, 0, emptyInt, &test_time)
-	var test_list []TaskDetail = []TaskDetail{test_task1, test_task2}
-	userInfo[4] = createStandingsRecord("test", 300, 0, &test_time, test_list)
+	// test_time, _ := time.ParseDuration("68594201s")
+	// test_task1 := createTaskDetail(4, 100, 0, 0, emptyInt, &test_time)
+	// test_task2 := createTaskDetail(5, 200, 0, 0, emptyInt, &test_time)
+	// var test_list []TaskDetail = []TaskDetail{test_task1, test_task2}
+	// userInfo[4] = createStandingsRecord("test", 300, 0, &test_time, test_list)
 
-	res := GetStandingsRecordSlice(userInfo)
+	// res := GetStandingsRecordSlice(userInfo)
 
 	// require.NoError(t, err)
-	t.Log(res)
+
+	test_time, _ := time.ParseDuration("68594201s")
+	t.Log(test_time)
+
+	test_time += time.Duration(300 * 1 * time.Second)
+
+	t.Log(test_time)
 }
