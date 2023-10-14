@@ -121,6 +121,11 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// StatementValidator is a validator for the "statement" field. It is called by the builders before save.
+	StatementValidator func(string) error
+)
+
 // OrderOption defines the ordering options for the Task queries.
 type OrderOption func(*sql.Selector)
 

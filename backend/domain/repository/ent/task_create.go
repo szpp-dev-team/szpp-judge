@@ -210,6 +210,11 @@ func (tc *TaskCreate) check() error {
 	if _, ok := tc.mutation.Statement(); !ok {
 		return &ValidationError{Name: "statement", err: errors.New(`ent: missing required field "Task.statement"`)}
 	}
+	if v, ok := tc.mutation.Statement(); ok {
+		if err := task.StatementValidator(v); err != nil {
+			return &ValidationError{Name: "statement", err: fmt.Errorf(`ent: validator failed for field "Task.statement": %w`, err)}
+		}
+	}
 	if _, ok := tc.mutation.Difficulty(); !ok {
 		return &ValidationError{Name: "difficulty", err: errors.New(`ent: missing required field "Task.difficulty"`)}
 	}
