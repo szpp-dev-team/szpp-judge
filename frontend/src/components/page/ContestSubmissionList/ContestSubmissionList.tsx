@@ -1,7 +1,7 @@
 import { LangID, langMetasBrief } from "@/src/gen/langs";
 import { JudgeStatus as PbJudgeStatus } from "@/src/gen/proto/judge/v1/resources_pb";
 import { useAccessTokenClaimValue } from "@/src/globalStates/credential";
-import { JudgeStatus } from "@/src/model/judge";
+import { JudgeStatus, JudgeTestcaseProgress } from "@/src/model/judge";
 import { useGetContest, useRouterContestSlug } from "@/src/usecases/contest";
 import { useGetJudgeProgress, useListSubmissions } from "@/src/usecases/judge";
 import { fmtDatetime } from "@/src/util/time";
@@ -40,10 +40,19 @@ const ReactiveStatusCell = ({ submissionId }: { submissionId: number }) => {
     return <>エラー</>;
   }
 
-  const judgeStatus = typeof data.judgeProgress?.status === "number"
-    ? PbJudgeStatus[data.judgeProgress.status] as JudgeStatus
-    : "WJ";
-  return <JudgeStatusBadge status={judgeStatus} />;
+  // HACK: UNSPECIFIED も WJ 扱いにする
+  const judgeStatus = data.judgeProgress?.status == null || data.judgeProgress.status === PbJudgeStatus.JUDGE_STATUS_UNSPECIFIED ? "WJ" : PbJudgeStatus[data.judgeProgress.status] as JudgeStatus;
+
+  let progress: JudgeTestcaseProgress | undefined = undefined;
+
+  if (data.judgeProgress?.completedTestcases !== undefined && data.judgeProgress?.totalTestcases !== undefined){
+    progress = {
+      done: data.judgeProgress.completedTestcases,
+      total: data.judgeProgress.totalTestcases,
+    }
+  }
+
+  return <JudgeStatusBadge status={judgeStatus} progress={progress} />;
 };
 
 type SubmissionTableProps = {
