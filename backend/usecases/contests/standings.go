@@ -161,9 +161,13 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			updateUserInfo.latestUntilAc = &untilAc
 			*updateUserInfo.latestUntilAc += time.Duration(updateUserInfo.totalPenaltyCount * contest.PenaltySeconds)
 		} else {
+			log.Println("============================ WA ==================================")
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
 		}
+
 		userInfo[submission.Edges.User.ID] = updateUserInfo
+
+		log.Println(userInfo)
 	}
 
 	return userInfo, nil
