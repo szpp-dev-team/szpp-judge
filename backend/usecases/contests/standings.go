@@ -139,13 +139,14 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			return nil, err
 		}
 
-		if !isHigherScore(userInfo, submission) {
-			continue
-		}
-
 		index := getTaskDetailIndex(userInfo, submission.Edges.User.ID, submission.Edges.Task.ID)
 		updateUserInfo := userInfo[submission.Edges.User.ID]
 		if *submission.Status == STATUS_AC {
+
+			if !isHigherScore(userInfo, submission) {
+				continue
+			}
+
 			untilAc := submission.SubmittedAt.Sub(contest.StartAt)
 			updateUserInfo.taskDetailList[index].acSubmitId = &submission.ID
 			updateUserInfo.taskDetailList[index].untilAc = &untilAc
