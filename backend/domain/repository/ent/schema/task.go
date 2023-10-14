@@ -14,7 +14,7 @@ func (Task) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id"),
 		field.String("title"),
-		field.String("statement"),
+		field.String("statement").MaxLen(2000),
 		field.String("difficulty"),
 		field.Uint("exec_time_limit"),   // ms
 		field.Uint("exec_memory_limit"), // MiB

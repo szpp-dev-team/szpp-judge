@@ -2,8 +2,19 @@
 
 package ent
 
+import (
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/schema"
+	"github.com/szpp-dev-team/szpp-judge/backend/domain/repository/ent/task"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	taskFields := schema.Task{}.Fields()
+	_ = taskFields
+	// taskDescStatement is the schema descriptor for statement field.
+	taskDescStatement := taskFields[2].Descriptor()
+	// task.StatementValidator is a validator for the "statement" field. It is called by the builders before save.
+	task.StatementValidator = taskDescStatement.Validators[0].(func(string) error)
 }

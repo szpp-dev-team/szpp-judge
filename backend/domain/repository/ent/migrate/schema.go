@@ -181,7 +181,7 @@ var (
 	TasksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "title", Type: field.TypeString},
-		{Name: "statement", Type: field.TypeString},
+		{Name: "statement", Type: field.TypeString, Size: 2000},
 		{Name: "difficulty", Type: field.TypeString},
 		{Name: "exec_time_limit", Type: field.TypeUint},
 		{Name: "exec_memory_limit", Type: field.TypeUint},

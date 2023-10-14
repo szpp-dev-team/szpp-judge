@@ -335,6 +335,11 @@ func (tu *TaskUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tu *TaskUpdate) check() error {
+	if v, ok := tu.mutation.Statement(); ok {
+		if err := task.StatementValidator(v); err != nil {
+			return &ValidationError{Name: "statement", err: fmt.Errorf(`ent: validator failed for field "Task.statement": %w`, err)}
+		}
+	}
 	if _, ok := tu.mutation.UserID(); tu.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Task.user"`)
 	}
@@ -971,6 +976,11 @@ func (tuo *TaskUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tuo *TaskUpdateOne) check() error {
+	if v, ok := tuo.mutation.Statement(); ok {
+		if err := task.StatementValidator(v); err != nil {
+			return &ValidationError{Name: "statement", err: fmt.Errorf(`ent: validator failed for field "Task.statement": %w`, err)}
+		}
+	}
 	if _, ok := tuo.mutation.UserID(); tuo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Task.user"`)
 	}
