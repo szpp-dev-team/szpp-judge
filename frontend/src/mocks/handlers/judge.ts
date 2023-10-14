@@ -50,6 +50,24 @@ const dummySubmissionDetails: PlainMessage<SubmissionDetail>[] = [
     ],
     submittedAt: Timestamp.fromDate(new Date("2023-09-25")),
   },
+  {
+    id: 2,
+    userId: 1,
+    username: "user",
+    contestId: 103,
+    taskId: 1,
+    taskTitle: "すずっぴー君のおつかい",
+    score: 0,
+    langId: "cpp/20/gcc" satisfies LangID,
+    sourceCode: sourcecodeAc,
+    status: JudgeStatus.WJ,
+    execTimeMs: 1,
+    execMemoryKib: 3000,
+    testcaseResults: [
+      { testcaseName: "sample_1", judgeStatus: JudgeStatus.AC, execTimeMs: 1, execMemoryKib: 3000 },
+    ],
+    submittedAt: Timestamp.fromDate(new Date("2023-09-25")),
+  },
 ];
 
 const dummySubmissionSummaries: PlainMessage<SubmissionSummary>[] = dummySubmissionDetails.map((submissions) => {
