@@ -80,7 +80,9 @@ func Test_GetStandings(t *testing.T) {
 	test_time, _ := time.ParseDuration("68594201s")
 	t.Log(test_time)
 
-	test_time += time.Duration(300 * 1 * time.Second)
+	var sec = 300
+	var pena = 1
+	test_time += time.Duration(sec * pena * int(time.Second))
 
 	t.Log(test_time)
 }

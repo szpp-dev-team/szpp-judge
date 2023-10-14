@@ -159,7 +159,7 @@ func separateSubmit(i *Interactor, ctx context.Context, submissions []*ent.Submi
 			updateUserInfo.taskDetailList[index].nextPenaltyCount = 0
 
 			// Until AC
-			var latestUntilAc = untilAc + time.Duration(updateUserInfo.totalPenaltyCount*contest.PenaltySeconds)
+			var latestUntilAc = untilAc + time.Duration(updateUserInfo.totalPenaltyCount*contest.PenaltySeconds*int(time.Second))
 			updateUserInfo.latestUntilAc = &latestUntilAc
 		} else {
 			updateUserInfo.taskDetailList[index].nextPenaltyCount++
