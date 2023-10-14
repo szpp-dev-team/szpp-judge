@@ -4,7 +4,7 @@ import { Duration, fmtDatetime } from "@/src/util/time";
 import { Box, FormControl, FormLabel, Icon, Link, Switch, Text } from "@chakra-ui/react";
 import type { BoxProps, LinkProps } from "@chakra-ui/react";
 import NextLink from "next/link";
-import React, { type ReactNode, useCallback, useMemo, useState } from "react";
+import React, { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import { IoBarChart, IoEarthSharp, IoHome, IoList, IoPerson, IoSchool } from "react-icons/io5";
 import { SIDEBAR_TOGGLE_KNOB_H, SIDEBAR_TOGGLE_KNOB_TOP, SidebarToggleKnob } from "../../ui/SidebarToggleKnob";
@@ -18,7 +18,7 @@ export type ContestSidebarProps = {
   /** コンテスト終了日時 */
   endAt?: Date;
   /** 現在時刻 */
-  now: Date;
+  now?: Date;
   /** コンテストの slug */
   slug: string;
   /** コンテストの問題と得点状況 */
@@ -54,6 +54,7 @@ export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) =
         left={0}
         h={`calc(100vh - ${top})`}
         maxH={`calc(100vh - ${top})`}
+        minW={fixedShow ? SIDEBAR_MAIN_PANE_WIDTH : 0}
       >
         <SidebarMainPane
           zIndex={47}
@@ -83,7 +84,7 @@ export const ContestSidebar = ({ top = "0px", ...props }: ContestSidebarProps) =
 };
 
 const SidebarHoverShowArea = (props: BoxProps) => {
-  const w = "60px";
+  const w = "50px";
   return (
     <Box
       position="absolute"
@@ -111,11 +112,13 @@ const SidebarMainPane = ({
   onFixSwitchChange,
   startAt,
   endAt,
-  now,
+  now: propNow,
   slug,
   tasks,
   ...props
 }: SidebarMainPaneProps) => {
+  const now = propNow ?? new Date();
+
   const contestRootPath = `/contests/${slug}`;
   const contestStarted = startAt ? now >= startAt : false;
   const contestFinished = endAt ? now >= endAt : false;
@@ -208,7 +211,7 @@ const SidebarMainPane = ({
       >
         {(startAt == null || endAt == null) ? <></> : (
           <>
-            <SidebarRemainingTime startAt={startAt} endAt={endAt} now={now} />
+            <SidebarRemainingTime startAt={startAt} endAt={endAt} />
             <SidebarDatetime label="開始" datetime={startAt} />
             <SidebarDatetime label="終了" datetime={endAt} />
           </>
@@ -262,11 +265,28 @@ const SidebarLinkItem = ({ icon, leftElem, text, href, ...props }: {
   );
 };
 
-const SidebarRemainingTime = ({ startAt, endAt, now }: {
+const SidebarRemainingTime = ({ startAt, endAt, now: propNow }: {
   startAt: Date;
   endAt: Date;
-  now: Date;
+  now?: Date;
 }): JSX.Element | undefined => {
+  const [realtimeNow, ssetRealtimeNow] = useState(new Date());
+
+  const intervalRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (intervalRef.current == null) {
+      intervalRef.current = window.setInterval(() => ssetRealtimeNow(new Date()), 1000);
+    }
+
+    return () => {
+      if (intervalRef.current != null) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  const now = propNow ?? realtimeNow;
+
   const render = useCallback((label: string, remainTime: string) => (
     <Box as="li">
       <Text as="span" fontSize="2xs">{label}</Text>

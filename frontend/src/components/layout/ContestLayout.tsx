@@ -40,7 +40,6 @@ export const ContestLayout = ({ children }: ContestLayoutProps) => {
           top={GLOBAL_HEADER_H}
           startAt={contest?.startAt?.toDate()}
           endAt={contest?.endAt?.toDate()}
-          now={new Date()}
           slug={contestSlug}
           tasks={unifiedTasks}
         />
