@@ -60,9 +60,10 @@ func name(langName, langVer, implName, implVer string) string {
 }
 
 func genCcCompileCmd(compiler, std, file string) []string {
-	return []string{
+	cmd := []string{
 		compiler,
 		std,
+		file,
 		"-I/opt/include",
 		"-lm",
 		"-Wall",
@@ -71,8 +72,16 @@ func genCcCompileCmd(compiler, std, file string) []string {
 		"-O2",
 		"-march=native",
 		"-mtune=native",
-		file,
 	}
+	isCpp := strings.Contains(std, "++")
+	if isCpp {
+		cmd = append(cmd,
+			"-fconstexpr-depth=2147483647",
+			"-fconstexpr-loop-limit=2147483647",
+			"-fconstexpr-ops-limit=2147483647",
+		)
+	}
+	return cmd
 }
 
 var LangMetas = []Meta{
@@ -82,7 +91,7 @@ var LangMetas = []Meta{
 		Active:      true,
 		DockerImage: gccDockerImage,
 		SourceFile:  "main.c",
-		CompileCmd:  genCcCompileCmd("gcc", "-std=c11", "main.c"),
+		CompileCmd:  genCcCompileCmd("gcc", "-std=gnu11", "main.c"),
 		ExecCmd:     []string{"./a.out"},
 	},
 	{
@@ -91,7 +100,7 @@ var LangMetas = []Meta{
 		Active:      true,
 		DockerImage: gccDockerImage,
 		SourceFile:  "main.cpp",
-		CompileCmd:  genCcCompileCmd("g++", "-std=c++20", "main.cpp"),
+		CompileCmd:  genCcCompileCmd("g++", "-std=gnu++20", "main.cpp"),
 		ExecCmd:     []string{"./a.out"},
 	},
 	{
