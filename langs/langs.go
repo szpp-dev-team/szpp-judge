@@ -60,9 +60,10 @@ func name(langName, langVer, implName, implVer string) string {
 }
 
 func genCcCompileCmd(compiler, std, file string) []string {
-	return []string{
+	cmd := []string{
 		compiler,
 		std,
+		file,
 		"-I/opt/include",
 		"-lm",
 		"-Wall",
@@ -71,8 +72,16 @@ func genCcCompileCmd(compiler, std, file string) []string {
 		"-O2",
 		"-march=native",
 		"-mtune=native",
-		file,
 	}
+	isCpp := strings.Contains(std, "++")
+	if isCpp {
+		cmd = append(cmd,
+			"-fconstexpr-depth=2147483647",
+			"-fconstexpr-loop-limit=2147483647",
+			"-fconstexpr-ops-limit=2147483647",
+		)
+	}
+	return cmd
 }
 
 var LangMetas = []Meta{
