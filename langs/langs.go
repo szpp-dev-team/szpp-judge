@@ -91,7 +91,7 @@ var LangMetas = []Meta{
 		Active:      true,
 		DockerImage: gccDockerImage,
 		SourceFile:  "main.c",
-		CompileCmd:  genCcCompileCmd("gcc", "-std=c11", "main.c"),
+		CompileCmd:  genCcCompileCmd("gcc", "-std=gnu11", "main.c"),
 		ExecCmd:     []string{"./a.out"},
 	},
 	{
@@ -100,7 +100,7 @@ var LangMetas = []Meta{
 		Active:      true,
 		DockerImage: gccDockerImage,
 		SourceFile:  "main.cpp",
-		CompileCmd:  genCcCompileCmd("g++", "-std=c++20", "main.cpp"),
+		CompileCmd:  genCcCompileCmd("g++", "-std=gnu++20", "main.cpp"),
 		ExecCmd:     []string{"./a.out"},
 	},
 	{
