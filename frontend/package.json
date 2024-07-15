@@ -39,16 +39,16 @@
     "framer-motion": "10.15.1",
     "jotai": "2.4.2",
     "jszip": "^3.10.1",
-    "katex": "^0.16.8",
+    "katex": "^0.16.10",
     "marked": "^9.0.3",
-    "next": "13.4.13",
+    "next": "14.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.4",
     "react-icons": "^4.11.0",
     "react-timer-hook": "^3.0.7",
     "typescript": "5.1.6",
-    "zod": "3.22"
+    "zod": "3.23"
   },
   "devDependencies": {
     "@chakra-ui/storybook-addon": "^5.0.1",
